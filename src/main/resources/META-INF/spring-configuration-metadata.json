@@ -48,26 +48,6 @@
       "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
     },
     {
-      "name": "iqscaffold.messaging.rabbitmq.credentials",
-      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Credentials",
-      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.exchanges",
-      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Exchanges",
-      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.queues",
-      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Queues",
-      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys",
-      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$RoutingKeys",
-      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
-    },
-    {
       "name": "iqscaffold.notification",
       "type": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties",
       "sourceType": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties"
@@ -267,103 +247,10 @@
       "description": "Connection pool size (used by DatabaseConfigurationProperties)."
     },
     {
-      "name": "iqscaffold.messaging.rabbitmq.host",
-      "type": "java.lang.String",
-      "description": "RabbitMQ broker hostname for messaging configuration."
-    },
-    {
       "name": "iqscaffold.messaging.rabbitmq.enabled",
       "type": "java.lang.Boolean",
       "description": "Enables RabbitMQ messaging. When false, all AMQP beans are skipped.",
       "defaultValue": false
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.credentials.username",
-      "type": "java.lang.String",
-      "description": "RabbitMQ credentials username."
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.credentials.password",
-      "type": "java.lang.String",
-      "description": "RabbitMQ credentials password."
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.exchanges.events",
-      "type": "java.lang.String",
-      "description": "Name of the main topic exchange for domain events.",
-      "defaultValue": "iqscaffold.events"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.exchanges.dlx",
-      "type": "java.lang.String",
-      "description": "Name of the dead-letter exchange.",
-      "defaultValue": "iqscaffold.dlx"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.queues.user-events",
-      "type": "java.lang.String",
-      "description": "Queue name for user domain events.",
-      "defaultValue": "iqscaffold.user.events"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.queues.notifications",
-      "type": "java.lang.String",
-      "description": "Queue name for notification events.",
-      "defaultValue": "iqscaffold.notifications"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.queues.tenant-provisioning",
-      "type": "java.lang.String",
-      "description": "Queue name for tenant provisioning events.",
-      "defaultValue": "iqscaffold.tenant.provisioning"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.queues.dlq",
-      "type": "java.lang.String",
-      "description": "Dead-letter queue name.",
-      "defaultValue": "iqscaffold.dlq"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-created",
-      "type": "java.lang.String",
-      "description": "Routing key for tenant.created events.",
-      "defaultValue": "tenant.created"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-updated",
-      "type": "java.lang.String",
-      "description": "Routing key for tenant.updated events.",
-      "defaultValue": "tenant.updated"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-deleted",
-      "type": "java.lang.String",
-      "description": "Routing key for tenant.deleted events.",
-      "defaultValue": "tenant.deleted"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-created",
-      "type": "java.lang.String",
-      "description": "Routing key for user.created events.",
-      "defaultValue": "user.created"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-updated",
-      "type": "java.lang.String",
-      "description": "Routing key for user.updated events.",
-      "defaultValue": "user.updated"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-deleted",
-      "type": "java.lang.String",
-      "description": "Routing key for user.deleted events.",
-      "defaultValue": "user.deleted"
-    },
-    {
-      "name": "iqscaffold.messaging.rabbitmq.routing-keys.notification-email",
-      "type": "java.lang.String",
-      "description": "Routing key for notification.email events.",
-      "defaultValue": "notification.email"
     },
     {
       "name": "iqscaffold.notification.mail.from",
