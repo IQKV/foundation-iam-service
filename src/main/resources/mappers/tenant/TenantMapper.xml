@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqscaffold.iam.tenant.TenantMapper">
+
+    <resultMap id="tenantResultMap" type="com.iqscaffold.iam.tenant.Tenant">
+        <id     property="id"         column="id"/>
+        <result property="tenantKey"  column="tenant_key"/>
+        <result property="name"       column="name"/>
+        <result property="status"     column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt"  column="created_at"/>
+        <result property="updatedAt"  column="updated_at"/>
+        <result property="createdBy"  column="created_by"/>
+        <result property="updatedBy"  column="updated_by"/>
+    </resultMap>
+
+    <insert id="insertIfAbsent" parameterType="com.iqscaffold.iam.tenant.Tenant">
+        INSERT INTO public.tenants
+            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by)
+        VALUES
+            (#{id}, #{tenantKey}, #{name},
+             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        ON CONFLICT (name) DO NOTHING
+    </insert>
+
+    <select id="findByTenantKey" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenants
+        WHERE tenant_key = #{tenantKey}
+    </select>
+
+    <select id="findByStatus" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenants
+        WHERE status = #{status}
+    </select>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM public.tenants
+        WHERE name = #{name}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE public.tenants
+        SET status     = #{status},
+            updated_at = NOW()
+        WHERE tenant_key = #{tenantKey}
+    </update>
+
+    <select id="findStuckProvisioning" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenants
+        WHERE status = 'PROVISIONING'
+          AND created_at &lt; #{olderThan}
+    </select>
+
+</mapper>

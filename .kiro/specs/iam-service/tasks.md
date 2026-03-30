@@ -104,12 +104,12 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - _Requirements: 20.14_
 
 - [ ] 4. MyBatis mapper interfaces and XML mapper files
-  - [ ] 4.1 Implement `TenantMapper` interface and `src/main/resources/mappers/tenant/TenantMapper.xml`
+  - [x] 4.1 Implement `TenantMapper` interface and `src/main/resources/mappers/tenant/TenantMapper.xml`
     - Interface: `insertIfAbsent(Tenant)`, `findByTenantKey(String): Optional<Tenant>`, `findByStatus(String): List<Tenant>`, `existsByName(String): boolean`, `updateStatus(@Param tenantKey, @Param status)`, `findStuckProvisioning(@Param olderThan Instant): List<Tenant>`
     - XML: `resultMap` with all column mappings; `INSERT ... ON CONFLICT (name) DO NOTHING` for `insertIfAbsent`; `findStuckProvisioning` selects `WHERE status = 'PROVISIONING' AND created_at < #{olderThan}`; `SELECT`, `UPDATE` statements targeting `public.tenants`
     - _Requirements: 1.1, 1.4, 1.17, 5.3_
 
-  - [ ] 4.2 Implement `UserMapper` interface and `src/main/resources/mappers/user/UserMapper.xml`
+  - [-] 4.2 Implement `UserMapper` interface and `src/main/resources/mappers/user/UserMapper.xml`
     - Interface: `upsertByEmail(User)`, `findById(UUID): Optional<User>`, `findByEmail(String): Optional<User>`, `existsByEmail(String): boolean`, `update(User)`, `updateLastGlobalSignoutAt(@Param userId, @Param lastGlobalSignoutAt): void`, `findLastGlobalSignoutAt(@Param userId): Optional<Instant>`, `setEmailVerified(@Param userId UUID): void`
     - XML: `resultMap` mapping `email_verified` column to `emailVerified` field; `upsertByEmail` includes `email_verified` column (value `#{emailVerified}`, defaults to `false`); `setEmailVerified` issues `UPDATE public.users SET email_verified = true WHERE id = #{userId}`; all other SQL targeting `public.users`
     - _Requirements: 8.1, 10.3_
