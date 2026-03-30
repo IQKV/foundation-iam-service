@@ -286,8 +286,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `MessageSource` bean (`@Bean messageSource()`): `ReloadableResourceBundleMessageSource`, basename `classpath:messages`, encoding UTF-8, cache seconds 3600, `fallbackToSystemLocale=false`; also configure `spring.messages.basename=messages` in `application.yml` so Spring's auto-config aligns
     - _Requirements: 18.1, 18.5, 18.8_
 
-- [ ] 9. Security configuration and JWT infrastructure
-  - [ ] 9.1 Implement `SecurityConfig`
+- [x] 9. Security configuration and JWT infrastructure
+  - [x] 9.1 Implement `SecurityConfig`
     - Stateless sessions, CSRF disabled
     - Public endpoints: `/actuator/**`, `/api-docs/**`, `/swagger-ui/**`, `/.well-known/**`, `/api/v1/iam/auth/signup`, `/api/v1/iam/users/tenants`, `/api/v1/iam/auth/signin`, `/api/v1/iam/auth/refresh`, `/api/v1/iam/auth/validate`, `/api/v1/iam/users/email/verify`, `/api/v1/iam/users/email/resend-verification`, `/api/v1/iam/users/password/forgot`, `/api/v1/iam/users/password/reset`
     - `GET /api/v1/iam/tenants/**` and `PATCH /api/v1/iam/tenants/**` require `TENANT_OWNER` authority (configured in `authorizeHttpRequests`, not `@PreAuthorize`, so it applies globally)
@@ -297,13 +297,13 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Register `JwtAuthenticationFilter` before `BearerTokenAuthenticationFilter`
     - _Requirements: 10.1, 20.15, 20.16_
 
-  - [ ] 9.2 Implement `JwtTokenGenerator`
+  - [x] 9.2 Implement `JwtTokenGenerator`
     - Constructor loads RSA `PrivateKey` from `AuthConfigurationProperties.jwt().privateKeyPath()`
     - `generateAccessToken(User user, String tenantKey, List<String> authorities)`: RS256, expiry from `authProps.jwt().expiry()` (default PT15M); claims: sub, iss, iat, exp, jti (UUID), type=access, userId, username, email, firstName, lastName, tenant_id, email_verified, authorities — use `JwtClaimNames` constants exclusively
     - `generateRefreshToken(User user, String tenantKey)`: RS256, expiry from `authProps.jwt().refreshExpiry()` (default P7D); claims: sub, iss, iat, exp, jti (UUID), type=refresh, username, tenant_id
     - _Requirements: 6.1-6.4, 10.7-10.10, 20.14, 20.15_
 
-  - [ ] 9.3 Implement `CorrelationIdFilter`
+  - [x] 9.3 Implement `CorrelationIdFilter`
     - `@Order(Ordered.HIGHEST_PRECEDENCE)`, extends `OncePerRequestFilter`
     - Read `X-Correlation-ID` header; generate UUID if absent; put in MDC as `correlationId`; set on response; remove in `finally`
     - _Requirements: 23.4_
