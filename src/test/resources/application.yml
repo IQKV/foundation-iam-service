@@ -1,0 +1,26 @@
+# ===================================================================
+# Spring Boot configuration.
+#
+# This configuration is used for unit/integration tests.
+# ===================================================================
+
+spring:
+  application:
+    name: servicename
+  modulith:
+    events:
+      externalization:
+        enabled: false
+      republish-outstanding-events-on-restart: true
+    republish-outstanding-events-on-restart: true
+
+git:
+  build_time: "@git.build.time@"
+  commit: "@git.commit.id.abbrev@"
+info:
+  app:
+    build_time: ${git.build_time}
+    description: "@project.description@"
+    git_commit: ${git.commit}
+    name: "@project.name@"
+    version: "@project.version@"

@@ -1,0 +1,5 @@
+${AnsiColor.BLUE} ===============================
+${AnsiColor.BLUE}  Servicename Backend API
+${AnsiColor.BLUE}  Running Spring Boot ${spring-boot.version}
+${AnsiColor.BLUE} ===============================
+${AnsiColor.DEFAULT}
