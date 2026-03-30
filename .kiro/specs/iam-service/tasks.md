@@ -66,14 +66,14 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `shouldNotFilter`: skips `/actuator/**`, `/api-docs/**`, `/swagger-ui/**`, `POST /api/v1/iam/auth/signup`, `POST /api/v1/iam/users/tenants`, `POST /api/v1/iam/users/email/verify`, `POST /api/v1/iam/users/email/resend-verification`, `POST /api/v1/iam/users/password/forgot`, and `POST /api/v1/iam/users/password/reset`
     - _Requirements: 3.1-3.6_
 
-- [ ] 3. Domain objects, enumerations, exceptions, and constants
-  - [ ] 3.1 Create enumerations
+- [x] 3. Domain objects, enumerations, exceptions, and constants
+  - [x] 3.1 Create enumerations
     - `TenantStatus`: `PROVISIONING`, `ACTIVE`, `SUSPENDED`, `DELETED`, `PROVISIONING_FAILED`
     - `AccountStatus`: `ACTIVE`
     - `MembershipStatus`: `ACTIVE`, `SUSPENDED`, `REMOVED`
     - _Requirements: 1.7, 4.2, 8.3_
 
-  - [ ] 3.2 Create plain Java domain objects (no JPA/Hibernate annotations)
+  - [x] 3.2 Create plain Java domain objects (no JPA/Hibernate annotations)
     - `Tenant`: id (UUID), tenantKey, name, status (TenantStatus), createdAt, updatedAt, createdBy, updatedBy
     - `User`: id (UUID), email, passwordHash, firstName, lastName, status (AccountStatus), emailVerified (boolean, default false), lastGlobalSignoutAt (Instant, nullable), createdAt, updatedAt, createdBy, updatedBy — no tenant_id field
     - `EmailVerificationToken`: id (UUID), userId (UUID), token (String, 64-char hex), expiresAt (Instant), resendCount (int, default 0), lastResendAt (Instant, nullable), createdAt (Instant)
@@ -84,7 +84,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Plain getters/setters only — no `@Entity`, `@Table`, `@Column`, `@GeneratedValue`, or any JPA annotations
     - _Requirements: 4.1, 4.2, 4.7_
 
-  - [ ] 3.3 Create custom exceptions in `shared/exception/`
+  - [x] 3.3 Create custom exceptions in `shared/exception/`
     - `UserNotFoundException`, `MembershipNotFoundException` (fields: userId, tenantKey), `EmailAlreadyRegisteredException`, `TenantSuspendedException`, `UserRegistrationException`, `UserManagementException`, `TenantContextMismatchException`
     - `TenantManagementException`: sealed class with permitted subtypes `TenantAlreadyExistsException`, `TenantNotFoundException`, `SchemaProvisioningException`, `InvalidTenantStateException`
     - `InvalidVerificationTokenException` (→ 400), `VerificationRateLimitException` (→ 429, carries `retryAfterSeconds: long`)
@@ -98,7 +98,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `PasswordResetRateLimitException` (→ 429, carries `retryAfterSeconds: long`) — thrown when the rate limit for password reset requests is exceeded
     - _Requirements: 4.4, 4.5_
 
-  - [ ] 3.4 Create `JwtClaimNames` and `UserServiceConstants`
+  - [x] 3.4 Create `JwtClaimNames` and `UserServiceConstants`
     - `JwtClaimNames`: constants for `SUB`, `ISS`, `IAT`, `EXP`, `JTI`, `TYPE`, `USER_ID`, `USERNAME`, `EMAIL`, `FIRST_NAME`, `LAST_NAME`, `TENANT_ID`, `AUTHORITIES`, `EMAIL_VERIFIED`; token type values `TYPE_ACCESS="access"` / `TYPE_REFRESH="refresh"`; issuer constant `ISSUER="iqscaffold-iam-service"`
     - `UserServiceConstants`: service-wide string constants
     - _Requirements: 20.14_
