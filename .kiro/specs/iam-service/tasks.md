@@ -195,8 +195,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `runMigrations(String schema, String changelogPath)`: private — get connection, `CREATE SCHEMA IF NOT EXISTS {schema}`, `SET search_path TO {schema}`, build `Liquibase`, call `update(new Contexts(), new LabelExpression())`
     - _Requirements: 2.6-2.8, 2.11_
 
-- [ ] 6. Account lockout
-  - [ ] 6.1 Implement `AccountLockoutManager`
+- [-] 6. Account lockout
+  - [x] 6.1 Implement `AccountLockoutManager`
     - `@Component`; constructor-inject `FailedLoginAttemptMapper`, `AuthConfigurationProperties`
     - `recordFailedAttempt(String email)`: build `FailedLoginAttempt` with `UUID.randomUUID()` and `Instant.now()`, call `mapper.insert(attempt)`
     - `isLocked(String email)`: call `mapper.countByEmailAndAttemptedAtAfter(email, Instant.now().minus(lockoutDuration))`, return `count >= threshold`
