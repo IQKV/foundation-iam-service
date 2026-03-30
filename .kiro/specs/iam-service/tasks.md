@@ -308,14 +308,14 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Read `X-Correlation-ID` header; generate UUID if absent; put in MDC as `correlationId`; set on response; remove in `finally`
     - _Requirements: 23.4_
 
-- [ ] 10. Tenant management feature
-  - [ ] 10.1 Implement `TenantDtos` and `TenantDtoMapper`
+- [x] 10. Tenant management feature
+  - [x] 10.1 Implement `TenantDtos` and `TenantDtoMapper`
     - `UpdateTenantStatusRequest`: status TenantStatus (`@NotNull`)
     - `TenantResponse`: tenantKey, name, status, createdAt
     - `TenantDtoMapper`: final class, static `toResponse(Tenant): TenantResponse`
     - _Requirements: 1.8, 5.7, 20.3-20.5_
 
-  - [ ] 10.2 Implement `TenantService` interface and `TenantServiceImpl`
+  - [x] 10.2 Implement `TenantService` interface and `TenantServiceImpl`
     - `@Service @Transactional`; `@Transactional(readOnly=true)` on read methods
     - `createTenant(String tenantName, UUID ownerUserId)`: check `tenantMapper.existsByName(tenantName)`, throw `TenantAlreadyExistsException` if duplicate; generate 8-char NanoID tenantKey (alphabet `a-z0-9`); set `id = UUID.randomUUID()`, `createdAt = LocalDateTime.now()`, `createdBy = ownerUserId.toString()`; call `tenantMapper.insertIfAbsent(tenant)`; call `messagingService.publishTenantCreated(tenantKey, tenantName)`; return tenant
     - `getTenantByKey(String tenantKey)`: call `tenantMapper.findByTenantKey(tenantKey)`, throw `TenantNotFoundException` if absent
@@ -323,7 +323,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `retryProvisioning(String tenantKey)`: load tenant via `tenantMapper.findByTenantKey(tenantKey)`, throw `TenantNotFoundException` if absent; assert `tenant.getStatus() == PROVISIONING_FAILED`, throw `InvalidTenantStateException("Tenant is not in PROVISIONING_FAILED state")` → 409 if not; call `tenantMapper.updateStatus(tenantKey, "PROVISIONING")`; call `messagingService.publishTenantCreated(tenantKey, tenant.getName())`; return updated tenant
     - _Requirements: 1.1-1.3, 1.7-1.10, 1.14-1.16, 5.1-5.7_
 
-  - [ ] 10.3 Implement `TenantProvisioningConsumer`
+  - [x] 10.3 Implement `TenantProvisioningConsumer`
     - `@RabbitListener(queues = RabbitMQConfig.TENANT_PROVISIONING_QUEUE)`
     - Extract tenantKey from `TenantEvent`
     - Call `tenantLiquibaseRunner.runMigrationsForTenant(tenantKey)`
@@ -331,7 +331,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - On any exception: call `tenantMapper.updateStatus(tenantKey, "PROVISIONING_FAILED")`; log error; do NOT rethrow (message is not requeued; failed state is observable via the status endpoint and retryable via `POST /retry-provisioning`)
     - _Requirements: 1.4-1.6_
 
-  - [ ] 10.4 Implement `TenantRestResource`
+  - [x] 10.4 Implement `TenantRestResource`
     - `@RestController @RequestMapping("/api/v1/iam/tenants")`
     - `GET /{tenantKey}` → 200 OK, body `TenantResponse`; `@PreAuthorize("hasAuthority('TENANT_OWNER')")`
     - `PATCH /{tenantKey}/status` → 200 OK, body `TenantResponse`; `@PreAuthorize("hasAuthority('TENANT_OWNER')")`
