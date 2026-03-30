@@ -195,7 +195,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `runMigrations(String schema, String changelogPath)`: private — get connection, `CREATE SCHEMA IF NOT EXISTS {schema}`, `SET search_path TO {schema}`, build `Liquibase`, call `update(new Contexts(), new LabelExpression())`
     - _Requirements: 2.6-2.8, 2.11_
 
-- [-] 6. Account lockout
+- [x] 6. Account lockout
   - [x] 6.1 Implement `AccountLockoutManager`
     - `@Component`; constructor-inject `FailedLoginAttemptMapper`, `AuthConfigurationProperties`
     - `recordFailedAttempt(String email)`: build `FailedLoginAttempt` with `UUID.randomUUID()` and `Instant.now()`, call `mapper.insert(attempt)`
@@ -203,8 +203,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `reset(String email)`: call `mapper.deleteByEmail(email)`
     - _Requirements: 9.2-9.6_
 
-- [ ] 7. Token denylist
-  - [ ] 7.1 Implement `TokenDenylistService`
+- [x] 7. Token denylist
+  - [x] 7.1 Implement `TokenDenylistService`
     - `@Component`; constructor-inject `TokenDenylistMapper`
     - `denyToken(String jti, UUID userId, Instant expiresAt)`: build `TokenDenylist` with `UUID.randomUUID()` and `Instant.now()` for createdAt, call `mapper.insert(entry)`
     - `isRevoked(String jti): boolean`: call `mapper.existsByJti(jti)`
@@ -212,7 +212,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `ShedLockConfig`: `@Configuration` bean providing `JdbcTemplateLockProvider` with `usingDbTime()` backed by the existing `DataSource`
     - _Requirements: 12.1, 12.5, 12.6, 20.25_
 
-  - [ ] 7.2 Implement `StuckTenantReaperJob`
+  - [x] 7.2 Implement `StuckTenantReaperJob`
     - `@Component`; constructor-inject `TenantMapper`, `TenancyConfigurationProperties`
     - `@Scheduled(cron = "0 */5 * * * *")` `@SchedulerLock(name = "StuckTenantReaperJob.reapStuckTenants", lockAtMostFor = "PT4M", lockAtLeastFor = "PT1M")` `reapStuckTenants()`:
       1. Compute `cutoff = Instant.now().minus(tenancyProps.provisioningTimeout())`
@@ -222,17 +222,17 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `TenancyConfigurationProperties` gains `provisioningTimeout` field (type `Duration`, default `PT10M`); add `provisioning-timeout: PT10M` to `application.yml` under `iqscaffold.tenancy`
     - _Requirements: 1.13, 1.17, 20.26_
 
-  - [ ] 7.3 Implement `ExpiredVerificationTokenReaperJob`
+  - [x] 7.3 Implement `ExpiredVerificationTokenReaperJob`
     - `@Component`; constructor-inject `EmailVerificationTokenMapper`
     - `@Scheduled(cron = "0 0 * * * *")` `@SchedulerLock(name = "ExpiredVerificationTokenReaperJob.cleanup", lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")` `cleanup()`: call `emailVerificationTokenMapper.deleteByExpiresAtBefore(Instant.now())`
     - _Requirements: 18.11_
 
-  - [ ] 7.4 Implement `ExpiredPasswordResetTokenReaperJob`
+  - [x] 7.4 Implement `ExpiredPasswordResetTokenReaperJob`
     - `@Component`; constructor-inject `PasswordResetTokenMapper`
     - `@Scheduled(cron = "0 0 * * * *")` `@SchedulerLock(name = "ExpiredPasswordResetTokenReaperJob.cleanup", lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")` `cleanup()`: call `passwordResetTokenMapper.deleteByExpiresAtBefore(Instant.now())`
     - _Requirements: 26.4_
 
-  - [ ] 7.5 Implement `JwtAuthenticationFilter`
+  - [x] 7.5 Implement `JwtAuthenticationFilter`
     - On every authenticated request: extract Bearer token, decode JWT, then check both revocation conditions:
       1. JTI denylist: call `tokenDenylistService.isRevoked(jti)` — covers regular signout
       2. Global signout: call `userMapper.findLastGlobalSignoutAt(userId)`; revoked if `iat ≤ lastGlobalSignoutAt` — covers signout-all
