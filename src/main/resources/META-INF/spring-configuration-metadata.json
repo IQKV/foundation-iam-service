@@ -1,0 +1,454 @@
+{
+  "groups": [
+    {
+      "name": "iqscaffold.db",
+      "description": "Intermediary database connection properties. Values are composed into spring.datasource by profile ymls."
+    },
+    {
+      "name": "iqscaffold.rabbitmq",
+      "description": "Intermediary RabbitMQ connection properties. Values are composed into spring.rabbitmq by profile ymls."
+    },
+    {
+      "name": "iqscaffold.mail",
+      "description": "Intermediary mail connection properties. Values are composed into spring.mail and iqscaffold.notification.mail."
+    },
+    {
+      "name": "iqscaffold.auth",
+      "type": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.auth.jwt",
+      "type": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties$Jwt",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.auth.security",
+      "type": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties$Security",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.auth.security.rate-limiting",
+      "type": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties$Security$RateLimiting",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties$Security"
+    },
+    {
+      "name": "iqscaffold.auth.password-reset",
+      "type": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties$PasswordReset",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.database",
+      "type": "com.iqscaffold.iam.infrastructure.config.DatabaseConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.DatabaseConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq",
+      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.credentials",
+      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Credentials",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.exchanges",
+      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Exchanges",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.queues",
+      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$Queues",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys",
+      "type": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties$RoutingKeys",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.MessagingConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.notification",
+      "type": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.notification.mail",
+      "type": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties$Mail",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.NotificationConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.tenancy",
+      "type": "com.iqscaffold.iam.infrastructure.config.TenancyConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.TenancyConfigurationProperties"
+    },
+    {
+      "name": "iqscaffold.liquibase",
+      "type": "com.iqscaffold.iam.infrastructure.config.LiquibaseConfigurationProperties",
+      "sourceType": "com.iqscaffold.iam.infrastructure.config.LiquibaseConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "iqscaffold.db.host",
+      "type": "java.lang.String",
+      "description": "Database server hostname.",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "iqscaffold.db.port",
+      "type": "java.lang.Integer",
+      "description": "Database server port.",
+      "defaultValue": 5432
+    },
+    {
+      "name": "iqscaffold.db.name",
+      "type": "java.lang.String",
+      "description": "Database name.",
+      "defaultValue": "iam"
+    },
+    {
+      "name": "iqscaffold.db.username",
+      "type": "java.lang.String",
+      "description": "Database username.",
+      "defaultValue": "iam"
+    },
+    {
+      "name": "iqscaffold.db.password",
+      "type": "java.lang.String",
+      "description": "Database password."
+    },
+    {
+      "name": "iqscaffold.rabbitmq.host",
+      "type": "java.lang.String",
+      "description": "RabbitMQ broker hostname.",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "iqscaffold.rabbitmq.port",
+      "type": "java.lang.Integer",
+      "description": "RabbitMQ broker AMQP port.",
+      "defaultValue": 5672
+    },
+    {
+      "name": "iqscaffold.rabbitmq.username",
+      "type": "java.lang.String",
+      "description": "RabbitMQ username.",
+      "defaultValue": "guest"
+    },
+    {
+      "name": "iqscaffold.rabbitmq.password",
+      "type": "java.lang.String",
+      "description": "RabbitMQ password."
+    },
+    {
+      "name": "iqscaffold.mail.host",
+      "type": "java.lang.String",
+      "description": "SMTP server hostname.",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "iqscaffold.mail.port",
+      "type": "java.lang.Integer",
+      "description": "SMTP server port.",
+      "defaultValue": 587
+    },
+    {
+      "name": "iqscaffold.mail.username",
+      "type": "java.lang.String",
+      "description": "SMTP authentication username."
+    },
+    {
+      "name": "iqscaffold.mail.password",
+      "type": "java.lang.String",
+      "description": "SMTP authentication password."
+    },
+    {
+      "name": "iqscaffold.mail.from",
+      "type": "java.lang.String",
+      "description": "Default From address for outgoing emails.",
+      "defaultValue": "noreply@example.com"
+    },
+    {
+      "name": "iqscaffold.mail.reply-to",
+      "type": "java.lang.String",
+      "description": "Default Reply-To address for outgoing emails."
+    },
+    {
+      "name": "iqscaffold.auth.jwt.private-key-path",
+      "type": "java.lang.String",
+      "description": "Path to the RSA private key PEM file used for signing JWTs. Supports classpath: and file: prefixes.",
+      "defaultValue": "classpath:keys/private.pem"
+    },
+    {
+      "name": "iqscaffold.auth.jwt.public-key-path",
+      "type": "java.lang.String",
+      "description": "Path to the RSA public key PEM file used for verifying JWTs. Supports classpath: and file: prefixes.",
+      "defaultValue": "classpath:keys/public.pem"
+    },
+    {
+      "name": "iqscaffold.auth.jwt.expiry",
+      "type": "java.time.Duration",
+      "description": "Access token lifetime.",
+      "defaultValue": "PT15M"
+    },
+    {
+      "name": "iqscaffold.auth.jwt.refresh-expiry",
+      "type": "java.time.Duration",
+      "description": "Refresh token lifetime.",
+      "defaultValue": "P7D"
+    },
+    {
+      "name": "iqscaffold.auth.jwt.issuer",
+      "type": "java.lang.String",
+      "description": "JWT iss claim value.",
+      "defaultValue": "iqscaffold-iam-service"
+    },
+    {
+      "name": "iqscaffold.auth.security.password-encoder-strength",
+      "type": "java.lang.Integer",
+      "description": "BCrypt encoder strength (cost factor).",
+      "defaultValue": 12
+    },
+    {
+      "name": "iqscaffold.auth.security.min-length",
+      "type": "java.lang.Integer",
+      "description": "Minimum password length.",
+      "defaultValue": 8
+    },
+    {
+      "name": "iqscaffold.auth.security.rate-limiting.login-attempts",
+      "type": "java.lang.Integer",
+      "description": "Maximum failed login attempts before account lockout.",
+      "defaultValue": 5
+    },
+    {
+      "name": "iqscaffold.auth.security.rate-limiting.lockout-duration",
+      "type": "java.time.Duration",
+      "description": "Duration of account lockout after exceeding failed login attempts.",
+      "defaultValue": "PT15M"
+    },
+    {
+      "name": "iqscaffold.auth.password-reset.token-ttl",
+      "type": "java.time.Duration",
+      "description": "Password reset token time-to-live.",
+      "defaultValue": "PT1H"
+    },
+    {
+      "name": "iqscaffold.auth.password-reset.rate-limit-window",
+      "type": "java.time.Duration",
+      "description": "Sliding window for password reset rate limiting.",
+      "defaultValue": "PT15M"
+    },
+    {
+      "name": "iqscaffold.auth.password-reset.rate-limit-max-requests",
+      "type": "java.lang.Integer",
+      "description": "Maximum password reset requests allowed within the rate limit window.",
+      "defaultValue": 3
+    },
+    {
+      "name": "iqscaffold.database.url",
+      "type": "java.lang.String",
+      "description": "Full JDBC URL for the datasource (used by DatabaseConfigurationProperties)."
+    },
+    {
+      "name": "iqscaffold.database.username",
+      "type": "java.lang.String",
+      "description": "Datasource username (used by DatabaseConfigurationProperties)."
+    },
+    {
+      "name": "iqscaffold.database.password",
+      "type": "java.lang.String",
+      "description": "Datasource password (used by DatabaseConfigurationProperties)."
+    },
+    {
+      "name": "iqscaffold.database.pool-size",
+      "type": "java.lang.Integer",
+      "description": "Connection pool size (used by DatabaseConfigurationProperties)."
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.host",
+      "type": "java.lang.String",
+      "description": "RabbitMQ broker hostname for messaging configuration."
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables RabbitMQ messaging. When false, all AMQP beans are skipped.",
+      "defaultValue": false
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.credentials.username",
+      "type": "java.lang.String",
+      "description": "RabbitMQ credentials username."
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.credentials.password",
+      "type": "java.lang.String",
+      "description": "RabbitMQ credentials password."
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.exchanges.events",
+      "type": "java.lang.String",
+      "description": "Name of the main topic exchange for domain events.",
+      "defaultValue": "iqscaffold.events"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.exchanges.dlx",
+      "type": "java.lang.String",
+      "description": "Name of the dead-letter exchange.",
+      "defaultValue": "iqscaffold.dlx"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.queues.user-events",
+      "type": "java.lang.String",
+      "description": "Queue name for user domain events.",
+      "defaultValue": "iqscaffold.user.events"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.queues.notifications",
+      "type": "java.lang.String",
+      "description": "Queue name for notification events.",
+      "defaultValue": "iqscaffold.notifications"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.queues.tenant-provisioning",
+      "type": "java.lang.String",
+      "description": "Queue name for tenant provisioning events.",
+      "defaultValue": "iqscaffold.tenant.provisioning"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.queues.dlq",
+      "type": "java.lang.String",
+      "description": "Dead-letter queue name.",
+      "defaultValue": "iqscaffold.dlq"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-created",
+      "type": "java.lang.String",
+      "description": "Routing key for tenant.created events.",
+      "defaultValue": "tenant.created"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-updated",
+      "type": "java.lang.String",
+      "description": "Routing key for tenant.updated events.",
+      "defaultValue": "tenant.updated"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.tenant-deleted",
+      "type": "java.lang.String",
+      "description": "Routing key for tenant.deleted events.",
+      "defaultValue": "tenant.deleted"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-created",
+      "type": "java.lang.String",
+      "description": "Routing key for user.created events.",
+      "defaultValue": "user.created"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-updated",
+      "type": "java.lang.String",
+      "description": "Routing key for user.updated events.",
+      "defaultValue": "user.updated"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.user-deleted",
+      "type": "java.lang.String",
+      "description": "Routing key for user.deleted events.",
+      "defaultValue": "user.deleted"
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.routing-keys.notification-email",
+      "type": "java.lang.String",
+      "description": "Routing key for notification.email events.",
+      "defaultValue": "notification.email"
+    },
+    {
+      "name": "iqscaffold.notification.mail.from",
+      "type": "java.lang.String",
+      "description": "From address used in outgoing notification emails."
+    },
+    {
+      "name": "iqscaffold.notification.mail.reply-to",
+      "type": "java.lang.String",
+      "description": "Reply-To address used in outgoing notification emails."
+    },
+    {
+      "name": "iqscaffold.notification.default-locale",
+      "type": "java.lang.String",
+      "description": "Default locale for notification templates.",
+      "defaultValue": "en"
+    },
+    {
+      "name": "iqscaffold.notification.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the frontend application, used in email links.",
+      "defaultValue": "http://localhost:3000"
+    },
+    {
+      "name": "iqscaffold.tenancy.schema-prefix",
+      "type": "java.lang.String",
+      "description": "PostgreSQL schema name prefix for tenant schemas.",
+      "defaultValue": "t_"
+    },
+    {
+      "name": "iqscaffold.tenancy.default-schema",
+      "type": "java.lang.String",
+      "description": "Default (system) schema name.",
+      "defaultValue": "public"
+    },
+    {
+      "name": "iqscaffold.tenancy.provisioning-timeout",
+      "type": "java.time.Duration",
+      "description": "Maximum time allowed for tenant schema provisioning before it is considered stuck.",
+      "defaultValue": "PT10M"
+    },
+    {
+      "name": "iqscaffold.liquibase.system-change-log",
+      "type": "java.lang.String",
+      "description": "Classpath location of the system (public schema) Liquibase changelog."
+    },
+    {
+      "name": "iqscaffold.liquibase.tenant-change-log",
+      "type": "java.lang.String",
+      "description": "Classpath location of the per-tenant schema Liquibase changelog."
+    },
+    {
+      "name": "iqscaffold.liquibase.contexts",
+      "type": "java.lang.String",
+      "description": "Active Liquibase contexts (e.g. demo, !demo)."
+    }
+  ],
+  "hints": [
+    {
+      "name": "iqscaffold.auth.jwt.private-key-path",
+      "values": [
+        { "value": "classpath:keys/private.pem", "description": "Bundled dev key (not for production)." },
+        { "value": "file:/run/secrets/private.pem", "description": "Docker secret mount path." }
+      ]
+    },
+    {
+      "name": "iqscaffold.auth.jwt.public-key-path",
+      "values": [
+        { "value": "classpath:keys/public.pem", "description": "Bundled dev key (not for production)." },
+        { "value": "file:/run/secrets/public.pem", "description": "Docker secret mount path." }
+      ]
+    },
+    {
+      "name": "iqscaffold.notification.default-locale",
+      "values": [
+        { "value": "en" },
+        { "value": "uk" }
+      ]
+    },
+    {
+      "name": "iqscaffold.messaging.rabbitmq.enabled",
+      "values": [
+        { "value": true, "description": "Enable RabbitMQ — required for all non-test profiles." },
+        { "value": false, "description": "Disable RabbitMQ — used in test profile." }
+      ]
+    }
+  ]
+}
