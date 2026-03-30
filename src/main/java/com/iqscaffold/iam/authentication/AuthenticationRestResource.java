@@ -18,9 +18,8 @@ package com.iqscaffold.iam.authentication;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -111,6 +110,7 @@ public class AuthenticationRestResource {
     final String jti = jwt.getId();
     final String userId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
     final Instant expiresAt = jwt.getExpiresAt();
+    // interface: signOut(jti, userId, expiresAt)
     authenticationService.signOut(jti, userId, expiresAt != null ? expiresAt.toString() : Instant.now().toString());
     return ResponseEntity.noContent().build();
   }
@@ -134,20 +134,17 @@ public class AuthenticationRestResource {
   @PostMapping("/validate")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Validate token and return user context",
-      description = "Decodes the Bearer token and returns userId, email, tenantId, and authorities. "
+      description = "Decodes the Bearer token, checks the denylist, and returns userId, email, tenantId, and authorities. "
           + "Intended for API gateway introspection.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Token valid, user context returned"),
       @ApiResponse(responseCode = "401", description = "Token invalid or revoked")
   })
   public ResponseEntity<AuthenticationDtos.ValidateTokenResponse> validate(
-      @AuthenticationPrincipal final Jwt jwt) {
-    final String userId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
-    final String email = jwt.getClaimAsString(JwtClaimNames.EMAIL);
-    final String tenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
-    final List<String> authorities = jwt.getClaimAsStringList(JwtClaimNames.AUTHORITIES);
-    return ResponseEntity.ok(new AuthenticationDtos.ValidateTokenResponse(
-        UUID.fromString(userId), email, tenantId,
-        authorities != null ? authorities : List.of()));
+      final HttpServletRequest request) {
+    final String authorization = request.getHeader("Authorization");
+    final String token = authorization != null && authorization.startsWith("Bearer ")
+        ? authorization.substring(7) : "";
+    return ResponseEntity.ok(authenticationService.validateToken(token));
   }
 }
