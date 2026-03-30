@@ -18,6 +18,10 @@ package com.iqscaffold.iam.passwordreset;
 
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +32,7 @@ import com.iqscaffold.iam.passwordreset.dto.PasswordResetDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users/password")
+@Tag(name = "Password Reset", description = "Initiate and complete the password reset flow")
 public class PasswordResetRestResource {
 
   private final PasswordResetService passwordResetService;
@@ -37,13 +42,29 @@ public class PasswordResetRestResource {
   }
 
   @PostMapping("/forgot")
-  public ResponseEntity<Void> forgot(@Valid @RequestBody final PasswordResetDtos.ForgotPasswordRequest request) {
+  @Operation(summary = "Initiate password reset",
+      description = "Sends a password reset email if the address is registered. "
+          + "Always returns 200 to avoid email enumeration. Rate-limited per email address.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Reset email sent (or silently ignored if email not found)"),
+      @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
+  })
+  public ResponseEntity<Void> forgot(
+      @Valid @RequestBody final PasswordResetDtos.ForgotPasswordRequest request) {
     passwordResetService.initiate(request.email());
     return ResponseEntity.ok().build();
   }
 
   @PostMapping("/reset")
-  public ResponseEntity<Void> reset(@Valid @RequestBody final PasswordResetDtos.ResetPasswordRequest request) {
+  @Operation(summary = "Complete password reset",
+      description = "Consumes the single-use reset token and sets a new password. "
+          + "The token expires after the configured TTL (default 1 hour).")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Password updated"),
+      @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+  })
+  public ResponseEntity<Void> reset(
+      @Valid @RequestBody final PasswordResetDtos.ResetPasswordRequest request) {
     passwordResetService.complete(request.token(), request.newPassword());
     return ResponseEntity.ok().build();
   }

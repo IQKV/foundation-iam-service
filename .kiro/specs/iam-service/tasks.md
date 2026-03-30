@@ -502,13 +502,13 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Production profile: `show-details: never`
     - _Requirements: 23.1-23.5_
 
-- [ ] 15. OpenAPI documentation
-  - [ ] 15.1 Implement `OpenApiConfig`
+- [x] 15. OpenAPI documentation
+  - [x] 15.1 Implement `OpenApiConfig`
     - `@SecurityScheme(name="bearerAuth", type=HTTP, scheme="bearer", bearerFormat="JWT")`
     - `OpenAPI` bean with `Info`, `Server`, and `SecurityRequirement`
     - _Requirements: 21.1-21.9_
 
-  - [ ] 15.2 Annotate all REST controllers
+  - [x] 15.2 Annotate all REST controllers
     - `@Tag`, `@Operation`, `@ApiResponses`, `@SecurityRequirement(name="bearerAuth")` on all endpoints
     - `@Parameter(name="X-Tenant-ID", in=HEADER, required=true)` on all tenant-scoped endpoints
     - Swagger UI at `/swagger-ui.html`, spec at `/api-docs`

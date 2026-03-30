@@ -22,6 +22,8 @@ import java.util.UUID;
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -61,6 +63,8 @@ public class UserRestResource {
   @PreAuthorize("isAuthenticated()")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Get current user profile")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Profile retrieved"),
       @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -75,6 +79,8 @@ public class UserRestResource {
   @PreAuthorize("isAuthenticated()")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Update current user profile")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Profile updated"),
       @ApiResponse(responseCode = "400", description = "Validation error"),
@@ -92,6 +98,8 @@ public class UserRestResource {
   @PreAuthorize("isAuthenticated()")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Delete current user membership from tenant")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Membership removed"),
       @ApiResponse(responseCode = "401", description = "Unauthorized"),

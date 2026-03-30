@@ -19,6 +19,8 @@ package com.iqscaffold.iam.tenant;
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -51,6 +53,8 @@ public class TenantRestResource {
   @GetMapping("/{tenantKey}")
   @PreAuthorize("hasAuthority('TENANT_OWNER')")
   @Operation(summary = "Get tenant by key", description = "Retrieves tenant details by tenantKey")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Tenant found"),
       @ApiResponse(responseCode = "403", description = "Access denied"),
@@ -64,6 +68,8 @@ public class TenantRestResource {
   @PatchMapping("/{tenantKey}/status")
   @PreAuthorize("hasAuthority('TENANT_OWNER')")
   @Operation(summary = "Update tenant status", description = "Transitions tenant to a new status")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Status updated"),
       @ApiResponse(responseCode = "400", description = "Invalid status transition"),
@@ -81,6 +87,8 @@ public class TenantRestResource {
   @PreAuthorize("hasAuthority('TENANT_OWNER')")
   @Operation(summary = "Retry tenant provisioning",
       description = "Retries provisioning for a tenant in PROVISIONING_FAILED state")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "202", description = "Provisioning retry initiated"),
       @ApiResponse(responseCode = "403", description = "Access denied"),

@@ -18,6 +18,10 @@ package com.iqscaffold.iam.email;
 
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +33,7 @@ import com.iqscaffold.iam.authentication.dto.AuthenticationDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users/email")
+@Tag(name = "Email Verification", description = "Email address verification and resend operations")
 public class EmailVerificationRestResource {
 
   private final AuthenticationService authenticationService;
@@ -38,6 +43,12 @@ public class EmailVerificationRestResource {
   }
 
   @PostMapping("/verify")
+  @Operation(summary = "Verify email address",
+      description = "Consumes a one-time 64-char hex token sent to the user's email and marks the address as verified.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Email verified"),
+      @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+  })
   public ResponseEntity<Void> verify(
       @Valid @RequestBody final AuthenticationDtos.VerifyEmailRequest request) {
     authenticationService.verifyEmail(request.token());
@@ -45,21 +56,16 @@ public class EmailVerificationRestResource {
   }
 
   @PostMapping("/resend-verification")
-  public ResponseEntity<Void> resend(
-      @Valid @RequestBody final AuthenticationDtos.ResendVerificationRequest request) {
-    authenticationService.resendVerification(request.email());
-    return ResponseEntity.accepted().build();
-  }
-}     @Valid @RequestBody final AuthenticationDtos.VerifyEmailRequest request) {
-")
+  @Operation(summary = "Resend email verification",
+      description = "Generates a new verification token and sends it to the given email address. "
+          + "Rate-limited to prevent abuse.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "202", description = "Verification email queued"),
+      @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
+  })
   public ResponseEntity<Void> resend(
       @Valid @RequestBody final AuthenticationDtos.ResendVerificationRequest request) {
     authenticationService.resendVerification(request.email());
     return ResponseEntity.accepted().build();
   }
 }
-    authenticationService.verifyEmail(request.token());
-    return ResponseEntity.ok().build();
-  }
-
-  @PostMapping("/resend-verification
