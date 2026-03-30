@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260115120300" author="iqscaffold">
+        <createTable tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="membership_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_tenant_member_authorities_membership_id"
+                             references="public.tenant_memberships(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="authority" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_tenant_member_authorities_membership_id" tableName="tenant_member_authorities" schemaName="public">
+            <column name="membership_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

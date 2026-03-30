@@ -169,8 +169,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Update `UserMapper.xml` to include `updatePassword(@Param userId, @Param passwordHash)` method
     - _Requirements: 25.7, 26.1-26.3_
 
-- [ ] 5. Liquibase migrations
-  - [ ] 5.1 Create system schema migrations in `db/changelog/system/`
+- [x] 5. Liquibase migrations
+  - [x] 5.1 Create system schema migrations in `db/changelog/system/`
     - `db.changelog-master.xml`: master changelog including all system changesets in order
     - `20260115120000-create-tenants-table.xml`: `tenants` table with UNIQUE constraint on both `tenant_key` and `name`; indexes `idx_tenants_tenant_key`, `idx_tenants_name` (UNIQUE)
     - `20260115120100-create-users-table.xml`: `users` table with `email_verified BOOLEAN NOT NULL DEFAULT FALSE` and `last_global_signout_at TIMESTAMP NULL`; index `idx_users_email`
@@ -184,11 +184,11 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - All changesets: `author="iqscaffold"`
     - _Requirements: 19.2, 19.4-19.7, 26.1-26.2_
 
-  - [ ] 5.2 Create tenant schema changelog `db/changelog/tenant/master.xml`
+  - [x] 5.2 Create tenant schema changelog `db/changelog/tenant/master.xml`
     - Empty master changelog (zero changesets for MVP); Liquibase tracking tables are initialized in `t_{tenantKey}` when `TenantLiquibaseRunner.runMigrationsForTenant` runs
     - _Requirements: 2.8, 19.3_
 
-  - [ ] 5.3 Implement `TenantLiquibaseRunner`
+  - [x] 5.3 Implement `TenantLiquibaseRunner`
     - Implements `ApplicationRunner`; constructor-inject `DataSource`
     - `run()`: call `runMigrations("public", "db/changelog/system/master.xml")`
     - `runMigrationsForTenant(String tenantKey)`: call `runMigrations("t_" + tenantKey, "db/changelog/tenant/master.xml")`; propagate all exceptions to the caller (do NOT catch here)

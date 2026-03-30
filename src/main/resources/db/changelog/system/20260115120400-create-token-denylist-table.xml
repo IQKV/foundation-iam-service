@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260115120400" author="iqscaffold">
+        <createTable tableName="token_denylist" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="jti" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_token_denylist_jti"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_token_denylist_user_id"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_token_denylist_jti" tableName="token_denylist" schemaName="public" unique="true">
+            <column name="jti"/>
+        </createIndex>
+
+        <createIndex indexName="idx_token_denylist_user_id" tableName="token_denylist" schemaName="public">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_token_denylist_expires_at" tableName="token_denylist" schemaName="public">
+            <column name="expires_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
