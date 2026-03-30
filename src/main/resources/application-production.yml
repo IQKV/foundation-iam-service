@@ -34,6 +34,11 @@ springdoc:
   swagger-ui:
     enabled: false
 
+management:
+  endpoint:
+    health:
+      show-details: never
+
 iqscaffold:
   auth:
     jwt:

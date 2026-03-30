@@ -458,8 +458,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
       7. Publish `NotificationEvent(PASSWORD_RESET_CONFIRMED, recipientEmail, locale="en", payload={firstName})`
     - _Requirements: 24.1-24.10, 25.1-25.12, 26.1-26.5, 27.1-27.9, 28.1-28.8_
 
-- [ ] 14. Global exception handler and observability
-  - [ ] 14.1 Implement `GlobalExceptionHandler` (`@RestControllerAdvice`)
+- [x] 14. Global exception handler and observability
+  - [x] 14.1 Implement `GlobalExceptionHandler` (`@RestControllerAdvice`)
     - Shared `problem(String type, String title, int status, String detail, HttpServletRequest request)` helper: builds RFC 9457 `ProblemDetail` with type, title, status, detail, instance (request URI), correlationId (from MDC), requestId (`req-` + 8-char UUID)
     - Handlers:
       - `MethodArgumentNotValidException` → 400, fields array of `{field, message}`
@@ -488,13 +488,13 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Log WARN for 4xx, ERROR with stack trace for 5xx
     - _Requirements: 7.3, 7.4, 20.10_
 
-  - [ ] 14.2 Implement `UserServiceMetrics`
+  - [x] 14.2 Implement `UserServiceMetrics`
     - `@Component`, constructor-inject `MeterRegistry`
     - Counters: `auth.success` (tags: tenantId), `auth.failure` (tags: tenantId, reason), `tenant.created`
     - Timer: `auth.duration` (tags: tenantId)
     - _Requirements: 23.6, 23.7_
 
-  - [ ] 14.3 Configure actuator
+  - [x] 14.3 Configure actuator
     - `management.server.port: 8081`
     - `management.endpoints.web.exposure.include: health,info,metrics,prometheus`
     - `management.endpoint.health.probes.enabled: true` (liveness + readiness for Kubernetes)

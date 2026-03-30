@@ -24,19 +24,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iqscaffold.iam.email.dto.EmailVerificationDtos;
+import com.iqscaffold.iam.authentication.AuthenticationService;
+import com.iqscaffold.iam.authentication.dto.AuthenticationDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users/email")
 public class EmailVerificationRestResource {
 
+  private final AuthenticationService authenticationService;
+
+  public EmailVerificationRestResource(final AuthenticationService authenticationService) {
+    this.authenticationService = authenticationService;
+  }
+
   @PostMapping("/verify")
-  public ResponseEntity<Void> verify(@Valid @RequestBody final EmailVerificationDtos.VerifyEmailRequest request) {
-    throw new UnsupportedOperationException("Not yet implemented");
+  public ResponseEntity<Void> verify(
+      @Valid @RequestBody final AuthenticationDtos.VerifyEmailRequest request) {
+    authenticationService.verifyEmail(request.token());
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/resend-verification")
-  public ResponseEntity<Void> resend(@Valid @RequestBody final EmailVerificationDtos.ResendVerificationRequest request) {
-    throw new UnsupportedOperationException("Not yet implemented");
+  public ResponseEntity<Void> resend(
+      @Valid @RequestBody final AuthenticationDtos.ResendVerificationRequest request) {
+    authenticationService.resendVerification(request.email());
+    return ResponseEntity.accepted().build();
+  }
+}     @Valid @RequestBody final AuthenticationDtos.VerifyEmailRequest request) {
+")
+  public ResponseEntity<Void> resend(
+      @Valid @RequestBody final AuthenticationDtos.ResendVerificationRequest request) {
+    authenticationService.resendVerification(request.email());
+    return ResponseEntity.accepted().build();
   }
 }
+    authenticationService.verifyEmail(request.token());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/resend-verification
