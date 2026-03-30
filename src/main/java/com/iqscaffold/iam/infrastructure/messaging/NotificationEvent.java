@@ -1,0 +1,56 @@
+/*
+ * Copyright 2026 IQKV Foundation Team.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.iqscaffold.iam.infrastructure.messaging;
+
+import java.time.Instant;
+import java.util.Map;
+
+public class NotificationEvent {
+
+  private String recipientEmail;
+  private String locale;
+  private NotificationEventType type;
+  private Map<String, Object> payload;
+  private Instant occurredAt;
+
+  public NotificationEvent() {}
+
+  public NotificationEvent(final String recipientEmail, final String locale,
+                           final NotificationEventType type, final Map<String, Object> payload,
+                           final Instant occurredAt) {
+    this.recipientEmail = recipientEmail;
+    this.locale = locale;
+    this.type = type;
+    this.payload = payload;
+    this.occurredAt = occurredAt;
+  }
+
+  public String getRecipientEmail() { return recipientEmail; }
+  public void setRecipientEmail(final String recipientEmail) { this.recipientEmail = recipientEmail; }
+
+  public String getLocale() { return locale; }
+  public void setLocale(final String locale) { this.locale = locale; }
+
+  public NotificationEventType getType() { return type; }
+  public void setType(final NotificationEventType type) { this.type = type; }
+
+  public Map<String, Object> getPayload() { return payload; }
+  public void setPayload(final Map<String, Object> payload) { this.payload = payload; }
+
+  public Instant getOccurredAt() { return occurredAt; }
+  public void setOccurredAt(final Instant occurredAt) { this.occurredAt = occurredAt; }
+}

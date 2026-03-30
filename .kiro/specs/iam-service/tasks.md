@@ -241,8 +241,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Register as a filter in `SecurityConfig` before `BearerTokenAuthenticationFilter`
     - _Requirements: 12.3, 12.4_
 
-- [ ] 8. Messaging infrastructure
-  - [ ] 8.1 Implement `RabbitMQConfig`
+- [x] 8. Messaging infrastructure
+  - [x] 8.1 Implement `RabbitMQConfig`
     - `@ConditionalOnProperty(name = "iqscaffold.messaging.rabbitmq.enabled", havingValue = "true")`, `@Profile("!test")`
     - Exchanges: `iqscaffold.events` (topic, durable), `iqscaffold.dlx` (topic, durable)
     - Queues with DLX args and 24h TTL: `iqscaffold.user.events` (routing `user.#`), `iqscaffold.notifications` (routing `notification.*`), `iqscaffold.tenant.provisioning` (routing `tenant.created`)
@@ -250,7 +250,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - String constants: `EVENTS_EXCHANGE`, `DLX_EXCHANGE`, `USER_EVENTS_QUEUE`, `NOTIFICATIONS_QUEUE`, `TENANT_PROVISIONING_QUEUE`, `DLQ`; routing key constants for all event types
     - _Requirements: 1.3_
 
-  - [ ] 8.2 Implement event payload classes in `infrastructure/messaging/`
+  - [x] 8.2 Implement event payload classes in `infrastructure/messaging/`
     - `TenantEvent`: tenantKey, tenantName, eventType (enum: `TENANT_CREATED`, `TENANT_UPDATED`, `TENANT_DELETED`), occurredAt
     - `UserEvent`: userId, tenantId, email, eventType (enum: `USER_CREATED`, `USER_UPDATED`, `USER_DELETED`), occurredAt
     - `NotificationEvent`: recipientEmail, locale (String, e.g. `"en"`, `"ru"`), type (`NotificationEventType` enum: `VERIFY_EMAIL`, `EMAIL_VERIFIED`), payload (`Map<String, Object>` — template variables), occurredAt
@@ -258,7 +258,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `MessagingException`: unchecked exception wrapping AMQP errors
     - _Requirements: 1.3, 18.1_
 
-  - [ ] 8.3 Implement `MessagingService`
+  - [x] 8.3 Implement `MessagingService`
     - Constructor-inject `RabbitTemplate`, `ObjectMapper`
     - `publishTenantCreated(String tenantKey, String tenantName)`: build `TenantEvent(TENANT_CREATED)`, publish to `EVENTS_EXCHANGE` with routing key `tenant.created`
     - `publishTenantUpdated(String tenantKey)`: routing key `tenant.updated`
@@ -267,17 +267,17 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - Wrap `AmqpException` in `MessagingException`
     - _Requirements: 1.3, 18.1_
 
-  - [ ] 8.4 Implement `UserEventPublisher`
+  - [x] 8.4 Implement `UserEventPublisher`
     - Facade over `MessagingService`
     - `publishUserCreated(User user)`: routing key `user.created`
     - `publishUserDeleted(User user)`: routing key `user.deleted`
     - _Requirements: 1.3_
 
-  - [ ] 8.5 Implement `UserEventListener`
+  - [x] 8.5 Implement `UserEventListener`
     - `@RabbitListener(queues = RabbitMQConfig.USER_EVENTS_QUEUE)` — log received events (stub for now)
     - _Requirements: 1.3_
 
-  - [ ] 8.6 Implement `NotificationConsumer` and email infrastructure
+  - [x] 8.6 Implement `NotificationConsumer` and email infrastructure
     - `NotificationConsumer`: `@Component`; `@RabbitListener(queues = RabbitMQConfig.NOTIFICATIONS_QUEUE)`; constructor-inject `EmailService`; `handleNotification(NotificationEvent event)`: delegate to `emailService.send(event)`; log errors but do NOT rethrow — failed messages route to DLQ via `x-dead-letter-exchange`
     - `EmailService`: `@Service`; constructor-inject `JavaMailSender`, `TemplateEngine` (Thymeleaf), `NotificationConfigurationProperties`, `MessageSource`; `send(NotificationEvent event)`: resolve `Locale` from `event.getLocale()` (fallback to `notificationProps.defaultLocale()`); switch on `event.getType()` to select template name; build Thymeleaf `Context` with locale + `event.getPayload()` variables; render HTML via `templateEngine.process(templateName, ctx)`; build `MimeMessage` via `javaMailSender.createMimeMessage()`; set from (`notificationProps.mail().from()`), to, subject (resolved from `MessageSource` with locale), HTML body; call `javaMailSender.send(msg)`; log success/failure
     - Template resolution: `email/signup/verify-email` → `src/main/resources/templates/email/signup/verify-email.html`; `email/signup/email-verified` → `src/main/resources/templates/email/signup/email-verified.html`; `email/password-reset/initiate` → `src/main/resources/templates/email/password-reset/initiate.html`; `email/password-reset/confirmed` → `src/main/resources/templates/email/password-reset/confirmed.html`
