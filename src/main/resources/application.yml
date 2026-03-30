@@ -4,7 +4,7 @@
 
 spring:
   application:
-    name: iam-service
+    name: iqscaffold-iam-service
   liquibase:
     enabled: false
   mail:
