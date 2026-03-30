@@ -383,8 +383,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `getAuthorities(UUID membershipId): List<String>`: call `authorityMapper.findAuthorityValuesByMembershipId(membershipId)`
     - _Requirements: 4.2-4.6, 7.1-7.5_
 
-- [ ] 13. Authentication feature
-  - [ ] 13.1 Implement `AuthenticationDtos` and `AuthenticationDtoMapper`
+- [x] 13. Authentication feature
+  - [x] 13.1 Implement `AuthenticationDtos` and `AuthenticationDtoMapper`
     - `SignInRequest`: email (`@Email @NotBlank`), password (`@NotBlank`)
     - `TenantDiscoveryRequest`: email (`@Email @NotBlank`), password (`@NotBlank`)
     - `TenantMembershipSummary`: tenantKey, tenantName, membershipStatus, authorities (List<String>)
@@ -397,7 +397,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `ResetPasswordRequest`: token (`@NotBlank @Size(min=64, max=64)`), newPassword (`@Size(min=8,max=128)`)
     - _Requirements: 10.10, 12.8, 13.5, 25.1_
 
-  - [ ] 13.2 Implement `AuthenticationService` interface and `AuthenticationServiceImpl`
+  - [x] 13.2 Implement `AuthenticationService` interface and `AuthenticationServiceImpl`
     - `@Service @Transactional`
     - `authenticate(String email, String password)`:
       1. Find tenant via `tenantMapper.findByTenantKey(TenantContext.getCurrentTenant())`; throw `TenantSuspendedException` if SUSPENDED; throw `TenantNotFoundException` if DELETED or PROVISIONING_FAILED
@@ -416,7 +416,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `resendVerification(String email)`: always returns without error (prevents enumeration); find user by email — if not found or `emailVerified = true` return silently; call `emailVerificationTokenMapper.countResendsWithinWindow(userId, Instant.now().minus(1h))`; if count >= 3 throw `VerificationRateLimitException` → 429 with `Retry-After: 3600`; call `emailVerificationTokenMapper.deleteByUserId(userId)`; generate new token; insert; publish `NotificationEvent(VERIFY_EMAIL, recipientEmail, locale="en", payload={verificationUrl, firstName, expiresInHours:24})`
     - _Requirements: 10.1-10.11, 11.1-11.7, 12.1-12.8, 13.1-13.7, 18.3-18.8_
 
-  - [ ] 13.3 Implement `AuthenticationRestResource`
+  - [x] 13.3 Implement `AuthenticationRestResource`
     - `@RestController @RequestMapping("/api/v1/iam/auth")`
     - `POST /signup` → 201 Created + `Location: /api/v1/iam/users/me` header, body `SignupResponse`; delegates to `UserService.registerUser(request)`
     - `POST /signin` → 200 OK, body `TokenResponse`
@@ -426,19 +426,19 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `POST /validate` → 200 OK, body `ValidateTokenResponse`; `@PreAuthorize("permitAll()")`
     - _Requirements: 10.10, 12.6-12.8, 6.7_
 
-  - [ ] 13.4 Implement `EmailVerificationRestResource`
+  - [x] 13.4 Implement `EmailVerificationRestResource`
     - `@RestController @RequestMapping("/api/v1/iam/users/email")`
     - `POST /verify` → 200 OK; public; body `{ "token": "<hex>" }`; delegates to `AuthenticationService.verifyEmail(token)`
     - `POST /resend-verification` → 202 Accepted; public; body `{ "email": "<address>" }`; delegates to `AuthenticationService.resendVerification(email)`
     - _Requirements: 18.2, 18.5_
 
-  - [ ] 13.5 Implement `PasswordResetRestResource`
+  - [x] 13.5 Implement `PasswordResetRestResource`
     - `@RestController @RequestMapping("/api/v1/iam/users/password")`
     - `POST /forgot` → 200 OK; public; body `{ "email": "<address>" }`; delegates to `PasswordResetService.initiatePasswordReset(email)`
     - `POST /reset` → 200 OK; public; body `{ "token": "<hex>", "newPassword": "<pass>" }`; delegates to `PasswordResetService.completePasswordReset(token, newPassword)`
     - _Requirements: 24.1, 24.7, 25.1, 25.11_
 
-  - [ ] 13.6 Implement `PasswordResetService` interface and `PasswordResetServiceImpl`
+  - [x] 13.6 Implement `PasswordResetService` interface and `PasswordResetServiceImpl`
     - `@Service @Transactional`
     - `initiatePasswordReset(String email)`:
       1. Call `passwordResetTokenMapper.countByUserIdAndCreatedAtAfter(userId, Instant.now().minus(rateLimitWindow))`; if count >= `rateLimitMaxRequests` throw `PasswordResetRateLimitException`

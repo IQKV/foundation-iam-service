@@ -22,15 +22,19 @@ import com.iqscaffold.iam.authentication.dto.AuthenticationDtos;
 
 public interface AuthenticationService {
 
-  AuthenticationDtos.SignInResponse signIn(AuthenticationDtos.SignInRequest request);
+  AuthenticationDtos.TokenResponse signIn(AuthenticationDtos.SignInRequest request);
 
-  AuthenticationDtos.SignInResponse refresh(AuthenticationDtos.RefreshTokenRequest request);
+  AuthenticationDtos.TokenResponse refresh(AuthenticationDtos.RefreshTokenRequest request);
 
   void signOut(String jti, String userId, String expiresAt);
 
-  void signOutAll(String userId);
+  void signOutAll(String userId, String jti, String expiresAt);
 
   AuthenticationDtos.ValidateTokenResponse validateToken(String token);
 
   List<AuthenticationDtos.TenantMembershipSummary> listUserTenants(String email, String password);
+
+  void verifyEmail(String token);
+
+  void resendVerification(String email);
 }

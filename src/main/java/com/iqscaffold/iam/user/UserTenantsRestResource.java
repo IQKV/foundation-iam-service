@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.iqscaffold.iam.passwordreset;
+package com.iqscaffold.iam.user;
+
+import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -24,27 +26,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iqscaffold.iam.passwordreset.dto.PasswordResetDtos;
+import com.iqscaffold.iam.authentication.AuthenticationService;
+import com.iqscaffold.iam.authentication.dto.AuthenticationDtos;
 
 @RestController
-@RequestMapping("/api/v1/iam/users/password")
-public class PasswordResetRestResource {
+@RequestMapping("/api/v1/iam/users")
+public class UserTenantsRestResource {
 
-  private final PasswordResetService passwordResetService;
+  private final AuthenticationService authenticationService;
 
-  public PasswordResetRestResource(final PasswordResetService passwordResetService) {
-    this.passwordResetService = passwordResetService;
+  public UserTenantsRestResource(final AuthenticationService authenticationService) {
+    this.authenticationService = authenticationService;
   }
 
-  @PostMapping("/forgot")
-  public ResponseEntity<Void> forgot(@Valid @RequestBody final PasswordResetDtos.ForgotPasswordRequest request) {
-    passwordResetService.initiate(request.email());
-    return ResponseEntity.ok().build();
-  }
-
-  @PostMapping("/reset")
-  public ResponseEntity<Void> reset(@Valid @RequestBody final PasswordResetDtos.ResetPasswordRequest request) {
-    passwordResetService.complete(request.token(), request.newPassword());
-    return ResponseEntity.ok().build();
+  @PostMapping("/tenants")
+  public ResponseEntity<List<AuthenticationDtos.TenantMembershipSummary>> listTenants(
+      @Valid @RequestBody final AuthenticationDtos.TenantDiscoveryRequest request) {
+    return ResponseEntity.ok(authenticationService.listUserTenants(request.email(), request.password()));
   }
 }
