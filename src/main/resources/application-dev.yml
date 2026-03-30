@@ -4,14 +4,14 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:iam}
-    username: ${DB_USERNAME:iam}
-    password: ${DB_PASSWORD:iam}
+    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
+    username: ${iqscaffold.db.username}
+    password: ${iqscaffold.db.password}
   rabbitmq:
-    host: ${RABBITMQ_HOST:rabbitmq}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+    host: ${iqscaffold.rabbitmq.host}
+    port: ${iqscaffold.rabbitmq.port}
+    username: ${iqscaffold.rabbitmq.username}
+    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: true
     contexts: demo
@@ -23,6 +23,15 @@ logging:
     liquibase: DEBUG
 
 iqscaffold:
+  db:
+    host: ${DB_HOST:postgres}
+    username: ${DB_USERNAME:iam}
+    password: ${DB_PASSWORD:iam}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:iam}
+    password: ${RABBITMQ_PASSWORD:iam}
   messaging:
     rabbitmq:
       enabled: true

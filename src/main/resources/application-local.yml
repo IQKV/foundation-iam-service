@@ -4,20 +4,20 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:iam}
-    username: ${DB_USERNAME:iam}
-    password: ${DB_PASSWORD:iam}
+    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
+    username: ${iqscaffold.db.username}
+    password: ${iqscaffold.db.password}
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+    host: ${iqscaffold.rabbitmq.host}
+    port: ${iqscaffold.rabbitmq.port}
+    username: ${iqscaffold.rabbitmq.username}
+    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: true
     contexts: demo
   mail:
-    host: localhost
-    port: 1025
+    host: ${iqscaffold.mail.host}
+    port: ${iqscaffold.mail.port}
     properties:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
@@ -34,6 +34,17 @@ logging:
     org.mybatis: DEBUG
 
 iqscaffold:
+  db:
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:iam}
+    password: ${RABBITMQ_PASSWORD:iam}
+  mail:
+    host: localhost
+    port: 1025
   auth:
     jwt:
       expiry: PT30M

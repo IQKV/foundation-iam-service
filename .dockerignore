@@ -1,4 +1,22 @@
+# Exclude everything by default, then allowlist what the build needs
 *
-!.dockerignore
+
+# Build files
 !Dockerfile
-!target/*.jar
+!.dockerignore
+!pom.xml
+!src/
+
+# Exclude test sources from image build
+src/test/
+
+# Exclude local/dev config and secrets
+.env*
+*.env
+target/
+node_modules/
+.git/
+.github/
+.idea/
+.vscode/
+docs/

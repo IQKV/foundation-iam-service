@@ -8,10 +8,10 @@ spring:
   liquibase:
     enabled: false
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    host: ${iqscaffold.mail.host}
+    port: ${iqscaffold.mail.port}
+    username: ${iqscaffold.mail.username}
+    password: ${iqscaffold.mail.password}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -46,6 +46,24 @@ management:
       show-details: when-authorized
 
 iqscaffold:
+  db:
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    name: ${DB_NAME:iam}
+    username: ${DB_USERNAME:iam}
+    password: ${DB_PASSWORD:iam}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    from: ${MAIL_FROM:noreply@example.com}
+    reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:
       private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:keys/private.pem}
@@ -69,8 +87,8 @@ iqscaffold:
     provisioning-timeout: PT10M
   notification:
     mail:
-      from: ${MAIL_FROM:noreply@example.com}
-      reply-to: ${MAIL_REPLY_TO:}
+      from: ${iqscaffold.mail.from}
+      reply-to: ${iqscaffold.mail.reply-to}
     default-locale: en
     base-url: ${APP_BASE_URL:http://localhost:3000}
 
