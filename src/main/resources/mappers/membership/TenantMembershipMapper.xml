@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqscaffold.iam.membership.TenantMembershipMapper">
+
+    <resultMap id="membershipResultMap" type="com.iqscaffold.iam.membership.TenantMembership">
+        <id     property="id"        column="id"/>
+        <result property="userId"    column="user_id"/>
+        <result property="tenantKey" column="tenant_key"/>
+        <result property="status"    column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqscaffold.iam.membership.TenantMembership">
+        INSERT INTO public.tenant_memberships
+            (id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by)
+        VALUES
+            (#{id}, #{userId}, #{tenantKey},
+             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+    </insert>
+
+    <select id="findByUserIdAndTenantKey" resultMap="membershipResultMap">
+        SELECT id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenant_memberships
+        WHERE user_id = #{userId}
+          AND tenant_key = #{tenantKey}
+    </select>
+
+    <select id="existsByUserIdAndTenantKey" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM public.tenant_memberships
+        WHERE user_id = #{userId}
+          AND tenant_key = #{tenantKey}
+    </select>
+
+    <select id="findByTenantKey" resultMap="membershipResultMap">
+        SELECT id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenant_memberships
+        WHERE tenant_key = #{tenantKey}
+    </select>
+
+    <select id="findByUserId" resultMap="membershipResultMap">
+        SELECT id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by
+        FROM public.tenant_memberships
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM public.tenant_memberships
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

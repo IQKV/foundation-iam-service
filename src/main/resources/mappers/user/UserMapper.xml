@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqscaffold.iam.user.UserMapper">
+
+    <resultMap id="userResultMap" type="com.iqscaffold.iam.user.User">
+        <id     property="id"                   column="id"/>
+        <result property="email"                column="email"/>
+        <result property="passwordHash"         column="password_hash"/>
+        <result property="firstName"            column="first_name"/>
+        <result property="lastName"             column="last_name"/>
+        <result property="status"               column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="emailVerified"        column="email_verified"/>
+        <result property="lastGlobalSignoutAt"  column="last_global_signout_at"/>
+        <result property="createdAt"            column="created_at"/>
+        <result property="updatedAt"            column="updated_at"/>
+        <result property="createdBy"            column="created_by"/>
+        <result property="updatedBy"            column="updated_by"/>
+    </resultMap>
+
+    <insert id="upsertByEmail" parameterType="com.iqscaffold.iam.user.User">
+        INSERT INTO public.users
+            (id, email, password_hash, first_name, last_name, status,
+             email_verified, created_at, updated_at, created_by, updated_by)
+        VALUES
+            (#{id}, #{email}, #{passwordHash}, #{firstName}, #{lastName},
+             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+             #{emailVerified}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        ON CONFLICT (email) DO NOTHING
+    </insert>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT id, email, password_hash, first_name, last_name, status,
+               email_verified, last_global_signout_at,
+               created_at, updated_at, created_by, updated_by
+        FROM public.users
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByEmail" resultMap="userResultMap">
+        SELECT id, email, password_hash, first_name, last_name, status,
+               email_verified, last_global_signout_at,
+               created_at, updated_at, created_by, updated_by
+        FROM public.users
+        WHERE email = #{email}
+    </select>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM public.users
+        WHERE email = #{email}
+    </select>
+
+    <update id="update" parameterType="com.iqscaffold.iam.user.User">
+        UPDATE public.users
+        SET first_name = #{firstName},
+            last_name  = #{lastName},
+            status     = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLastGlobalSignoutAt">
+        UPDATE public.users
+        SET last_global_signout_at = #{lastGlobalSignoutAt}
+        WHERE id = #{userId}
+    </update>
+
+    <select id="findLastGlobalSignoutAt" resultType="java.time.Instant">
+        SELECT last_global_signout_at
+        FROM public.users
+        WHERE id = #{userId}
+    </select>
+
+    <update id="setEmailVerified">
+        UPDATE public.users
+        SET email_verified = true
+        WHERE id = #{userId}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE public.users
+        SET password_hash = #{passwordHash},
+            updated_at    = NOW()
+        WHERE id = #{userId}
+    </update>
+
+</mapper>

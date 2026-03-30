@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqscaffold.iam.membership.TenantMemberAuthorityMapper">
+
+    <resultMap id="authorityResultMap" type="com.iqscaffold.iam.membership.TenantMemberAuthority">
+        <id     property="id"           column="id"/>
+        <result property="membershipId" column="membership_id"/>
+        <result property="authority"    column="authority"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqscaffold.iam.membership.TenantMemberAuthority">
+        INSERT INTO public.tenant_member_authorities
+            (id, membership_id, authority)
+        VALUES
+            (#{id}, #{membershipId}, #{authority})
+    </insert>
+
+    <select id="findByMembershipId" resultMap="authorityResultMap">
+        SELECT id, membership_id, authority
+        FROM public.tenant_member_authorities
+        WHERE membership_id = #{membershipId}
+    </select>
+
+    <select id="findAuthorityValuesByMembershipId" resultType="java.lang.String">
+        SELECT authority
+        FROM public.tenant_member_authorities
+        WHERE membership_id = #{membershipId}
+    </select>
+
+    <delete id="deleteByMembershipId">
+        DELETE FROM public.tenant_member_authorities
+        WHERE membership_id = #{membershipId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqscaffold.iam.denylist.TokenDenylistMapper">
+
+    <resultMap id="tokenDenylistResultMap" type="com.iqscaffold.iam.denylist.TokenDenylist">
+        <id     property="id"        column="id"/>
+        <result property="jti"       column="jti"/>
+        <result property="userId"    column="user_id"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqscaffold.iam.denylist.TokenDenylist">
+        INSERT INTO public.token_denylist
+            (id, jti, user_id, expires_at, created_at)
+        VALUES
+            (#{id}, #{jti}, #{userId}, #{expiresAt}, #{createdAt})
+    </insert>
+
+    <select id="existsByJti" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM public.token_denylist
+        WHERE jti = #{jti}
+    </select>
+
+    <select id="findByUserId" resultMap="tokenDenylistResultMap">
+        SELECT id, jti, user_id, expires_at, created_at
+        FROM public.token_denylist
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteByExpiresAtBefore">
+        DELETE FROM public.token_denylist
+        WHERE expires_at &lt; #{cutoff}
+    </delete>
+
+</mapper>

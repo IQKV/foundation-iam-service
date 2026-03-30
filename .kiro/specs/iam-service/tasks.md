@@ -103,42 +103,42 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `UserServiceConstants`: service-wide string constants
     - _Requirements: 20.14_
 
-- [ ] 4. MyBatis mapper interfaces and XML mapper files
+- [x] 4. MyBatis mapper interfaces and XML mapper files
   - [x] 4.1 Implement `TenantMapper` interface and `src/main/resources/mappers/tenant/TenantMapper.xml`
     - Interface: `insertIfAbsent(Tenant)`, `findByTenantKey(String): Optional<Tenant>`, `findByStatus(String): List<Tenant>`, `existsByName(String): boolean`, `updateStatus(@Param tenantKey, @Param status)`, `findStuckProvisioning(@Param olderThan Instant): List<Tenant>`
     - XML: `resultMap` with all column mappings; `INSERT ... ON CONFLICT (name) DO NOTHING` for `insertIfAbsent`; `findStuckProvisioning` selects `WHERE status = 'PROVISIONING' AND created_at < #{olderThan}`; `SELECT`, `UPDATE` statements targeting `public.tenants`
     - _Requirements: 1.1, 1.4, 1.17, 5.3_
 
-  - [-] 4.2 Implement `UserMapper` interface and `src/main/resources/mappers/user/UserMapper.xml`
+  - [x] 4.2 Implement `UserMapper` interface and `src/main/resources/mappers/user/UserMapper.xml`
     - Interface: `upsertByEmail(User)`, `findById(UUID): Optional<User>`, `findByEmail(String): Optional<User>`, `existsByEmail(String): boolean`, `update(User)`, `updateLastGlobalSignoutAt(@Param userId, @Param lastGlobalSignoutAt): void`, `findLastGlobalSignoutAt(@Param userId): Optional<Instant>`, `setEmailVerified(@Param userId UUID): void`
     - XML: `resultMap` mapping `email_verified` column to `emailVerified` field; `upsertByEmail` includes `email_verified` column (value `#{emailVerified}`, defaults to `false`); `setEmailVerified` issues `UPDATE public.users SET email_verified = true WHERE id = #{userId}`; all other SQL targeting `public.users`
     - _Requirements: 8.1, 10.3_
 
-  - [ ] 4.3 Implement `TenantMembershipMapper` interface and `TenantMembershipMapper.xml`
+  - [x] 4.3 Implement `TenantMembershipMapper` interface and `TenantMembershipMapper.xml`
     - Interface: `insert(TenantMembership)`, `findByUserIdAndTenantKey(@Param userId, @Param tenantKey): Optional<TenantMembership>`, `existsByUserIdAndTenantKey(@Param userId, @Param tenantKey): boolean`, `findByTenantKey(String): List<TenantMembership>`, `findByUserId(UUID): List<TenantMembership>`, `deleteById(UUID)`
     - XML: all SQL targeting `public.tenant_memberships`
     - _Requirements: 4.2, 4.3_
 
-  - [ ] 4.4 Implement `TenantMemberAuthorityMapper` interface and `TenantMemberAuthorityMapper.xml`
+  - [x] 4.4 Implement `TenantMemberAuthorityMapper` interface and `TenantMemberAuthorityMapper.xml`
     - Interface: `insert(TenantMemberAuthority)`, `findByMembershipId(UUID): List<TenantMemberAuthority>`, `findAuthorityValuesByMembershipId(UUID): List<String>`, `deleteByMembershipId(UUID)`
     - XML: all SQL targeting `public.tenant_member_authorities`
     - _Requirements: 4.7, 20.23_
 
-  - [ ] 4.5 Implement `TokenDenylistMapper` interface and `TokenDenylistMapper.xml`
+  - [x] 4.5 Implement `TokenDenylistMapper` interface and `TokenDenylistMapper.xml`
     - Interface: `insert(TokenDenylist)`, `existsByJti(String): boolean`, `findByUserId(UUID): List<TokenDenylist>`, `deleteByExpiresAtBefore(Instant)`
     - XML: all SQL targeting `public.token_denylist`
     - _Requirements: 12.1, 12.3_
 
-  - [ ] 4.6 Implement `FailedLoginAttemptMapper` interface and `FailedLoginAttemptMapper.xml`
+  - [x] 4.6 Implement `FailedLoginAttemptMapper` interface and `FailedLoginAttemptMapper.xml`
     - Interface: `insert(FailedLoginAttempt)`, `countByEmailAndAttemptedAtAfter(@Param email, @Param since): long`, `deleteByEmail(String)`
     - XML: all SQL targeting `public.failed_login_attempts`
     - _Requirements: 9.1, 9.2_
 
-  - [ ] 4.7 Implement `EmailVerificationTokenMapper` interface and `EmailVerificationTokenMapper.xml`
+  - [x] 4.7 Implement `EmailVerificationTokenMapper` interface and `EmailVerificationTokenMapper.xml`
     - XML: `resultMap` mapping all columns; `countResendsWithinWindow` counts rows WHERE `user_id = #{userId} AND last_resend_at >= #{since}`; all SQL targeting `public.email_verification_tokens`
     - _Requirements: 18.1, 18.7, 18.8, 18.11_
 
-  - [ ] 4.8 Directory Structure
+  - [x] 4.8 Directory Structure
     ├── user/
     │   ├── User.java
     │   ├── AccountStatus.java
