@@ -22,7 +22,23 @@ import com.iqscaffold.iam.user.dto.UserDtos;
 
 public interface UserService {
 
-  UserDtos.UserResponse getProfile(UUID userId);
+  UserDtos.SignupResponse registerUser(UserDtos.RegisterUserRequest request);
 
-  UserDtos.UserResponse updateProfile(UUID userId, UserDtos.UpdateProfileRequest request);
+  UserDtos.UserResponse getUserById(UUID userId);
+
+  UserDtos.UserResponse updateUser(UUID userId, String firstName, String lastName, String updatedBy);
+
+  void deleteUser(UUID userId, String tenantKey);
+
+  /** @deprecated Use {@link #getUserById(UUID)} for profile retrieval. */
+  @Deprecated
+  default UserDtos.UserResponse getProfile(final UUID userId) {
+    return getUserById(userId);
+  }
+
+  /** @deprecated Use {@link #updateUser(UUID, String, String, String)} instead. */
+  @Deprecated
+  default UserDtos.UserResponse updateProfile(final UUID userId, final UserDtos.UpdateProfileRequest request) {
+    return updateUser(userId, request.firstName(), request.lastName(), userId.toString());
+  }
 }

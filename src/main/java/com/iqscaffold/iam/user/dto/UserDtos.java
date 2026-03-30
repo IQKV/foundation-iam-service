@@ -19,12 +19,37 @@ package com.iqscaffold.iam.user.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public final class UserDtos {
 
   private UserDtos() {}
+
+  public record RegisterUserRequest(
+      @Email @NotBlank String email,
+      @NotBlank @Size(min = 8, max = 128)
+      @Pattern(
+          regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
+          message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
+      String password,
+      @NotBlank @Size(max = 100) String firstName,
+      @NotBlank @Size(max = 100) String lastName,
+      @NotBlank @Size(min = 1, max = 100) String tenantName) {}
+
+  public record UpdateUserRequest(
+      @NotBlank @Size(max = 100) String firstName,
+      @NotBlank @Size(max = 100) String lastName) {}
+
+  /**
+   * @deprecated Use {@link UpdateUserRequest} instead.
+   */
+  @Deprecated
+  public record UpdateProfileRequest(
+      @NotBlank @Size(max = 100) String firstName,
+      @NotBlank @Size(max = 100) String lastName) {}
 
   public record UserResponse(
       UUID id,
@@ -35,7 +60,9 @@ public final class UserDtos {
       boolean emailVerified,
       LocalDateTime createdAt) {}
 
-  public record UpdateProfileRequest(
-      @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {}
+  public record SignupResponse(
+      UUID userId,
+      String email,
+      String tenantKey,
+      String tenantStatus) {}
 }

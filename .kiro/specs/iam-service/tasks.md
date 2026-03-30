@@ -339,8 +339,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `@Tag`, `@Operation`, `@ApiResponses`, `@SecurityRequirement(name="bearerAuth")` on all endpoints
     - _Requirements: 1.11-1.12, 1.14, 5.7, 21.1-21.9_
 
-- [ ] 11. User registration and profile management
-  - [ ] 11.1 Implement `UserDtos` and `UserDtoMapper`
+- [x] 11. User registration and profile management
+  - [x] 11.1 Implement `UserDtos` and `UserDtoMapper`
     - `RegisterUserRequest`: email (`@Email @NotBlank`), password (`@Size(min=8,max=128) @Pattern` for complexity), firstName (`@NotBlank @Size(max=100)`), lastName (`@NotBlank @Size(max=100)`), tenantName (`@NotBlank @Size(min=1, max=100)`)
     - `UpdateUserRequest`: firstName, lastName (both `@NotBlank @Size(max=100)`)
     - `UserResponse`: id (UUID), email, firstName, lastName, status, createdAt — no passwordHash
@@ -348,7 +348,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `UserDtoMapper`: final class, static `toResponse(User): UserResponse`, static `toSignupResponse(User, Tenant): SignupResponse`
     - _Requirements: 8.4-8.8, 15.4, 16.8, 20.3-20.5_
 
-  - [ ] 11.2 Implement `UserService` interface and `UserServiceImpl`
+  - [x] 11.2 Implement `UserService` interface and `UserServiceImpl`
     - `@Service @Transactional`; `@Transactional(readOnly=true)` on reads
     - Constructor-inject: `UserMapper`, `TenantMembershipMapper`, `TenantMemberAuthorityMapper`, `TenantService`, `UserEventPublisher`, `PasswordEncoder`
     - `registerUser(RegisterUserRequest)`:
@@ -366,7 +366,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `deleteUser(UUID userId, String tenantKey)`: resolve membership via `membershipMapper.findByUserIdAndTenantKey`, call `membershipMapper.deleteById(membership.getId())` (DB cascade removes authorities), publish `UserEvent(USER_DELETED)` — does NOT delete the global `User` record
     - _Requirements: 8.1-8.10, 15.1-15.7, 16.1-16.8, 17.1-17.3_
 
-  - [ ] 11.3 Implement `UserRestResource`
+  - [x] 11.3 Implement `UserRestResource`
     - `@RestController @RequestMapping("/api/v1/iam/users")`
     - `GET /me` → 200 OK, `UserResponse`; extract userId from JWT `JwtClaimNames.USER_ID` claim
     - `PATCH /me` → 200 OK, `UserResponse`
@@ -376,8 +376,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `@Tag`, `@Operation`, `@ApiResponses`, `@SecurityRequirement(name="bearerAuth")` on all endpoints
     - _Requirements: 13.1, 15.6, 16.7, 17.3, 21.1-21.9_
 
-- [ ] 12. Membership service
-  - [ ] 12.1 Implement `MembershipService` interface and `MembershipServiceImpl`
+- [x] 12. Membership service
+  - [x] 12.1 Implement `MembershipService` interface and `MembershipServiceImpl`
     - `@Service @Transactional(readOnly=true)`
     - `resolveMembership(UUID userId, String tenantKey): TenantMembership`: call `membershipMapper.findByUserIdAndTenantKey(userId, tenantKey)`, throw `MembershipNotFoundException` if absent; throw `MembershipNotFoundException` if status is `SUSPENDED` or `REMOVED`
     - `getAuthorities(UUID membershipId): List<String>`: call `authorityMapper.findAuthorityValuesByMembershipId(membershipId)`

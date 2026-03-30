@@ -16,6 +16,7 @@
 
 package com.iqscaffold.iam.user.dto;
 
+import com.iqscaffold.iam.tenant.Tenant;
 import com.iqscaffold.iam.user.User;
 
 public final class UserDtoMapper {
@@ -31,5 +32,13 @@ public final class UserDtoMapper {
         user.getStatus() != null ? user.getStatus().name() : null,
         user.isEmailVerified(),
         user.getCreatedAt());
+  }
+
+  public static UserDtos.SignupResponse toSignupResponse(final User user, final Tenant tenant) {
+    return new UserDtos.SignupResponse(
+        user.getId(),
+        user.getEmail(),
+        tenant.getTenantKey(),
+        tenant.getStatus() != null ? tenant.getStatus().name() : null);
   }
 }

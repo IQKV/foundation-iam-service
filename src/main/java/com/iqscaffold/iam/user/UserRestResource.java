@@ -16,38 +16,104 @@
 
 package com.iqscaffold.iam.user;
 
+import java.util.List;
+import java.util.UUID;
+
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iqscaffold.iam.authentication.AuthenticationService;
+import com.iqscaffold.iam.authentication.dto.AuthenticationDtos;
+import com.iqscaffold.iam.security.JwtClaimNames;
 import com.iqscaffold.iam.user.dto.UserDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users")
+@Tag(name = "User Management", description = "User profile and tenant discovery operations")
 public class UserRestResource {
 
   private final UserService userService;
+  private final AuthenticationService authenticationService;
 
-  public UserRestResource(final UserService userService) {
+  public UserRestResource(final UserService userService,
+                          final AuthenticationService authenticationService) {
     this.userService = userService;
+    this.authenticationService = authenticationService;
   }
 
   @GetMapping("/me")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "Get current user profile")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Profile retrieved"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
   public ResponseEntity<UserDtos.UserResponse> getProfile(@AuthenticationPrincipal final Jwt jwt) {
-    throw new UnsupportedOperationException("Not yet implemented");
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(userService.getUserById(userId));
   }
 
   @PatchMapping("/me")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "Update current user profile")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Profile updated"),
+      @ApiResponse(responseCode = "400", description = "Validation error"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
   public ResponseEntity<UserDtos.UserResponse> updateProfile(
       @AuthenticationPrincipal final Jwt jwt,
-      @Valid @RequestBody final UserDtos.UpdateProfileRequest request) {
-    throw new UnsupportedOperationException("Not yet implemented");
+      @Valid @RequestBody final UserDtos.UpdateUserRequest request) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(
+        userService.updateUser(userId, request.firstName(), request.lastName(), userId.toString()));
+  }
+
+  @DeleteMapping("/me")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "Delete current user membership from tenant")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Membership removed"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "Membership not found")
+  })
+  public ResponseEntity<Void> deleteProfile(@AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    final String tenantKey = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    userService.deleteUser(userId, tenantKey);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/tenants")
+  @PreAuthorize("permitAll()")
+  @Operation(summary = "Discover tenants for a user (credential-gated, no JWT required)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Tenant list returned"),
+      @ApiResponse(responseCode = "401", description = "Invalid credentials")
+  })
+  public ResponseEntity<List<AuthenticationDtos.TenantMembershipSummary>> listUserTenants(
+      @Valid @RequestBody final AuthenticationDtos.TenantDiscoveryRequest request) {
+    return ResponseEntity.ok(
+        authenticationService.listUserTenants(request.email(), request.password()));
   }
 }
