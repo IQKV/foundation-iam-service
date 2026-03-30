@@ -16,8 +16,8 @@
 
 package com.iqscaffold.iam.authentication;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -31,6 +31,7 @@ import com.iqscaffold.iam.infrastructure.config.AuthConfigurationProperties;
 import com.iqscaffold.iam.security.JwtClaimNames;
 import com.iqscaffold.iam.user.User;
 import io.jsonwebtoken.Jwts;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,14 +40,19 @@ public class JwtTokenGenerator {
   private final AuthConfigurationProperties authProps;
   private final RSAPrivateKey privateKey;
 
-  public JwtTokenGenerator(final AuthConfigurationProperties authProps) {
+  public JwtTokenGenerator(final AuthConfigurationProperties authProps,
+                            final ResourceLoader resourceLoader) {
     this.authProps = authProps;
-    this.privateKey = loadPrivateKey(authProps.jwt().privateKeyPath());
+    this.privateKey = loadPrivateKey(authProps.jwt().privateKeyPath(), resourceLoader);
   }
 
-  private static RSAPrivateKey loadPrivateKey(final String privateKeyPath) {
+  private static RSAPrivateKey loadPrivateKey(final String privateKeyPath,
+                                              final ResourceLoader resourceLoader) {
     try {
-      final String pem = Files.readString(Path.of(privateKeyPath));
+      final String pem;
+      try (InputStream is = resourceLoader.getResource(privateKeyPath).getInputStream()) {
+        pem = new String(is.readAllBytes());
+      }
       final String stripped = pem
           .replace("-----BEGIN PRIVATE KEY-----", "")
           .replace("-----END PRIVATE KEY-----", "")
@@ -56,7 +62,7 @@ public class JwtTokenGenerator {
       final byte[] keyBytes = Base64.getDecoder().decode(stripped);
       final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
       return (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
-    } catch (final Exception e) {
+    } catch (final IOException | java.security.GeneralSecurityException e) {
       throw new IllegalStateException("Failed to load RSA private key for JWT signing", e);
     }
   }

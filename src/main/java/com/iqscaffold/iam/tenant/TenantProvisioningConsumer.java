@@ -19,6 +19,7 @@ package com.iqscaffold.iam.tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.iqscaffold.iam.infrastructure.config.RabbitMQConfig;
@@ -27,6 +28,7 @@ import com.iqscaffold.iam.infrastructure.messaging.TenantEvent;
 import com.iqscaffold.iam.tenancy.TenantLiquibaseRunner;
 
 @Component
+@ConditionalOnProperty(name = "iqscaffold.messaging.rabbitmq.enabled", havingValue = "true")
 public class TenantProvisioningConsumer {
 
   private static final Logger log = LoggerFactory.getLogger(TenantProvisioningConsumer.class);

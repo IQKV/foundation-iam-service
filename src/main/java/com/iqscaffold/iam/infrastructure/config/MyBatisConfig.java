@@ -16,8 +16,10 @@
 
 package com.iqscaffold.iam.infrastructure.config;
 
+import java.util.UUID;
 import javax.sql.DataSource;
 
+import com.iqscaffold.iam.infrastructure.mybatis.UuidTypeHandler;
 import com.iqscaffold.iam.tenancy.MyBatisSchemaInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -46,6 +48,7 @@ public class MyBatisConfig {
         new org.apache.ibatis.session.Configuration();
     config.setMapUnderscoreToCamelCase(true);
     config.addInterceptor(new MyBatisSchemaInterceptor());
+    config.getTypeHandlerRegistry().register(UUID.class, UuidTypeHandler.class);
     factory.setConfiguration(config);
 
     return factory.getObject();

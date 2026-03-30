@@ -16,8 +16,9 @@
 
 package com.iqscaffold.iam.infrastructure.config;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -29,6 +30,8 @@ import com.iqscaffold.iam.security.JwtAuthenticationFilter;
 import com.iqscaffold.iam.security.JwtClaimNames;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,11 +53,14 @@ public class SecurityConfig {
 
   private final AuthConfigurationProperties authProps;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ResourceLoader resourceLoader;
 
   public SecurityConfig(final AuthConfigurationProperties authProps,
-                        final JwtAuthenticationFilter jwtAuthenticationFilter) {
+                        @Lazy final JwtAuthenticationFilter jwtAuthenticationFilter,
+                        final ResourceLoader resourceLoader) {
     this.authProps = authProps;
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.resourceLoader = resourceLoader;
   }
 
   @Bean
@@ -95,7 +101,10 @@ public class SecurityConfig {
   public JwtDecoder jwtDecoder() {
     try {
       final String publicKeyPath = authProps.jwt().publicKeyPath();
-      final String pem = Files.readString(Path.of(publicKeyPath));
+      final String pem;
+      try (InputStream is = resourceLoader.getResource(publicKeyPath).getInputStream()) {
+        pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+      }
       final String stripped = pem
           .replace("-----BEGIN PUBLIC KEY-----", "")
           .replace("-----END PUBLIC KEY-----", "")
@@ -104,7 +113,7 @@ public class SecurityConfig {
       final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
       final RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
       return NimbusJwtDecoder.withPublicKey(publicKey).build();
-    } catch (final Exception e) {
+    } catch (final IOException | java.security.GeneralSecurityException e) {
       throw new IllegalStateException("Failed to load RSA public key for JWT decoding", e);
     }
   }

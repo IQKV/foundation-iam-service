@@ -16,8 +16,9 @@
 
 package com.iqscaffold.iam.infrastructure.security;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -28,6 +29,7 @@ import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,8 +50,9 @@ public class JwksRestResource {
 
   private final Map<String, Object> jwks;
 
-  public JwksRestResource(final AuthConfigurationProperties authProps) {
-    this.jwks = buildJwks(authProps.jwt().publicKeyPath());
+  public JwksRestResource(final AuthConfigurationProperties authProps,
+                          final ResourceLoader resourceLoader) {
+    this.jwks = buildJwks(authProps.jwt().publicKeyPath(), resourceLoader);
   }
 
   @GetMapping(value = "/jwks.json", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,9 +63,13 @@ public class JwksRestResource {
     return ResponseEntity.ok(jwks);
   }
 
-  private static Map<String, Object> buildJwks(final String publicKeyPath) {
+  private static Map<String, Object> buildJwks(final String publicKeyPath,
+                                               final ResourceLoader resourceLoader) {
     try {
-      final String pem = Files.readString(Path.of(publicKeyPath));
+      final String pem;
+      try (InputStream is = resourceLoader.getResource(publicKeyPath).getInputStream()) {
+        pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+      }
       final String stripped = pem
           .replace("-----BEGIN PUBLIC KEY-----", "")
           .replace("-----END PUBLIC KEY-----", "")
@@ -84,7 +91,7 @@ public class JwksRestResource {
           "e", e
       );
       return Map.of("keys", List.of(jwk));
-    } catch (final Exception ex) {
+    } catch (final IOException | java.security.GeneralSecurityException ex) {
       throw new IllegalStateException("Failed to build JWKS from public key", ex);
     }
   }
