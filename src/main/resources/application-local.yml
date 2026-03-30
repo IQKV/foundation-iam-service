@@ -1,28 +1,45 @@
 # ===================================================================
-# Spring Boot configuration for the "dev" profile (K8s / dev cluster).
+# Spring Boot configuration for the "local" profile.
 # ===================================================================
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:iam}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:iam}
     username: ${DB_USERNAME:iam}
     password: ${DB_PASSWORD:iam}
   rabbitmq:
-    host: ${RABBITMQ_HOST:rabbitmq}
+    host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
   liquibase:
     enabled: true
     contexts: demo
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 logging:
   level:
     com.iqscaffold: DEBUG
     org.mybatis: DEBUG
-    liquibase: DEBUG
 
 iqscaffold:
+  auth:
+    jwt:
+      expiry: PT30M
+      refresh-expiry: P30D
+    security:
+      min-length: 6
   messaging:
     rabbitmq:
       enabled: true

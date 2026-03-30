@@ -6,8 +6,8 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
 
 ## Tasks
 
-- [ ] 1. Project scaffold and build configuration
-  - [ ] 1.1 Create Maven `pom.xml`
+- [x] 1. Project scaffold and build configuration
+  - [x] 1.1 Create Maven `pom.xml`
     - Spring Boot 3.x parent, Java 21, packaging jar
     - Dependencies: `spring-boot-starter-web`, `mybatis-spring-boot-starter`, `spring-boot-starter-security`, `spring-boot-starter-oauth2-resource-server`, `spring-boot-starter-amqp`, `spring-boot-starter-actuator`, `spring-boot-starter-validation`, `spring-boot-starter-mail`, `spring-boot-starter-thymeleaf`
     - `postgresql` driver, `liquibase-core`
@@ -18,7 +18,7 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - NO `spring-boot-starter-data-jpa`, NO Hibernate BOM, NO JPA dependencies
     - _Requirements: 20.1_
 
-  - [ ] 1.2 Create `src/main/resources/application.yml` and profile configs
+  - [x] 1.2 Create `src/main/resources/application.yml` and profile configs
     - `application.yml`: `mybatis.mapper-locations: classpath:mappers/**/*.xml`; `mybatis.configuration.map-underscore-to-camel-case: true`; `spring.liquibase.enabled: false`; actuator on port 8081; JWT RS256 key paths + `expiry: PT15M` + `refresh-expiry: P7D` via env vars; `iqscaffold.tenancy.provisioning-timeout: PT10M`; `iqscaffold.notification.mail.from: ${MAIL_FROM:noreply@example.com}`; `iqscaffold.notification.mail.reply-to: ${MAIL_REPLY_TO:}`; `iqscaffold.notification.default-locale: en`; `iqscaffold.notification.base-url: ${APP_BASE_URL:http://localhost:3000}`; `iqscaffold.auth.password-reset.token-ttl: PT1H`; `iqscaffold.auth.password-reset.rate-limit-window: PT15M`; `iqscaffold.auth.password-reset.rate-limit-max-requests: 3`; `spring.mail.host: ${MAIL_HOST:localhost}`; `spring.mail.port: ${MAIL_PORT:587}`; `spring.mail.username: ${MAIL_USERNAME:}`; `spring.mail.password: ${MAIL_PASSWORD:}`; `spring.mail.properties.mail.smtp.auth: true`; `spring.mail.properties.mail.smtp.starttls.enable: true`; `spring.messages.basename: messages`; `spring.messages.encoding: UTF-8`; `spring.messages.fallback-to-system-locale: false`; all sensitive values via `${ENV_VAR:default}`
     - NO `spring.jpa.*` or `hibernate.*` properties anywhere
     - `application-local.yml`: relaxed password policy (`min-length: 6`), `liquibase.contexts: demo`, all actuator endpoints exposed, longer token TTLs (`PT30M`/`P30D`), `spring.mail.host: localhost`, `spring.mail.port: 1025` (Mailpit/MailHog), `spring.mail.properties.mail.smtp.auth: false`, `spring.mail.properties.mail.smtp.starttls.enable: false`
@@ -27,10 +27,10 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
     - `application-test.yml`: `liquibase.contexts: demo`, debug Liquibase logging, `spring.mail.host: localhost`, `spring.mail.port: 3025`
     - _Requirements: 2.4, 20.21-20.22_
 
-  - [ ] 1.3 Create `src/main/resources/logback-spring.xml`
+  - [x] 1.3 Create `src/main/resources/logback-spring.xml`
     - Console appender with `LogstashEncoder` for structured JSON output
 
-  - [ ] 1.4 Create `IamServiceApplication.java` and configuration properties classes
+  - [x] 1.4 Create `IamServiceApplication.java` and configuration properties classes
     - `IamServiceApplication`: `@SpringBootApplication` main class with `@EnableScheduling` and `@EnableSchedulerLock(defaultLockAtMostFor = "PT55M")`
     - `@ConfigurationProperties` records:
       - `DatabaseConfigurationProperties` (`iqscaffold.database`): url, username, password, pool size
@@ -41,24 +41,24 @@ Implement a multi-tenant Spring Boot 3.x / Java 21 authentication microservice w
       - `NotificationConfigurationProperties` (`iqscaffold.notification`): mail (from, reply-to), default-locale (`"en"`), base-url — used by `EmailService` for template rendering and link generation
     - _Requirements: 20.1_
 
-- [ ] 2. Multi-tenancy infrastructure
-  - [ ] 2.1 Implement `TenantContext` (ThreadLocal holder)
+- [x] 2. Multi-tenancy infrastructure
+  - [x] 2.1 Implement `TenantContext` (ThreadLocal holder)
     - Static `setCurrentTenant(String)`, `getCurrentTenant()`, `clear()` methods
     - `setCurrentTenant` throws `IllegalArgumentException` on null/blank input
     - `getCurrentTenant()` throws `IllegalStateException("No tenant context set for current thread")` when empty
     - _Requirements: 3.7, 3.8, 3.9_
 
-  - [ ] 2.2 Implement `MyBatisSchemaInterceptor`
+  - [x] 2.2 Implement `MyBatisSchemaInterceptor`
     - `@Intercepts({ @Signature(type=StatementHandler.class, method="prepare", args={Connection.class, Integer.class}) })`
     - In `intercept()`: call `TenantContext.getCurrentTenant()`; if present execute `SET search_path TO t_{tenantKey}, public` on the connection via a `Statement`; if `IllegalStateException` (no context) proceed without changing search_path
     - _Requirements: 2.2, 2.3, 2.5, 3.10, 3.11, 3.12_
 
-  - [ ] 2.3 Implement `MyBatisConfig`
+  - [x] 2.3 Implement `MyBatisConfig`
     - `@Configuration @MapperScan("com.iqscaffold.iam")`
     - `SqlSessionFactory` bean: set `DataSource`, mapper locations (`classpath:mappers/**/*.xml`), `mapUnderscoreToCamelCase=true`, register `MyBatisSchemaInterceptor`
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 2.4 Implement `TenantExtractionFilter`
+  - [x] 2.4 Implement `TenantExtractionFilter`
     - `@Order(Ordered.HIGHEST_PRECEDENCE + 1)`, extends `OncePerRequestFilter`
     - Priority 1: `X-Tenant-ID` header; Priority 2: JWT `tenant_id` claim — constructor-inject `JwtDecoder`, decode Bearer token, extract `JwtClaimNames.TENANT_ID` claim
     - Returns 400 `application/problem+json` `{"title":"Tenant ID required","status":400}` when unresolvable

@@ -1,42 +1,50 @@
-# Spring Boot configuration — unit / context tests.
-# Uses H2 in-memory DB; RabbitMQ and Liquibase are disabled so that
-# @SpringBootTest context tests pass without external infrastructure.
+# ===================================================================
+# Spring Boot configuration for tests.
+# ===================================================================
 
 spring:
-  application:
-    name: iam-service
-
-  # In-memory datasource for context tests
-  datasource:
-    url: jdbc:h2:mem:iam_test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  # Disable Liquibase (no migrations needed for scaffold tests)
   liquibase:
-    enabled: false
-
-  # Disable RabbitMQ auto-connect
-  rabbitmq:
+    enabled: true
+    contexts: demo
+  mail:
     host: localhost
-    port: 5672
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+    port: 3025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 
-mybatis:
-  mapper-locations: classpath:mappers/**/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
+logging:
+  level:
+    liquibase: DEBUG
 
-git:
-  build_time: "@git.build.time@"
-  commit: "@git.commit.id.abbrev@"
-info:
-  app:
-    build_time: ${git.build_time}
-    description: "@project.description@"
-    git_commit: ${git.commit}
-    name: "@project.name@"
-    version: "@project.version@"
+iqscaffold:
+  auth:
+    jwt:
+      private-key-path: classpath:keys/private.pem
+      public-key-path: classpath:keys/public.pem
+      expiry: PT15M
+      refresh-expiry: P7D
+      issuer: iqscaffold-iam-service
+    security:
+      password-encoder-strength: 4
+      min-length: 8
+      rate-limiting:
+        login-attempts: 5
+        lockout-duration: PT15M
+    password-reset:
+      token-ttl: PT1H
+      rate-limit-window: PT15M
+      rate-limit-max-requests: 3
+  tenancy:
+    schema-prefix: t_
+    default-schema: public
+    provisioning-timeout: PT10M
+  notification:
+    mail:
+      from: noreply@example.com
+      reply-to: ""
+    default-locale: en
+    base-url: http://localhost:3000
+  messaging:
+    rabbitmq:
+      enabled: false

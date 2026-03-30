@@ -1,13 +1,69 @@
 # ===================================================================
-# Spring Boot configuration.
-#
-# This configuration will be overridden by the Spring profile you use,
-# for example application-dev.yml if you use the "dev" profile.
+# Spring Boot base configuration — overridden by active profile.
 # ===================================================================
 
 spring:
   application:
     name: iam-service
+  liquibase:
+    enabled: false
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+mybatis:
+  mapper-locations: classpath:mappers/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+iqscaffold:
+  auth:
+    jwt:
+      private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:keys/private.pem}
+      public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
+      expiry: PT15M
+      refresh-expiry: P7D
+      issuer: iqscaffold-iam-service
+    security:
+      password-encoder-strength: 12
+      min-length: 8
+      rate-limiting:
+        login-attempts: 5
+        lockout-duration: PT15M
+    password-reset:
+      token-ttl: PT1H
+      rate-limit-window: PT15M
+      rate-limit-max-requests: 3
+  tenancy:
+    schema-prefix: t_
+    default-schema: public
+    provisioning-timeout: PT10M
+  notification:
+    mail:
+      from: ${MAIL_FROM:noreply@example.com}
+      reply-to: ${MAIL_REPLY_TO:}
+    default-locale: en
+    base-url: ${APP_BASE_URL:http://localhost:3000}
 
 git:
   build_time: "@git.build.time@"
