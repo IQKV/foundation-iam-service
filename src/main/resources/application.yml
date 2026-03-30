@@ -7,7 +7,7 @@
 
 spring:
   application:
-    name: servicename
+    name: iam-service
 
 git:
   build_time: "@git.build.time@"

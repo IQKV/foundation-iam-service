@@ -1,74 +1,78 @@
-# Project Name 🚀
+# IAM Service
 
-<!-- TEMPLATE: This README.template.md is a starter template. Copy parts into your real README.md and replace placeholders. -->
+Multi-tenant Identity and Access Management microservice. A single user account can belong to multiple tenants with different roles in each.
 
-<details>
-  <summary><strong>How to use this template (click to expand)</strong></summary>
+![CI](https://img.shields.io/github/actions/workflow/status/IQKV/iqscaffold-iam-service/ci.yml?label=CI)
+![License](https://img.shields.io/github/license/IQKV/iqscaffold-iam-service)
 
-1. Rename the title above to your project name and optionally add a logo right below it.
-2. Add badges (build, tests, coverage, license) under the title.
-3. Fill each section below with your actual project content (keep the section order if you like it).
-4. Replace placeholder code blocks and bullet points with real commands and steps.
-5. Keep the "Template Usage" links if you want quick access to template docs, or remove them in your final README.md.
-6. Remove this guidance block after you finish customizing.
+## About
 
-</details>
+The IAM service handles the full identity lifecycle for a SaaS platform:
 
-- Add your project logo.
-- Write a short introduction to the project.
-- If you are using badges, add them here.
+- **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant roles (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
+- **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
+- **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
+- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after a configurable threshold
+- **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 
-<details>
-  <summary><strong>Badge examples (optional)</strong></summary>
+## API
 
-- Build: <code>![CI](https://img.shields.io/github/actions/workflow/status/ORG/REPO/ci.yml?label=CI)</code>
-- Tests: <code>![Tests](https://img.shields.io/badge/tests-passing-brightgreen)</code>
-- Coverage: <code>![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)</code>
-- License: <code>![License](https://img.shields.io/github/license/ORG/REPO)</code>
+Base path: `/api/v1/iam`
 
-</details>
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/auth/signup` | public | Register user and create tenant |
+| `POST` | `/auth/signin` | `X-Tenant-ID` | Sign in, receive token pair |
+| `POST` | `/auth/refresh` | `X-Tenant-ID` | Rotate access + refresh tokens |
+| `POST` | `/auth/signout` | JWT | Revoke current session |
+| `POST` | `/auth/signout-all` | JWT | Revoke all sessions globally |
+| `POST` | `/auth/validate` | JWT | Validate token for gateway introspection |
+| `POST` | `/users/tenants` | public | Discover tenants by credentials |
+| `GET`  | `/users/me` | JWT | Get own profile |
+| `PATCH` | `/users/me` | JWT | Update own profile |
+| `GET`  | `/tenants/{tenantKey}` | JWT `TENANT_OWNER` | Get tenant status |
+| `PATCH` | `/tenants/{tenantKey}/status` | JWT `TENANT_OWNER` | Transition tenant status |
+| `POST` | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` | Retry failed provisioning |
 
-## :beginner: About
+## Tech Stack
 
-Add a detailed introduction about the project here, everything you want the reader to know.
+- Java 21 / Spring Boot 3.4
+- MyBatis 3.x (no JPA) + PostgreSQL
+- Liquibase for schema migrations
+- RabbitMQ for async tenant provisioning
+- JJWT (RS256 signing)
+- ShedLock for distributed scheduled jobs
+- Micrometer + Prometheus
 
-## 📚 Documentation
+## Running Locally
+
+**Prerequisites:** JDK 21, Docker
+
+```bash
+# Start dependencies
+docker compose up -d
+
+# Run the service
+./mvnw spring-boot:run -Pdev
+```
+
+## Building
+
+```bash
+# Compile and test
+./mvnw clean verify -Dcheckstyle.skip=true
+
+# Production image
+./mvnw clean package -Pproduction
+docker build -t iam-service .
+```
+
+## Documentation
 
 - [API Documentation](docs/api/README.md)
 - [Architecture Overview](docs/architecture/README.md)
 - [Deployment Guide](docs/deployment/README.md)
 - [Contributing Guidelines](.github/CONTRIBUTING.md)
 
----
-
-<details>
-  <summary><strong>✅ Pre-publish checklist (remove in final README)</strong></summary>
-
-- [ ] Title updated and logo added
-- [ ] Badges added (CI, tests, coverage, license)
-- [ ] About/Usage/Installation/Commands completed
-- [ ] Development prerequisites and environment documented
-- [ ] Architecture notes reflect your stack and modules
-- [ ] Links verified (Getting Started, docs, external resources)
-- [ ] Guidance blocks, template-docs folder, are removed before publishing
-
-</details>
-
----
-
-## 📚 Template Usage
-
-- [Project Overview](./template-docs/01-project-overview.md)
-- [Getting Started Guide](./template-docs/02-getting-started.md)
-- [Architecture Overview](./template-docs/03-architecture-overview.md)
-- [Development Workflow](./template-docs/04-development-workflow.md)
-- [Testing Guide](./template-docs/05-testing-guide.md)
-
-## 🧩 Boilerplate Architecture
-
-- **Project Structure**: Tactical DDD with bounded contexts, hexagonal architecture (domain/application/adapter layers)
-- **GitHub Integration**: Issue templates, labels, and workflows
-- **Quality Tools**: Code formatting, linting, and testing setup
-- **Documentation**: Community guidelines and contribution process
-
-> See [AGENTS.md](AGENTS.md) for detailed project structure and DDD patterns.
+> See [AGENTS.md](AGENTS.md) for repository structure, DDD patterns, and agent guidelines.
