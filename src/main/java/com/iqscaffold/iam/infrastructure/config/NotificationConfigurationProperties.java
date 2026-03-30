@@ -1,13 +1,19 @@
 package com.iqscaffold.iam.infrastructure.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+@Validated
 @ConfigurationProperties(prefix = "iqscaffold.notification")
 public record NotificationConfigurationProperties(
-    Mail mail,
-    String defaultLocale,
-    String baseUrl
+    @Valid @NotNull Mail mail,
+    @NotBlank String defaultLocale,
+    @NotBlank String baseUrl
 ) {
 
-    public record Mail(String from, String replyTo) {}
+    public record Mail(@NotBlank String from, String replyTo) {}
 }

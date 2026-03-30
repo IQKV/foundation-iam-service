@@ -3,10 +3,15 @@ package com.iqscaffold.iam.infrastructure.config;
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+@Validated
 @ConfigurationProperties(prefix = "iqscaffold.tenancy")
 public record TenancyConfigurationProperties(
-    String schemaPrefix,
-    String defaultSchema,
-    Duration provisioningTimeout
+    @NotBlank String schemaPrefix,
+    @NotBlank String defaultSchema,
+    @NotNull Duration provisioningTimeout
 ) {}

@@ -1,17 +1,9 @@
 # ===================================================================
 # Spring Boot configuration for the "dev" profile (K8s / dev cluster).
+# Overrides base: points to in-cluster service names, enables Liquibase with demo data.
 # ===================================================================
 
 spring:
-  datasource:
-    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
-    username: ${iqscaffold.db.username}
-    password: ${iqscaffold.db.password}
-  rabbitmq:
-    host: ${iqscaffold.rabbitmq.host}
-    port: ${iqscaffold.rabbitmq.port}
-    username: ${iqscaffold.rabbitmq.username}
-    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: true
     contexts: demo
@@ -29,7 +21,6 @@ iqscaffold:
     password: ${DB_PASSWORD:iam}
   rabbitmq:
     host: ${RABBITMQ_HOST:rabbitmq}
-    port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:iam}
     password: ${RABBITMQ_PASSWORD:iam}
   messaging:

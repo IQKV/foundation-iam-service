@@ -3,36 +3,44 @@ package com.iqscaffold.iam.infrastructure.config;
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+@Validated
 @ConfigurationProperties(prefix = "iqscaffold.auth")
 public record AuthConfigurationProperties(
-    Jwt jwt,
-    Security security,
-    PasswordReset passwordReset
+    @Valid @NotNull Jwt jwt,
+    @Valid @NotNull Security security,
+    @Valid @NotNull PasswordReset passwordReset
 ) {
 
     public record Jwt(
-        String privateKeyPath,
-        String publicKeyPath,
-        Duration expiry,
-        Duration refreshExpiry,
-        String issuer
+        @NotBlank String privateKeyPath,
+        @NotBlank String publicKeyPath,
+        @NotNull Duration expiry,
+        @NotNull Duration refreshExpiry,
+        @NotBlank String issuer
     ) {}
 
     public record Security(
-        int passwordEncoderStrength,
-        int minLength,
-        RateLimiting rateLimiting
+        @Min(4) int passwordEncoderStrength,
+        @Min(1) int minLength,
+        @Valid @NotNull RateLimiting rateLimiting
     ) {
         public record RateLimiting(
-            int loginAttempts,
-            Duration lockoutDuration
+            @Positive int loginAttempts,
+            @NotNull Duration lockoutDuration
         ) {}
     }
 
     public record PasswordReset(
-        Duration tokenTtl,
-        Duration rateLimitWindow,
-        int rateLimitMaxRequests
+        @NotNull Duration tokenTtl,
+        @NotNull Duration rateLimitWindow,
+        @Positive int rateLimitMaxRequests
     ) {}
 }

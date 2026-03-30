@@ -5,6 +5,15 @@
 spring:
   application:
     name: iqscaffold-iam-service
+  datasource:
+    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
+    username: ${iqscaffold.db.username}
+    password: ${iqscaffold.db.password}
+  rabbitmq:
+    host: ${iqscaffold.rabbitmq.host}
+    port: ${iqscaffold.rabbitmq.port}
+    username: ${iqscaffold.rabbitmq.username}
+    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: false
   mail:

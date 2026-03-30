@@ -1,26 +1,12 @@
 # ===================================================================
 # Spring Boot configuration for the "production" profile.
-# All secrets MUST be supplied via environment variables — no defaults.
+# Overrides base: all secrets via env vars (no defaults), hardens actuator/swagger.
 # ===================================================================
 
 spring:
-  datasource:
-    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
-    username: ${iqscaffold.db.username}
-    password: ${iqscaffold.db.password}
-  rabbitmq:
-    host: ${iqscaffold.rabbitmq.host}
-    port: ${iqscaffold.rabbitmq.port}
-    username: ${iqscaffold.rabbitmq.username}
-    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: true
     contexts: "!demo"
-  mail:
-    host: ${iqscaffold.mail.host}
-    port: ${iqscaffold.mail.port}
-    username: ${iqscaffold.mail.username}
-    password: ${iqscaffold.mail.password}
   mvc:
     pathmatch:
       use-suffix-pattern: false
@@ -56,6 +42,8 @@ iqscaffold:
     port: ${MAIL_PORT}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
+    from: ${MAIL_FROM}
+    reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:
       private-key-path: ${JWT_PRIVATE_KEY_PATH}

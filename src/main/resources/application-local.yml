@@ -1,23 +1,14 @@
 # ===================================================================
 # Spring Boot configuration for the "local" profile.
+# Overrides base: enables Liquibase with demo data, uses MailHog,
+# relaxes SMTP auth, exposes all actuator endpoints, loosens JWT/password rules.
 # ===================================================================
 
 spring:
-  datasource:
-    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
-    username: ${iqscaffold.db.username}
-    password: ${iqscaffold.db.password}
-  rabbitmq:
-    host: ${iqscaffold.rabbitmq.host}
-    port: ${iqscaffold.rabbitmq.port}
-    username: ${iqscaffold.rabbitmq.username}
-    password: ${iqscaffold.rabbitmq.password}
   liquibase:
     enabled: true
     contexts: demo
   mail:
-    host: ${iqscaffold.mail.host}
-    port: ${iqscaffold.mail.port}
     properties:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
@@ -43,8 +34,8 @@ iqscaffold:
     username: ${RABBITMQ_USERNAME:iam}
     password: ${RABBITMQ_PASSWORD:iam}
   mail:
-    host: localhost
-    port: 1025
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
   auth:
     jwt:
       expiry: PT30M
