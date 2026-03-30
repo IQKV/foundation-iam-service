@@ -1,0 +1,39 @@
+services:
+  # PostgreSQL Database for IAM Service
+  postgres-iam:
+    extends:
+      file: compose.base.yaml
+      service: postgres-iam
+
+  # RabbitMQ for IAM Service
+  rabbitmq-iam:
+    extends:
+      file: compose.base.yaml
+      service: rabbitmq-iam
+
+  # MailHog for local email testing
+  mailhog:
+    extends:
+      file: compose.base.yaml
+      service: mailhog
+
+  # IAM Service - Full platform run including build phase
+  iam-service:
+    extends:
+      file: compose.base.yaml
+      service: iam-service
+
+networks:
+  iam-service-network:
+    name: iqscaffold-iam-network-dev
+    external: false
+
+volumes:
+  postgres_iam_data:
+    name: iqscaffold_iam_postgres_data_dev
+  rabbitmq_iam_data:
+    name: iqscaffold_iam_rabbitmq_data_dev
+  iam_logs:
+    name: iqscaffold_iam_logs_dev
+  iam_tmp:
+    name: iqscaffold_iam_tmp_dev

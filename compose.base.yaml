@@ -1,0 +1,179 @@
+services:
+  # PostgreSQL Database for IAM Service - Local Development
+  postgres-iam:
+    image: postgres:17-alpine
+    container_name: iqscaffold-iam-postgres-dev
+    environment:
+      POSTGRES_DB: iam
+      POSTGRES_USER: iam
+      POSTGRES_PASSWORD: iam
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_iam_data:/var/lib/postgresql/data
+    networks:
+      - iam-service-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iam -d iam -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.track=all
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+
+  # RabbitMQ for IAM Service - Local Development
+  rabbitmq-iam:
+    image: rabbitmq:3.13-management-alpine
+    container_name: iqscaffold-iam-rabbitmq-dev
+    environment:
+      RABBITMQ_DEFAULT_USER: iam
+      RABBITMQ_DEFAULT_PASS: iam
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,info}] disk_free_limit 2147483648
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_iam_data:/var/lib/rabbitmq
+    networks:
+      - iam-service-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # MailHog for local email testing
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: iqscaffold-iam-mailhog-dev
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - iam-service-network
+    restart: unless-stopped
+
+  # IAM Service - Local Development
+  iam-service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: builder
+    image: iqscaffold/iqscaffold-iam-service:dev
+    container_name: iqscaffold-iam-service-dev
+    environment:
+      # Spring Configuration
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_APPLICATION_NAME: iqscaffold-iam-service
+
+      # Database Configuration
+      DB_HOST: postgres-iam
+      DB_PORT: 5432
+      DB_NAME: iam
+      DB_USERNAME: iam
+      DB_PASSWORD: iam
+
+      # RabbitMQ Configuration
+      RABBITMQ_HOST: rabbitmq-iam
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: iam
+      RABBITMQ_PASSWORD: iam
+
+      # Mail Configuration (MailHog)
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_FROM: noreply@iqscaffold.site
+      MAIL_REPLY_TO: ""
+
+      # JWT RS256 Key Configuration
+      JWT_PRIVATE_KEY_PATH: classpath:keys/private.pem
+      JWT_PUBLIC_KEY_PATH: classpath:keys/public.pem
+
+      # Application URLs
+      APP_BASE_URL: http://localhost:3000
+
+      # Observability
+      OTEL_SERVICE_NAME: iqscaffold-iam-service
+      OTEL_RESOURCE_ATTRIBUTES: service.name=iqscaffold-iam-service,service.version=1.0.0,deployment.environment=dev
+
+      # JVM Configuration
+      JAVA_OPTS: >-
+        -Xms256m
+        -Xmx512m
+        -XX:+UseG1GC
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Djava.security.egd=file:/dev/./urandom
+    ports:
+      - "8080:8080" # IAM service API
+      - "8081:8081" # Actuator / management
+    depends_on:
+      postgres-iam:
+        condition: service_healthy
+      rabbitmq-iam:
+        condition: service_healthy
+    networks:
+      - iam-service-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    restart: unless-stopped
+    volumes:
+      - iam_logs:/app/logs
+      - iam_tmp:/app/tmp
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 768M
+        reservations:
+          cpus: "0.25"
+          memory: 384M
+
+networks:
+  iam-service-network:
+    driver: bridge
+    name: iqscaffold-iam-network-dev
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  postgres_iam_data:
+    name: iqscaffold_iam_postgres_data_dev
+    driver: local
+  rabbitmq_iam_data:
+    name: iqscaffold_iam_rabbitmq_data_dev
+    driver: local
+  iam_logs:
+    name: iqscaffold_iam_logs_dev
+    driver: local
+  iam_tmp:
+    name: iqscaffold_iam_tmp_dev
+    driver: local
