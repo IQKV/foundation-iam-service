@@ -12,8 +12,8 @@ importers:
         specifier: ^20.5.0
         version: 20.5.0(@types/node@22.19.11)(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.4.0)(typescript@5.9.3)
       '@commitlint/config-conventional':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.0
+        version: 20.5.0
       '@release-it/conventional-changelog':
         specifier: ^10.0.6
         version: 10.0.6(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.4.0)(release-it@19.2.4(@types/node@22.19.11))
@@ -117,8 +117,8 @@ packages:
     engines: {node: '>=v18'}
     hasBin: true
 
-  '@commitlint/config-conventional@20.4.3':
-    resolution: {integrity: sha512-9RtLySbYQAs8yEqWEqhSZo9nYhbm57jx7qHXtgRmv/nmeQIjjMcwf6Dl+y5UZcGWgWx435TAYBURONaJIuCjWg==}
+  '@commitlint/config-conventional@20.5.0':
+    resolution: {integrity: sha512-t3Ni88rFw1XMa4nZHgOKJ8fIAT9M2j5TnKyTqJzsxea7FUetlNdYFus9dz+MhIRZmc16P0PPyEfh6X2d/qw8SA==}
     engines: {node: '>=v18'}
 
   '@commitlint/config-validator@20.4.3':
@@ -187,10 +187,6 @@ packages:
 
   '@commitlint/top-level@20.4.3':
     resolution: {integrity: sha512-qD9xfP6dFg5jQ3NMrOhG0/w5y3bBUsVGyJvXxdWEwBm8hyx4WOk3kKXw28T5czBYvyeCVJgJJ6aoJZUWDpaacQ==}
-    engines: {node: '>=v18'}
-
-  '@commitlint/types@20.4.3':
-    resolution: {integrity: sha512-51OWa1Gi6ODOasPmfJPq6js4pZoomima4XLZZCrkldaH2V5Nb3bVhNXPeT6XV0gubbainSpTw4zi68NqAeCNCg==}
     engines: {node: '>=v18'}
 
   '@commitlint/types@20.5.0':
@@ -1249,11 +1245,6 @@ packages:
   conventional-commits-filter@5.0.0:
     resolution: {integrity: sha512-tQMagCOC59EVgNZcC5zl7XqO30Wki9i9J3acbUvkaosCT6JX3EeFwJD7Qqp4MCikRnzS18WXV3BLIQ66ytu6+Q==}
     engines: {node: '>=18'}
-
-  conventional-commits-parser@6.3.0:
-    resolution: {integrity: sha512-RfOq/Cqy9xV9bOA8N+ZH6DlrDR+5S3Mi0B5kACEjESpE+AviIpAptx9a9cFpWCCvgRtWT+0BbUw+e1BZfts9jg==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   conventional-commits-parser@6.4.0:
     resolution: {integrity: sha512-tvRg7FIBNlyPzjdG8wWRlPHQJJHI7DylhtRGeU9Lq+JuoPh5BKpPRX83ZdLrvXuOSu5Eo/e7SzOQhU4Hd2Miuw==}
@@ -2960,10 +2951,10 @@ snapshots:
       - conventional-commits-parser
       - typescript
 
-  '@commitlint/config-conventional@20.4.3':
+  '@commitlint/config-conventional@20.5.0':
     dependencies:
-      '@commitlint/types': 20.4.3
-      conventional-changelog-conventionalcommits: 9.3.0
+      '@commitlint/types': 20.5.0
+      conventional-changelog-conventionalcommits: 9.3.1
 
   '@commitlint/config-validator@20.4.3':
     dependencies:
@@ -3085,11 +3076,6 @@ snapshots:
   '@commitlint/top-level@20.4.3':
     dependencies:
       escalade: 3.2.0
-
-  '@commitlint/types@20.4.3':
-    dependencies:
-      conventional-commits-parser: 6.3.0
-      picocolors: 1.1.1
 
   '@commitlint/types@20.5.0':
     dependencies:
@@ -4002,11 +3988,6 @@ snapshots:
   conventional-commit-types@3.0.0: {}
 
   conventional-commits-filter@5.0.0: {}
-
-  conventional-commits-parser@6.3.0:
-    dependencies:
-      '@simple-libs/stream-utils': 1.2.0
-      meow: 13.2.0
 
   conventional-commits-parser@6.4.0:
     dependencies:
