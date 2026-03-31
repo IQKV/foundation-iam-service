@@ -12,10 +12,12 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.iqscaffold.iam.infrastructure.config.LiquibaseConfigurationProperties;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @ConditionalOnProperty(name = "iqscaffold.liquibase.tenant-runner-enabled", havingValue = "true", matchIfMissing = true)
@@ -27,9 +29,12 @@ public class TenantLiquibaseRunner implements ApplicationRunner {
     private static final String TENANT_CHANGELOG = "db/changelog/tenant/master.xml";
 
     private final DataSource dataSource;
+    private final LiquibaseConfigurationProperties liquibaseProps;
 
-    public TenantLiquibaseRunner(final DataSource dataSource) {
+    public TenantLiquibaseRunner(final DataSource dataSource,
+                                 final LiquibaseConfigurationProperties liquibaseProps) {
         this.dataSource = dataSource;
+        this.liquibaseProps = liquibaseProps;
     }
 
     @Override
@@ -58,11 +63,15 @@ public class TenantLiquibaseRunner implements ApplicationRunner {
             database.setDefaultSchemaName(schema);
             database.setLiquibaseSchemaName(schema);
 
+            final Contexts contexts = StringUtils.hasText(liquibaseProps.contexts())
+                    ? new Contexts(liquibaseProps.contexts())
+                    : new Contexts();
+
             try (final Liquibase liquibase = new Liquibase(
                     changelogPath,
                     new ClassLoaderResourceAccessor(),
                     database)) {
-                liquibase.update(new Contexts(), new LabelExpression());
+                liquibase.update(contexts, new LabelExpression());
             }
         }
     }

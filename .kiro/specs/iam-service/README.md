@@ -24,12 +24,12 @@ i18n via `messages*.properties` (en, es, it, ru). Add a new `messages_<lang>.pro
 
 ## Email Templates (Planned — Future Iterations)
 
-| Template | Trigger | Iteration |
-|----------|---------|-----------|
-| `password-reset/initiate.html` | User requests password reset | v2 |
-| `password-reset/confirmed.html` | Password successfully changed | v2 |
-| `invitation/invitation-email.html` | User invited to join a tenant | v3 |
-| `invitation/invitation-accepted.html` | Invitee accepts the invitation | v3 |
+| Template                              | Trigger                        | Iteration |
+| ------------------------------------- | ------------------------------ | --------- |
+| `password-reset/initiate.html`        | User requests password reset   | v2        |
+| `password-reset/confirmed.html`       | Password successfully changed  | v2        |
+| `invitation/invitation-email.html`    | User invited to join a tenant  | v3        |
+| `invitation/invitation-accepted.html` | Invitee accepts the invitation | v3        |
 
 ## Out of Scope (Current Iteration)
 
@@ -40,8 +40,8 @@ i18n via `messages*.properties` (en, es, it, ru). Add a new `messages_<lang>.pro
 
 ## Spec Files
 
-| File | Purpose |
-|------|---------|
-| `requirements.md` | Functional requirements and acceptance criteria |
-| `design.md` | Architecture, domain model, component design, code examples |
-| `tasks.md` | Ordered implementation tasks |
+| File              | Purpose                                                     |
+| ----------------- | ----------------------------------------------------------- |
+| `requirements.md` | Functional requirements and acceptance criteria             |
+| `design.md`       | Architecture, domain model, component design, code examples |
+| `tasks.md`        | Ordered implementation tasks                                |

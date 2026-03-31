@@ -94,6 +94,9 @@ iqscaffold:
     schema-prefix: t_
     default-schema: public
     provisioning-timeout: PT10M
+  liquibase:
+    system-change-log: db/changelog/system/db.changelog-master.xml
+    tenant-change-log: db/changelog/tenant/master.xml
   notification:
     mail:
       from: ${iqscaffold.mail.from}

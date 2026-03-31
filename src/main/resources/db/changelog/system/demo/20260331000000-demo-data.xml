@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Demo seed data — local/dev only (context: demo).
+
+        Tenant  : demo
+        User    : admin@demo.iqscaffold.com  /  TenantAdmin123!  (BCrypt 12)
+        Authority: TENANT_OWNER
+    -->
+
+    <changeSet id="20260331000000-demo-tenant" author="iqscaffold" context="demo">
+        <insert tableName="tenants" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0000-000000000001"/>
+            <column name="tenant_key" value="demo"/>
+            <column name="name"       value="Demo Tenant"/>
+            <column name="status"     value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenants" schemaName="public">
+                <where>tenant_key = 'demo'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260331000000-demo-user" author="iqscaffold" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0001-000000000001"/>
+            <column name="email"          value="admin@demo.iqscaffold.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Demo"/>
+            <column name="last_name"      value="Admin"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at"     valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="users" schemaName="public">
+                <where>id = '00000000-0000-0000-0001-000000000001'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260331000000-demo-membership" author="iqscaffold" context="demo">
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000001"/>
+            <column name="user_id"    value="00000000-0000-0000-0001-000000000001"/>
+            <column name="tenant_key" value="demo"/>
+            <column name="status"     value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_memberships" schemaName="public">
+                <where>id = '00000000-0000-0000-0002-000000000001'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260331000000-demo-authority" author="iqscaffold" context="demo">
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000001"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="authority"     value="TENANT_OWNER"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_member_authorities" schemaName="public">
+                <where>id = '00000000-0000-0000-0003-000000000001'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

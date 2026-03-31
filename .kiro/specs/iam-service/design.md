@@ -24,20 +24,19 @@ The Identity and Access Management is a production-ready, multi-tenant authentic
 
 ### Technology Stack
 
-| Category | Technology | Version | Justification |
-|----------|-----------|---------|---------------|
-| Language | Java | 21 | Records, pattern matching, virtual threads, text blocks |
-| Framework | Spring Boot | 3.x | Industry standard, comprehensive ecosystem, production-ready |
-| Persistence | MyBatis | 3.x | SQL-first, explicit query control, no ORM magic, easy multi-schema routing |
-| Database | PostgreSQL | 16 | Schema-per-tenant support, ACID compliance, JSON support |
-| Security | Spring Security + JWT | 6.x | OAuth2 resource server, method security, JWT RS256 |
-| Migration | Liquibase | 4.x | Version control for database, multi-tenant support |
-| Messaging | RabbitMQ | 3.x | Event publishing, reliable delivery, dead letter queues |
-| Observability | OpenTelemetry + Prometheus | Latest | Distributed tracing, metrics, industry standards |
-| API Docs | SpringDoc OpenAPI | 2.x | Automatic OpenAPI 3.0 generation, Swagger UI |
-| Testing | JUnit 5 + Testcontainers | Latest | Modern testing, real database integration tests |
-| Distributed Lock | ShedLock | 6.x | Prevents concurrent `@Scheduled` job execution across pods |
-
+| Category         | Technology                 | Version | Justification                                                              |
+| ---------------- | -------------------------- | ------- | -------------------------------------------------------------------------- |
+| Language         | Java                       | 21      | Records, pattern matching, virtual threads, text blocks                    |
+| Framework        | Spring Boot                | 3.x     | Industry standard, comprehensive ecosystem, production-ready               |
+| Persistence      | MyBatis                    | 3.x     | SQL-first, explicit query control, no ORM magic, easy multi-schema routing |
+| Database         | PostgreSQL                 | 16      | Schema-per-tenant support, ACID compliance, JSON support                   |
+| Security         | Spring Security + JWT      | 6.x     | OAuth2 resource server, method security, JWT RS256                         |
+| Migration        | Liquibase                  | 4.x     | Version control for database, multi-tenant support                         |
+| Messaging        | RabbitMQ                   | 3.x     | Event publishing, reliable delivery, dead letter queues                    |
+| Observability    | OpenTelemetry + Prometheus | Latest  | Distributed tracing, metrics, industry standards                           |
+| API Docs         | SpringDoc OpenAPI          | 2.x     | Automatic OpenAPI 3.0 generation, Swagger UI                               |
+| Testing          | JUnit 5 + Testcontainers   | Latest  | Modern testing, real database integration tests                            |
+| Distributed Lock | ShedLock                   | 6.x     | Prevents concurrent `@Scheduled` job execution across pods                 |
 
 ## System Architecture
 
@@ -117,15 +116,15 @@ All entities reside in the **public** schema. The identity model follows the **G
 
 ### Tenant Identity: tenantKey vs name
 
-| Field | `tenantKey` | `name` |
-|-------|-------------|--------|
-| Purpose | Internal identifier, used in headers, JWT claims, schema name | Human-readable display name |
-| Format | 8 lowercase alphanumeric chars (NanoID, alphabet `a-z0-9`) | 1–100 characters, immutable after creation |
-| Example | `xk7f2b9a` | `Acme Corporation` |
-| Schema | `t_xk7f2b9a` | — |
-| Mutability | Immutable after creation | Immutable after creation |
-| Uniqueness | UNIQUE constraint on `tenant_key` | UNIQUE constraint on `name` |
-| Exposed in | `X-Tenant-ID` header, JWT `tenant_id` claim, API responses | API responses only |
+| Field      | `tenantKey`                                                   | `name`                                     |
+| ---------- | ------------------------------------------------------------- | ------------------------------------------ |
+| Purpose    | Internal identifier, used in headers, JWT claims, schema name | Human-readable display name                |
+| Format     | 8 lowercase alphanumeric chars (NanoID, alphabet `a-z0-9`)    | 1–100 characters, immutable after creation |
+| Example    | `xk7f2b9a`                                                    | `Acme Corporation`                         |
+| Schema     | `t_xk7f2b9a`                                                  | —                                          |
+| Mutability | Immutable after creation                                      | Immutable after creation                   |
+| Uniqueness | UNIQUE constraint on `tenant_key`                             | UNIQUE constraint on `name`                |
+| Exposed in | `X-Tenant-ID` header, JWT `tenant_id` claim, API responses    | API responses only                         |
 
 ### Tenant Provisioning Flow (Fully Async via Signup + RabbitMQ)
 
@@ -175,7 +174,6 @@ POST /api/v1/iam/tenants/{tenantKey}/retry-provisioning
 ```
 
 The `PROVISIONING_FAILED → PROVISIONING` transition is only available through this dedicated endpoint, not through the generic `PATCH /status` endpoint, to prevent accidental misuse.
-
 
 ## Domain Model
 
@@ -302,7 +300,6 @@ tenant_memberships.id ←── tenant_member_authorities.membership_id (FK, ON 
 users.id           ←── token_denylist.user_id        (FK, ON DELETE CASCADE)
 ```
 
-
 ## Package Structure (Vertical Slices)
 
 ```
@@ -413,7 +410,6 @@ com.iqscaffold.iam/
 │       └── PasswordResetDtos.java
 └── IamServiceApplication.java
 ```
-
 
 ## MyBatis Configuration and Multi-Schema Routing
 
@@ -571,7 +567,6 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
 }
 ```
 
-
 ## MyBatis Mapper Design
 
 ### Mapper Interface Pattern
@@ -667,7 +662,7 @@ public interface TokenDenylistMapper {
 
 ### FailedLoginAttemptMapper
 
-```java
+````java
 @Mapper
 public interface FailedLoginAttemptMapper {
     void insert(FailedLoginAttempt attempt);
@@ -689,8 +684,9 @@ public interface PasswordResetTokenMapper {
     void deleteByExpiresAtBefore(Instant cutoff);
     int countByUserIdAndCreatedAtAfter(@Param("userId") UUID userId, @Param("since") Instant since);
 }
-```
-```
+````
+
+````
 
 ### XML Mapper Example (TenantMapper.xml)
 
@@ -732,7 +728,7 @@ public interface PasswordResetTokenMapper {
     </update>
 
 </mapper>
-```
+````
 
 ### UserMapper.xml (upsert example)
 
@@ -756,46 +752,45 @@ public interface PasswordResetTokenMapper {
     </update>
 ```
 
-
 ## Application Configuration
 
 ### application.yml (key sections)
 
 ```yaml
 spring:
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/iqscaffold}
-    username: ${DB_USERNAME:iqscaffold}
-    password: ${DB_PASSWORD:secret}
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-  liquibase:
-    enabled: false   # managed by TenantLiquibaseRunner
+    datasource:
+        url: ${DB_URL:jdbc:postgresql://localhost:5432/iqscaffold}
+        username: ${DB_USERNAME:iqscaffold}
+        password: ${DB_PASSWORD:secret}
+        hikari:
+            maximum-pool-size: 20
+            minimum-idle: 5
+    liquibase:
+        enabled: false # managed by TenantLiquibaseRunner
 
 mybatis:
-  mapper-locations: classpath:mappers/**/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-    default-fetch-size: 100
-    default-statement-timeout: 30
+    mapper-locations: classpath:mappers/**/*.xml
+    configuration:
+        map-underscore-to-camel-case: true
+        default-fetch-size: 100
+        default-statement-timeout: 30
 
 iqscaffold:
-  auth:
-    jwt:
-      private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:keys/private.pem}
-      public-key-path:  ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
-      expiry: ${JWT_EXPIRY:PT15M}
-      refresh-expiry: ${JWT_REFRESH_EXPIRY:P7D}
-      issuer: iqscaffold-iam-service
-    security:
-      password-encoder-strength: 12
-      rate-limiting:
-        login-attempts: 5
-        lockout-duration: PT15M
-  tenancy:
-    schema-prefix: t_
-    default-schema: public
+    auth:
+        jwt:
+            private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:keys/private.pem}
+            public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
+            expiry: ${JWT_EXPIRY:PT15M}
+            refresh-expiry: ${JWT_REFRESH_EXPIRY:P7D}
+            issuer: iqscaffold-iam-service
+        security:
+            password-encoder-strength: 12
+            rate-limiting:
+                login-attempts: 5
+                lockout-duration: PT15M
+    tenancy:
+        schema-prefix: t_
+        default-schema: public
 ```
 
 > **No `spring.jpa.*` or `hibernate.*` properties** — MyBatis does not use JPA or Hibernate.
@@ -804,7 +799,7 @@ iqscaffold:
 
 Manages schema migrations without Hibernate. Uses raw JDBC to set `search_path` before running Liquibase.
 
-```java
+````java
 @Component
 public class TenantLiquibaseRunner implements ApplicationRunner {
 
@@ -934,11 +929,12 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         // Additional complexity checks omitted for brevity — same regex as signup validation
     }
 }
-```
+````
 
 ### Sequence Diagrams
 
 #### Initiation
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -967,6 +963,7 @@ sequenceDiagram
 ```
 
 #### Completion
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -995,7 +992,8 @@ sequenceDiagram
     end
     AuthResource-->>Client: 200 OK "Password has been reset successfully"
 ```
-```
+
+````
 
 ## Security Configuration
 
@@ -1033,7 +1031,7 @@ public final class JwtClaimNames {
 
     private JwtClaimNames() {}
 }
-```
+````
 
 ### SecurityConfig
 
@@ -1083,7 +1081,6 @@ public class SecurityConfig {
     }
 }
 ```
-
 
 ## Email Verification Design
 
@@ -1323,10 +1320,10 @@ The `provisioningTimeout` is added to `TenancyConfigurationProperties`:
 
 ```yaml
 iqscaffold:
-  tenancy:
-    schema-prefix: t_
-    default-schema: public
-    provisioning-timeout: PT10M   # tenants stuck in PROVISIONING longer than this are failed by the reaper
+    tenancy:
+        schema-prefix: t_
+        default-schema: public
+        provisioning-timeout: PT10M # tenants stuck in PROVISIONING longer than this are failed by the reaper
 ```
 
 ### JwtAuthenticationFilter
@@ -1582,6 +1579,7 @@ public class EmailService {
 ### i18n Properties
 
 `src/main/resources/messages.properties` (default — English, used when no locale match):
+
 ```properties
 email.verify-email.subject=Verify your email address
 email.verify-email.greeting=Hi {0},
@@ -1596,6 +1594,7 @@ email.email-verified.cta=Sign In
 ```
 
 `src/main/resources/messages_es.properties`:
+
 ```properties
 email.verify-email.subject=Verifica tu dirección de correo electrónico
 email.verify-email.greeting=Hola {0},
@@ -1610,6 +1609,7 @@ email.email-verified.cta=Iniciar sesión
 ```
 
 `src/main/resources/messages_it.properties`:
+
 ```properties
 email.verify-email.subject=Verifica il tuo indirizzo email
 email.verify-email.greeting=Ciao {0},
@@ -1624,6 +1624,7 @@ email.email-verified.cta=Accedi
 ```
 
 `src/main/resources/messages_hu.properties`:
+
 ```properties
 email.verify-email.subject=Erősítsd meg az e-mail címed
 email.verify-email.greeting=Szia {0},
@@ -1644,16 +1645,16 @@ Adding a new language requires only a new `messages_<lang>.properties` file — 
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
-<head>
-  <meta charset="UTF-8"/>
-  <title th:text="#{email.verify-email.subject}">Verify your email</title>
-</head>
-<body>
-  <p th:text="#{email.verify-email.greeting(${firstName})}">Hi,</p>
-  <p th:text="#{email.verify-email.body(${expiresInHours})}">Please verify...</p>
-  <a th:href="${verificationUrl}" th:text="#{email.verify-email.cta}">Verify Email</a>
-  <p th:text="#{email.verify-email.ignore}">If you did not...</p>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title th:text="#{email.verify-email.subject}">Verify your email</title>
+    </head>
+    <body>
+        <p th:text="#{email.verify-email.greeting(${firstName})}">Hi,</p>
+        <p th:text="#{email.verify-email.body(${expiresInHours})}">Please verify...</p>
+        <a th:href="${verificationUrl}" th:text="#{email.verify-email.cta}">Verify Email</a>
+        <p th:text="#{email.verify-email.ignore}">If you did not...</p>
+    </body>
 </html>
 ```
 
@@ -1664,15 +1665,15 @@ The `verificationUrl` is built by the caller as `notificationProps.baseUrl() + "
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
-<head>
-  <meta charset="UTF-8"/>
-  <title th:text="#{email.email-verified.subject}">Email verified</title>
-</head>
-<body>
-  <p th:text="#{email.email-verified.greeting(${firstName})}">Hi,</p>
-  <p th:text="#{email.email-verified.body}">Your email has been verified.</p>
-  <a th:href="${signinUrl}" th:text="#{email.email-verified.cta}">Sign In</a>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title th:text="#{email.email-verified.subject}">Email verified</title>
+    </head>
+    <body>
+        <p th:text="#{email.email-verified.greeting(${firstName})}">Hi,</p>
+        <p th:text="#{email.email-verified.body}">Your email has been verified.</p>
+        <a th:href="${signinUrl}" th:text="#{email.email-verified.cta}">Sign In</a>
+    </body>
 </html>
 ```
 
@@ -1695,45 +1696,46 @@ public record NotificationConfigurationProperties(
 
 ```yaml
 iqscaffold:
-  notification:
-    mail:
-      from: ${MAIL_FROM:noreply@example.com}
-      reply-to: ${MAIL_REPLY_TO:}
-    default-locale: en
-    base-url: ${APP_BASE_URL:http://localhost:3000}
+    notification:
+        mail:
+            from: ${MAIL_FROM:noreply@example.com}
+            reply-to: ${MAIL_REPLY_TO:}
+        default-locale: en
+        base-url: ${APP_BASE_URL:http://localhost:3000}
 
 spring:
-  mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: HTML
-    encoding: UTF-8
-    cache: true   # set false in local profile
-  messages:
-    basename: messages
-    encoding: UTF-8
-    fallback-to-system-locale: false
+    mail:
+        host: ${MAIL_HOST:localhost}
+        port: ${MAIL_PORT:587}
+        username: ${MAIL_USERNAME:}
+        password: ${MAIL_PASSWORD:}
+        properties:
+            mail.smtp.auth: true
+            mail.smtp.starttls.enable: true
+    thymeleaf:
+        prefix: classpath:/templates/
+        suffix: .html
+        mode: HTML
+        encoding: UTF-8
+        cache: true # set false in local profile
+    messages:
+        basename: messages
+        encoding: UTF-8
+        fallback-to-system-locale: false
 ```
 
 `application-local.yml` overrides (Mailpit on port 1025):
+
 ```yaml
 spring:
-  mail:
-    host: localhost
-    port: 1025
-    properties:
-      mail.smtp.auth: false
-      mail.smtp.starttls.enable: false
-  thymeleaf:
-    cache: false
+    mail:
+        host: localhost
+        port: 1025
+        properties:
+            mail.smtp.auth: false
+            mail.smtp.starttls.enable: false
+    thymeleaf:
+        cache: false
 ```
 
 ### MessageSource Bean
@@ -1753,25 +1755,25 @@ public MessageSource messageSource() {
 
 ## API Endpoint Summary
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | /api/v1/iam/tenants/{tenantKey} | TENANT_OWNER | Get tenant status (200) |
-| PATCH | /api/v1/iam/tenants/{tenantKey}/status | TENANT_OWNER | Update tenant status (200) |
-| POST | /api/v1/iam/tenants/{tenantKey}/retry-provisioning | TENANT_OWNER | Retry a PROVISIONING_FAILED tenant (202) |
-| POST | /api/v1/iam/auth/signup | Public | Register user + create tenant (201) |
-| POST | /api/v1/iam/users/email/verify| Public | Verify email with token (200) |
-| POST | /api/v1/iam/users/email/resend-verification | Public | Resend verification email (202) |
-| POST | /api/v1/iam/users/password/forgot | Public | Request password reset link (200) |
-| POST | /api/v1/iam/users/password/reset | Public | Submit new password with one-time token (200) |
-| POST | /api/v1/iam/users/tenants | Public | List user's active tenants (200) — credential-gated, no token issued |
-| POST | /api/v1/iam/auth/signin | Public | Sign in to a specific tenant (200) |
-| POST | /api/v1/iam/auth/refresh | Public | Refresh tokens (200) |
-| POST | /api/v1/iam/auth/signout | Authenticated | Sign out (204) |
-| POST | /api/v1/iam/auth/signout-all | Authenticated | Sign out all sessions (204) |
-| POST | /api/v1/iam/auth/validate | Public | Validate token (200) |
-| GET | /api/v1/iam/users/me | Authenticated | Get profile (200) |
-| PATCH | /api/v1/iam/users/me | Authenticated | Update profile (200) |
-| DELETE | /api/v1/iam/users/me | Authenticated | Delete membership (204) |
+| Method | Path                                               | Auth          | Description                                                          |
+| ------ | -------------------------------------------------- | ------------- | -------------------------------------------------------------------- |
+| GET    | /api/v1/iam/tenants/{tenantKey}                    | TENANT_OWNER  | Get tenant status (200)                                              |
+| PATCH  | /api/v1/iam/tenants/{tenantKey}/status             | TENANT_OWNER  | Update tenant status (200)                                           |
+| POST   | /api/v1/iam/tenants/{tenantKey}/retry-provisioning | TENANT_OWNER  | Retry a PROVISIONING_FAILED tenant (202)                             |
+| POST   | /api/v1/iam/auth/signup                            | Public        | Register user + create tenant (201)                                  |
+| POST   | /api/v1/iam/users/email/verify                     | Public        | Verify email with token (200)                                        |
+| POST   | /api/v1/iam/users/email/resend-verification        | Public        | Resend verification email (202)                                      |
+| POST   | /api/v1/iam/users/password/forgot                  | Public        | Request password reset link (200)                                    |
+| POST   | /api/v1/iam/users/password/reset                   | Public        | Submit new password with one-time token (200)                        |
+| POST   | /api/v1/iam/users/tenants                          | Public        | List user's active tenants (200) — credential-gated, no token issued |
+| POST   | /api/v1/iam/auth/signin                            | Public        | Sign in to a specific tenant (200)                                   |
+| POST   | /api/v1/iam/auth/refresh                           | Public        | Refresh tokens (200)                                                 |
+| POST   | /api/v1/iam/auth/signout                           | Authenticated | Sign out (204)                                                       |
+| POST   | /api/v1/iam/auth/signout-all                       | Authenticated | Sign out all sessions (204)                                          |
+| POST   | /api/v1/iam/auth/validate                          | Public        | Validate token (200)                                                 |
+| GET    | /api/v1/iam/users/me                               | Authenticated | Get profile (200)                                                    |
+| PATCH  | /api/v1/iam/users/me                               | Authenticated | Update profile (200)                                                 |
+| DELETE | /api/v1/iam/users/me                               | Authenticated | Delete membership (204)                                              |
 
 All tenant-scoped endpoints require `X-Tenant-ID` header or JWT `tenant_id` claim.
 
@@ -1785,52 +1787,52 @@ All custom exceptions extend `RuntimeException` unless noted. The `GlobalExcepti
 
 ### Authentication & Token Exceptions (→ 401)
 
-| Exception | HTTP | Message |
-|-----------|------|---------|
-| `InvalidTokenTypeException` | 401 | "Invalid token type" — JWT `type` claim is not `"refresh"` during token refresh |
-| `TokenExpiredException` | 401 | "Refresh token expired" — refresh token past its `exp` claim |
-| `InvalidTokenSignatureException` | 401 | "Invalid token signature" — RS256 signature verification failed |
+| Exception                        | HTTP | Message                                                                         |
+| -------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| `InvalidTokenTypeException`      | 401  | "Invalid token type" — JWT `type` claim is not `"refresh"` during token refresh |
+| `TokenExpiredException`          | 401  | "Refresh token expired" — refresh token past its `exp` claim                    |
+| `InvalidTokenSignatureException` | 401  | "Invalid token signature" — RS256 signature verification failed                 |
 
 ### Authorization Exceptions (→ 403)
 
-| Exception | HTTP | Message |
-|-----------|------|---------|
-| `MembershipNotFoundException` | 403 | "User is not a member of this tenant" — no `TenantMembership` for `(userId, tenantKey)` |
-| `TenantContextMismatchException` | 403 | "Tenant context mismatch" — `tenant_id` in refresh token ≠ `TenantContext.getCurrentTenant()` |
-| `TenantSuspendedException` | 403 | "Tenant suspended" — tenant status is `SUSPENDED` |
-| `TenantNotAvailableException` | 403 | "Tenant not available" — tenant status is `DELETED` or `PROVISIONING_FAILED` |
-| `AccountLockedException` | 403 | "Account temporarily locked" — failed login attempts exceeded threshold |
+| Exception                        | HTTP | Message                                                                                       |
+| -------------------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| `MembershipNotFoundException`    | 403  | "User is not a member of this tenant" — no `TenantMembership` for `(userId, tenantKey)`       |
+| `TenantContextMismatchException` | 403  | "Tenant context mismatch" — `tenant_id` in refresh token ≠ `TenantContext.getCurrentTenant()` |
+| `TenantSuspendedException`       | 403  | "Tenant suspended" — tenant status is `SUSPENDED`                                             |
+| `TenantNotAvailableException`    | 403  | "Tenant not available" — tenant status is `DELETED` or `PROVISIONING_FAILED`                  |
+| `AccountLockedException`         | 403  | "Account temporarily locked" — failed login attempts exceeded threshold                       |
 
 ### Not Found Exceptions (→ 404)
 
-| Exception | HTTP | Message |
-|-----------|------|---------|
-| `UserNotFoundException` | 404 | "User not found" |
-| `TenantNotFoundException` (subtype of `TenantManagementException`) | 404 | "Tenant not found" |
+| Exception                                                          | HTTP | Message            |
+| ------------------------------------------------------------------ | ---- | ------------------ |
+| `UserNotFoundException`                                            | 404  | "User not found"   |
+| `TenantNotFoundException` (subtype of `TenantManagementException`) | 404  | "Tenant not found" |
 
 ### Conflict Exceptions (→ 409)
 
-| Exception | HTTP | Message |
-|-----------|------|---------|
-| `UserRegistrationException` | 409 | Duplicate email or other registration conflict |
-| `TenantAlreadyExistsException` (subtype of `TenantManagementException`) | 409 | "Tenant name already taken" |
-| `TenantMembershipAlreadyExistsException` | 409 | "User is already a member of this tenant" |
-| `InvalidTenantStateException` (subtype of `TenantManagementException`) | 409 | "Tenant is not in PROVISIONING_FAILED state" |
+| Exception                                                               | HTTP | Message                                        |
+| ----------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| `UserRegistrationException`                                             | 409  | Duplicate email or other registration conflict |
+| `TenantAlreadyExistsException` (subtype of `TenantManagementException`) | 409  | "Tenant name already taken"                    |
+| `TenantMembershipAlreadyExistsException`                                | 409  | "User is already a member of this tenant"      |
+| `InvalidTenantStateException` (subtype of `TenantManagementException`)  | 409  | "Tenant is not in PROVISIONING_FAILED state"   |
 
 ### Validation Exceptions (→ 400)
 
-| Exception | HTTP | Message |
-|-----------|------|---------|
-| `InvalidVerificationTokenException` | 400 | "Invalid or expired verification token" |
-| `PasswordResetTokenNotFoundException` | 400 | "Invalid or expired password reset token" |
-| `EmailAlreadyRegisteredException` | 400 | "Email already registered" |
+| Exception                             | HTTP | Message                                   |
+| ------------------------------------- | ---- | ----------------------------------------- |
+| `InvalidVerificationTokenException`   | 400  | "Invalid or expired verification token"   |
+| `PasswordResetTokenNotFoundException` | 400  | "Invalid or expired password reset token" |
+| `EmailAlreadyRegisteredException`     | 400  | "Email already registered"                |
 
 ### Rate Limit Exceptions (→ 429)
 
-| Exception | HTTP | Notes |
-|-----------|------|-------|
-| `VerificationRateLimitException` | 429 | Carries `retryAfterSeconds: long`; handler sets `Retry-After` response header |
-| `PasswordResetRateLimitException` | 429 | Carries `retryAfterSeconds: long`; handler sets `Retry-After` response header |
+| Exception                         | HTTP | Notes                                                                         |
+| --------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| `VerificationRateLimitException`  | 429  | Carries `retryAfterSeconds: long`; handler sets `Retry-After` response header |
+| `PasswordResetRateLimitException` | 429  | Carries `retryAfterSeconds: long`; handler sets `Retry-After` response header |
 
 ### Sealed Hierarchy
 
@@ -1847,34 +1849,33 @@ public sealed class TenantManagementException extends RuntimeException
 
 ### Other
 
-| Exception | HTTP | Notes |
-|-----------|------|-------|
-| `UserManagementException` | 422 | General user update/delete failure |
-| `MessagingException` | 503 | Wraps `AmqpException`; thrown by `MessagingService` when RabbitMQ publish fails |
-
-
+| Exception                 | HTTP | Notes                                                                           |
+| ------------------------- | ---- | ------------------------------------------------------------------------------- |
+| `UserManagementException` | 422  | General user update/delete failure                                              |
+| `MessagingException`      | 503  | Wraps `AmqpException`; thrown by `MessagingService` when RabbitMQ publish fails |
 
 ```json
 {
-  "type": "https://iqscaffold.com/errors/membership-not-found",
-  "title": "User is not a member of this tenant",
-  "status": 403,
-  "detail": "No active membership found for user in tenant xk7f2b9a",
-  "instance": "/api/v1/iam/users/me",
-  "correlationId": "550e8400-e29b-41d4-a716-446655440000",
-  "requestId": "req-a1b2c3d4"
+    "type": "https://iqscaffold.com/errors/membership-not-found",
+    "title": "User is not a member of this tenant",
+    "status": 403,
+    "detail": "No active membership found for user in tenant xk7f2b9a",
+    "instance": "/api/v1/iam/users/me",
+    "correlationId": "550e8400-e29b-41d4-a716-446655440000",
+    "requestId": "req-a1b2c3d4"
 }
 ```
 
 Validation errors include a `fields` array:
+
 ```json
 {
-  "type": "https://iqscaffold.com/errors/validation",
-  "title": "Validation failed",
-  "status": 400,
-  "fields": [
-    { "field": "email", "message": "must be a well-formed email address" },
-    { "field": "password", "message": "size must be between 8 and 128" }
-  ]
+    "type": "https://iqscaffold.com/errors/validation",
+    "title": "Validation failed",
+    "status": 400,
+    "fields": [
+        { "field": "email", "message": "must be a well-formed email address" },
+        { "field": "password", "message": "size must be between 8 and 128" }
+    ]
 }
 ```

@@ -8,6 +8,12 @@ spring:
   liquibase:
     enabled: true
     contexts: demo
+
+iqscaffold:
+  liquibase:
+    system-change-log: db/changelog/system/db.changelog-master.xml
+    tenant-change-log: db/changelog/tenant/master.xml
+    contexts: demo
   mail:
     properties:
       mail.smtp.auth: false

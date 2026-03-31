@@ -20,20 +20,20 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 
 Base path: `/api/v1/iam`
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/auth/signup` | public | Register user and create tenant |
-| `POST` | `/auth/signin` | `X-Tenant-ID` | Sign in, receive token pair |
-| `POST` | `/auth/refresh` | `X-Tenant-ID` | Rotate access + refresh tokens |
-| `POST` | `/auth/signout` | JWT | Revoke current session |
-| `POST` | `/auth/signout-all` | JWT | Revoke all sessions globally |
-| `POST` | `/auth/validate` | JWT | Validate token for gateway introspection |
-| `POST` | `/users/tenants` | public | Discover tenants by credentials |
-| `GET`  | `/users/me` | JWT | Get own profile |
-| `PATCH` | `/users/me` | JWT | Update own profile |
-| `GET`  | `/tenants/{tenantKey}` | JWT `TENANT_OWNER` | Get tenant status |
-| `PATCH` | `/tenants/{tenantKey}/status` | JWT `TENANT_OWNER` | Transition tenant status |
-| `POST` | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` | Retry failed provisioning |
+| Method  | Path                                      | Auth               | Description                              |
+| ------- | ----------------------------------------- | ------------------ | ---------------------------------------- |
+| `POST`  | `/auth/signup`                            | public             | Register user and create tenant          |
+| `POST`  | `/auth/signin`                            | `X-Tenant-ID`      | Sign in, receive token pair              |
+| `POST`  | `/auth/refresh`                           | `X-Tenant-ID`      | Rotate access + refresh tokens           |
+| `POST`  | `/auth/signout`                           | JWT                | Revoke current session                   |
+| `POST`  | `/auth/signout-all`                       | JWT                | Revoke all sessions globally             |
+| `POST`  | `/auth/validate`                          | JWT                | Validate token for gateway introspection |
+| `POST`  | `/users/tenants`                          | public             | Discover tenants by credentials          |
+| `GET`   | `/users/me`                               | JWT                | Get own profile                          |
+| `PATCH` | `/users/me`                               | JWT                | Update own profile                       |
+| `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` | Get tenant status                        |
+| `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` | Transition tenant status                 |
+| `POST`  | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` | Retry failed provisioning                |
 
 ## Tech Stack
 

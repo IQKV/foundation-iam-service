@@ -32,7 +32,6 @@ All domain tables reside in the `public` PostgreSQL schema. Tenant isolation is 
 - **Public_Schema**: PostgreSQL `public` schema — contains all tables: tenants, users, tenant_memberships, tenant_member_authorities, token_denylist, failed_login_attempts, password_reset_tokens
 - **Tenant_Schema**: PostgreSQL schema `t_{tenantKey}` — reserved for future tenant-scoped tables; currently empty
 
-
 ## Requirements
 
 ### Requirement 1: Tenant Registration and Provisioning
@@ -66,13 +65,13 @@ All domain tables reside in the `public` PostgreSQL schema. Tenant isolation is 
 #### Acceptance Criteria
 
 1. THE User_Service SHALL configure MyBatis with `MyBatisSchemaInterceptor` registered in `SqlSessionFactory`
-2. THE User_Service SHALL implement `MyBatisSchemaInterceptor` to intercept `StatementHandler.prepare()` and execute `SET search_path TO t_{tenantKey}, public` when a tenant context is active
+2. THE User*Service SHALL implement `MyBatisSchemaInterceptor` to intercept `StatementHandler.prepare()` and execute `SET search_path TO t*{tenantKey}, public` when a tenant context is active
 3. WHEN no tenant context is active, THE `MyBatisSchemaInterceptor` SHALL NOT change the search_path (public schema is the default)
 4. THE User_Service SHALL configure `mybatis.mapper-locations=classpath:mappers/**/*.xml` and `map-underscore-to-camel-case=true` in application.yml
 5. WHEN MyBatis executes any statement, THE `MyBatisSchemaInterceptor` SHALL automatically route to the schema `t_{tenantKey}` when a tenant context is present
 6. THE Tenant_Liquibase_Runner SHALL maintain two migration changelogs: `db/changelog/system/` for the public schema and `db/changelog/tenant/` for per-tenant schemas
 7. WHEN the application starts, THE Tenant_Liquibase_Runner SHALL apply system migrations to the public schema
-8. WHEN a new tenant is provisioned, THE Tenant_Liquibase_Runner SHALL apply tenant migrations to the `t_{tenantKey}` schema; for MVP the tenant changelog contains zero changesets
+8. WHEN a new tenant is provisioned, THE Tenant*Liquibase_Runner SHALL apply tenant migrations to the `t*{tenantKey}` schema; for MVP the tenant changelog contains zero changesets
 9. THE User_Service SHALL create all entity tables (tenants, users, user_authorities) in the public schema via system migrations
 10. THE User_Service SHALL create all indexes in the public schema
 11. THE `TenantLiquibaseRunner.runMigrationsForTenant` SHALL propagate exceptions to the caller; the `TenantProvisioningConsumer` is responsible for catching the exception and setting the tenant status to `PROVISIONING_FAILED`
@@ -233,9 +232,9 @@ All domain tables reside in the `public` PostgreSQL schema. Tenant isolation is 
 4. THE `JwtAuthenticationFilter` SHALL be registered before `BearerTokenAuthenticationFilter` in the `SecurityFilterChain`
 5. THE `TokenDenylistService` SHALL run `@Scheduled(cron = "0 0 * * * *")` cleanup that deletes entries where `expires_at < NOW()`
 6. THE cleanup job SHALL be guarded by ShedLock (`@SchedulerLock`) so that only one pod executes the deletion at a time in a horizontally scaled deployment; the lock SHALL be held for at most 55 minutes (`lockAtMostFor = "PT55M"`) and released after 5 minutes minimum (`lockAtLeastFor = "PT5M"`)
-6. THE User_Service SHALL expose `POST /api/v1/iam/auth/signout` endpoint (returns 204 No Content)
-7. THE User_Service SHALL expose `POST /api/v1/iam/auth/signout-all` endpoint (returns 204 No Content)
-8. THE User_Service SHALL expose `POST /api/v1/iam/auth/validate` endpoint to validate a JWT and return decoded user context for gateway introspection (returns 200 OK with `userId`, `email`, `tenantId`, `authorities`)
+7. THE User_Service SHALL expose `POST /api/v1/iam/auth/signout` endpoint (returns 204 No Content)
+8. THE User_Service SHALL expose `POST /api/v1/iam/auth/signout-all` endpoint (returns 204 No Content)
+9. THE User_Service SHALL expose `POST /api/v1/iam/auth/validate` endpoint to validate a JWT and return decoded user context for gateway introspection (returns 200 OK with `userId`, `email`, `tenantId`, `authorities`)
 
 ### Requirement 13: Tenant Discovery
 
@@ -317,13 +316,13 @@ All domain tables reside in the `public` PostgreSQL schema. Tenant isolation is 
 
 1. THE User_Service SHALL use Liquibase for all database schema changes with a single system changelog targeting the public schema
 2. THE User_Service SHALL create the following tables in the public schema:
-   - `tenants` (id UUID PK, tenant_key VARCHAR 12 UNIQUE NOT NULL, name VARCHAR 100 UNIQUE NOT NULL, status VARCHAR 20, created_at, updated_at, created_by, updated_by)
-   - `users` (id UUID PK, email VARCHAR 255 UNIQUE NOT NULL, password_hash VARCHAR 255, first_name VARCHAR 100, last_name VARCHAR 100, status VARCHAR 50, last_global_signout_at TIMESTAMP NULL, created_at, updated_at, created_by, updated_by) — no tenant_id column
-   - `tenant_memberships` (id UUID PK, user_id UUID NOT NULL FK → users.id ON DELETE CASCADE, tenant_key VARCHAR 12 NOT NULL FK → tenants.tenant_key ON DELETE CASCADE, status VARCHAR 50 NOT NULL, created_at, updated_at, created_by, updated_by); UNIQUE constraint on (user_id, tenant_key)
-   - `tenant_member_authorities` (id UUID PK, membership_id UUID NOT NULL FK → tenant_memberships.id ON DELETE CASCADE, authority VARCHAR 50 NOT NULL)
-   - `token_denylist` (id UUID PK, jti VARCHAR 255 UNIQUE NOT NULL, user_id UUID NOT NULL FK → users.id ON DELETE CASCADE, expires_at TIMESTAMP NOT NULL, created_at TIMESTAMP NOT NULL)
-   - `failed_login_attempts` (id UUID PK, email VARCHAR 255 NOT NULL, attempted_at TIMESTAMP NOT NULL)
-3. THE User_Service SHALL maintain per-tenant migration changelogs in `db/changelog/tenant/`; for MVP these contain zero changesets — the tenant schema `t_{tenantKey}` is created and Liquibase tracking tables are initialized, but no application tables are created there yet
+    - `tenants` (id UUID PK, tenant_key VARCHAR 12 UNIQUE NOT NULL, name VARCHAR 100 UNIQUE NOT NULL, status VARCHAR 20, created_at, updated_at, created_by, updated_by)
+    - `users` (id UUID PK, email VARCHAR 255 UNIQUE NOT NULL, password_hash VARCHAR 255, first_name VARCHAR 100, last_name VARCHAR 100, status VARCHAR 50, last_global_signout_at TIMESTAMP NULL, created_at, updated_at, created_by, updated_by) — no tenant_id column
+    - `tenant_memberships` (id UUID PK, user_id UUID NOT NULL FK → users.id ON DELETE CASCADE, tenant_key VARCHAR 12 NOT NULL FK → tenants.tenant_key ON DELETE CASCADE, status VARCHAR 50 NOT NULL, created_at, updated_at, created_by, updated_by); UNIQUE constraint on (user_id, tenant_key)
+    - `tenant_member_authorities` (id UUID PK, membership_id UUID NOT NULL FK → tenant_memberships.id ON DELETE CASCADE, authority VARCHAR 50 NOT NULL)
+    - `token_denylist` (id UUID PK, jti VARCHAR 255 UNIQUE NOT NULL, user_id UUID NOT NULL FK → users.id ON DELETE CASCADE, expires_at TIMESTAMP NOT NULL, created_at TIMESTAMP NOT NULL)
+    - `failed_login_attempts` (id UUID PK, email VARCHAR 255 NOT NULL, attempted_at TIMESTAMP NOT NULL)
+3. THE User*Service SHALL maintain per-tenant migration changelogs in `db/changelog/tenant/`; for MVP these contain zero changesets — the tenant schema `t*{tenantKey}` is created and Liquibase tracking tables are initialized, but no application tables are created there yet
 4. THE User_Service SHALL create indexes: idx_tenants_tenant_key, idx_tenants_name (UNIQUE), idx_users_email, idx_tenant_memberships_user_id, idx_tenant_memberships_tenant_key, idx_tenant_member_authorities_membership_id, idx_token_denylist_jti, idx_token_denylist_user_id, idx_failed_login_attempts_email
 5. ALL Liquibase changeset files SHALL follow naming convention YYYYMMDDhhmmss-description.xml
 6. ALL Liquibase changesets SHALL have author set to "iqscaffold"
