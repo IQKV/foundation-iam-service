@@ -43,5 +43,6 @@ public interface UserMapper {
 
   void setEmailVerified(@Param("userId") UUID userId);
 
-  void updatePassword(@Param("userId") UUID userId, @Param("passwordHash") String passwordHash);
+  void updatePassword(@Param("userId") UUID userId, @Param("passwordHash") String passwordHash,
+                      @Param("updatedAt") Instant updatedAt);
 }

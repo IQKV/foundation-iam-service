@@ -17,6 +17,7 @@
 package com.iqscaffold.iam.tenant;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -53,7 +54,7 @@ public class StuckTenantReaperJob {
     }
 
     for (final Tenant tenant : stuckTenants) {
-      tenantMapper.updateStatus(tenant.getTenantKey(), TenantStatus.PROVISIONING_FAILED.name());
+      tenantMapper.updateStatus(tenant.getTenantKey(), TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
       log.error("Marked stuck tenant as PROVISIONING_FAILED: tenantKey={}, createdAt={}",
           tenant.getTenantKey(), tenant.getCreatedAt());
     }

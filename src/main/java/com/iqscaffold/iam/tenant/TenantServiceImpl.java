@@ -99,7 +99,7 @@ public class TenantServiceImpl implements TenantService {
       throw new InvalidTenantStateException("Invalid status transition");
     }
 
-    tenantMapper.updateStatus(tenantKey, newStatus.name());
+    tenantMapper.updateStatus(tenantKey, newStatus.name(), LocalDateTime.now());
     tenant.setStatus(newStatus);
     tenant.setUpdatedAt(LocalDateTime.now());
 
@@ -116,7 +116,7 @@ public class TenantServiceImpl implements TenantService {
       throw new InvalidTenantStateException("Tenant is not in PROVISIONING_FAILED state");
     }
 
-    tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING.name());
+    tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING.name(), LocalDateTime.now());
     messagingService.publishTenantCreated(tenantKey, tenant.getName());
 
     tenant.setStatus(TenantStatus.PROVISIONING);

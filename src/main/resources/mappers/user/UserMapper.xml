@@ -47,9 +47,7 @@
     </select>
 
     <select id="existsByEmail" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM public.users
-        WHERE email = #{email}
+        SELECT EXISTS (SELECT 1 FROM public.users WHERE email = #{email})
     </select>
 
     <update id="update" parameterType="com.iqscaffold.iam.user.User">
@@ -83,7 +81,7 @@
     <update id="updatePassword">
         UPDATE public.users
         SET password_hash = #{passwordHash},
-            updated_at    = NOW()
+            updated_at    = #{updatedAt}
         WHERE id = #{userId}
     </update>
 

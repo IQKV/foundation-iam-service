@@ -34,7 +34,8 @@ public interface TenantMapper {
 
   boolean existsByName(String name);
 
-  void updateStatus(@Param("tenantKey") String tenantKey, @Param("status") String status);
+  void updateStatus(@Param("tenantKey") String tenantKey, @Param("status") String status,
+                    @Param("updatedAt") java.time.LocalDateTime updatedAt);
 
   List<Tenant> findStuckProvisioning(@Param("olderThan") Instant olderThan);
 }

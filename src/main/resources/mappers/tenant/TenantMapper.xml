@@ -38,15 +38,13 @@
     </select>
 
     <select id="existsByName" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM public.tenants
-        WHERE name = #{name}
+        SELECT EXISTS (SELECT 1 FROM public.tenants WHERE name = #{name})
     </select>
 
     <update id="updateStatus">
         UPDATE public.tenants
         SET status     = #{status},
-            updated_at = NOW()
+            updated_at = #{updatedAt}
         WHERE tenant_key = #{tenantKey}
     </update>
 

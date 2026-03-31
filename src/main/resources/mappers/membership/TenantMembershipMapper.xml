@@ -29,13 +29,14 @@
         FROM public.tenant_memberships
         WHERE user_id = #{userId}
           AND tenant_key = #{tenantKey}
+        LIMIT 1
     </select>
 
     <select id="existsByUserIdAndTenantKey" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM public.tenant_memberships
-        WHERE user_id = #{userId}
-          AND tenant_key = #{tenantKey}
+        SELECT EXISTS (
+            SELECT 1 FROM public.tenant_memberships
+            WHERE user_id = #{userId} AND tenant_key = #{tenantKey}
+        )
     </select>
 
     <select id="findByTenantKey" resultMap="membershipResultMap">

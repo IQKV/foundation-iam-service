@@ -16,6 +16,8 @@
 
 package com.iqscaffold.iam.tenant;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -52,12 +54,12 @@ public class TenantProvisioningConsumer {
 
     try {
       tenantLiquibaseRunner.runMigrationsForTenant(tenantKey);
-      tenantMapper.updateStatus(tenantKey, TenantStatus.ACTIVE.name());
+      tenantMapper.updateStatus(tenantKey, TenantStatus.ACTIVE.name(), LocalDateTime.now());
       messagingService.publishTenantUpdated(tenantKey);
       log.info("Tenant provisioning succeeded: tenantKey={}", tenantKey);
     } catch (final Exception e) {
       log.error("Tenant provisioning failed: tenantKey={}", tenantKey, e);
-      tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING_FAILED.name());
+      tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
       // Do NOT rethrow — message is not requeued; failed state is observable via status endpoint
     }
   }

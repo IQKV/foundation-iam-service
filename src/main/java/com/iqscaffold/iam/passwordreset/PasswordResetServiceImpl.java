@@ -126,7 +126,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     }
 
     final String hash = passwordEncoder.encode(newPassword);
-    userMapper.updatePassword(prt.getUserId(), hash);
+    userMapper.updatePassword(prt.getUserId(), hash, Instant.now());
     passwordResetTokenMapper.deleteByToken(token);
     userMapper.updateLastGlobalSignoutAt(prt.getUserId(), Instant.now());
 
