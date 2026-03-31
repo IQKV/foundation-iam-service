@@ -27,7 +27,7 @@
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>
         <!-- Dependency versions -->
         <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
-        <liquibase.version>4.31.1</liquibase.version>
+        <liquibase.version>5.0.2</liquibase.version>
         <jjwt.version>0.12.6</jjwt.version>
         <shedlock.version>6.9.0</shedlock.version>
         <nanoid.version>2.0.0</nanoid.version>
