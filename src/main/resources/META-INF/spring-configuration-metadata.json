@@ -147,7 +147,13 @@
       "name": "iqscaffold.mail.from",
       "type": "java.lang.String",
       "description": "Default From address for outgoing emails.",
-      "defaultValue": "noreply@example.com"
+      "defaultValue": "noreply@iqscaffold.com"
+    },
+    {
+      "name": "iqscaffold.mail.from-name",
+      "type": "java.lang.String",
+      "description": "Display name for the From address in outgoing emails.",
+      "defaultValue": "IQ Scaffold"
     },
     {
       "name": "iqscaffold.mail.reply-to",
@@ -256,6 +262,11 @@
       "name": "iqscaffold.notification.mail.from",
       "type": "java.lang.String",
       "description": "From address used in outgoing notification emails."
+    },
+    {
+      "name": "iqscaffold.notification.mail.from-name",
+      "type": "java.lang.String",
+      "description": "Display name for the From address in outgoing notification emails."
     },
     {
       "name": "iqscaffold.notification.mail.reply-to",

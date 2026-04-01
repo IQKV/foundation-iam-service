@@ -66,7 +66,7 @@ public class EmailService {
 
       final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
       final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-      helper.setFrom(notificationProps.mail().from());
+      helper.setFrom(notificationProps.mail().from(), notificationProps.mail().fromName());
       helper.setTo(event.getRecipientEmail());
       helper.setSubject(subject);
       helper.setText(htmlBody, true);
@@ -78,7 +78,7 @@ public class EmailService {
 
       javaMailSender.send(mimeMessage);
       log.info("Email sent: type={} to={}", event.getType(), event.getRecipientEmail());
-    } catch (final MessagingException e) {
+    } catch (final MessagingException | java.io.UnsupportedEncodingException e) {
       log.error("Failed to send email: type={} to={}", event.getType(), event.getRecipientEmail(), e);
       throw new com.iqscaffold.iam.infrastructure.messaging.MessagingException(
           "Failed to send email to " + event.getRecipientEmail(), e);

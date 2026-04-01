@@ -15,5 +15,5 @@ public record NotificationConfigurationProperties(
     @NotBlank String baseUrl
 ) {
 
-    public record Mail(@NotBlank String from, String replyTo) {}
+    public record Mail(@NotBlank String from, @NotBlank String fromName, String replyTo) {}
 }

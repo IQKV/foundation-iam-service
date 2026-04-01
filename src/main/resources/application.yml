@@ -71,7 +71,8 @@ iqscaffold:
     port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
-    from: ${MAIL_FROM:noreply@example.com}
+    from: ${MAIL_FROM:noreply@iqscaffold.com}
+    from-name: ${MAIL_FROM_NAME:IQ Scaffold}
     reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:
@@ -100,6 +101,7 @@ iqscaffold:
   notification:
     mail:
       from: ${iqscaffold.mail.from}
+      from-name: ${iqscaffold.mail.from-name}
       reply-to: ${iqscaffold.mail.reply-to}
     default-locale: en
     base-url: ${APP_BASE_URL:http://localhost:3000}

@@ -52,7 +52,8 @@ iqscaffold:
     provisioning-timeout: PT10M
   notification:
     mail:
-      from: noreply@example.com
+      from: noreply@iqscaffold.com
+      from-name: IQ Scaffold
       reply-to: ""
     default-locale: en
     base-url: http://localhost:3000
