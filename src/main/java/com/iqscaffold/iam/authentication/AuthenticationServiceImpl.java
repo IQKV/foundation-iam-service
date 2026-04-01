@@ -65,6 +65,7 @@ import com.iqscaffold.iam.user.UserMapper;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
   private static final int RESEND_RATE_LIMIT = 3;
   private static final Duration RESEND_WINDOW = Duration.ofHours(1);
   private static final Duration EMAIL_TOKEN_TTL = Duration.ofHours(24);
@@ -302,7 +303,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     emailVerificationTokenMapper.deleteByUserId(user.getId());
 
     final byte[] bytes = new byte[32];
-    new SecureRandom().nextBytes(bytes);
+    SECURE_RANDOM.nextBytes(bytes);
     final String tokenValue = HexFormat.of().formatHex(bytes);
 
     final var newToken = new EmailVerificationToken();

@@ -41,12 +41,16 @@ import org.slf4j.LoggerFactory;
 public class MyBatisSchemaInterceptor implements Interceptor {
 
   private static final Logger log = LoggerFactory.getLogger(MyBatisSchemaInterceptor.class);
+  private static final java.util.regex.Pattern SAFE_TENANT_KEY = java.util.regex.Pattern.compile("^[a-zA-Z0-9_]+$");
 
   @Override
   public Object intercept(final Invocation invocation) throws Throwable {
     final Connection connection = (Connection) invocation.getArgs()[0];
     try {
       final String tenantKey = TenantContext.getCurrentTenant();
+      if (!SAFE_TENANT_KEY.matcher(tenantKey).matches()) {
+        throw new IllegalArgumentException("Invalid tenant key: " + tenantKey);
+      }
       final String schema = "t_" + tenantKey;
       try (final Statement stmt = connection.createStatement()) {
         stmt.execute("SET search_path TO " + schema + ", public");

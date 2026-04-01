@@ -43,6 +43,7 @@ import com.iqscaffold.iam.user.UserMapper;
 public class PasswordResetServiceImpl implements PasswordResetService {
 
   private static final Logger log = LoggerFactory.getLogger(PasswordResetServiceImpl.class);
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
   private static final Pattern PASSWORD_PATTERN =
       Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$");
 
@@ -85,7 +86,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     passwordResetTokenMapper.deleteByUserId(user.getId());
 
     final byte[] bytes = new byte[32];
-    new SecureRandom().nextBytes(bytes);
+    SECURE_RANDOM.nextBytes(bytes);
     final String tokenValue = HexFormat.of().formatHex(bytes);
 
     final var prt = new PasswordResetToken();
