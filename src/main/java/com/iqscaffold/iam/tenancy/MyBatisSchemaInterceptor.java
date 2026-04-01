@@ -17,7 +17,6 @@
 package com.iqscaffold.iam.tenancy;
 
 import java.sql.Connection;
-import java.sql.Statement;
 
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.Interceptor;
@@ -52,8 +51,8 @@ public class MyBatisSchemaInterceptor implements Interceptor {
         throw new IllegalArgumentException("Invalid tenant key: " + tenantKey);
       }
       final String schema = "t_" + tenantKey;
-      try (final Statement stmt = connection.createStatement()) {
-        stmt.execute("SET search_path TO " + schema + ", public");
+      try (final var stmt = connection.prepareStatement("SET search_path TO " + schema + ", public")) {
+        stmt.execute();
       }
       log.trace("search_path set to {}, public", schema);
     } catch (final IllegalStateException e) {
