@@ -1,5 +1,6 @@
 ${AnsiColor.BLUE} ===============================
-${AnsiColor.BLUE}  Servicename Backend API
+${AnsiColor.BLUE}  IAM Service Application
 ${AnsiColor.BLUE}  Running Spring Boot ${spring-boot.version}
+${AnsiColor.BLUE}  VCS Reference: ${APPLICATION_VCS_REFERENCE:unknown}
 ${AnsiColor.BLUE} ===============================
 ${AnsiColor.DEFAULT}
