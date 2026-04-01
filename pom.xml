@@ -26,7 +26,7 @@
         <jacoco.skip>true</jacoco.skip>
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>
         <!-- Dependency versions -->
-        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
+        <mybatis-spring-boot.version>4.0.1</mybatis-spring-boot.version>
         <liquibase.version>5.0.2</liquibase.version>
         <jjwt.version>0.13.0</jjwt.version>
         <shedlock.version>7.7.0</shedlock.version>
