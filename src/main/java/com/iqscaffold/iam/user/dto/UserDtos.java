@@ -43,14 +43,6 @@ public final class UserDtos {
       @NotBlank @Size(max = 100) String firstName,
       @NotBlank @Size(max = 100) String lastName) {}
 
-  /**
-   * @deprecated Use {@link UpdateUserRequest} instead.
-   */
-  @Deprecated
-  public record UpdateProfileRequest(
-      @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {}
-
   public record UserResponse(
       UUID id,
       String email,
@@ -65,4 +57,21 @@ public final class UserDtos {
       String email,
       String tenantKey,
       String tenantStatus) {}
+
+  public record AdminCreateUserRequest(
+      @Email @NotBlank String email,
+      @NotBlank @Size(max = 100) String firstName,
+      @NotBlank @Size(max = 100) String lastName) {}
+
+  public record AdminUpdateUserRequest(
+      @Size(max = 100) String firstName,
+      @Size(max = 100) String lastName,
+      String status) {}
+
+  public record PagedUserResponse(
+      java.util.List<UserResponse> content,
+      int page,
+      int size,
+      long totalElements,
+      int totalPages) {}
 }

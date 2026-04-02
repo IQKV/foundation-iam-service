@@ -82,6 +82,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/email/resend-verification").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/forgot").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/reset").permitAll()
+            .requestMatchers("/api/v1/iam/admin/users/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/tenants/**").hasAuthority("TENANT_OWNER")
             .requestMatchers(HttpMethod.PATCH, "/api/v1/iam/tenants/**").hasAuthority("TENANT_OWNER")
             .anyRequest().authenticated()

@@ -50,6 +50,23 @@
         SELECT EXISTS (SELECT 1 FROM public.users WHERE email = #{email})
     </select>
 
+    <select id="findAll" resultMap="userResultMap">
+        SELECT id, email, password_hash, first_name, last_name, status,
+               email_verified, last_global_signout_at,
+               created_at, updated_at, created_by, updated_by
+        FROM public.users
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM public.users
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM public.users WHERE id = #{id}
+    </delete>
+
     <update id="update" parameterType="com.iqscaffold.iam.user.User">
         UPDATE public.users
         SET first_name = #{firstName},

@@ -17,6 +17,7 @@
 package com.iqscaffold.iam.user;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,7 +35,13 @@ public interface UserMapper {
 
   boolean existsByEmail(String email);
 
+  List<User> findAll(@Param("limit") int limit, @Param("offset") int offset);
+
+  long countAll();
+
   void update(User user);
+
+  void deleteById(@Param("id") UUID id);
 
   void updateLastGlobalSignoutAt(@Param("userId") UUID userId,
                                  @Param("lastGlobalSignoutAt") Instant lastGlobalSignoutAt);

@@ -190,6 +190,64 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
+  public UserDtos.PagedUserResponse listUsers(final int page, final int size) {
+    final int offset = page * size;
+    final var users = userMapper.findAll(size, offset).stream()
+        .map(UserDtoMapper::toResponse)
+        .toList();
+    final long total = userMapper.countAll();
+    final int totalPages = (int) Math.ceil((double) total / size);
+    return new UserDtos.PagedUserResponse(users, page, size, total, totalPages);
+  }
+
+  @Override
+  public UserDtos.UserResponse createUser(final UserDtos.AdminCreateUserRequest request) {
+    final var user = new User();
+    user.setId(UUID.randomUUID());
+    user.setEmail(request.email());
+    user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+    user.setFirstName(request.firstName());
+    user.setLastName(request.lastName());
+    user.setStatus(AccountStatus.ACTIVE);
+    user.setEmailVerified(false);
+    user.setCreatedAt(LocalDateTime.now());
+    user.setUpdatedAt(LocalDateTime.now());
+    user.setCreatedBy("system");
+    user.setUpdatedBy("system");
+    userMapper.upsertByEmail(user);
+    return UserDtoMapper.toResponse(userMapper.findByEmail(request.email())
+        .orElseThrow(() -> new UserNotFoundException("User not found after insert: " + request.email())));
+  }
+
+  @Override
+  public UserDtos.UserResponse patchUser(final UUID userId, final UserDtos.AdminUpdateUserRequest request) {
+    final User user = userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+    if (request.firstName() != null) {
+      user.setFirstName(request.firstName());
+    }
+    if (request.lastName() != null) {
+      user.setLastName(request.lastName());
+    }
+    if (request.status() != null) {
+      user.setStatus(AccountStatus.valueOf(request.status()));
+    }
+    user.setUpdatedAt(LocalDateTime.now());
+    user.setUpdatedBy("system");
+    userMapper.update(user);
+    return UserDtoMapper.toResponse(user);
+  }
+
+  @Override
+  public void deleteUserById(final UUID userId) {
+    userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+    userMapper.deleteById(userId);
+    log.info("User deleted: userId={}", userId);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public UserDtos.UserResponse getUserById(final UUID userId) {
     final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
