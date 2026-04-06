@@ -2,8 +2,8 @@
 
 Multi-tenant Identity and Access Management microservice. A single user account can belong to multiple tenants with different roles in each.
 
-![CI](https://img.shields.io/github/actions/workflow/status/IQKV/iqkv-iam-service/ci.yml?label=CI)
-![License](https://img.shields.io/github/license/IQKV/iqkv-iam-service)
+![CI](https://img.shields.io/github/actions/workflow/status/IQKV/iqkvdev-iam-service/ci.yml?label=CI)
+![License](https://img.shields.io/github/license/IQKV/iqkvdev-iam-service)
 
 ## About
 
