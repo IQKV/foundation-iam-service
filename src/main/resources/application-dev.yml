@@ -10,11 +10,11 @@ spring:
 
 logging:
   level:
-    com.iqscaffold: DEBUG
+    dev.iqkv: DEBUG
     org.mybatis: DEBUG
     liquibase: DEBUG
 
-iqscaffold:
+iqkv:
   db:
     host: ${DB_HOST:postgres}
     username: ${DB_USERNAME:iam}

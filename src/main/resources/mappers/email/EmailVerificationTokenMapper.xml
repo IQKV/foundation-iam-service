@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqscaffold.iam.email.EmailVerificationTokenMapper">
+<mapper namespace="dev.iqkv.iamservice.email.EmailVerificationTokenMapper">
 
-    <resultMap id="emailVerificationTokenResultMap" type="com.iqscaffold.iam.email.EmailVerificationToken">
+    <resultMap id="emailVerificationTokenResultMap" type="dev.iqkv.iamservice.email.EmailVerificationToken">
         <id     property="id"           column="id"/>
         <result property="userId"       column="user_id"/>
         <result property="token"        column="token"/>
@@ -13,7 +13,7 @@
         <result property="createdAt"    column="created_at"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.iqscaffold.iam.email.EmailVerificationToken">
+    <insert id="insert" parameterType="dev.iqkv.iamservice.email.EmailVerificationToken">
         INSERT INTO public.email_verification_tokens
             (id, user_id, token, expires_at, resend_count, last_resend_at, created_at)
         VALUES

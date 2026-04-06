@@ -19,11 +19,11 @@ services:
 
 networks:
   iam-service-network:
-    name: iqscaffold-iam-network-dev
+    name: iqkv-iam-network-dev
     external: false
 
 volumes:
   postgres_iam_data:
-    name: iqscaffold_iam_postgres_data_dev
+    name: iqkv_iam_postgres_data_dev
   rabbitmq_iam_data:
-    name: iqscaffold_iam_rabbitmq_data_dev
+    name: iqkv_iam_rabbitmq_data_dev

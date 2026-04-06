@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database for IAM Service - Local Development
   postgres-iam:
     image: postgres:17-alpine
-    container_name: iqscaffold-iam-postgres-dev
+    container_name: iqkv-iam-postgres-dev
     environment:
       POSTGRES_DB: iam
       POSTGRES_USER: iam
@@ -42,7 +42,7 @@ services:
   # RabbitMQ for IAM Service - Local Development
   rabbitmq-iam:
     image: rabbitmq:3.13-management-alpine
-    container_name: iqscaffold-iam-rabbitmq-dev
+    container_name: iqkv-iam-rabbitmq-dev
     environment:
       RABBITMQ_DEFAULT_USER: iam
       RABBITMQ_DEFAULT_PASS: iam
@@ -66,7 +66,7 @@ services:
   # MailHog for local email testing
   mailhog:
     image: mailhog/mailhog:v1.0.1
-    container_name: iqscaffold-iam-mailhog-dev
+    container_name: iqkv-iam-mailhog-dev
     ports:
       - "1025:1025" # SMTP
       - "8025:8025" # Web UI
@@ -80,12 +80,12 @@ services:
       context: .
       dockerfile: ./Dockerfile
       target: builder
-    image: iqscaffold/iqscaffold-iam-service:dev
-    container_name: iqscaffold-iam-service-dev
+    image: iqkv/iqkv-iam-service:dev
+    container_name: iqkv-iam-service-dev
     environment:
       # Spring Configuration
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_APPLICATION_NAME: iqscaffold-iam-service
+      SPRING_APPLICATION_NAME: iqkv-iam-service
 
       # Database Configuration
       DB_HOST: postgres-iam
@@ -105,7 +105,7 @@ services:
       MAIL_PORT: 1025
       MAIL_USERNAME: ""
       MAIL_PASSWORD: ""
-      MAIL_FROM: noreply@iqscaffold.site
+      MAIL_FROM: noreply@iqkv.site
       MAIL_REPLY_TO: ""
 
       # JWT RS256 Key Configuration
@@ -116,8 +116,8 @@ services:
       APP_BASE_URL: http://localhost:3000
 
       # Observability
-      OTEL_SERVICE_NAME: iqscaffold-iam-service
-      OTEL_RESOURCE_ATTRIBUTES: service.name=iqscaffold-iam-service,service.version=1.0.0,deployment.environment=dev
+      OTEL_SERVICE_NAME: iqkv-iam-service
+      OTEL_RESOURCE_ATTRIBUTES: service.name=iqkv-iam-service,service.version=1.0.0,deployment.environment=dev
 
       # JVM Configuration
       JAVA_OPTS: >-
@@ -159,21 +159,21 @@ services:
 networks:
   iam-service-network:
     driver: bridge
-    name: iqscaffold-iam-network-dev
+    name: iqkv-iam-network-dev
     ipam:
       config:
         - subnet: 172.21.0.0/16
 
 volumes:
   postgres_iam_data:
-    name: iqscaffold_iam_postgres_data_dev
+    name: iqkv_iam_postgres_data_dev
     driver: local
   rabbitmq_iam_data:
-    name: iqscaffold_iam_rabbitmq_data_dev
+    name: iqkv_iam_rabbitmq_data_dev
     driver: local
   iam_logs:
-    name: iqscaffold_iam_logs_dev
+    name: iqkv_iam_logs_dev
     driver: local
   iam_tmp:
-    name: iqscaffold_iam_tmp_dev
+    name: iqkv_iam_tmp_dev
     driver: local

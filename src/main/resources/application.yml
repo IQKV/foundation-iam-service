@@ -4,23 +4,23 @@
 
 spring:
   application:
-    name: iqscaffold-iam-service
+    name: iqkv-iam-service
   datasource:
-    url: jdbc:postgresql://${iqscaffold.db.host}:${iqscaffold.db.port}/${iqscaffold.db.name}
-    username: ${iqscaffold.db.username}
-    password: ${iqscaffold.db.password}
+    url: jdbc:postgresql://${iqkv.db.host}:${iqkv.db.port}/${iqkv.db.name}
+    username: ${iqkv.db.username}
+    password: ${iqkv.db.password}
   rabbitmq:
-    host: ${iqscaffold.rabbitmq.host}
-    port: ${iqscaffold.rabbitmq.port}
-    username: ${iqscaffold.rabbitmq.username}
-    password: ${iqscaffold.rabbitmq.password}
+    host: ${iqkv.rabbitmq.host}
+    port: ${iqkv.rabbitmq.port}
+    username: ${iqkv.rabbitmq.username}
+    password: ${iqkv.rabbitmq.password}
   liquibase:
     enabled: false
   mail:
-    host: ${iqscaffold.mail.host}
-    port: ${iqscaffold.mail.port}
-    username: ${iqscaffold.mail.username}
-    password: ${iqscaffold.mail.password}
+    host: ${iqkv.mail.host}
+    port: ${iqkv.mail.port}
+    username: ${iqkv.mail.username}
+    password: ${iqkv.mail.password}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -54,7 +54,7 @@ management:
         enabled: true
       show-details: when-authorized
 
-iqscaffold:
+iqkv:
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
@@ -71,8 +71,8 @@ iqscaffold:
     port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
-    from: ${MAIL_FROM:noreply@iqscaffold.com}
-    from-name: ${MAIL_FROM_NAME:IQ Scaffold}
+    from: ${MAIL_FROM:noreply@iqkv.com}
+    from-name: ${MAIL_FROM_NAME:IQ Key Value}
     reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:
@@ -80,7 +80,7 @@ iqscaffold:
       public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
       expiry: PT15M
       refresh-expiry: P7D
-      issuer: iqscaffold-iam-service
+      issuer: iqkv-iam-service
     security:
       password-encoder-strength: 12
       min-length: 8
@@ -100,9 +100,9 @@ iqscaffold:
     tenant-change-log: db/changelog/tenant/master.xml
   notification:
     mail:
-      from: ${iqscaffold.mail.from}
-      from-name: ${iqscaffold.mail.from-name}
-      reply-to: ${iqscaffold.mail.reply-to}
+      from: ${iqkv.mail.from}
+      from-name: ${iqkv.mail.from-name}
+      reply-to: ${iqkv.mail.reply-to}
     default-locale: en
     base-url: ${APP_BASE_URL:http://localhost:3000}
 

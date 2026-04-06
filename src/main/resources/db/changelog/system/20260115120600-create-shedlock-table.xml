@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="20260115120600" author="iqscaffold">
+    <changeSet id="20260115120600" author="iqkv">
         <createTable tableName="shedlock" schemaName="public">
             <column name="name" type="VARCHAR(64)">
                 <constraints primaryKey="true" nullable="false"/>

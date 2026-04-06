@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="20260115120400" author="iqscaffold">
+    <changeSet id="20260115120400" author="iqkv">
         <createTable tableName="token_denylist" schemaName="public">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>

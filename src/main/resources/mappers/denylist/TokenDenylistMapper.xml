@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqscaffold.iam.denylist.TokenDenylistMapper">
+<mapper namespace="dev.iqkv.iamservice.denylist.TokenDenylistMapper">
 
-    <resultMap id="tokenDenylistResultMap" type="com.iqscaffold.iam.denylist.TokenDenylist">
+    <resultMap id="tokenDenylistResultMap" type="dev.iqkv.iamservice.denylist.TokenDenylist">
         <id     property="id"        column="id"/>
         <result property="jti"       column="jti"/>
         <result property="userId"    column="user_id"/>
@@ -11,7 +11,7 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.iqscaffold.iam.denylist.TokenDenylist">
+    <insert id="insert" parameterType="dev.iqkv.iamservice.denylist.TokenDenylist">
         INSERT INTO public.token_denylist
             (id, jti, user_id, expires_at, created_at)
         VALUES

@@ -9,7 +9,7 @@ spring:
     enabled: true
     contexts: demo
 
-iqscaffold:
+iqkv:
   liquibase:
     system-change-log: db/changelog/system/db.changelog-master.xml
     tenant-change-log: db/changelog/tenant/master.xml
@@ -27,10 +27,10 @@ management:
 
 logging:
   level:
-    com.iqscaffold: DEBUG
+    dev.iqkv: DEBUG
     org.mybatis: DEBUG
 
-iqscaffold:
+iqkv:
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}

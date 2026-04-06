@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqscaffold.iam.tenant.TenantMapper">
+<mapper namespace="dev.iqkv.iamservice.tenant.TenantMapper">
 
-    <resultMap id="tenantResultMap" type="com.iqscaffold.iam.tenant.Tenant">
+    <resultMap id="tenantResultMap" type="dev.iqkv.iamservice.tenant.Tenant">
         <id     property="id"         column="id"/>
         <result property="tenantKey"  column="tenant_key"/>
         <result property="name"       column="name"/>
@@ -15,7 +15,7 @@
         <result property="updatedBy"  column="updated_by"/>
     </resultMap>
 
-    <insert id="insertIfAbsent" parameterType="com.iqscaffold.iam.tenant.Tenant">
+    <insert id="insertIfAbsent" parameterType="dev.iqkv.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
             (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by)
         VALUES
