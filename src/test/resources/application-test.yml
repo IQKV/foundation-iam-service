@@ -1,5 +1,7 @@
 # ===================================================================
-# Spring Boot configuration for tests.
+# Spring Boot configuration for the "test" profile.
+# Activated via @ActiveProfiles("test") on test classes.
+# Only contains overrides and test-specific values relative to application.yml.
 # ===================================================================
 
 spring:
@@ -33,29 +35,13 @@ iqkv:
     jwt:
       private-key-path: classpath:keys/private.pem
       public-key-path: classpath:keys/public.pem
-      expiry: PT15M
-      refresh-expiry: P7D
-      issuer: iqkv-iam-service
     security:
-      password-encoder-strength: 4
-      min-length: 8
-      rate-limiting:
-        login-attempts: 5
-        lockout-duration: PT15M
-    password-reset:
-      token-ttl: PT1H
-      rate-limit-window: PT15M
-      rate-limit-max-requests: 3
-  tenancy:
-    schema-prefix: t_
-    default-schema: public
-    provisioning-timeout: PT10M
+      password-encoder-strength: 4  # Reduced from 12 for faster test execution
   notification:
     mail:
       from: noreply@iqkv.com
       from-name: IQ Key Value
       reply-to: ""
-    default-locale: en
     base-url: http://localhost:3000
   messaging:
     rabbitmq:

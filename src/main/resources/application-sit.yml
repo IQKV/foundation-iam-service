@@ -1,5 +1,5 @@
 # ===================================================================
-# Spring Boot configuration for the "dev" profile (K8s / dev cluster).
+# Spring Boot configuration for the "sit" profile (K8s / SIT namespace).
 # Overrides base: points to in-cluster service names, enables Liquibase with demo data.
 # ===================================================================
 
