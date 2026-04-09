@@ -7,10 +7,7 @@
 spring:
   liquibase:
     enabled: true
-    change-log: classpath:/db/changelog/system/db.changelog-master.xml
-    contexts: demo
   mail:
-    host: localhost
     port: 3025
     properties:
       mail.smtp.auth: false
@@ -32,17 +29,8 @@ iqkv:
     contexts: demo
     tenant-runner-enabled: false
   auth:
-    jwt:
-      private-key-path: classpath:keys/private.pem
-      public-key-path: classpath:keys/public.pem
     security:
       password-encoder-strength: 4  # Reduced from 12 for faster test execution
-  notification:
-    mail:
-      from: noreply@iqkv.com
-      from-name: IQ Key Value
-      reply-to: ""
-    base-url: http://localhost:3000
   messaging:
     rabbitmq:
       enabled: false
