@@ -1,5 +1,5 @@
 # ===================================================================
-# Spring Boot configuration for the "production" profile.
+# Spring Boot configuration for the "prd" profile.
 # Overrides base: all secrets via env vars (no defaults), hardens actuator/swagger.
 # ===================================================================
 
