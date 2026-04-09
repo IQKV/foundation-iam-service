@@ -11,23 +11,20 @@ spring:
     password: ""
     driver-class-name: org.h2.Driver
   liquibase:
-    enabled: true
+    enabled: false  # Migrations are handled by TenantLiquibaseRunner; Spring auto-config must stay off to avoid conflicts
   mail:
     port: 3025
     properties:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
 
-logging:
-  level:
-    liquibase: DEBUG
 
 iqkv:
   liquibase:
-    system-change-log: classpath:/db/changelog/system/db.changelog-master.xml
-    tenant-change-log: classpath:/db/changelog/tenant/master.xml
+    system-change-log: db/changelog/system/db.changelog-master.xml
+    tenant-change-log: db/changelog/tenant/master.xml
     contexts: demo
-    tenant-runner-enabled: false
+    tenant-runner-enabled: false  # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
   auth:
     security:
       password-encoder-strength: 4  # Reduced from 12 for faster test execution
