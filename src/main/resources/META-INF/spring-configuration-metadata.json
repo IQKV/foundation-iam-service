@@ -38,11 +38,6 @@
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
-      "name": "iqkv.database",
-      "type": "com.iqkv.foundation.iamservice.infrastructure.config.DatabaseConfigurationProperties",
-      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.DatabaseConfigurationProperties"
-    },
-    {
       "name": "iqkv.messaging.rabbitmq",
       "type": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties",
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties"
@@ -231,26 +226,6 @@
       "type": "java.lang.Integer",
       "description": "Maximum password reset requests allowed within the rate limit window.",
       "defaultValue": 3
-    },
-    {
-      "name": "iqkv.database.url",
-      "type": "java.lang.String",
-      "description": "Full JDBC URL for the datasource (used by DatabaseConfigurationProperties)."
-    },
-    {
-      "name": "iqkv.database.username",
-      "type": "java.lang.String",
-      "description": "Datasource username (used by DatabaseConfigurationProperties)."
-    },
-    {
-      "name": "iqkv.database.password",
-      "type": "java.lang.String",
-      "description": "Datasource password (used by DatabaseConfigurationProperties)."
-    },
-    {
-      "name": "iqkv.database.pool-size",
-      "type": "java.lang.Integer",
-      "description": "Connection pool size (used by DatabaseConfigurationProperties)."
     },
     {
       "name": "iqkv.messaging.rabbitmq.enabled",
