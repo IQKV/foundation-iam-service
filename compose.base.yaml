@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database for IAM Service - Local Development
   postgres-iam:
     image: postgres:17-alpine
-    container_name: iqkv-iam-postgres-dev
+    container_name: foundation-iam-postgres-dev
     environment:
       POSTGRES_DB: iam
       POSTGRES_USER: iam
@@ -42,7 +42,7 @@ services:
   # RabbitMQ for IAM Service - Local Development
   rabbitmq-iam:
     image: rabbitmq:3.13-management-alpine
-    container_name: iqkv-iam-rabbitmq-dev
+    container_name: foundation-iam-rabbitmq-dev
     environment:
       RABBITMQ_DEFAULT_USER: iam
       RABBITMQ_DEFAULT_PASS: iam
@@ -66,7 +66,7 @@ services:
   # MailHog for local email testing
   mailhog:
     image: mailhog/mailhog:v1.0.1
-    container_name: iqkv-iam-mailhog-dev
+    container_name: foundation-iam-mailhog-dev
     ports:
       - "1025:1025" # SMTP
       - "8025:8025" # Web UI
@@ -80,12 +80,12 @@ services:
       context: .
       dockerfile: ./Dockerfile
       target: builder
-    image: iqkv/iqkv-iam-service:dev
-    container_name: iqkv-iam-service-dev
+    image: iqkv/foundation-iam-service:dev
+    container_name: foundation-iam-service-dev
     environment:
       # Spring Configuration
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_APPLICATION_NAME: iqkv-iam-service
+      SPRING_APPLICATION_NAME: foundation-iam-service
 
       # Database Configuration
       DB_HOST: postgres-iam
@@ -116,8 +116,8 @@ services:
       APP_BASE_URL: http://localhost:3000
 
       # Observability
-      OTEL_SERVICE_NAME: iqkv-iam-service
-      OTEL_RESOURCE_ATTRIBUTES: service.name=iqkv-iam-service,service.version=1.0.0,deployment.environment=dev
+      OTEL_SERVICE_NAME: foundation-iam-service
+      OTEL_RESOURCE_ATTRIBUTES: service.name=foundation-iam-service,service.version=1.0.0,deployment.environment=dev
 
       # JVM Configuration
       JAVA_OPTS: >-
@@ -159,7 +159,7 @@ services:
 networks:
   iam-service-network:
     driver: bridge
-    name: iqkv-iam-network-dev
+    name: foundation-iam-network-dev
     ipam:
       config:
         - subnet: 172.21.0.0/16

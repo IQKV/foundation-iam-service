@@ -4,7 +4,7 @@
 
 spring:
   application:
-    name: iqkv-iam-service
+    name: foundation-iam-service
   datasource:
     url: jdbc:postgresql://${iqkv.db.host}:${iqkv.db.port}/${iqkv.db.name}
     username: ${iqkv.db.username}
@@ -80,7 +80,7 @@ iqkv:
       public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
       expiry: PT15M
       refresh-expiry: P7D
-      issuer: iqkv-iam-service
+      issuer: foundation-iam-service
     security:
       password-encoder-strength: 12
       min-length: 8

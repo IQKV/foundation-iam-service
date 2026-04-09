@@ -40,7 +40,7 @@ public final class JwtClaimNames {
   public static final String TYPE_ACCESS = "access";
   public static final String TYPE_REFRESH = "refresh";
 
-  public static final String ISSUER = "iqkv-iam-service";
+  public static final String ISSUER = "foundation-iam-service";
 
   private JwtClaimNames() {}
 }

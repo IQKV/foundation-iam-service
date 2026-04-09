@@ -188,7 +188,7 @@
       "name": "iqkv.auth.jwt.issuer",
       "type": "java.lang.String",
       "description": "JWT iss claim value.",
-      "defaultValue": "iqkv-iam-service"
+      "defaultValue": "foundation-iam-service"
     },
     {
       "name": "iqkv.auth.security.password-encoder-strength",

@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.iqkv</groupId>
-    <artifactId>iqkv-iam-service</artifactId>
+    <artifactId>foundation-iam-service</artifactId>
     <version>0.0.0-SNAPSHOT</version>
     <name>IAM Service</name>
     <description>Identity and Access Management Service.</description>
