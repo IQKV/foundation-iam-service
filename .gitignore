@@ -40,6 +40,6 @@ CLAUDE.local.md
 
 ### Environment files (keep only .example in VCS) ###
 .env.local
-.env.staging
-.env.production
+.env.uat
+.env.prd
 .env
