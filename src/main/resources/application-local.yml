@@ -27,7 +27,7 @@ management:
 
 logging:
   level:
-    dev.iqkv: DEBUG
+    com.iqkv: DEBUG
     org.mybatis: DEBUG
 
 iqkv:

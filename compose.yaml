@@ -19,7 +19,7 @@ services:
 
 networks:
   iam-service-network:
-    name: iqkvdev-iam-network-dev
+    name: iqkv-iam-network-dev
     external: false
 
 volumes:

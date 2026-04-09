@@ -35,7 +35,7 @@ iqkv:
       public-key-path: classpath:keys/public.pem
       expiry: PT15M
       refresh-expiry: P7D
-      issuer: iqkvdev-iam-service
+      issuer: iqkv-iam-service
     security:
       password-encoder-strength: 4
       min-length: 8

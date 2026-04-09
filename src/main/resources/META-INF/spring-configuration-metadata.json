@@ -14,58 +14,58 @@
     },
     {
       "name": "iqkv.auth",
-      "type": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.jwt",
-      "type": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Jwt",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Jwt",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.security",
-      "type": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.security.rate-limiting",
-      "type": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security$RateLimiting",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security"
+      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security$RateLimiting",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security"
     },
     {
       "name": "iqkv.auth.password-reset",
-      "type": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$PasswordReset",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$PasswordReset",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.database",
-      "type": "dev.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties"
     },
     {
       "name": "iqkv.messaging.rabbitmq",
-      "type": "dev.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties"
     },
     {
       "name": "iqkv.notification",
-      "type": "dev.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
     },
     {
       "name": "iqkv.notification.mail",
-      "type": "dev.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
     },
     {
       "name": "iqkv.tenancy",
-      "type": "dev.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties"
     },
     {
       "name": "iqkv.liquibase",
-      "type": "dev.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
-      "sourceType": "dev.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
+      "type": "com.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
+      "sourceType": "com.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
     }
   ],
   "properties": [
@@ -188,7 +188,7 @@
       "name": "iqkv.auth.jwt.issuer",
       "type": "java.lang.String",
       "description": "JWT iss claim value.",
-      "defaultValue": "iqkvdev-iam-service"
+      "defaultValue": "iqkv-iam-service"
     },
     {
       "name": "iqkv.auth.security.password-encoder-strength",
