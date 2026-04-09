@@ -14,58 +14,58 @@
     },
     {
       "name": "iqkv.auth",
-      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.jwt",
-      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Jwt",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$Jwt",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.security",
-      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$Security",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.auth.security.rate-limiting",
-      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security$RateLimiting",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$Security"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$Security$RateLimiting",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$Security"
     },
     {
       "name": "iqkv.auth.password-reset",
-      "type": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties$PasswordReset",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.AuthConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$PasswordReset",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
       "name": "iqkv.database",
-      "type": "com.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.DatabaseConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.DatabaseConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.DatabaseConfigurationProperties"
     },
     {
       "name": "iqkv.messaging.rabbitmq",
-      "type": "com.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.MessagingConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties"
     },
     {
       "name": "iqkv.notification",
-      "type": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties"
     },
     {
       "name": "iqkv.notification.mail",
-      "type": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.NotificationConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties"
     },
     {
       "name": "iqkv.tenancy",
-      "type": "com.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.TenancyConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties"
     },
     {
       "name": "iqkv.liquibase",
-      "type": "com.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
-      "sourceType": "com.iqkv.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
     }
   ],
   "properties": [

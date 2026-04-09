@@ -21,7 +21,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <spring-boot.run.jvmArguments>-Duser.timezone=UTC</spring-boot.run.jvmArguments>
-        <start-class>com.iqkv.iamservice.IamServiceApplication</start-class>
+        <start-class>com.iqkv.foundation.iamservice.IamServiceApplication</start-class>
         <checkstyle.skip>true</checkstyle.skip>
         <jacoco.skip>true</jacoco.skip>
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>

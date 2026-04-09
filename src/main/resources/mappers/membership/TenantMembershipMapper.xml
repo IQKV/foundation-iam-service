@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqkv.iamservice.membership.TenantMembershipMapper">
+<mapper namespace="com.iqkv.foundation.iamservice.membership.TenantMembershipMapper">
 
-    <resultMap id="membershipResultMap" type="com.iqkv.iamservice.membership.TenantMembership">
+    <resultMap id="membershipResultMap" type="com.iqkv.foundation.iamservice.membership.TenantMembership">
         <id     property="id"        column="id"/>
         <result property="userId"    column="user_id"/>
         <result property="tenantKey" column="tenant_key"/>
@@ -15,7 +15,7 @@
         <result property="updatedBy" column="updated_by"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.iqkv.iamservice.membership.TenantMembership">
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.membership.TenantMembership">
         INSERT INTO public.tenant_memberships
             (id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by)
         VALUES

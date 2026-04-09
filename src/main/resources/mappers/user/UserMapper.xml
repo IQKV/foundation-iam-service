@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqkv.iamservice.user.UserMapper">
+<mapper namespace="com.iqkv.foundation.iamservice.user.UserMapper">
 
-    <resultMap id="userResultMap" type="com.iqkv.iamservice.user.User">
+    <resultMap id="userResultMap" type="com.iqkv.foundation.iamservice.user.User">
         <id     property="id"                   column="id"/>
         <result property="email"                column="email"/>
         <result property="passwordHash"         column="password_hash"/>
@@ -19,7 +19,7 @@
         <result property="updatedBy"            column="updated_by"/>
     </resultMap>
 
-    <insert id="upsertByEmail" parameterType="com.iqkv.iamservice.user.User">
+    <insert id="upsertByEmail" parameterType="com.iqkv.foundation.iamservice.user.User">
         INSERT INTO public.users
             (id, email, password_hash, first_name, last_name, status,
              email_verified, created_at, updated_at, created_by, updated_by)
@@ -67,7 +67,7 @@
         DELETE FROM public.users WHERE id = #{id}
     </delete>
 
-    <update id="update" parameterType="com.iqkv.iamservice.user.User">
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.user.User">
         UPDATE public.users
         SET first_name = #{firstName},
             last_name  = #{lastName},
