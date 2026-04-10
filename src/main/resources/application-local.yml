@@ -8,12 +8,6 @@ spring:
   liquibase:
     enabled: true
     contexts: demo
-
-iqkv:
-  liquibase:
-    system-change-log: db/changelog/system/db.changelog-master.xml
-    tenant-change-log: db/changelog/tenant/master.xml
-    contexts: demo
   mail:
     properties:
       mail.smtp.auth: false
@@ -33,7 +27,7 @@ logging:
 iqkv:
   db:
     host: ${DB_HOST:localhost}
-    port: ${DB_PORT:5432}
+    port: ${DB_PORT:5433}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -42,6 +36,10 @@ iqkv:
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
+  liquibase:
+    system-change-log: db/changelog/system/db.changelog-master.xml
+    tenant-change-log: db/changelog/tenant/master.xml
+    contexts: demo
   auth:
     jwt:
       expiry: PT30M

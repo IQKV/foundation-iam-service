@@ -64,8 +64,8 @@ iqkv:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+    username: ${RABBITMQ_USERNAME:iam}
+    password: ${RABBITMQ_PASSWORD:iam}
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:587}
