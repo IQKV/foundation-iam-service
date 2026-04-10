@@ -1,26 +1,20 @@
 # ===================================================================
-# Spring Boot configuration for the "prd" profile.
-# Overrides base: all secrets via env vars (no defaults), hardens actuator/swagger.
+# Spring Boot configuration for the "uat" profile (staging).
+# Overrides base: points to in-cluster service names, enables Liquibase with demo data,
+# all secrets via env vars (no defaults).
 # ===================================================================
 
 spring:
   liquibase:
     enabled: true
-    contexts: "!demo"
+    contexts: demo
 
 server:
   shutdown: graceful
 
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
-
-management:
-  endpoint:
-    health:
-      show-details: never
+logging:
+  level:
+    com.iqkv: DEBUG
 
 iqkv:
   db:
@@ -48,7 +42,7 @@ iqkv:
       public-key-path: ${JWT_PUBLIC_KEY_PATH}
       issuer: ${JWT_ISSUER:foundation-iam-service}
   liquibase:
-    contexts: "!demo"
+    contexts: demo
   messaging:
     rabbitmq:
       enabled: true
