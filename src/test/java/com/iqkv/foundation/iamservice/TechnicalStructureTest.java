@@ -32,14 +32,5 @@ class TechnicalStructureTest {
   @ArchTest
   static final ArchRule respectsTechnicalArchitectureLayers = onionArchitecture()
       .withOptionalLayers(true)
-      .domainModels("..domain.model..", "..domain.event..")
-      .domainServices("..domain.service..")
-      .applicationServices("..application.service..", "..application.port..")
-      .adapter("rest",        "..adapter.in.rest..")
-      .adapter("persistence", "..adapter.out.persistence..")
-      .adapter("messaging",   "..adapter.out.messaging..")
-      .adapter("config",      "..infrastructure.config..")
-      .adapter("security",    "..infrastructure.security..")
-
       .ignoreDependency(belongToAnyOf(IamServiceApplication.class), alwaysTrue());
 }
