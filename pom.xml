@@ -31,7 +31,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <shedlock.version>7.7.0</shedlock.version>
         <nanoid.version>2.0.0</nanoid.version>
-        <archunit.version>1.4.1</archunit.version>
+        <archunit.version>1.4.2</archunit.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
     </properties>
