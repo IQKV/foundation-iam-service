@@ -180,8 +180,8 @@ Before making recommendations, agents should understand the project's technology
 
 **Runtime & Framework**
 
-- Java 21 with modern features (records, pattern matching, text blocks, var)
-- Spring Boot 3.x
+- Java 25 with modern features (records, pattern matching, text blocks, var)
+- Spring Boot 4.x
 - Maven for build management
 
 **Data & Caching**
@@ -345,7 +345,7 @@ Would you like me to use this commit message, or would you prefer to modify it?
 
 ### Code Quality Standards
 
-#### Java Code Standards (Java 21)
+#### Java Code Standards (Java 25)
 
 **Use Modern Java Features:**
 

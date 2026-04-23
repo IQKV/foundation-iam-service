@@ -59,7 +59,7 @@ Base path: `/api/v1/your-service`
 
 ## Tech Stack
 
-- Java 21 / Spring Boot 3.x
+- Java 25 / Spring Boot 4.x
 - MyBatis 3.x + PostgreSQL (or JPA — update as needed)
 - Liquibase for schema migrations
 - RabbitMQ for async messaging (if applicable)
