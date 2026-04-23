@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class MessagingService {
@@ -32,11 +33,11 @@ public class MessagingService {
   private static final Logger log = LoggerFactory.getLogger(MessagingService.class);
 
   private final RabbitTemplate rabbitTemplate;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper jsonMapper;
 
-  public MessagingService(final RabbitTemplate rabbitTemplate, final ObjectMapper objectMapper) {
+  public MessagingService(final RabbitTemplate rabbitTemplate, final JsonMapper jsonMapper) {
     this.rabbitTemplate = rabbitTemplate;
-    this.objectMapper = objectMapper;
+    this.jsonMapper = jsonMapper;
   }
 
   public void publishTenantCreated(final String tenantKey, final String tenantName) {
