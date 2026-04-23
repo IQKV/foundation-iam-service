@@ -59,7 +59,7 @@ JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 
 ## Tech Stack
 
-- Java 25 / Spring Boot 4.4
+- Java 25 / Spring Boot 4.0
 - MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase for schema migrations
 - RabbitMQ for async tenant provisioning
