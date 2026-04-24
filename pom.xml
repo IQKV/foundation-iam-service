@@ -23,10 +23,6 @@
         <checkstyle.skip>true</checkstyle.skip>
         <jacoco.skip>true</jacoco.skip>
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>
-        <!-- Dependency versions -->
-        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
-        <shedlock.version>7.7.0</shedlock.version>
-        <nanoid.version>2.0.0</nanoid.version>
     </properties>
 
     <dependencies>
@@ -70,7 +66,6 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis-spring-boot.version}</version>
         </dependency>
 
         <!-- Database: PostgreSQL + Liquibase -->
@@ -104,19 +99,16 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-spring</artifactId>
-            <version>${shedlock.version}</version>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>${shedlock.version}</version>
         </dependency>
 
         <!-- NanoID (tenantKey generation) -->
         <dependency>
             <groupId>com.aventrix.jnanoid</groupId>
             <artifactId>jnanoid</artifactId>
-            <version>${nanoid.version}</version>
         </dependency>
 
         <!-- Observability -->
@@ -155,7 +147,6 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter-test</artifactId>
-            <version>${mybatis-spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -237,8 +228,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <parameters>true</parameters>
                 </configuration>
             </plugin>
