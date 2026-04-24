@@ -41,25 +41,25 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 
 Base path: `/api/v1/iam`
 
-| Method  | Path                                      | Auth               | Description                              |
-| ------- | ----------------------------------------- | ------------------ | ---------------------------------------- |
-| `POST`  | `/auth/signup`                            | public             | Register user and create tenant          |
-| `POST`  | `/auth/signin`                            | `X-Tenant-ID`      | Sign in, receive token pair              |
-| `POST`  | `/auth/refresh`                           | `X-Tenant-ID`      | Rotate access + refresh tokens           |
-| `POST`  | `/auth/signout`                           | JWT                | Revoke current session                   |
-| `POST`  | `/auth/signout-all`                       | JWT                | Revoke all sessions globally             |
-| `POST`  | `/auth/validate`                          | JWT                | Validate token for gateway introspection |
-| `POST`  | `/users/tenants`                          | public             | Discover tenants by credentials          |
-| `GET`   | `/users/me`                               | JWT                | Get own profile                          |
-| `PATCH` | `/users/me`                               | JWT                | Update own profile                       |
-| `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` | Get tenant status                        |
-| `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` | Transition tenant status                 |
-| `POST`  | `/tenants/{tenantKey}/retry-provisioning`        | JWT `TENANT_OWNER` | Retry failed provisioning                |
-| `POST`  | `/tenants/{tenantKey}/invitations`               | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Send invitation email          |
-| `GET`   | `/tenants/{tenantKey}/invitations`               | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | List pending invitations        |
-| `DELETE`| `/tenants/{tenantKey}/invitations/{id}`          | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation     |
-| `GET`   | `/invitations/{token}`                           | public             | Preview invitation — token resolves tenant   |
-| `POST`  | `/invitations/{token}/accept`                    | public             | Accept invitation — token resolves tenant    |
+| Method   | Path                                      | Auth                                       | Description                                |
+| -------- | ----------------------------------------- | ------------------------------------------ | ------------------------------------------ |
+| `POST`   | `/auth/signup`                            | public                                     | Register user and create tenant            |
+| `POST`   | `/auth/signin`                            | `X-Tenant-ID`                              | Sign in, receive token pair                |
+| `POST`   | `/auth/refresh`                           | `X-Tenant-ID`                              | Rotate access + refresh tokens             |
+| `POST`   | `/auth/signout`                           | JWT                                        | Revoke current session                     |
+| `POST`   | `/auth/signout-all`                       | JWT                                        | Revoke all sessions globally               |
+| `POST`   | `/auth/validate`                          | JWT                                        | Validate token for gateway introspection   |
+| `POST`   | `/users/tenants`                          | public                                     | Discover tenants by credentials            |
+| `GET`    | `/users/me`                               | JWT                                        | Get own profile                            |
+| `PATCH`  | `/users/me`                               | JWT                                        | Update own profile                         |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                         | Get tenant status                          |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                         | Transition tenant status                   |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                         | Retry failed provisioning                  |
+| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Send invitation email                      |
+| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | List pending invitations                   |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation                |
+| `GET`    | `/invitations/{token}`                    | public                                     | Preview invitation — token resolves tenant |
+| `POST`   | `/invitations/{token}/accept`             | public                                     | Accept invitation — token resolves tenant  |
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 
@@ -108,23 +108,23 @@ docker compose up -d
 
 ## Environment Variables
 
-| Variable               | Default                      | Description                             |
-| ---------------------- | ---------------------------- | --------------------------------------- |
-| `DB_HOST`              | `localhost`                  | PostgreSQL host                         |
-| `DB_PORT`              | `5432`                       | PostgreSQL port                         |
-| `DB_NAME`              | `iam`                        | Database name                           |
-| `DB_USERNAME`          | `iam`                        | Database user                           |
-| `DB_PASSWORD`          | `iam`                        | Database password                       |
-| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                           |
-| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                      |
-| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                           |
-| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                       |
-| `MAIL_HOST`            | `localhost`                  | SMTP host                               |
-| `MAIL_PORT`            | `587`                        | SMTP port                               |
-| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                          |
-| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                       |
-| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                        |
-| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links) |
+| Variable               | Default                      | Description                              |
+| ---------------------- | ---------------------------- | ---------------------------------------- |
+| `DB_HOST`              | `localhost`                  | PostgreSQL host                          |
+| `DB_PORT`              | `5432`                       | PostgreSQL port                          |
+| `DB_NAME`              | `iam`                        | Database name                            |
+| `DB_USERNAME`          | `iam`                        | Database user                            |
+| `DB_PASSWORD`          | `iam`                        | Database password                        |
+| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                            |
+| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                       |
+| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                            |
+| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                        |
+| `MAIL_HOST`            | `localhost`                  | SMTP host                                |
+| `MAIL_PORT`            | `587`                        | SMTP port                                |
+| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                           |
+| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                        |
+| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                         |
+| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)  |
 | `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token TTL (ISO-8601 duration) |
 
 Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
