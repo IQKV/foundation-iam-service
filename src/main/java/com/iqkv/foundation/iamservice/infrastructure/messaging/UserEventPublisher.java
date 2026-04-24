@@ -42,4 +42,10 @@ public class UserEventPublisher {
         UserEvent.EventType.USER_DELETED, Instant.now());
     messagingService.publishUserEvent(event, RabbitMQConfig.ROUTING_USER_DELETED);
   }
+
+  public void publishUserRemoved(final User user, final String tenantKey) {
+    final var event = new UserEvent(user.getId(), tenantKey, user.getEmail(),
+        UserEvent.EventType.USER_REMOVED, Instant.now());
+    messagingService.publishUserEvent(event, RabbitMQConfig.ROUTING_USER_REMOVED);
+  }
 }

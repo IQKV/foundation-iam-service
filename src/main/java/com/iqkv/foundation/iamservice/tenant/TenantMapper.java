@@ -38,4 +38,6 @@ public interface TenantMapper {
                     @Param("updatedAt") java.time.LocalDateTime updatedAt);
 
   List<Tenant> findStuckProvisioning(@Param("olderThan") Instant olderThan);
+
+  Optional<OwnerInfo> findOwnerByTenantKey(String tenantKey);
 }

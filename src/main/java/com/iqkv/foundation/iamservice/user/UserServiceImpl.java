@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
     authorityMapper.insert(authority);
 
     // Step 5: Publish tenant created event
-    messagingService.publishTenantCreated(tenantKey, request.tenantName());
+    messagingService.publishTenantCreated(tenantKey, request.tenantName(), request.email(), request.firstName());
 
     // Step 6: Publish user created event
     userEventPublisher.publishUserCreated(canonicalUser);
@@ -273,7 +273,7 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new MembershipNotFoundException(userId, tenantKey));
     membershipMapper.deleteById(membership.getId());
 
-    userMapper.findById(userId).ifPresent(userEventPublisher::publishUserDeleted);
+    userMapper.findById(userId).ifPresent(user -> userEventPublisher.publishUserRemoved(user, tenantKey));
     log.info("User membership removed: userId={}, tenantKey={}", userId, tenantKey);
   }
 }

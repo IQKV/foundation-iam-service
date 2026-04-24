@@ -55,4 +55,21 @@
           AND created_at &lt; #{olderThan}
     </select>
 
+    <select id="findOwnerByTenantKey"
+            parameterType="string"
+            resultType="com.iqkv.foundation.iamservice.tenant.OwnerInfo">
+        SELECT u.email      AS email,
+               u.first_name AS firstName
+        FROM   public.tenants t
+        JOIN   public.tenant_memberships m
+                 ON m.tenant_key = t.tenant_key
+        JOIN   public.tenant_member_authorities a
+                 ON a.membership_id = m.id
+        JOIN   public.users u
+                 ON u.id = m.user_id
+        WHERE  t.tenant_key = #{tenantKey}
+          AND  a.authority  = 'TENANT_OWNER'
+        LIMIT  1
+    </select>
+
 </mapper>

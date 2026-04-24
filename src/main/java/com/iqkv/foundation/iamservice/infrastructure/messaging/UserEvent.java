@@ -22,7 +22,9 @@ import java.util.UUID;
 public class UserEvent {
 
   public enum EventType {
-    USER_CREATED, USER_UPDATED, USER_DELETED
+    USER_CREATED, USER_UPDATED, USER_DELETED,
+    USER_REMOVED,   // membership removal
+    USER_INVITED    // invitation sent
   }
 
   private UUID userId;

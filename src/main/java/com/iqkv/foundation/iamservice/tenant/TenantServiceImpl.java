@@ -103,6 +103,10 @@ public class TenantServiceImpl implements TenantService {
     tenant.setStatus(newStatus);
     tenant.setUpdatedAt(LocalDateTime.now());
 
+    if (newStatus == TenantStatus.SUSPENDED) {
+      messagingService.publishTenantSuspended(tenantKey);
+    }
+
     log.info("Tenant status updated: tenantKey={}, status={}", tenantKey, newStatus);
     return tenant;
   }
@@ -116,8 +120,11 @@ public class TenantServiceImpl implements TenantService {
       throw new InvalidTenantStateException("Tenant is not in PROVISIONING_FAILED state");
     }
 
+    final OwnerInfo ownerInfo = tenantMapper.findOwnerByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Owner not found for tenant: " + tenantKey));
+
     tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING.name(), LocalDateTime.now());
-    messagingService.publishTenantCreated(tenantKey, tenant.getName());
+    messagingService.publishTenantCreated(tenantKey, tenant.getName(), ownerInfo.email(), ownerInfo.firstName());
 
     tenant.setStatus(TenantStatus.PROVISIONING);
     tenant.setUpdatedAt(LocalDateTime.now());

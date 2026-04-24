@@ -40,14 +40,27 @@ public class MessagingService {
     this.jsonMapper = jsonMapper;
   }
 
-  public void publishTenantCreated(final String tenantKey, final String tenantName) {
-    final var event = new TenantEvent(tenantKey, tenantName,
+  public void publishTenantCreated(final String tenantKey, final String tenantName,
+                                    final String ownerEmail, final String ownerFirstName) {
+    final var event = new TenantEvent(tenantKey, tenantName, ownerEmail, ownerFirstName,
         TenantEvent.EventType.TENANT_CREATED, Instant.now());
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_CREATED, event);
   }
 
+  /** @deprecated Use {@link #publishTenantCreated(String, String, String, String)} — task 8 will remove this overload */
+  @Deprecated
+  public void publishTenantCreated(final String tenantKey, final String tenantName) {
+    publishTenantCreated(tenantKey, tenantName, null, null);
+  }
+
+  public void publishTenantSuspended(final String tenantKey) {
+    final var event = new TenantEvent(tenantKey, null, null, null,
+        TenantEvent.EventType.TENANT_SUSPENDED, Instant.now());
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_SUSPENDED, event);
+  }
+
   public void publishTenantUpdated(final String tenantKey) {
-    final var event = new TenantEvent(tenantKey, null,
+    final var event = new TenantEvent(tenantKey, null, null, null,
         TenantEvent.EventType.TENANT_UPDATED, Instant.now());
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_UPDATED, event);
   }

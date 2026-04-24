@@ -18,28 +18,23 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
 import java.time.Instant;
 
-public class TenantEvent {
+public class SubscriptionEvent {
 
   public enum EventType {
-    TENANT_CREATED, TENANT_UPDATED, TENANT_DELETED, TENANT_SUSPENDED
+    SUBSCRIPTION_CANCELLED
   }
 
   private String tenantKey;
-  private String tenantName;
-  private String ownerEmail;
-  private String ownerFirstName;
+  private String externalSubscriptionId;
   private EventType eventType;
   private Instant occurredAt;
 
-  public TenantEvent() {}
+  public SubscriptionEvent() {}
 
-  public TenantEvent(final String tenantKey, final String tenantName,
-                     final String ownerEmail, final String ownerFirstName,
-                     final EventType eventType, final Instant occurredAt) {
+  public SubscriptionEvent(final String tenantKey, final String externalSubscriptionId,
+                            final EventType eventType, final Instant occurredAt) {
     this.tenantKey = tenantKey;
-    this.tenantName = tenantName;
-    this.ownerEmail = ownerEmail;
-    this.ownerFirstName = ownerFirstName;
+    this.externalSubscriptionId = externalSubscriptionId;
     this.eventType = eventType;
     this.occurredAt = occurredAt;
   }
@@ -47,14 +42,10 @@ public class TenantEvent {
   public String getTenantKey() { return tenantKey; }
   public void setTenantKey(final String tenantKey) { this.tenantKey = tenantKey; }
 
-  public String getTenantName() { return tenantName; }
-  public void setTenantName(final String tenantName) { this.tenantName = tenantName; }
-
-  public String getOwnerEmail() { return ownerEmail; }
-  public void setOwnerEmail(final String ownerEmail) { this.ownerEmail = ownerEmail; }
-
-  public String getOwnerFirstName() { return ownerFirstName; }
-  public void setOwnerFirstName(final String ownerFirstName) { this.ownerFirstName = ownerFirstName; }
+  public String getExternalSubscriptionId() { return externalSubscriptionId; }
+  public void setExternalSubscriptionId(final String externalSubscriptionId) {
+    this.externalSubscriptionId = externalSubscriptionId;
+  }
 
   public EventType getEventType() { return eventType; }
   public void setEventType(final EventType eventType) { this.eventType = eventType; }

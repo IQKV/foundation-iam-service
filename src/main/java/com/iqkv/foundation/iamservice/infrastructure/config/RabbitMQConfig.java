@@ -42,15 +42,20 @@ public class RabbitMQConfig {
   public static final String USER_EVENTS_QUEUE = "iqkv.user.events";
   public static final String NOTIFICATIONS_QUEUE = "iqkv.notifications";
   public static final String TENANT_PROVISIONING_QUEUE = "iqkv.tenant.provisioning";
+  public static final String SUBSCRIPTION_EVENTS_QUEUE = "iqkv.iam.subscription.events";
   public static final String DLQ = "iqkv.dlq";
 
   // Routing keys
   public static final String ROUTING_TENANT_CREATED = "tenant.created";
   public static final String ROUTING_TENANT_UPDATED = "tenant.updated";
   public static final String ROUTING_TENANT_DELETED = "tenant.deleted";
+  public static final String ROUTING_TENANT_SUSPENDED = "tenant.suspended";
   public static final String ROUTING_USER_CREATED = "user.created";
   public static final String ROUTING_USER_UPDATED = "user.updated";
   public static final String ROUTING_USER_DELETED = "user.deleted";
+  public static final String ROUTING_USER_REMOVED = "user.removed";
+  public static final String ROUTING_USER_INVITED = "user.invited";
+  public static final String ROUTING_SUBSCRIPTION_CANCELLED = "subscription.cancelled";
   public static final String ROUTING_NOTIFICATION_EMAIL = "notification.email";
 
   private static final long TTL_24H_MS = 86_400_000L;
@@ -112,5 +117,18 @@ public class RabbitMQConfig {
   @Bean
   public Binding dlqBinding() {
     return BindingBuilder.bind(deadLetterQueue()).to(dlxExchange()).with("#");
+  }
+
+  @Bean
+  public Queue subscriptionEventsQueue() {
+    return QueueBuilder.durable(SUBSCRIPTION_EVENTS_QUEUE)
+        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+        .withArgument("x-message-ttl", TTL_24H_MS)
+        .build();
+  }
+
+  @Bean
+  public Binding subscriptionEventsBinding() {
+    return BindingBuilder.bind(subscriptionEventsQueue()).to(eventsExchange()).with(ROUTING_SUBSCRIPTION_CANCELLED);
   }
 }
