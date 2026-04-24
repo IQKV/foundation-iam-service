@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.infrastructure.messaging;
+package com.iqkv.foundation.iamservice.infrastructure.config;
 
-public enum NotificationEventType {
-  VERIFY_EMAIL,
-  EMAIL_VERIFIED,
-  PASSWORD_RESET_INITIATE,
-  PASSWORD_RESET_CONFIRMED,
-  INVITATION
-}
+import java.time.Duration;
+
+import jakarta.validation.constraints.NotNull;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+@ConfigurationProperties(prefix = "iqkv.invitation")
+public record InvitationConfigurationProperties(
+    /** How long an invitation token remains valid. Default: 72 hours. */
+    @NotNull Duration tokenTtl
+) {}

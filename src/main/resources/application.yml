@@ -91,6 +91,9 @@ iqkv:
       token-ttl: PT1H
       rate-limit-window: PT15M
       rate-limit-max-requests: 3
+  invitation:
+    token-ttl: ${INVITATION_TOKEN_TTL:PT72H}
+    reaper-interval: ${INVITATION_REAPER_INTERVAL:PT1H}
   tenancy:
     schema-prefix: t_
     default-schema: public

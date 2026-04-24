@@ -99,6 +99,7 @@ public class EmailService {
       case EMAIL_VERIFIED -> "email/signup/email-verified";
       case PASSWORD_RESET_INITIATE -> "email/password-reset/initiate";
       case PASSWORD_RESET_CONFIRMED -> "email/password-reset/confirmed";
+      case INVITATION -> "email/invitation/invite";
     };
   }
 
@@ -108,6 +109,7 @@ public class EmailService {
       case EMAIL_VERIFIED -> "email.email-verified.subject";
       case PASSWORD_RESET_INITIATE -> "email.password-reset.initiate.subject";
       case PASSWORD_RESET_CONFIRMED -> "email.password-reset.confirmed.subject";
+      case INVITATION -> "email.invitation.subject";
     };
   }
 }

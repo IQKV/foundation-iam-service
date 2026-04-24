@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.infrastructure.messaging;
+package com.iqkv.foundation.iamservice.invitation;
 
-public enum NotificationEventType {
-  VERIFY_EMAIL,
-  EMAIL_VERIFIED,
-  PASSWORD_RESET_INITIATE,
-  PASSWORD_RESET_CONFIRMED,
-  INVITATION
+/**
+ * Lifecycle states for a {@link TenantInvitation}.
+ *
+ * <pre>
+ *   PENDING ──▶ ACCEPTED  (invitee completes signup or join)
+ *           ──▶ REVOKED   (inviter or TENANT_OWNER cancels)
+ *           ──▶ EXPIRED   (reaper job, TTL exceeded)
+ * </pre>
+ *
+ * Transitions from ACCEPTED, REVOKED, or EXPIRED are not allowed.
+ * A new invitation record must be created to re-invite.
+ */
+public enum InvitationStatus {
+  PENDING,
+  ACCEPTED,
+  REVOKED,
+  EXPIRED
 }

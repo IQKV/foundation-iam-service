@@ -55,7 +55,7 @@ Base path: `/api/v1/your-service`
 | `PATCH`  | `/resource/{id}` | JWT `ROLE`  | Update resource    |
 | `DELETE` | `/resource/{id}` | JWT `ADMIN` | Delete resource    |
 
-> Replace with your actual endpoints. Document the auth requirement for each — `public`, `X-Tenant-ID`, `JWT`, or `JWT ROLE_NAME`.
+> Replace with your actual endpoints. Document the auth requirement for each — `public`, `X-Tenant-ID`, `JWT`, `JWT ROLE_NAME`, or `JWT ROLE_NAME + X-Tenant-ID` for tenant-scoped management endpoints.
 
 ## Tech Stack
 
@@ -192,7 +192,8 @@ src/main/java/com/example/yourservice/
 - **Persistence**: MyBatis with XML mappers + PostgreSQL; Liquibase manages both system and per-tenant schema migrations
 - **Messaging**: RabbitMQ for async domain events (e.g. tenant provisioning); ShedLock guards scheduled cleanup jobs
 - **Security**: Spring Security + JJWT RS256; JTI denylist for token revocation; brute-force lockout per identity
-- **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant roles
+- **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`); tenant-scoped management endpoints require a JWT scoped to the target tenant via `X-Tenant-ID` header
+- **Invitations**: Token-based signup-by-invitation flow; token resolves tenant context so accept endpoints are tenant-agnostic; `authority` defaults to `MEMBER`; ShedLock-guarded reaper expires stale tokens
 - **Email**: Thymeleaf-rendered transactional emails via Spring Mail; MailHog for local testing
 - **Observability**: Micrometer + Prometheus; structured JSON logging with Logstash encoder; health probes for Kubernetes
 - **GitHub Integration**: Issue templates, labels, Dependabot, and CI workflows

@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.infrastructure.messaging;
+package com.iqkv.foundation.iamservice.shared.exception;
 
-public enum NotificationEventType {
-  VERIFY_EMAIL,
-  EMAIL_VERIFIED,
-  PASSWORD_RESET_INITIATE,
-  PASSWORD_RESET_CONFIRMED,
-  INVITATION
+/** Thrown when an invitation token is not found, expired, or already used. Maps to HTTP 404. */
+public class InvitationNotFoundException extends RuntimeException {
+
+  public InvitationNotFoundException() {
+    super("Invitation not found or no longer valid");
+  }
+
+  public InvitationNotFoundException(final String message) {
+    super(message);
+  }
 }

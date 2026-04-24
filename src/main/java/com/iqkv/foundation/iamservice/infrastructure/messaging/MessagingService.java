@@ -87,6 +87,18 @@ public class MessagingService {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, routingKey, event);
   }
 
+  public void publishUserInvited(
+      final com.iqkv.foundation.iamservice.invitation.TenantInvitation invitation,
+      final String tenantName) {
+    final var event = new UserEvent(
+        null,                          // invitee has no userId yet (may not have an account)
+        invitation.getTenantKey(),
+        invitation.getInvitedEmail(),
+        UserEvent.EventType.USER_INVITED,
+        java.time.Instant.now());
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_INVITED, event);
+  }
+
   public void publishNotification(final NotificationEvent event) {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_NOTIFICATION_IAM_EMAIL, event);
   }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260424130000" author="iqkv">
+        <createTable tableName="tenant_invitations" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_key" type="VARCHAR(21)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invited_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invited_by" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_tenant_invitations_invited_by"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="authority" type="VARCHAR(50)" defaultValue="MEMBER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_tenant_invitations_token"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="accepted_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="updated_by" type="VARCHAR(255)"/>
+        </createTable>
+
+        <!-- Fast token lookup (accept flow) -->
+        <createIndex indexName="idx_tenant_invitations_token"
+                     tableName="tenant_invitations" schemaName="public" unique="true">
+            <column name="token"/>
+        </createIndex>
+
+        <!-- List invitations per tenant -->
+        <createIndex indexName="idx_tenant_invitations_tenant_key"
+                     tableName="tenant_invitations" schemaName="public">
+            <column name="tenant_key"/>
+        </createIndex>
+
+        <!-- Reaper job: find expired PENDING rows efficiently -->
+        <createIndex indexName="idx_tenant_invitations_expires_at"
+                     tableName="tenant_invitations" schemaName="public">
+            <column name="expires_at"/>
+        </createIndex>
+
+        <!--
+            Partial unique index: only one PENDING invite per (tenant, email) at a time.
+            PostgreSQL partial indexes are not supported natively in Liquibase XML,
+            so we use a raw SQL changeset.
+        -->
+        <sql>
+            CREATE UNIQUE INDEX idx_tenant_invitations_pending_email
+                ON public.tenant_invitations (tenant_key, invited_email)
+                WHERE status = 'PENDING';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

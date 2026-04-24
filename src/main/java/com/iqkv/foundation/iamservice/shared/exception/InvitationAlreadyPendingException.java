@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.infrastructure.messaging;
+package com.iqkv.foundation.iamservice.shared.exception;
 
-public enum NotificationEventType {
-  VERIFY_EMAIL,
-  EMAIL_VERIFIED,
-  PASSWORD_RESET_INITIATE,
-  PASSWORD_RESET_CONFIRMED,
-  INVITATION
+/** Thrown when a PENDING invitation already exists for the same (tenantKey, email). Maps to HTTP 409. */
+public class InvitationAlreadyPendingException extends RuntimeException {
+
+  public InvitationAlreadyPendingException(final String email) {
+    super("A pending invitation already exists for " + email);
+  }
 }

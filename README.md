@@ -21,7 +21,8 @@ Multi-tenant Identity and Access Management microservice. Handles the full ident
 The IAM service handles the full identity lifecycle for a SaaS platform:
 
 - **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
-- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant roles (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
+- **Signup by invitation** — existing TENANT_OWNER or ADMIN sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
@@ -53,7 +54,12 @@ Base path: `/api/v1/iam`
 | `PATCH` | `/users/me`                               | JWT                | Update own profile                       |
 | `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` | Get tenant status                        |
 | `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` | Transition tenant status                 |
-| `POST`  | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` | Retry failed provisioning                |
+| `POST`  | `/tenants/{tenantKey}/retry-provisioning`        | JWT `TENANT_OWNER` | Retry failed provisioning                |
+| `POST`  | `/tenants/{tenantKey}/invitations`               | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Send invitation email          |
+| `GET`   | `/tenants/{tenantKey}/invitations`               | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | List pending invitations        |
+| `DELETE`| `/tenants/{tenantKey}/invitations/{id}`          | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation     |
+| `GET`   | `/invitations/{token}`                           | public             | Preview invitation — token resolves tenant   |
+| `POST`  | `/invitations/{token}/accept`                    | public             | Accept invitation — token resolves tenant    |
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 
@@ -119,6 +125,7 @@ docker compose up -d
 | `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                       |
 | `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                        |
 | `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links) |
+| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token TTL (ISO-8601 duration) |
 
 Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
 
@@ -173,8 +180,9 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── denylist/           # JTI denylist for token revocation
 ├── email/              # Thymeleaf email templates and sending
 ├── infrastructure/     # Spring config, security, MyBatis, RabbitMQ setup
+├── invitation/         # Signup by invitation — send, preview, accept, revoke, reaper job
 ├── lockout/            # Brute-force login attempt tracking
-├── membership/         # TenantMembership — per-tenant roles
+├── membership/         # TenantMembership — per-tenant authorities
 ├── passwordreset/      # Password reset token lifecycle
 ├── security/           # JWT RS256 signing/validation, JWKS endpoint
 ├── shared/             # Common exceptions, utilities, value objects

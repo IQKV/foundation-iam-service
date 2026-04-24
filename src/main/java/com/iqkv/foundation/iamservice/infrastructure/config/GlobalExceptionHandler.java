@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
+import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
+import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenSignatureException;
@@ -353,6 +355,32 @@ public class GlobalExceptionHandler {
         msg("error.title.conflict", locale),
         409,
         msg("error.membership.already-exists", locale),
+        request);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
+  }
+
+  @ExceptionHandler(InvitationNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleInvitationNotFound(final InvitationNotFoundException ex,
+                                                                final HttpServletRequest request,
+                                                                final Locale locale) {
+    log.warn("Invitation not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.not-found", locale),
+        404,
+        msg("error.invitation.not-found", locale),
+        request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
+  }
+
+  @ExceptionHandler(InvitationAlreadyPendingException.class)
+  public ResponseEntity<ProblemDetail> handleInvitationAlreadyPending(final InvitationAlreadyPendingException ex,
+                                                                      final HttpServletRequest request,
+                                                                      final Locale locale) {
+    log.warn("Invitation already pending: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.conflict", locale),
+        409,
+        msg("error.invitation.already-pending", locale),
         request);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
   }
