@@ -53,10 +53,28 @@ public class MessagingService {
     publishTenantCreated(tenantKey, tenantName, null, null);
   }
 
+  public void publishTenantProvisioned(final String tenantKey) {
+    final var event = new TenantEvent(tenantKey, null, null, null,
+        TenantEvent.EventType.TENANT_PROVISIONED, Instant.now());
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_PROVISIONED, event);
+  }
+
+  public void publishTenantProvisioningFailed(final String tenantKey) {
+    final var event = new TenantEvent(tenantKey, null, null, null,
+        TenantEvent.EventType.TENANT_PROVISIONING_FAILED, Instant.now());
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_PROVISIONING_FAILED, event);
+  }
+
   public void publishTenantSuspended(final String tenantKey) {
     final var event = new TenantEvent(tenantKey, null, null, null,
         TenantEvent.EventType.TENANT_SUSPENDED, Instant.now());
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_SUSPENDED, event);
+  }
+
+  public void publishTenantDeleted(final String tenantKey) {
+    final var event = new TenantEvent(tenantKey, null, null, null,
+        TenantEvent.EventType.TENANT_DELETED, Instant.now());
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_DELETED, event);
   }
 
   public void publishTenantUpdated(final String tenantKey) {
@@ -70,7 +88,7 @@ public class MessagingService {
   }
 
   public void publishNotification(final NotificationEvent event) {
-    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_NOTIFICATION_EMAIL, event);
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_NOTIFICATION_IAM_EMAIL, event);
   }
 
   private void publish(final String exchange, final String routingKey, final Object payload) {

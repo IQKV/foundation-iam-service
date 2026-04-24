@@ -55,11 +55,12 @@ public class TenantProvisioningConsumer {
     try {
       tenantLiquibaseRunner.runMigrationsForTenant(tenantKey);
       tenantMapper.updateStatus(tenantKey, TenantStatus.ACTIVE.name(), LocalDateTime.now());
-      messagingService.publishTenantUpdated(tenantKey);
+      messagingService.publishTenantProvisioned(tenantKey);
       log.info("Tenant provisioning succeeded: tenantKey={}", tenantKey);
     } catch (final Exception e) {
       log.error("Tenant provisioning failed: tenantKey={}", tenantKey, e);
       tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
+      messagingService.publishTenantProvisioningFailed(tenantKey);
       // Do NOT rethrow — message is not requeued; failed state is observable via status endpoint
     }
   }

@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 
 @Component
 public class StuckTenantReaperJob {
@@ -35,11 +36,14 @@ public class StuckTenantReaperJob {
 
   private final TenantMapper tenantMapper;
   private final TenancyConfigurationProperties tenancyProps;
+  private final MessagingService messagingService;
 
   public StuckTenantReaperJob(final TenantMapper tenantMapper,
-                               final TenancyConfigurationProperties tenancyProps) {
+                               final TenancyConfigurationProperties tenancyProps,
+                               final MessagingService messagingService) {
     this.tenantMapper = tenantMapper;
     this.tenancyProps = tenancyProps;
+    this.messagingService = messagingService;
   }
 
   @Scheduled(cron = "0 */5 * * * *")
@@ -55,6 +59,7 @@ public class StuckTenantReaperJob {
 
     for (final Tenant tenant : stuckTenants) {
       tenantMapper.updateStatus(tenant.getTenantKey(), TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
+      messagingService.publishTenantProvisioningFailed(tenant.getTenantKey());
       log.error("Marked stuck tenant as PROVISIONING_FAILED: tenantKey={}, createdAt={}",
           tenant.getTenantKey(), tenant.getCreatedAt());
     }

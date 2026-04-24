@@ -16,9 +16,6 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -34,31 +31,47 @@ import org.springframework.context.annotation.Profile;
 @Profile("!test")
 public class RabbitMQConfig {
 
-  // Exchange names
+  // -------------------------------------------------------------------------
+  // Shared exchange (all services publish here)
+  // -------------------------------------------------------------------------
   public static final String EVENTS_EXCHANGE = "iqkv.events";
-  public static final String DLX_EXCHANGE = "iqkv.dlx";
+  public static final String DLX_EXCHANGE    = "iqkv.dlx";
+  public static final String DLQ             = "iqkv.dlq";
 
-  // Queue names
-  public static final String USER_EVENTS_QUEUE = "iqkv.user.events";
-  public static final String NOTIFICATIONS_QUEUE = "iqkv.notifications";
-  public static final String TENANT_PROVISIONING_QUEUE = "iqkv.tenant.provisioning";
+  // -------------------------------------------------------------------------
+  // IAM queue names
+  // -------------------------------------------------------------------------
+  public static final String USER_EVENTS_QUEUE         = "iqkv.iam.user.events";
+  public static final String NOTIFICATIONS_QUEUE       = "iqkv.iam.notifications";
+  public static final String TENANT_PROVISIONING_QUEUE = "iqkv.iam.tenant.provisioning";
   public static final String SUBSCRIPTION_EVENTS_QUEUE = "iqkv.iam.subscription.events";
-  public static final String DLQ = "iqkv.dlq";
 
-  // Routing keys
-  public static final String ROUTING_TENANT_CREATED = "tenant.created";
-  public static final String ROUTING_TENANT_UPDATED = "tenant.updated";
-  public static final String ROUTING_TENANT_DELETED = "tenant.deleted";
-  public static final String ROUTING_TENANT_SUSPENDED = "tenant.suspended";
-  public static final String ROUTING_USER_CREATED = "user.created";
-  public static final String ROUTING_USER_UPDATED = "user.updated";
-  public static final String ROUTING_USER_DELETED = "user.deleted";
-  public static final String ROUTING_USER_REMOVED = "user.removed";
-  public static final String ROUTING_USER_INVITED = "user.invited";
-  public static final String ROUTING_SUBSCRIPTION_CANCELLED = "subscription.cancelled";
-  public static final String ROUTING_NOTIFICATION_EMAIL = "notification.email";
+  // -------------------------------------------------------------------------
+  // Routing keys — domain events (shared across services)
+  // -------------------------------------------------------------------------
+  public static final String ROUTING_TENANT_CREATED             = "tenant.created";
+  public static final String ROUTING_TENANT_PROVISIONED         = "tenant.provisioned";
+  public static final String ROUTING_TENANT_PROVISIONING_FAILED = "tenant.provisioning_failed";
+  public static final String ROUTING_TENANT_UPDATED             = "tenant.updated";
+  public static final String ROUTING_TENANT_DELETED             = "tenant.deleted";
+  public static final String ROUTING_TENANT_SUSPENDED           = "tenant.suspended";
+  public static final String ROUTING_USER_CREATED               = "user.created";
+  public static final String ROUTING_USER_UPDATED               = "user.updated";
+  public static final String ROUTING_USER_DELETED               = "user.deleted";
+  public static final String ROUTING_USER_REMOVED               = "user.removed";
+  public static final String ROUTING_USER_INVITED               = "user.invited";
+  public static final String ROUTING_SUBSCRIPTION_CANCELLED     = "subscription.cancelled";
+
+  // -------------------------------------------------------------------------
+  // Routing keys — IAM notification emails (scoped to avoid conflicts)
+  // -------------------------------------------------------------------------
+  public static final String ROUTING_NOTIFICATION_IAM_EMAIL = "notification.iam.email";
 
   private static final long TTL_24H_MS = 86_400_000L;
+
+  // -------------------------------------------------------------------------
+  // Beans
+  // -------------------------------------------------------------------------
 
   @Bean
   public TopicExchange eventsExchange() {
@@ -68,6 +81,11 @@ public class RabbitMQConfig {
   @Bean
   public TopicExchange dlxExchange() {
     return new TopicExchange(DLX_EXCHANGE, true, false);
+  }
+
+  @Bean
+  public Queue deadLetterQueue() {
+    return QueueBuilder.durable(DLQ).build();
   }
 
   @Bean
@@ -95,8 +113,11 @@ public class RabbitMQConfig {
   }
 
   @Bean
-  public Queue deadLetterQueue() {
-    return QueueBuilder.durable(DLQ).build();
+  public Queue subscriptionEventsQueue() {
+    return QueueBuilder.durable(SUBSCRIPTION_EVENTS_QUEUE)
+        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+        .withArgument("x-message-ttl", TTL_24H_MS)
+        .build();
   }
 
   @Bean
@@ -106,29 +127,25 @@ public class RabbitMQConfig {
 
   @Bean
   public Binding notificationsBinding() {
-    return BindingBuilder.bind(notificationsQueue()).to(eventsExchange()).with("notification.*");
+    // Exact match — only IAM notification emails land here
+    return BindingBuilder.bind(notificationsQueue()).to(eventsExchange())
+        .with(ROUTING_NOTIFICATION_IAM_EMAIL);
   }
 
   @Bean
   public Binding tenantProvisioningBinding() {
-    return BindingBuilder.bind(tenantProvisioningQueue()).to(eventsExchange()).with(ROUTING_TENANT_CREATED);
+    return BindingBuilder.bind(tenantProvisioningQueue()).to(eventsExchange())
+        .with(ROUTING_TENANT_CREATED);
+  }
+
+  @Bean
+  public Binding subscriptionEventsBinding() {
+    return BindingBuilder.bind(subscriptionEventsQueue()).to(eventsExchange())
+        .with(ROUTING_SUBSCRIPTION_CANCELLED);
   }
 
   @Bean
   public Binding dlqBinding() {
     return BindingBuilder.bind(deadLetterQueue()).to(dlxExchange()).with("#");
-  }
-
-  @Bean
-  public Queue subscriptionEventsQueue() {
-    return QueueBuilder.durable(SUBSCRIPTION_EVENTS_QUEUE)
-        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
-        .withArgument("x-message-ttl", TTL_24H_MS)
-        .build();
-  }
-
-  @Bean
-  public Binding subscriptionEventsBinding() {
-    return BindingBuilder.bind(subscriptionEventsQueue()).to(eventsExchange()).with(ROUTING_SUBSCRIPTION_CANCELLED);
   }
 }

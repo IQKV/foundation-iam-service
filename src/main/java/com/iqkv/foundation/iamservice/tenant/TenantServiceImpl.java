@@ -105,6 +105,8 @@ public class TenantServiceImpl implements TenantService {
 
     if (newStatus == TenantStatus.SUSPENDED) {
       messagingService.publishTenantSuspended(tenantKey);
+    } else if (newStatus == TenantStatus.DELETED) {
+      messagingService.publishTenantDeleted(tenantKey);
     }
 
     log.info("Tenant status updated: tenantKey={}, status={}", tenantKey, newStatus);
