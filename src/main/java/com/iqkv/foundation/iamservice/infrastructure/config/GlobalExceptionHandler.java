@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenSignatureException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException;
@@ -54,6 +55,7 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableExcepti
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.TokenExpiredException;
+import com.iqkv.foundation.iamservice.shared.exception.TokenRevokedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserRegistrationException;
@@ -64,8 +66,6 @@ public class GlobalExceptionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String MDC_CORRELATION_ID = "correlationId";
-
-  // ── Helper ────────────────────────────────────────────────────────────────
 
   private ProblemDetail problem(final String type,
                                 final String title,
@@ -81,8 +81,6 @@ public class GlobalExceptionHandler {
     pd.setProperty("requestId", "req-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8));
     return pd;
   }
-
-  // ── 400 Bad Request ───────────────────────────────────────────────────────
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ProblemDetail> handleValidation(final MethodArgumentNotValidException ex,
@@ -125,7 +123,14 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(pd);
   }
 
-  // ── 401 Unauthorized ──────────────────────────────────────────────────────
+  @ExceptionHandler(InvalidPasswordException.class)
+  public ResponseEntity<ProblemDetail> handleInvalidPassword(final InvalidPasswordException ex,
+                                                             final HttpServletRequest request) {
+    log.warn("Invalid password: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Invalid Password", 400,
+        ex.getMessage(), request);
+    return ResponseEntity.badRequest().body(pd);
+  }
 
   @ExceptionHandler({AuthenticationException.class})
   public ResponseEntity<ProblemDetail> handleAuthentication(final AuthenticationException ex,
@@ -163,7 +168,14 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
-  // ── 403 Forbidden ─────────────────────────────────────────────────────────
+  @ExceptionHandler(TokenRevokedException.class)
+  public ResponseEntity<ProblemDetail> handleTokenRevoked(final TokenRevokedException ex,
+                                                          final HttpServletRequest request) {
+    log.warn("Token revoked: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Token Revoked", 401,
+        "Token has been revoked", request);
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
+  }
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ProblemDetail> handleAccessDenied(final AccessDeniedException ex,
@@ -219,8 +231,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
-  // ── 404 Not Found ─────────────────────────────────────────────────────────
-
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleUserNotFound(final UserNotFoundException ex,
                                                           final HttpServletRequest request) {
@@ -229,8 +239,6 @@ public class GlobalExceptionHandler {
         ex.getMessage(), request);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
-
-  // ── 409 Conflict / 404 / 422 / 503 — TenantManagementException ───────────
 
   @ExceptionHandler(TenantManagementException.class)
   public ResponseEntity<ProblemDetail> handleTenantManagement(final TenantManagementException ex,
@@ -252,8 +260,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(status).body(pd);
   }
 
-  // ── 409 Conflict ──────────────────────────────────────────────────────────
-
   @ExceptionHandler(TenantMembershipAlreadyExistsException.class)
   public ResponseEntity<ProblemDetail> handleMembershipAlreadyExists(final TenantMembershipAlreadyExistsException ex,
                                                                      final HttpServletRequest request) {
@@ -272,8 +278,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
   }
 
-  // ── 422 Unprocessable ─────────────────────────────────────────────────────
-
   @ExceptionHandler(UserManagementException.class)
   public ResponseEntity<ProblemDetail> handleUserManagement(final UserManagementException ex,
                                                             final HttpServletRequest request) {
@@ -282,8 +286,6 @@ public class GlobalExceptionHandler {
         ex.getMessage(), request);
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(pd);
   }
-
-  // ── 429 Too Many Requests ─────────────────────────────────────────────────
 
   @ExceptionHandler(VerificationRateLimitException.class)
   public ResponseEntity<ProblemDetail> handleVerificationRateLimit(final VerificationRateLimitException ex,
@@ -309,8 +311,6 @@ public class GlobalExceptionHandler {
         .body(pd);
   }
 
-  // ── 503 Service Unavailable ───────────────────────────────────────────────
-
   @ExceptionHandler(MessagingException.class)
   public ResponseEntity<ProblemDetail> handleMessaging(final MessagingException ex,
                                                        final HttpServletRequest request) {
@@ -319,8 +319,6 @@ public class GlobalExceptionHandler {
         "Messaging service unavailable", request);
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(pd);
   }
-
-  // ── 500 Catch-all ─────────────────────────────────────────────────────────
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ProblemDetail> handleGeneral(final Exception ex,

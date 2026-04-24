@@ -48,10 +48,12 @@ import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
+import com.iqkv.foundation.iamservice.shared.exception.TokenRevokedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
@@ -128,7 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
     if (accountLockoutManager.isLocked(request.email())) {
-      throw new BadCredentialsException("Account temporarily locked");
+      throw new AccountLockedException();
     }
 
     if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
@@ -203,7 +205,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     final String jti = jwt.getClaimAsString(JwtClaimNames.JTI);
     if (jti != null && tokenDenylistService.isRevoked(jti)) {
-      throw new BadCredentialsException("Token revoked");
+      throw new TokenRevokedException();
     }
 
     final String userId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
@@ -225,7 +227,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
     if (accountLockoutManager.isLocked(email)) {
-      throw new BadCredentialsException("Account temporarily locked");
+      throw new AccountLockedException();
     }
 
     if (!passwordEncoder.matches(password, user.getPasswordHash())) {

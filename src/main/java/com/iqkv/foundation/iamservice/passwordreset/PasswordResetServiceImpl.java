@@ -34,6 +34,7 @@ import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigur
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
 import com.iqkv.foundation.iamservice.user.UserMapper;
@@ -122,7 +123,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
         || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
-      throw new IllegalArgumentException(
+      throw new InvalidPasswordException(
           "Password must be 8-128 characters and contain uppercase, lowercase, digit, and special character");
     }
 
