@@ -69,7 +69,7 @@ Base path: `/api/v1/your-service`
 
 ## Prerequisites
 
-- JDK 21 (Eclipse Temurin)
+- JDK 25 (Eclipse Temurin)
 - Maven 3.9+
 - Node.js >= 22.15.0 & pnpm >= 10.33.0 (git hooks)
 - Docker & Docker Compose
