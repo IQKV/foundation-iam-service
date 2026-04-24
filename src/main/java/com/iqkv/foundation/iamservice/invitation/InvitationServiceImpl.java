@@ -124,10 +124,10 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     // ADMIN cannot grant a role higher than their own
-    if ("ADMIN".equals(request.role()) && !inviterAuthorities.contains("TENANT_OWNER")
+    if ("ADMIN".equals(request.authority()) && !inviterAuthorities.contains("TENANT_OWNER")
         && !inviterAuthorities.contains("ADMIN")) {
       throw new org.springframework.security.access.AccessDeniedException(
-          "Insufficient authority to grant role " + request.role());
+          "Insufficient authority to grant role " + request.authority());
     }
 
     final String normalizedEmail = request.email().toLowerCase();
@@ -203,7 +203,7 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     log.info("Invitation sent: invitationId={} tenantKey={} email={} role={}",
-        invitation.getId(), tenantKey, normalizedEmail, request.role());
+        invitation.getId(), tenantKey, normalizedEmail, request.authority());
 
     return InvitationDtoMapper.toResponse(invitation);
   }
