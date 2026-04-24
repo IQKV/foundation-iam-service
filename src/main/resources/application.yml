@@ -25,7 +25,7 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
   messages:
-    basename: messages
+    basename: i18n/messages
     encoding: UTF-8
     fallback-to-system-locale: false
 

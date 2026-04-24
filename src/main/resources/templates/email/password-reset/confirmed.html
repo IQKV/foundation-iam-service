@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:lang="${#locale.language}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password reset confirmed</title>
+  <title th:text="#{email.password-reset.confirmed.page-title}">Password reset confirmed</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -87,27 +87,28 @@
 <body>
 <div class="email-container">
   <div class="header">
-    <div class="logo">IQ Key Value</div>
-    <div class="success-icon">✓</div>
-    <h1 class="title">Password Reset Confirmed</h1>
+    <div class="logo" th:text="#{email.common.logo}">IQ Key Value</div>
+    <div class="success-icon">&#10003;</div>
+    <h1 class="title" th:text="#{email.password-reset.confirmed.title}">Password Reset Confirmed</h1>
   </div>
 
   <div class="content">
-    <p>Hello,</p>
+    <p th:text="#{email.common.greeting}">Hello,</p>
 
     <div class="confirmation-message">
-      <p>Your password has been successfully reset. You can now sign in with your new password.</p>
+      <p th:text="#{email.password-reset.confirmed.success-message}">Your password has been successfully reset. You can now sign in with your new password.</p>
     </div>
 
-    <div class="security-notice">
+    <div class="security-notice" th:text="#{email.password-reset.confirmed.security-notice}">
       If you did not perform this action, please contact support immediately.
     </div>
 
-    <p>Best regards,<br>The IQ Key Value Team</p>
+    <p><span th:text="#{email.common.regards}">Best regards,</span><br>
+      <span th:text="#{email.common.team}">The IQ Key Value Team</span></p>
   </div>
 
   <div class="footer">
-    <p>© 2026 IQ Key Value. All rights reserved.</p>
+    <p th:text="#{email.common.footer.copyright}">&copy; 2026 IQ Key Value. All rights reserved.</p>
   </div>
 </div>
 </body>

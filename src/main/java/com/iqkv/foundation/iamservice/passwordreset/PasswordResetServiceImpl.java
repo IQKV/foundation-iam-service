@@ -19,12 +19,14 @@ package com.iqkv.foundation.iamservice.passwordreset;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
   private final MessagingService messagingService;
   private final AuthConfigurationProperties authProps;
   private final NotificationConfigurationProperties notificationProps;
+  private final MessageSource messageSource;
 
   public PasswordResetServiceImpl(
       final UserMapper userMapper,
@@ -61,13 +64,15 @@ public class PasswordResetServiceImpl implements PasswordResetService {
       final PasswordEncoder passwordEncoder,
       final MessagingService messagingService,
       final AuthConfigurationProperties authProps,
-      final NotificationConfigurationProperties notificationProps) {
+      final NotificationConfigurationProperties notificationProps,
+      final MessageSource messageSource) {
     this.userMapper = userMapper;
     this.passwordResetTokenMapper = passwordResetTokenMapper;
     this.passwordEncoder = passwordEncoder;
     this.messagingService = messagingService;
     this.authProps = authProps;
     this.notificationProps = notificationProps;
+    this.messageSource = messageSource;
   }
 
   @Override
@@ -124,7 +129,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
         || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
       throw new InvalidPasswordException(
-          "Password must be 8-128 characters and contain uppercase, lowercase, digit, and special character");
+          messageSource.getMessage("error.password-reset.invalid-password", null, Locale.ENGLISH));
     }
 
     final String hash = passwordEncoder.encode(newPassword);

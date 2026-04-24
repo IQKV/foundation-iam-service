@@ -18,6 +18,7 @@ package com.iqkv.foundation.iamservice.infrastructure.config;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -67,6 +69,16 @@ public class GlobalExceptionHandler {
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String MDC_CORRELATION_ID = "correlationId";
 
+  private final MessageSource messageSource;
+
+  public GlobalExceptionHandler(final MessageSource messageSource) {
+    this.messageSource = messageSource;
+  }
+
+  private String msg(final String key, final Locale locale, final Object... args) {
+    return messageSource.getMessage(key, args, key, locale);
+  }
+
   private ProblemDetail problem(final String type,
                                 final String title,
                                 final int status,
@@ -84,10 +96,14 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ProblemDetail> handleValidation(final MethodArgumentNotValidException ex,
-                                                        final HttpServletRequest request) {
+                                                        final HttpServletRequest request,
+                                                        final Locale locale) {
     log.warn("Validation failed: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Validation Failed", 400,
-        "Request validation failed", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.validation-failed", locale),
+        400,
+        msg("error.detail.validation-failed", locale),
+        request);
     final List<Map<String, String>> fields = ex.getBindingResult().getFieldErrors().stream()
         .map(fe -> Map.of("field", fe.getField(), "message",
             fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "invalid"))
@@ -98,151 +114,216 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<ProblemDetail> handleConstraintViolation(final ConstraintViolationException ex,
-                                                                 final HttpServletRequest request) {
+                                                                 final HttpServletRequest request,
+                                                                 final Locale locale) {
     log.warn("Constraint violation: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Constraint Violation", 400,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.constraint-violation", locale),
+        400,
+        ex.getMessage(),
+        request);
     return ResponseEntity.badRequest().body(pd);
   }
 
   @ExceptionHandler(InvalidVerificationTokenException.class)
   public ResponseEntity<ProblemDetail> handleInvalidVerificationToken(final InvalidVerificationTokenException ex,
-                                                                      final HttpServletRequest request) {
+                                                                      final HttpServletRequest request,
+                                                                      final Locale locale) {
     log.warn("Invalid verification token: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Invalid Verification Token", 400,
-        "Invalid or expired verification token", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-verification-token", locale),
+        400,
+        msg("error.detail.invalid-verification-token", locale),
+        request);
     return ResponseEntity.badRequest().body(pd);
   }
 
   @ExceptionHandler(PasswordResetTokenNotFoundException.class)
   public ResponseEntity<ProblemDetail> handlePasswordResetTokenNotFound(final PasswordResetTokenNotFoundException ex,
-                                                                        final HttpServletRequest request) {
+                                                                        final HttpServletRequest request,
+                                                                        final Locale locale) {
     log.warn("Password reset token not found: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Invalid Password Reset Token", 400,
-        "Invalid or expired password reset token", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-password-reset-token", locale),
+        400,
+        msg("error.detail.invalid-password-reset-token", locale),
+        request);
     return ResponseEntity.badRequest().body(pd);
   }
 
   @ExceptionHandler(InvalidPasswordException.class)
   public ResponseEntity<ProblemDetail> handleInvalidPassword(final InvalidPasswordException ex,
-                                                             final HttpServletRequest request) {
+                                                             final HttpServletRequest request,
+                                                             final Locale locale) {
     log.warn("Invalid password: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Invalid Password", 400,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-password", locale),
+        400,
+        ex.getMessage(),
+        request);
     return ResponseEntity.badRequest().body(pd);
   }
 
   @ExceptionHandler({AuthenticationException.class})
   public ResponseEntity<ProblemDetail> handleAuthentication(final AuthenticationException ex,
-                                                            final HttpServletRequest request) {
+                                                            final HttpServletRequest request,
+                                                            final Locale locale) {
     log.warn("Authentication failed: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Unauthorized", 401,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.unauthorized", locale),
+        401,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
   @ExceptionHandler(InvalidTokenTypeException.class)
   public ResponseEntity<ProblemDetail> handleInvalidTokenType(final InvalidTokenTypeException ex,
-                                                              final HttpServletRequest request) {
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
     log.warn("Invalid token type: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Invalid Token Type", 401,
-        "Invalid token type", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-token-type", locale),
+        401,
+        msg("error.authentication.invalid-token-type", locale),
+        request);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
   @ExceptionHandler(TokenExpiredException.class)
   public ResponseEntity<ProblemDetail> handleTokenExpired(final TokenExpiredException ex,
-                                                          final HttpServletRequest request) {
+                                                          final HttpServletRequest request,
+                                                          final Locale locale) {
     log.warn("Token expired: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Token Expired", 401,
-        "Refresh token expired", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.token-expired", locale),
+        401,
+        msg("error.authentication.token-expired", locale),
+        request);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
   @ExceptionHandler(InvalidTokenSignatureException.class)
   public ResponseEntity<ProblemDetail> handleInvalidTokenSignature(final InvalidTokenSignatureException ex,
-                                                                   final HttpServletRequest request) {
+                                                                   final HttpServletRequest request,
+                                                                   final Locale locale) {
     log.warn("Invalid token signature: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Invalid Token Signature", 401,
-        "Invalid token signature", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-token-signature", locale),
+        401,
+        msg("error.authentication.invalid-token-signature", locale),
+        request);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
   @ExceptionHandler(TokenRevokedException.class)
   public ResponseEntity<ProblemDetail> handleTokenRevoked(final TokenRevokedException ex,
-                                                          final HttpServletRequest request) {
+                                                          final HttpServletRequest request,
+                                                          final Locale locale) {
     log.warn("Token revoked: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Token Revoked", 401,
-        "Token has been revoked", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.token-revoked", locale),
+        401,
+        msg("error.authentication.token-revoked", locale),
+        request);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
   }
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ProblemDetail> handleAccessDenied(final AccessDeniedException ex,
-                                                          final HttpServletRequest request) {
+                                                          final HttpServletRequest request,
+                                                          final Locale locale) {
     log.warn("Access denied: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Forbidden", 403,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.forbidden", locale),
+        403,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(MembershipNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleMembershipNotFound(final MembershipNotFoundException ex,
-                                                                final HttpServletRequest request) {
+                                                                final HttpServletRequest request,
+                                                                final Locale locale) {
     log.warn("Membership not found: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Forbidden", 403,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.forbidden", locale),
+        403,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(TenantContextMismatchException.class)
   public ResponseEntity<ProblemDetail> handleTenantContextMismatch(final TenantContextMismatchException ex,
-                                                                   final HttpServletRequest request) {
+                                                                   final HttpServletRequest request,
+                                                                   final Locale locale) {
     log.warn("Tenant context mismatch: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Tenant Context Mismatch", 403,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.tenant-context-mismatch", locale),
+        403,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(TenantSuspendedException.class)
   public ResponseEntity<ProblemDetail> handleTenantSuspended(final TenantSuspendedException ex,
-                                                             final HttpServletRequest request) {
+                                                             final HttpServletRequest request,
+                                                             final Locale locale) {
     log.warn("Tenant suspended: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Tenant Suspended", 403,
-        "Tenant suspended", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.tenant-suspended", locale),
+        403,
+        msg("error.detail.tenant-suspended", locale),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(TenantNotAvailableException.class)
   public ResponseEntity<ProblemDetail> handleTenantNotAvailable(final TenantNotAvailableException ex,
-                                                                final HttpServletRequest request) {
+                                                                final HttpServletRequest request,
+                                                                final Locale locale) {
     log.warn("Tenant not available: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Tenant Not Available", 403,
-        "Tenant not available", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.tenant-not-available", locale),
+        403,
+        msg("error.detail.tenant-not-available", locale),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(AccountLockedException.class)
   public ResponseEntity<ProblemDetail> handleAccountLocked(final AccountLockedException ex,
-                                                           final HttpServletRequest request) {
+                                                           final HttpServletRequest request,
+                                                           final Locale locale) {
     log.warn("Account locked: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Account Locked", 403,
-        "Account temporarily locked", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.account-locked", locale),
+        403,
+        msg("error.detail.account-locked", locale),
+        request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleUserNotFound(final UserNotFoundException ex,
-                                                          final HttpServletRequest request) {
+                                                          final HttpServletRequest request,
+                                                          final Locale locale) {
     log.warn("User not found: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "User Not Found", 404,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.user-not-found", locale),
+        404,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
 
   @ExceptionHandler(TenantManagementException.class)
   public ResponseEntity<ProblemDetail> handleTenantManagement(final TenantManagementException ex,
-                                                              final HttpServletRequest request) {
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
     final int status = switch (ex) {
       case TenantAlreadyExistsException ignored -> 409;
       case TenantNotFoundException ignored -> 404;
@@ -255,44 +336,63 @@ public class GlobalExceptionHandler {
     } else {
       log.warn("Tenant management error ({}): {}", status, ex.getMessage());
     }
-    final ProblemDetail pd = problem("about:blank", "Tenant Management Error", status,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.tenant-management-error", locale),
+        status,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(status).body(pd);
   }
 
   @ExceptionHandler(TenantMembershipAlreadyExistsException.class)
   public ResponseEntity<ProblemDetail> handleMembershipAlreadyExists(final TenantMembershipAlreadyExistsException ex,
-                                                                     final HttpServletRequest request) {
+                                                                     final HttpServletRequest request,
+                                                                     final Locale locale) {
     log.warn("Membership already exists: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Conflict", 409,
-        "User is already a member of this tenant", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.conflict", locale),
+        409,
+        msg("error.membership.already-exists", locale),
+        request);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
   }
 
   @ExceptionHandler(UserRegistrationException.class)
   public ResponseEntity<ProblemDetail> handleUserRegistration(final UserRegistrationException ex,
-                                                              final HttpServletRequest request) {
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
     log.warn("User registration error: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Registration Error", 409,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.registration-error", locale),
+        409,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
   }
 
   @ExceptionHandler(UserManagementException.class)
   public ResponseEntity<ProblemDetail> handleUserManagement(final UserManagementException ex,
-                                                            final HttpServletRequest request) {
+                                                            final HttpServletRequest request,
+                                                            final Locale locale) {
     log.warn("User management error: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Unprocessable Entity", 422,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.unprocessable-entity", locale),
+        422,
+        ex.getMessage(),
+        request);
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(pd);
   }
 
   @ExceptionHandler(VerificationRateLimitException.class)
   public ResponseEntity<ProblemDetail> handleVerificationRateLimit(final VerificationRateLimitException ex,
-                                                                   final HttpServletRequest request) {
+                                                                   final HttpServletRequest request,
+                                                                   final Locale locale) {
     log.warn("Verification rate limit exceeded: retryAfter={}s", ex.getRetryAfterSeconds());
-    final ProblemDetail pd = problem("about:blank", "Too Many Requests", 429,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.too-many-requests", locale),
+        429,
+        msg("error.verification.rate-limit", locale, ex.getRetryAfterSeconds()),
+        request);
     pd.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
         .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
@@ -301,10 +401,14 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(PasswordResetRateLimitException.class)
   public ResponseEntity<ProblemDetail> handlePasswordResetRateLimit(final PasswordResetRateLimitException ex,
-                                                                    final HttpServletRequest request) {
+                                                                    final HttpServletRequest request,
+                                                                    final Locale locale) {
     log.warn("Password reset rate limit exceeded: retryAfter={}s", ex.getRetryAfterSeconds());
-    final ProblemDetail pd = problem("about:blank", "Too Many Requests", 429,
-        ex.getMessage(), request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.too-many-requests", locale),
+        429,
+        msg("error.password-reset.rate-limit", locale, ex.getRetryAfterSeconds()),
+        request);
     pd.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
         .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
@@ -313,19 +417,27 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MessagingException.class)
   public ResponseEntity<ProblemDetail> handleMessaging(final MessagingException ex,
-                                                       final HttpServletRequest request) {
+                                                       final HttpServletRequest request,
+                                                       final Locale locale) {
     log.error("Messaging service error: {}", ex.getMessage(), ex);
-    final ProblemDetail pd = problem("about:blank", "Service Unavailable", 503,
-        "Messaging service unavailable", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.service-unavailable", locale),
+        503,
+        msg("error.detail.messaging-unavailable", locale),
+        request);
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(pd);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ProblemDetail> handleGeneral(final Exception ex,
-                                                     final HttpServletRequest request) {
+                                                     final HttpServletRequest request,
+                                                     final Locale locale) {
     log.error("Unhandled exception: {}", ex.getMessage(), ex);
-    final ProblemDetail pd = problem("about:blank", "Internal Server Error", 500,
-        "An unexpected error occurred", request);
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.internal-server-error", locale),
+        500,
+        msg("error.detail.unexpected", locale),
+        request);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
   }
 }
