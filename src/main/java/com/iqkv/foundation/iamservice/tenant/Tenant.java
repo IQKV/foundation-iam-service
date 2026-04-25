@@ -29,6 +29,8 @@ public class Tenant {
   private LocalDateTime updatedAt;
   private String createdBy;
   private String updatedBy;
+  private Boolean isDefault;
+  private String tenantModeOrigin;
 
   public UUID getId() {
     return id;
@@ -92,5 +94,21 @@ public class Tenant {
 
   public void setUpdatedBy(final String updatedBy) {
     this.updatedBy = updatedBy;
+  }
+
+  public Boolean getIsDefault() {
+    return isDefault;
+  }
+
+  public void setIsDefault(final Boolean isDefault) {
+    this.isDefault = isDefault;
+  }
+
+  public String getTenantModeOrigin() {
+    return tenantModeOrigin;
+  }
+
+  public void setTenantModeOrigin(final String tenantModeOrigin) {
+    this.tenantModeOrigin = tenantModeOrigin;
   }
 }

@@ -13,26 +13,28 @@
         <result property="updatedAt"  column="updated_at"/>
         <result property="createdBy"  column="created_by"/>
         <result property="updatedBy"  column="updated_by"/>
+        <result property="isDefault"  column="is_default"/>
+        <result property="tenantModeOrigin" column="tenant_mode_origin"/>
     </resultMap>
 
     <insert id="insertIfAbsent" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
-            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by)
+            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
         VALUES
             (#{id}, #{tenantKey}, #{name},
              #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, #{isDefault}, #{tenantModeOrigin})
         ON CONFLICT (name) DO NOTHING
     </insert>
 
     <select id="findByTenantKey" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
         FROM public.tenants
         WHERE tenant_key = #{tenantKey}
     </select>
 
     <select id="findByStatus" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
         FROM public.tenants
         WHERE status = #{status}
     </select>
@@ -49,7 +51,7 @@
     </update>
 
     <select id="findStuckProvisioning" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
         FROM public.tenants
         WHERE status = 'PROVISIONING'
           AND created_at &lt; #{olderThan}
@@ -71,5 +73,29 @@
           AND  a.authority  = 'TENANT_OWNER'
         LIMIT  1
     </select>
+
+    <select id="findDefaultTenant" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        FROM public.tenants
+        WHERE is_default = true
+        LIMIT 1
+    </select>
+
+    <update id="markDefaultTenant">
+        UPDATE public.tenants
+        SET is_default = true,
+            updated_at = NOW()
+        WHERE tenant_key = #{tenantKey}
+    </update>
+
+    <insert id="insertIfAbsentDefault" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
+        INSERT INTO public.tenants
+            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
+        VALUES
+            (#{id}, #{tenantKey}, #{name},
+             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, true, #{tenantModeOrigin})
+        ON CONFLICT (is_default) WHERE is_default = true DO NOTHING
+    </insert>
 
 </mapper>

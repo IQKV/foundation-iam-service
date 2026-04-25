@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260125140000" author="iqkv">
+        <!-- Add is_default column -->
+        <addColumn tableName="tenants" schemaName="public">
+            <column name="is_default" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add tenant_mode_origin column -->
+        <addColumn tableName="tenants" schemaName="public">
+            <column name="tenant_mode_origin" type="VARCHAR(16)"/>
+        </addColumn>
+
+        <!-- Add check constraint for tenant_mode_origin values -->
+        <sql>
+            ALTER TABLE public.tenants
+            ADD CONSTRAINT chk_tenant_mode_origin
+            CHECK (tenant_mode_origin IN ('SINGLE_BOOTSTRAP', 'MULTI_SIGNUP', 'ADMIN_CREATED'));
+        </sql>
+
+        <!-- Create partial unique index ensuring at most one default tenant -->
+        <sql>
+            CREATE UNIQUE INDEX idx_tenants_default_unique
+            ON public.tenants (is_default)
+            WHERE is_default = true;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

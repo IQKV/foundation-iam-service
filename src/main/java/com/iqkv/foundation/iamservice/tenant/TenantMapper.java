@@ -40,4 +40,22 @@ public interface TenantMapper {
   List<Tenant> findStuckProvisioning(@Param("olderThan") Instant olderThan);
 
   Optional<OwnerInfo> findOwnerByTenantKey(String tenantKey);
+
+  /**
+   * Finds the default tenant (is_default = true).
+   * Returns empty if no default tenant exists.
+   */
+  Optional<Tenant> findDefaultTenant();
+
+  /**
+   * Marks the specified tenant as the default tenant.
+   * Sets is_default = true for the given key.
+   */
+  void markDefaultTenant(@Param("tenantKey") String tenantKey);
+
+  /**
+   * Atomically inserts a default tenant if none exists.
+   * Uses INSERT ... ON CONFLICT DO NOTHING pattern.
+   */
+  void insertIfAbsentDefault(Tenant tenant);
 }
