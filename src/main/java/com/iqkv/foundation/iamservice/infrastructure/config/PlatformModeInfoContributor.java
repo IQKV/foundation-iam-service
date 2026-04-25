@@ -24,12 +24,12 @@ public class PlatformModeInfoContributor implements InfoContributor {
     try {
       final RolloutMode mode = platformModeValidator.getMode();
       builder.withDetail("platform", Map.of(
-          "rolloutMode", mode.name(),
+          "rollout-mode", mode.name(),
           "description", getDescription(mode)
       ));
     } catch (final Exception e) {
       builder.withDetail("platform", Map.of(
-          "rolloutMode", "UNKNOWN",
+          "rollout-mode", "UNKNOWN",
           "error", e.getMessage()
       ));
     }
