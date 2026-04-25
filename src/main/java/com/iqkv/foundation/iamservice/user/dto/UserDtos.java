@@ -37,7 +37,7 @@ public final class UserDtos {
       String password,
       @NotBlank @Size(max = 100) String firstName,
       @NotBlank @Size(max = 100) String lastName,
-      @NotBlank @Size(min = 1, max = 100) String tenantName) {}
+      @Size(max = 100) String tenantName) {}
 
   public record UpdateUserRequest(
       @NotBlank @Size(max = 100) String firstName,

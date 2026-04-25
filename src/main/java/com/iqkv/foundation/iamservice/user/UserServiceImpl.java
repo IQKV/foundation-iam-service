@@ -24,7 +24,6 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,17 +37,11 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
-import com.iqkv.foundation.iamservice.membership.MembershipStatus;
-import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
-import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
-import com.iqkv.foundation.iamservice.tenant.Tenant;
-import com.iqkv.foundation.iamservice.tenant.TenantMapper;
-import com.iqkv.foundation.iamservice.tenant.TenantStatus;
+import com.iqkv.foundation.iamservice.signup.SignupStrategy;
 import com.iqkv.foundation.iamservice.user.dto.UserDtoMapper;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 
@@ -58,105 +51,47 @@ public class UserServiceImpl implements UserService {
 
   private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
-  private static final char[] NANOID_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-  private static final int NANOID_SIZE = 8;
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
   private final UserMapper userMapper;
-  private final TenantMapper tenantMapper;
   private final TenantMembershipMapper membershipMapper;
-  private final TenantMemberAuthorityMapper authorityMapper;
   private final EmailVerificationTokenMapper emailVerificationTokenMapper;
   private final MessagingService messagingService;
   private final UserEventPublisher userEventPublisher;
-  private final PasswordEncoder passwordEncoder;
   private final NotificationConfigurationProperties notificationProps;
+  private final SignupStrategy signupStrategy;
+  private final PasswordEncoder passwordEncoder;
 
   public UserServiceImpl(final UserMapper userMapper,
-                         final TenantMapper tenantMapper,
                          final TenantMembershipMapper membershipMapper,
-                         final TenantMemberAuthorityMapper authorityMapper,
                          final EmailVerificationTokenMapper emailVerificationTokenMapper,
                          final MessagingService messagingService,
                          final UserEventPublisher userEventPublisher,
-                         final PasswordEncoder passwordEncoder,
-                         final NotificationConfigurationProperties notificationProps) {
+                         final NotificationConfigurationProperties notificationProps,
+                         final SignupStrategy signupStrategy,
+                         final PasswordEncoder passwordEncoder) {
     this.userMapper = userMapper;
-    this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
-    this.authorityMapper = authorityMapper;
     this.emailVerificationTokenMapper = emailVerificationTokenMapper;
     this.messagingService = messagingService;
     this.userEventPublisher = userEventPublisher;
-    this.passwordEncoder = passwordEncoder;
     this.notificationProps = notificationProps;
+    this.signupStrategy = signupStrategy;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Override
   public UserDtos.SignupResponse registerUser(final UserDtos.RegisterUserRequest request) {
-    // Step 1: Upsert user (atomic, eliminates TOCTOU)
-    final var user = new User();
-    user.setId(UUID.randomUUID());
-    user.setEmail(request.email());
-    user.setPasswordHash(passwordEncoder.encode(request.password()));
-    user.setFirstName(request.firstName());
-    user.setLastName(request.lastName());
-    user.setStatus(AccountStatus.ACTIVE);
-    user.setEmailVerified(false);
-    user.setCreatedAt(LocalDateTime.now());
-    user.setUpdatedAt(LocalDateTime.now());
-    user.setCreatedBy("system");
-    user.setUpdatedBy("system");
+    // Delegate mode-specific signup logic (user upsert, tenant resolution/creation,
+    // membership creation, authority grant) to the active SignupStrategy.
+    final var result = signupStrategy.execute(request);
 
-    userMapper.upsertByEmail(user);
-    final User canonicalUser = userMapper.findByEmail(request.email())
-        .orElseThrow(() -> new UserNotFoundException("User not found after upsert: " + request.email()));
+    final var canonicalUser = result.user();
 
-    // Step 2: Create tenant atomically (INSERT ... ON CONFLICT DO NOTHING)
-    final String tenantKey = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NANOID_ALPHABET, NANOID_SIZE);
-    final var tenant = new Tenant();
-    tenant.setId(UUID.randomUUID());
-    tenant.setTenantKey(tenantKey);
-    tenant.setName(request.tenantName());
-    tenant.setStatus(TenantStatus.PROVISIONING);
-    tenant.setCreatedAt(LocalDateTime.now());
-    tenant.setUpdatedAt(LocalDateTime.now());
-    tenant.setCreatedBy(canonicalUser.getId().toString());
-    tenant.setUpdatedBy(canonicalUser.getId().toString());
-
-    tenantMapper.insertIfAbsent(tenant);
-    final Tenant canonicalTenant = tenantMapper.findByTenantKey(tenantKey).orElse(null);
-    if (canonicalTenant == null) {
-      // insertIfAbsent did nothing — name was already taken
-      throw new TenantAlreadyExistsException("Tenant name already taken");
-    }
-
-    // Step 3: Create membership
-    final var membership = new TenantMembership();
-    membership.setId(UUID.randomUUID());
-    membership.setUserId(canonicalUser.getId());
-    membership.setTenantKey(tenantKey);
-    membership.setStatus(MembershipStatus.ACTIVE);
-    membership.setCreatedAt(LocalDateTime.now());
-    membership.setUpdatedAt(LocalDateTime.now());
-    membership.setCreatedBy(canonicalUser.getId().toString());
-    membership.setUpdatedBy(canonicalUser.getId().toString());
-    membershipMapper.insert(membership);
-
-    // Step 4: Grant TENANT_OWNER authority
-    final var authority = new TenantMemberAuthority();
-    authority.setId(UUID.randomUUID());
-    authority.setMembershipId(membership.getId());
-    authority.setAuthority("TENANT_OWNER");
-    authorityMapper.insert(authority);
-
-    // Step 5: Publish tenant created event
-    messagingService.publishTenantCreated(tenantKey, request.tenantName(), request.email(), request.firstName());
-
-    // Step 6: Publish user created event
+    // Publish user.created event (mode-independent, requirement 4.7)
     userEventPublisher.publishUserCreated(canonicalUser);
 
-    // Step 7: Generate email verification token
+    // Generate email verification token (mode-independent, requirement 4.7)
     final byte[] tokenBytes = new byte[32];
     SECURE_RANDOM.nextBytes(tokenBytes);
     final String tokenHex = HexFormat.of().formatHex(tokenBytes);
@@ -170,7 +105,7 @@ public class UserServiceImpl implements UserService {
     verificationToken.setCreatedAt(Instant.now());
     emailVerificationTokenMapper.insert(verificationToken);
 
-    // Step 8: Publish verification email notification
+    // Publish verification email notification (mode-independent, requirement 4.7)
     final String verificationUrl = notificationProps.baseUrl()
         + "/api/v1/iam/users/email/verify?token=" + tokenHex;
     final var notificationEvent = new NotificationEvent(
@@ -184,8 +119,8 @@ public class UserServiceImpl implements UserService {
         Instant.now());
     messagingService.publishNotification(notificationEvent);
 
-    log.info("User registered: userId={}, tenantKey={}", canonicalUser.getId(), tenantKey);
-    return UserDtoMapper.toSignupResponse(canonicalUser, canonicalTenant);
+    log.info("User registered: userId={}, tenantKey={}", canonicalUser.getId(), result.tenant().getTenantKey());
+    return UserDtoMapper.toSignupResponse(canonicalUser, result.tenant());
   }
 
   @Override
