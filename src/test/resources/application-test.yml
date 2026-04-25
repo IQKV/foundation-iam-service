@@ -20,6 +20,10 @@ spring:
 
 
 iqkv:
+  platform:
+    rollout-mode: MULTI_TENANT
+  tenancy:
+    mode: MULTI
   liquibase:
     system-change-log: db/changelog/system/db.changelog-master.xml
     tenant-change-log: db/changelog/tenant/master.xml

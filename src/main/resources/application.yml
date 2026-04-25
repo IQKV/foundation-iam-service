@@ -55,6 +55,8 @@ management:
       show-details: when-authorized
 
 iqkv:
+  platform:
+    rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}  # MULTI_TENANT | SINGLE_TENANT
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
