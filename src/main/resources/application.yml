@@ -56,7 +56,10 @@ management:
 
 iqkv:
   platform:
-    rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}  # MULTI_TENANT | SINGLE_TENANT
+    # Platform-wide operational mode: MULTI_TENANT (default) or SINGLE_TENANT
+    # MULTI_TENANT: Each user signup creates a new tenant with TENANT_OWNER authority
+    # SINGLE_TENANT: All users join a single pre-provisioned default tenant with MEMBER authority
+    rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
@@ -97,6 +100,17 @@ iqkv:
     token-ttl: ${INVITATION_TOKEN_TTL:PT72H}
     reaper-interval: ${INVITATION_REAPER_INTERVAL:PT1H}
   tenancy:
+    # Tenancy mode: MULTI (default) or SINGLE (must match platform.rollout-mode)
+    # MULTI: Multi-tenant mode with per-tenant schema isolation
+    # SINGLE: Single-tenant mode with all users in one default tenant
+    mode: ${TENANCY_MODE:MULTI}
+    # Default tenant key for SINGLE_TENANT mode (optional)
+    # If not provided, will be resolved from database or auto-generated
+    # Format: 8-character NanoID using alphabet [a-z0-9]
+    # Example: abc12345
+    default-tenant-key: ${DEFAULT_TENANT_KEY:}
+    # Display name for the default tenant in SINGLE_TENANT mode
+    default-tenant-name: ${DEFAULT_TENANT_NAME:Default Organization}
     schema-prefix: t_
     default-schema: public
     provisioning-timeout: PT10M
