@@ -30,6 +30,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
+import com.iqkv.foundation.iamservice.user.UserMapper;
 
 @Service
 @Transactional
@@ -51,10 +52,14 @@ public class TenantServiceImpl implements TenantService {
 
   private final TenantMapper tenantMapper;
   private final MessagingService messagingService;
+  private final UserMapper userMapper;
 
-  public TenantServiceImpl(final TenantMapper tenantMapper, final MessagingService messagingService) {
+  public TenantServiceImpl(final TenantMapper tenantMapper,
+                            final MessagingService messagingService,
+                            final UserMapper userMapper) {
     this.tenantMapper = tenantMapper;
     this.messagingService = messagingService;
+    this.userMapper = userMapper;
   }
 
   @Override
@@ -76,7 +81,12 @@ public class TenantServiceImpl implements TenantService {
     tenant.setUpdatedBy(ownerUserId.toString());
 
     tenantMapper.insertIfAbsent(tenant);
-    messagingService.publishTenantCreated(tenantKey, tenantName);
+
+    // Resolve owner fields for the tenant.created event so Billing can bootstrap correctly.
+    final var owner = userMapper.findById(ownerUserId).orElse(null);
+    final String ownerEmail = owner != null ? owner.getEmail() : null;
+    final String ownerFirstName = owner != null ? owner.getFirstName() : null;
+    messagingService.publishTenantCreated(tenantKey, tenantName, ownerEmail, ownerFirstName);
 
     log.info("Tenant created: tenantKey={}, name={}", tenantKey, tenantName);
     return tenant;

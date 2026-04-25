@@ -34,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.iqkv.foundation.iamservice.authentication.JwtTokenGenerator;
 import com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.config.PlatformConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.config.RolloutMode;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
@@ -75,6 +77,7 @@ public class InvitationServiceImpl implements InvitationService {
   private final MessagingService messagingService;
   private final InvitationConfigurationProperties invitationProps;
   private final NotificationConfigurationProperties notificationProps;
+  private final PlatformConfigurationProperties platformConfig;
 
   public InvitationServiceImpl(
       final InvitationMapper invitationMapper,
@@ -88,7 +91,8 @@ public class InvitationServiceImpl implements InvitationService {
       final JwtTokenGenerator jwtTokenGenerator,
       final MessagingService messagingService,
       final InvitationConfigurationProperties invitationProps,
-      final NotificationConfigurationProperties notificationProps) {
+      final NotificationConfigurationProperties notificationProps,
+      final PlatformConfigurationProperties platformConfig) {
     this.invitationMapper = invitationMapper;
     this.tenantMapper = tenantMapper;
     this.userMapper = userMapper;
@@ -101,6 +105,7 @@ public class InvitationServiceImpl implements InvitationService {
     this.messagingService = messagingService;
     this.invitationProps = invitationProps;
     this.notificationProps = notificationProps;
+    this.platformConfig = platformConfig;
   }
 
   // -------------------------------------------------------------------------
@@ -112,6 +117,13 @@ public class InvitationServiceImpl implements InvitationService {
       final String tenantKey,
       final UUID inviterId,
       final InvitationDtos.SendInvitationRequest request) {
+
+    // Invitations are a multi-tenant concept — in SINGLE_TENANT mode all users
+    // auto-join the default tenant on signup, so there is nothing to invite to.
+    if (platformConfig.rolloutMode() == RolloutMode.SINGLE_TENANT) {
+      throw new org.springframework.security.access.AccessDeniedException(
+          "Invitations are not available in SINGLE_TENANT mode");
+    }
 
     final Tenant tenant = requireActiveTenant(tenantKey);
 

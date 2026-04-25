@@ -18,7 +18,6 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
 import java.time.Instant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +44,6 @@ public class MessagingService {
     final var event = new TenantEvent(tenantKey, tenantName, ownerEmail, ownerFirstName,
         TenantEvent.EventType.TENANT_CREATED, Instant.now());
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_CREATED, event);
-  }
-
-  /** @deprecated Use {@link #publishTenantCreated(String, String, String, String)} — task 8 will remove this overload */
-  @Deprecated
-  public void publishTenantCreated(final String tenantKey, final String tenantName) {
-    publishTenantCreated(tenantKey, tenantName, null, null);
   }
 
   public void publishTenantProvisioned(final String tenantKey) {
