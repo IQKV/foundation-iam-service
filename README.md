@@ -13,8 +13,6 @@
 
 Multi-tenant Identity and Access Management microservice. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
 
-![CI](https://img.shields.io/github/actions/workflow/status/IQKV/foundation-iam-service/build-nodejs-project.yml?label=CI)
-![License](https://img.shields.io/github/license/IQKV/foundation-iam-service)
 
 ## About
 
