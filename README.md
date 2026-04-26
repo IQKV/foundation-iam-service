@@ -13,7 +13,6 @@
 
 Multi-tenant Identity and Access Management microservice. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
 
-
 ## About
 
 The IAM service handles the full identity lifecycle for a SaaS platform:
