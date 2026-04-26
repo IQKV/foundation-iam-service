@@ -44,6 +44,7 @@ iqkv:
     jwt:
       expiry: PT30M
       refresh-expiry: P30D
+      issuer: ${JWT_ISSUER:foundation-iam-service}
     security:
       min-length: 6
   messaging:

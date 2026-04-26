@@ -98,7 +98,8 @@ cp .env.example .env.local
 # Start dependencies (PostgreSQL on :5433, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
 docker compose up -d
 
-# Run the service
+# Run the service (load .env.local first to activate the local Spring profile)
+export $(grep -v '^#' .env.local | xargs)
 ./mvnw spring-boot:run -Pdev
 # → API:      http://localhost:8080
 # → Actuator: http://localhost:8081/actuator/health
@@ -111,7 +112,7 @@ docker compose up -d
 | Variable               | Default                      | Description                              |
 | ---------------------- | ---------------------------- | ---------------------------------------- |
 | `DB_HOST`              | `localhost`                  | PostgreSQL host                          |
-| `DB_PORT`              | `5432`                       | PostgreSQL port                          |
+| `DB_PORT`              | `5433`                       | PostgreSQL port (host-mapped from Docker) |
 | `DB_NAME`              | `iam`                        | Database name                            |
 | `DB_USERNAME`          | `iam`                        | Database user                            |
 | `DB_PASSWORD`          | `iam`                        | Database password                        |
