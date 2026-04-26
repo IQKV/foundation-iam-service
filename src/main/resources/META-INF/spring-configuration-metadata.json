@@ -13,6 +13,12 @@
       "description": "Intermediary mail connection properties. Values are composed into spring.mail and iqkv.notification.mail."
     },
     {
+      "name": "iqkv.platform",
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.PlatformConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.PlatformConfigurationProperties",
+      "description": "Platform-wide operational settings. Must be consistent across all core services (IAM, Billing, Gateway)."
+    },
+    {
       "name": "iqkv.auth",
       "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties",
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
@@ -38,6 +44,16 @@
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
     },
     {
+      "name": "iqkv.invitation",
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties"
+    },
+    {
+      "name": "iqkv.tenancy",
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties",
+      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties"
+    },
+    {
       "name": "iqkv.messaging.rabbitmq",
       "type": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties",
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.MessagingConfigurationProperties"
@@ -51,11 +67,6 @@
       "name": "iqkv.notification.mail",
       "type": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail",
       "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties"
-    },
-    {
-      "name": "iqkv.tenancy",
-      "type": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties",
-      "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties"
     },
     {
       "name": "iqkv.liquibase",
@@ -109,7 +120,7 @@
       "name": "iqkv.rabbitmq.username",
       "type": "java.lang.String",
       "description": "RabbitMQ username.",
-      "defaultValue": "guest"
+      "defaultValue": "iam"
     },
     {
       "name": "iqkv.rabbitmq.password",
@@ -156,6 +167,12 @@
       "description": "Default Reply-To address for outgoing emails."
     },
     {
+      "name": "iqkv.platform.rollout-mode",
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.RolloutMode",
+      "description": "Platform-wide operational mode. Must match across all core services. MULTI_TENANT: each signup creates a new tenant with TENANT_OWNER authority. SINGLE_TENANT: all users join a single pre-provisioned tenant with MEMBER authority.",
+      "defaultValue": "MULTI_TENANT"
+    },
+    {
       "name": "iqkv.auth.jwt.private-key-path",
       "type": "java.lang.String",
       "description": "Path to the RSA private key PEM file used for signing JWTs. Supports classpath: and file: prefixes.",
@@ -188,7 +205,7 @@
     {
       "name": "iqkv.auth.security.password-encoder-strength",
       "type": "java.lang.Integer",
-      "description": "BCrypt encoder strength (cost factor).",
+      "description": "BCrypt encoder strength (cost factor). Must be >= 4.",
       "defaultValue": 12
     },
     {
@@ -228,6 +245,53 @@
       "defaultValue": 3
     },
     {
+      "name": "iqkv.invitation.token-ttl",
+      "type": "java.time.Duration",
+      "description": "How long an invitation token remains valid.",
+      "defaultValue": "PT72H"
+    },
+    {
+      "name": "iqkv.invitation.reaper-interval",
+      "type": "java.time.Duration",
+      "description": "How often the InvitationReaperJob runs to expire stale PENDING invitations. Used directly in @Scheduled(fixedDelayString).",
+      "defaultValue": "PT1H"
+    },
+    {
+      "name": "iqkv.tenancy.mode",
+      "type": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties$TenancyMode",
+      "description": "Tenancy isolation mode. Must be consistent with iqkv.platform.rollout-mode: MULTI_TENANT → MULTI, SINGLE_TENANT → SINGLE.",
+      "defaultValue": "MULTI"
+    },
+    {
+      "name": "iqkv.tenancy.default-tenant-key",
+      "type": "java.lang.String",
+      "description": "NanoID key of the default tenant used in SINGLE tenancy mode. Must be exactly 8 lowercase alphanumeric characters [a-z0-9]. Auto-generated if blank."
+    },
+    {
+      "name": "iqkv.tenancy.default-tenant-name",
+      "type": "java.lang.String",
+      "description": "Display name for the default tenant in SINGLE tenancy mode.",
+      "defaultValue": "Default Organization"
+    },
+    {
+      "name": "iqkv.tenancy.schema-prefix",
+      "type": "java.lang.String",
+      "description": "PostgreSQL schema name prefix for tenant schemas.",
+      "defaultValue": "t_"
+    },
+    {
+      "name": "iqkv.tenancy.default-schema",
+      "type": "java.lang.String",
+      "description": "Default (system) schema name.",
+      "defaultValue": "public"
+    },
+    {
+      "name": "iqkv.tenancy.provisioning-timeout",
+      "type": "java.time.Duration",
+      "description": "Maximum time allowed for tenant schema provisioning before it is considered stuck.",
+      "defaultValue": "PT10M"
+    },
+    {
       "name": "iqkv.messaging.rabbitmq.enabled",
       "type": "java.lang.Boolean",
       "description": "Enables RabbitMQ messaging. When false, all AMQP beans are skipped.",
@@ -261,24 +325,6 @@
       "defaultValue": "http://localhost:3000"
     },
     {
-      "name": "iqkv.tenancy.schema-prefix",
-      "type": "java.lang.String",
-      "description": "PostgreSQL schema name prefix for tenant schemas.",
-      "defaultValue": "t_"
-    },
-    {
-      "name": "iqkv.tenancy.default-schema",
-      "type": "java.lang.String",
-      "description": "Default (system) schema name.",
-      "defaultValue": "public"
-    },
-    {
-      "name": "iqkv.tenancy.provisioning-timeout",
-      "type": "java.time.Duration",
-      "description": "Maximum time allowed for tenant schema provisioning before it is considered stuck.",
-      "defaultValue": "PT10M"
-    },
-    {
       "name": "iqkv.liquibase.system-change-log",
       "type": "java.lang.String",
       "description": "Classpath location of the system (public schema) Liquibase changelog."
@@ -291,10 +337,17 @@
     {
       "name": "iqkv.liquibase.contexts",
       "type": "java.lang.String",
-      "description": "Active Liquibase contexts (e.g. demo, !demo)."
+      "description": "Active Liquibase contexts (e.g. demo to include seed data, or omit for clean schema only)."
     }
   ],
   "hints": [
+    {
+      "name": "iqkv.platform.rollout-mode",
+      "values": [
+        { "value": "MULTI_TENANT", "description": "Each signup creates a new tenant. Users get TENANT_OWNER authority." },
+        { "value": "SINGLE_TENANT", "description": "All users join a single pre-provisioned tenant. Users get MEMBER authority." }
+      ]
+    },
     {
       "name": "iqkv.auth.jwt.private-key-path",
       "values": [
@@ -307,6 +360,13 @@
       "values": [
         { "value": "classpath:keys/public.pem", "description": "Bundled dev key (not for production)." },
         { "value": "file:/run/secrets/public.pem", "description": "Docker secret mount path." }
+      ]
+    },
+    {
+      "name": "iqkv.tenancy.mode",
+      "values": [
+        { "value": "MULTI", "description": "Multi-tenant mode — use with ROLLOUT_MODE=MULTI_TENANT." },
+        { "value": "SINGLE", "description": "Single-tenant mode — use with ROLLOUT_MODE=SINGLE_TENANT." }
       ]
     },
     {
