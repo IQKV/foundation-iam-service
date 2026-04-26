@@ -257,12 +257,6 @@
       "defaultValue": "PT1H"
     },
     {
-      "name": "iqkv.tenancy.mode",
-      "type": "com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties$TenancyMode",
-      "description": "Tenancy isolation mode. Must be consistent with iqkv.platform.rollout-mode: MULTI_TENANT → MULTI, SINGLE_TENANT → SINGLE.",
-      "defaultValue": "MULTI"
-    },
-    {
       "name": "iqkv.tenancy.default-tenant-key",
       "type": "java.lang.String",
       "description": "NanoID key of the default tenant used in SINGLE tenancy mode. Must be exactly 8 lowercase alphanumeric characters [a-z0-9]. Auto-generated if blank."

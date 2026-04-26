@@ -109,24 +109,24 @@ export $(grep -v '^#' .env.local | xargs)
 
 ## Environment Variables
 
-| Variable               | Default                      | Description                              |
-| ---------------------- |------------------------------| ---------------------------------------- |
-| `DB_HOST`              | `localhost`                  | PostgreSQL host                          |
+| Variable               | Default                      | Description                               |
+| ---------------------- | ---------------------------- | ----------------------------------------- |
+| `DB_HOST`              | `localhost`                  | PostgreSQL host                           |
 | `DB_PORT`              | `5432`                       | PostgreSQL port (host-mapped from Docker) |
-| `DB_NAME`              | `iam`                        | Database name                            |
-| `DB_USERNAME`          | `iam`                        | Database user                            |
-| `DB_PASSWORD`          | `iam`                        | Database password                        |
-| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                            |
-| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                       |
-| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                            |
-| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                        |
-| `MAIL_HOST`            | `localhost`                  | SMTP host                                |
-| `MAIL_PORT`            | `587`                        | SMTP port                                |
-| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                           |
-| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                        |
-| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                         |
-| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)  |
-| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token TTL (ISO-8601 duration) |
+| `DB_NAME`              | `iam`                        | Database name                             |
+| `DB_USERNAME`          | `iam`                        | Database user                             |
+| `DB_PASSWORD`          | `iam`                        | Database password                         |
+| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                             |
+| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                        |
+| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                             |
+| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                         |
+| `MAIL_HOST`            | `localhost`                  | SMTP host                                 |
+| `MAIL_PORT`            | `587`                        | SMTP port                                 |
+| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                            |
+| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                         |
+| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                          |
+| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)   |
+| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token TTL (ISO-8601 duration)  |
 
 Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
 
