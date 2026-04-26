@@ -17,18 +17,9 @@ public record TenancyConfigurationProperties(
     @NotBlank String schemaPrefix,
     @NotBlank String defaultSchema,
     @NotNull Duration provisioningTimeout,
-    TenancyMode mode,
     String defaultTenantKey,
     String defaultTenantName
 ) {
-
-  /**
-   * Defines the tenancy mode, which must match the platform rollout mode.
-   */
-  public enum TenancyMode {
-    MULTI,
-    SINGLE
-  }
 
   private static final Pattern NANOID_PATTERN = Pattern.compile("^[a-z0-9]{8}$");
 
@@ -49,30 +40,4 @@ public record TenancyConfigurationProperties(
     }
   }
 
-  /**
-   * Validates that tenancy mode matches the platform rollout mode.
-   *
-   * @param rolloutMode the validated platform rollout mode
-   * @throws InvalidPlatformModeException if modes are inconsistent
-   */
-  public void validateModeConsistency(final RolloutMode rolloutMode) {
-    if (mode == null) {
-      return; // Mode is optional; if not set, no consistency check needed
-    }
-
-    final boolean consistent = switch (rolloutMode) {
-      case MULTI_TENANT -> mode == TenancyMode.MULTI;
-      case SINGLE_TENANT -> mode == TenancyMode.SINGLE;
-    };
-
-    if (!consistent) {
-      throw new InvalidPlatformModeException(
-          String.format(
-              "Tenancy mode mismatch: iqkv.tenancy.mode=%s does not match iqkv.platform.rollout-mode=%s. "
-                  + "Expected iqkv.tenancy.mode=%s.",
-              mode,
-              rolloutMode,
-              rolloutMode == RolloutMode.MULTI_TENANT ? TenancyMode.MULTI : TenancyMode.SINGLE));
-    }
-  }
 }

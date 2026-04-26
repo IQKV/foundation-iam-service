@@ -100,10 +100,6 @@ iqkv:
     token-ttl: ${INVITATION_TOKEN_TTL:PT72H}
     reaper-interval: ${INVITATION_REAPER_INTERVAL:PT1H}
   tenancy:
-    # Tenancy mode: MULTI (default) or SINGLE (must match platform.rollout-mode)
-    # MULTI: Multi-tenant mode with per-tenant schema isolation
-    # SINGLE: Single-tenant mode with all users in one default tenant
-    mode: ${TENANCY_MODE:MULTI}
     # Default tenant key for SINGLE_TENANT mode (optional)
     # If not provided, will be resolved from database or auto-generated
     # Format: 8-character NanoID using alphabet [a-z0-9]

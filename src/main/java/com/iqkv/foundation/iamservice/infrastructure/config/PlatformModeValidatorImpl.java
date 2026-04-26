@@ -46,10 +46,6 @@ public class PlatformModeValidatorImpl implements PlatformModeValidator, Applica
 
     validatedMode = platformConfig.rolloutMode();
     log.info("Platform rollout mode validated successfully: {}", validatedMode);
-
-    // Validate tenancy mode consistency
-    tenancyConfig.validateModeConsistency(validatedMode);
-    log.info("Tenancy mode consistency validated successfully");
   }
 
   @Override
