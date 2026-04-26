@@ -8,9 +8,6 @@ spring:
     enabled: true
     contexts: "!demo"
 
-server:
-  shutdown: graceful
-
 springdoc:
   api-docs:
     enabled: false
@@ -40,15 +37,10 @@ iqkv:
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     from: ${MAIL_FROM}
-    from-name: ${MAIL_FROM_NAME:IQ Key Value}
-    reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:
       private-key-path: ${JWT_PRIVATE_KEY_PATH}
       public-key-path: ${JWT_PUBLIC_KEY_PATH}
-      issuer: ${JWT_ISSUER:foundation-iam-service}
-  liquibase:
-    contexts: "!demo"
   messaging:
     rabbitmq:
       enabled: true

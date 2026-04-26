@@ -18,16 +18,8 @@ spring:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
 
-
 iqkv:
-  platform:
-    rollout-mode: MULTI_TENANT
-  tenancy:
-    mode: MULTI
   liquibase:
-    system-change-log: db/changelog/system/db.changelog-master.xml
-    tenant-change-log: db/changelog/tenant/master.xml
-    contexts: demo
     tenant-runner-enabled: false  # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
   auth:
     security:

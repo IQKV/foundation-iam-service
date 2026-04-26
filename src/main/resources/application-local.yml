@@ -25,26 +25,12 @@ logging:
     org.mybatis: DEBUG
 
 iqkv:
-  db:
-    host: ${DB_HOST:localhost}
-    port: ${DB_PORT:5432}
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:iam}
-    password: ${RABBITMQ_PASSWORD:iam}
   mail:
-    host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
-  liquibase:
-    system-change-log: db/changelog/system/db.changelog-master.xml
-    tenant-change-log: db/changelog/tenant/master.xml
-    contexts: demo
   auth:
     jwt:
       expiry: PT30M
       refresh-expiry: P30D
-      issuer: ${JWT_ISSUER:foundation-iam-service}
     security:
       min-length: 6
   messaging:

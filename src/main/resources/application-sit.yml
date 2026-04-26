@@ -17,20 +17,11 @@ logging:
 iqkv:
   db:
     host: ${DB_HOST:postgres}
-    port: ${DB_PORT:5432}
-    name: ${DB_NAME:iam}
-    username: ${DB_USERNAME:iam}
-    password: ${DB_PASSWORD:iam}
   rabbitmq:
     host: ${RABBITMQ_HOST:rabbitmq}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:iam}
-    password: ${RABBITMQ_PASSWORD:iam}
   mail:
     host: ${MAIL_HOST:mailhog}
     port: ${MAIL_PORT:1025}
-  liquibase:
-    contexts: demo
   messaging:
     rabbitmq:
       enabled: true
