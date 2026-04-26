@@ -95,7 +95,7 @@ pnpm install
 cp .env.example .env.local
 # Edit .env.local — defaults work for local Docker setup
 
-# Start dependencies (PostgreSQL on :5433, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
+# Start dependencies (PostgreSQL on :5432, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
 docker compose up -d
 
 # Run the service (load .env.local first to activate the local Spring profile)
@@ -110,9 +110,9 @@ export $(grep -v '^#' .env.local | xargs)
 ## Environment Variables
 
 | Variable               | Default                      | Description                              |
-| ---------------------- | ---------------------------- | ---------------------------------------- |
+| ---------------------- |------------------------------| ---------------------------------------- |
 | `DB_HOST`              | `localhost`                  | PostgreSQL host                          |
-| `DB_PORT`              | `5433`                       | PostgreSQL port (host-mapped from Docker) |
+| `DB_PORT`              | `5432`                       | PostgreSQL port (host-mapped from Docker) |
 | `DB_NAME`              | `iam`                        | Database name                            |
 | `DB_USERNAME`          | `iam`                        | Database user                            |
 | `DB_PASSWORD`          | `iam`                        | Database password                        |

@@ -17,10 +17,10 @@ spring:
   liquibase:
     enabled: false
   mail:
-    host: ${iqkv.mail.host}
-    port: ${iqkv.mail.port}
-    username: ${iqkv.mail.username}
-    password: ${iqkv.mail.password}
+    host: ${iqkv.mail.host:localhost}
+    port: ${iqkv.mail.port:587}
+    username: ${iqkv.mail.username:dev}
+    password: ${iqkv.mail.password:dev}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -74,8 +74,8 @@ iqkv:
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    username: ${MAIL_USERNAME:dev}
+    password: ${MAIL_PASSWORD:dev}
     from: ${MAIL_FROM:noreply@iqkv.com}
     from-name: ${MAIL_FROM_NAME:IQ Key Value}
     reply-to: ${MAIL_REPLY_TO:}

@@ -27,7 +27,7 @@ logging:
 iqkv:
   db:
     host: ${DB_HOST:localhost}
-    port: ${DB_PORT:5433}
+    port: ${DB_PORT:5432}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
