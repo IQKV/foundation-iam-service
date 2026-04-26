@@ -54,56 +54,56 @@ Base path: `/api/v1/iam`
 
 ### Authentication — `/api/v1/iam/auth`
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/auth/signup` | public | Register user + create tenant (multi-tenant) or join default tenant (single-tenant) |
-| `POST` | `/auth/signin` | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair |
-| `POST` | `/auth/refresh` | public | Exchange refresh token for a new token pair |
-| `POST` | `/auth/signout` | JWT | Revoke current token (JTI denylist) |
-| `POST` | `/auth/signout-all` | JWT | Invalidate all sessions via `last_global_signout_at` |
-| `POST` | `/auth/validate` | JWT | Validate token and return user context (gateway introspection) |
+| Method | Path                | Auth                   | Description                                                                         |
+| ------ | ------------------- | ---------------------- | ----------------------------------------------------------------------------------- |
+| `POST` | `/auth/signup`      | public                 | Register user + create tenant (multi-tenant) or join default tenant (single-tenant) |
+| `POST` | `/auth/signin`      | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair                                  |
+| `POST` | `/auth/refresh`     | public                 | Exchange refresh token for a new token pair                                         |
+| `POST` | `/auth/signout`     | JWT                    | Revoke current token (JTI denylist)                                                 |
+| `POST` | `/auth/signout-all` | JWT                    | Invalidate all sessions via `last_global_signout_at`                                |
+| `POST` | `/auth/validate`    | JWT                    | Validate token and return user context (gateway introspection)                      |
 
 ### User — `/api/v1/iam/users`
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/users/me` | JWT + `X-Tenant-ID` | Get current user profile |
-| `PATCH` | `/users/me` | JWT + `X-Tenant-ID` | Update current user profile |
-| `DELETE` | `/users/me` | JWT + `X-Tenant-ID` | Remove current user's membership from tenant |
-| `POST` | `/users/tenants` | public (credential-gated) | Discover tenants for a user |
-| `POST` | `/users/email/verify` | public | Verify email address via one-time token |
-| `POST` | `/users/email/resend-verification` | public | Resend email verification |
-| `POST` | `/users/password/forgot` | public | Initiate password reset (rate-limited) |
-| `POST` | `/users/password/reset` | public | Complete password reset with token |
+| Method   | Path                               | Auth                      | Description                                  |
+| -------- | ---------------------------------- | ------------------------- | -------------------------------------------- |
+| `GET`    | `/users/me`                        | JWT + `X-Tenant-ID`       | Get current user profile                     |
+| `PATCH`  | `/users/me`                        | JWT + `X-Tenant-ID`       | Update current user profile                  |
+| `DELETE` | `/users/me`                        | JWT + `X-Tenant-ID`       | Remove current user's membership from tenant |
+| `POST`   | `/users/tenants`                   | public (credential-gated) | Discover tenants for a user                  |
+| `POST`   | `/users/email/verify`              | public                    | Verify email address via one-time token      |
+| `POST`   | `/users/email/resend-verification` | public                    | Resend email verification                    |
+| `POST`   | `/users/password/forgot`           | public                    | Initiate password reset (rate-limited)       |
+| `POST`   | `/users/password/reset`            | public                    | Complete password reset with token           |
 
 ### User Admin — `/api/v1/iam/admin/users`
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/admin/users` | JWT `ADMIN` | List users (paginated) |
-| `GET` | `/admin/users/{id}` | JWT `ADMIN` | Get user by UUID |
-| `POST` | `/admin/users` | JWT `ADMIN` | Create user with temporary password |
-| `PUT` | `/admin/users/{id}` | JWT `ADMIN` | Replace user (full update) |
-| `PATCH` | `/admin/users/{id}` | JWT `ADMIN` | Partially update user |
-| `DELETE` | `/admin/users/{id}` | JWT `ADMIN` | Delete user and all memberships |
+| Method   | Path                | Auth        | Description                         |
+| -------- | ------------------- | ----------- | ----------------------------------- |
+| `GET`    | `/admin/users`      | JWT `ADMIN` | List users (paginated)              |
+| `GET`    | `/admin/users/{id}` | JWT `ADMIN` | Get user by UUID                    |
+| `POST`   | `/admin/users`      | JWT `ADMIN` | Create user with temporary password |
+| `PUT`    | `/admin/users/{id}` | JWT `ADMIN` | Replace user (full update)          |
+| `PATCH`  | `/admin/users/{id}` | JWT `ADMIN` | Partially update user               |
+| `DELETE` | `/admin/users/{id}` | JWT `ADMIN` | Delete user and all memberships     |
 
 ### Tenant — `/api/v1/iam/tenants`
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/tenants/{tenantKey}` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Get tenant details |
-| `PATCH` | `/tenants/{tenantKey}/status` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Update tenant status |
-| `POST` | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Retry failed provisioning |
+| Method  | Path                                      | Auth                               | Description               |
+| ------- | ----------------------------------------- | ---------------------------------- | ------------------------- |
+| `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID` | Get tenant details        |
+| `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` + `X-Tenant-ID` | Update tenant status      |
+| `POST`  | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Retry failed provisioning |
 
 ### Invitations
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/tenants/{tenantKey}/invitations` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email |
-| `GET` | `/tenants/{tenantKey}/invitations` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation |
-| `GET` | `/invitations/{token}` | public | Preview invitation (tenant name, role, expiry) |
-| `POST` | `/invitations/{token}/accept` | public | Accept invitation; returns token pair |
+| Method   | Path                                    | Auth                                       | Description                                    |
+| -------- | --------------------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email                          |
+| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations                       |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation                              |
+| `GET`    | `/invitations/{token}`                  | public                                     | Preview invitation (tenant name, role, expiry) |
+| `POST`   | `/invitations/{token}/accept`           | public                                     | Accept invitation; returns token pair          |
 
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
@@ -152,27 +152,27 @@ docker compose up -d
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ROLLOUT_MODE` | `MULTI_TENANT` | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
-| `DB_HOST` | `localhost` | PostgreSQL host |
-| `DB_PORT` | `5432` | PostgreSQL port |
-| `DB_NAME` | `iam` | Database name |
-| `DB_USERNAME` | `iam` | Database user |
-| `DB_PASSWORD` | `iam` | Database password |
-| `RABBITMQ_HOST` | `localhost` | RabbitMQ host |
-| `RABBITMQ_PORT` | `5672` | RabbitMQ AMQP port |
-| `RABBITMQ_USERNAME` | `iam` | RabbitMQ user |
-| `RABBITMQ_PASSWORD` | `iam` | RabbitMQ password |
-| `MAIL_HOST` | `localhost` | SMTP host |
-| `MAIL_PORT` | `587` | SMTP port |
-| `MAIL_FROM` | `noreply@iqkv.com` | Sender address |
-| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key |
-| `JWT_PUBLIC_KEY_PATH` | `classpath:keys/public.pem` | RS256 public key |
-| `APP_BASE_URL` | `http://localhost:3000` | Frontend base URL (used in email links) |
-| `DEFAULT_TENANT_KEY` | _(empty)_ | Default tenant key for `SINGLE_TENANT` mode |
-| `DEFAULT_TENANT_NAME` | `Default Organization` | Default tenant display name |
-| `INVITATION_TOKEN_TTL` | `PT72H` | Invitation token lifetime |
+| Variable               | Default                      | Description                                      |
+| ---------------------- | ---------------------------- | ------------------------------------------------ |
+| `ROLLOUT_MODE`         | `MULTI_TENANT`               | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
+| `DB_HOST`              | `localhost`                  | PostgreSQL host                                  |
+| `DB_PORT`              | `5432`                       | PostgreSQL port                                  |
+| `DB_NAME`              | `iam`                        | Database name                                    |
+| `DB_USERNAME`          | `iam`                        | Database user                                    |
+| `DB_PASSWORD`          | `iam`                        | Database password                                |
+| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                                    |
+| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                               |
+| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                                    |
+| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                                |
+| `MAIL_HOST`            | `localhost`                  | SMTP host                                        |
+| `MAIL_PORT`            | `587`                        | SMTP port                                        |
+| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                                   |
+| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                                |
+| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                                 |
+| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
+| `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
+| `DEFAULT_TENANT_NAME`  | `Default Organization`       | Default tenant display name                      |
+| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime                        |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values for each environment.
 
@@ -207,13 +207,13 @@ docker compose -f compose.container.yaml up -d
 
 ## Monitoring
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /actuator/health` | Liveness + readiness probes; includes `PlatformModeHealthIndicator` |
-| `GET /actuator/info` | Build info + canonical `platform.rollout-mode` |
-| `GET /actuator/metrics` | Application metrics |
-| `GET /actuator/prometheus` | Prometheus scrape endpoint |
-| `GET /swagger-ui.html` | API documentation |
+| Endpoint                   | Description                                                         |
+| -------------------------- | ------------------------------------------------------------------- |
+| `GET /actuator/health`     | Liveness + readiness probes; includes `PlatformModeHealthIndicator` |
+| `GET /actuator/info`       | Build info + canonical `platform.rollout-mode`                      |
+| `GET /actuator/metrics`    | Application metrics                                                 |
+| `GET /actuator/prometheus` | Prometheus scrape endpoint                                          |
+| `GET /swagger-ui.html`     | API documentation                                                   |
 
 ## Project Structure
 
