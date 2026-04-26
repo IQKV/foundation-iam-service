@@ -368,7 +368,7 @@ public class InvitationServiceImpl implements InvitationService {
     // New user path — firstName and lastName are required
     if (request.firstName() == null || request.firstName().isBlank()
         || request.lastName() == null || request.lastName().isBlank()) {
-      throw new com.iqkv.foundation.iamservice.shared.exception.UserRegistrationException(
+      throw new com.iqkv.foundation.iamservice.shared.exception.UserSignupException(
           "firstName and lastName are required for new users");
     }
 

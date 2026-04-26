@@ -16,13 +16,13 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-public class UserRegistrationException extends RuntimeException {
+public class UserSignupException extends RuntimeException {
 
-  public UserRegistrationException(final String message) {
+  public UserSignupException(final String message) {
     super(message);
   }
 
-  public UserRegistrationException(final String message, final Throwable cause) {
+  public UserSignupException(final String message, final Throwable cause) {
     super(message, cause);
   }
 }

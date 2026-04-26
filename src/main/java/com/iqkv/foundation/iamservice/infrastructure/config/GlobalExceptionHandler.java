@@ -62,7 +62,7 @@ import com.iqkv.foundation.iamservice.shared.exception.TokenExpiredException;
 import com.iqkv.foundation.iamservice.shared.exception.TokenRevokedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.UserRegistrationException;
+import com.iqkv.foundation.iamservice.shared.exception.UserSignupException;
 import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitException;
 
 @RestControllerAdvice
@@ -385,11 +385,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
   }
 
-  @ExceptionHandler(UserRegistrationException.class)
-  public ResponseEntity<ProblemDetail> handleUserRegistration(final UserRegistrationException ex,
+  @ExceptionHandler(UserSignupException.class)
+  public ResponseEntity<ProblemDetail> handleUserSignup(final UserSignupException ex,
                                                               final HttpServletRequest request,
                                                               final Locale locale) {
-    log.warn("User registration error: {}", ex.getMessage());
+    log.warn("User signup error: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.registration-error", locale),
         409,
