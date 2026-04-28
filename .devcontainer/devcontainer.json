@@ -1,14 +1,14 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/java
 {
-    "name": "SampleWebmvcServicenameApplication",
+    "name": "IamServiceApplication",
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
             // Update the VARIANT arg to pick a Java version: 17, 19
             // Append -bullseye or -buster to pin to an OS version.
             // Use the -bullseye variants on local arm64/Apple Silicon.
-            "VARIANT": "21-bookworm",
+            "VARIANT": "25-bookworm",
             // Options
             "INSTALL_MAVEN": "true",
             // "INSTALL_GRADLE": "false",

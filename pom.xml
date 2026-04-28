@@ -189,7 +189,7 @@
             </activation>
         </profile>
         <profile>
-            <id>dev</id>
+            <id>local</id>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>

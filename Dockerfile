@@ -1,5 +1,5 @@
 # Multi-stage build for IAM Service with optimized caching
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:25-jdk-alpine AS builder
 
 # Install Maven for build optimization
 RUN apk add --no-cache maven
@@ -23,7 +23,7 @@ RUN mvn clean package -DskipTests -B && \
     java -Djarmode=tools -jar app.jar extract --layers --destination dependency
 
 # Production runtime stage with security hardening
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 # Security: Install only essential packages
 RUN apk add --no-cache curl tzdata && \

@@ -156,7 +156,7 @@ docker build -t iqkv/foundation-iam-service:latest .
 docker compose -f compose.container.yaml up -d
 ```
 
-The Dockerfile uses a multi-stage build: Maven compiles in `eclipse-temurin:21-jdk-alpine`, the runtime stage uses `eclipse-temurin:21-jre-alpine` with a non-root `appuser` and layered JAR extraction for optimal cache reuse.
+The Dockerfile uses a multi-stage build: Maven compiles in `eclipse-temurin:25-jdk-alpine`, the runtime stage uses `eclipse-temurin:25-jre-alpine` with a non-root `appuser` and layered JAR extraction for optimal cache reuse.
 
 ## Monitoring
 
