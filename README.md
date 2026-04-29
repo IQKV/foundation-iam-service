@@ -38,25 +38,68 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 
 Base path: `/api/v1/iam`
 
-| Method   | Path                                      | Auth                                       | Description                                |
-| -------- | ----------------------------------------- | ------------------------------------------ | ------------------------------------------ |
-| `POST`   | `/auth/signup`                            | public                                     | Register user and create tenant            |
-| `POST`   | `/auth/signin`                            | `X-Tenant-ID`                              | Sign in, receive token pair                |
-| `POST`   | `/auth/refresh`                           | `X-Tenant-ID`                              | Rotate access + refresh tokens             |
-| `POST`   | `/auth/signout`                           | JWT                                        | Revoke current session                     |
-| `POST`   | `/auth/signout-all`                       | JWT                                        | Revoke all sessions globally               |
-| `POST`   | `/auth/validate`                          | JWT                                        | Validate token for gateway introspection   |
-| `POST`   | `/users/tenants`                          | public                                     | Discover tenants by credentials            |
-| `GET`    | `/users/me`                               | JWT                                        | Get own profile                            |
-| `PATCH`  | `/users/me`                               | JWT                                        | Update own profile                         |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                         | Get tenant status                          |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                         | Transition tenant status                   |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                         | Retry failed provisioning                  |
-| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Send invitation email                      |
-| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | List pending invitations                   |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation                |
-| `GET`    | `/invitations/{token}`                    | public                                     | Preview invitation — token resolves tenant |
-| `POST`   | `/invitations/{token}/accept`             | public                                     | Accept invitation — token resolves tenant  |
+### Authentication
+
+| Method | Path                | Auth          | Description                              |
+| ------ | ------------------- | ------------- | ---------------------------------------- |
+| `POST` | `/auth/signup`      | public        | Register user and create tenant          |
+| `POST` | `/auth/signin`      | `X-Tenant-ID` | Sign in, receive token pair              |
+| `POST` | `/auth/refresh`     | `X-Tenant-ID` | Rotate access + refresh tokens           |
+| `POST` | `/auth/signout`     | JWT           | Revoke current session                   |
+| `POST` | `/auth/signout-all` | JWT           | Revoke all sessions globally             |
+| `POST` | `/auth/validate`    | JWT           | Validate token for gateway introspection |
+
+### User Profile
+
+| Method   | Path            | Auth   | Description                              |
+| -------- | --------------- | ------ | ---------------------------------------- |
+| `GET`    | `/users/me`     | JWT    | Get own profile                          |
+| `PATCH`  | `/users/me`     | JWT    | Update own profile                       |
+| `DELETE` | `/users/me`     | JWT    | Remove own membership from current tenant|
+| `POST`   | `/users/tenants`| public | Discover tenants by credentials          |
+
+### Password Reset
+
+| Method | Path                          | Auth   | Description                                    |
+| ------ | ----------------------------- | ------ | ---------------------------------------------- |
+| `POST` | `/users/password/forgot`      | public | Initiate password reset (rate-limited)         |
+| `POST` | `/users/password/reset`       | public | Complete password reset with token             |
+
+### Email Verification
+
+| Method | Path                              | Auth   | Description                                    |
+| ------ | --------------------------------- | ------ | ---------------------------------------------- |
+| `POST` | `/users/email/verify`             | public | Verify email address with one-time token       |
+| `POST` | `/users/email/resend-verification`| public | Resend verification email (rate-limited)       |
+
+### Tenant Management
+
+| Method   | Path                                      | Auth                                       | Description                    |
+| -------- | ----------------------------------------- | ------------------------------------------ | ------------------------------ |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                         | Get tenant status              |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                         | Transition tenant status       |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                         | Retry failed provisioning      |
+| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
+| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
+
+### Invitations (public)
+
+| Method | Path                       | Auth   | Description                                |
+| ------ | -------------------------- | ------ | ------------------------------------------ |
+| `GET`  | `/invitations/{token}`     | public | Preview invitation — token resolves tenant |
+| `POST` | `/invitations/{token}/accept` | public | Accept invitation — token resolves tenant |
+
+### Admin
+
+| Method   | Path                  | Auth  | Description                                  |
+| -------- | --------------------- | ----- | -------------------------------------------- |
+| `GET`    | `/admin/users`        | JWT   | List all users (paginated)                   |
+| `GET`    | `/admin/users/{id}`   | JWT   | Get user by ID                               |
+| `POST`   | `/admin/users`        | JWT   | Create user                                  |
+| `PUT`    | `/admin/users/{id}`   | JWT   | Replace user (full update)                   |
+| `PATCH`  | `/admin/users/{id}`   | JWT   | Partially update user                        |
+| `DELETE` | `/admin/users/{id}`   | JWT   | Delete user and all memberships              |
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 

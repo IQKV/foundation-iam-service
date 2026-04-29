@@ -1,45 +1,21 @@
 # Foundation IAM Service 🔐
 
-<!-- TEMPLATE: Copy relevant sections into README.md and replace placeholders. Remove guidance blocks when done. -->
-
-<details>
-  <summary><strong>How to use this template (click to expand)</strong></summary>
-
-1. Rename the title to your service name and add a logo if desired.
-2. Add badges (build, license) under the title.
-3. Fill each section with your actual service content.
-4. Update the API table to reflect actual endpoints and auth requirements.
-5. Update the environment variables table to match your `application.yml` bindings.
-6. Update the project structure tree if your bounded contexts differ.
-7. Remove this guidance block after customizing.
-
-</details>
-
-- Add your service logo.
-- Write a short introduction — what the service does and which platform it belongs to.
-- If you are using badges, add them here.
-
-<details>
-  <summary><strong>Badge examples (optional)</strong></summary>
-
-- Build: `![CI](https://img.shields.io/github/actions/workflow/status/ORG/REPO/build-nodejs-project.yml?label=CI)`
-- License: `![License](https://img.shields.io/github/license/ORG/REPO)`
-- Java: `![Java](https://img.shields.io/badge/java-25-blue)`
-- Spring Boot: `![Spring Boot](https://img.shields.io/badge/spring--boot-3.x-brightgreen)`
-
-</details>
+Identity and Access Management microservice for the IQKV platform. Owns user accounts, tenant lifecycle, memberships, and RS256 token issuance. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
 
 ## About
 
-The Foundation IAM Service is the Identity and Access Management backbone of the IQKV platform. It owns user accounts, tenant lifecycle, memberships, and token issuance. Key responsibilities:
+The IAM service is the identity backbone of the platform:
 
-- Issues and validates RS256 JWT access tokens (15 min) and refresh tokens (7 days)
-- Manages multi-tenant and single-tenant rollout modes via `ROLLOUT_MODE`
-- Enforces per-tenant membership authorities: `TENANT_OWNER`, `ADMIN`, `MEMBER`
-- Handles signup, signin, signout, token refresh, and global session revocation
-- Provides invitation-based onboarding with token-gated accept flows
-- Manages password reset and email verification flows
-- Publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service
+- **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
+- **Signup by invitation** — existing `TENANT_OWNER` or `ADMIN` sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
+- **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
+- **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
+- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
+- **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
+- **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
+- **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
+- **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 
 ## Quick Links
 
@@ -107,16 +83,18 @@ Base path: `/api/v1/iam`
 
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
+JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
+
 ## Tech Stack
 
-- Java 25 / Spring Boot 3.x
-- MyBatis 3.x + PostgreSQL
+- Java 25 / Spring Boot 4.0
+- MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase (system + per-tenant schema migrations)
 - RabbitMQ (async tenant provisioning events)
-- JJWT RS256 (token issuance and validation)
-- ShedLock (distributed scheduled cleanup jobs)
-- Micrometer + Prometheus
+- JJWT 0.13 RS256 (token issuance and validation)
+- ShedLock 7.x (distributed scheduled cleanup jobs)
 - Thymeleaf (transactional email templates)
+- Micrometer + Prometheus
 - springdoc-openapi (Swagger UI)
 
 ## Prerequisites
@@ -130,24 +108,26 @@ Base path: `/api/v1/iam`
 
 ```bash
 # Clone the repository
-git clone https://github.com/ORG/REPO.git
-cd REPO
+git clone https://github.com/IQKV/foundation-iam-service.git
+cd foundation-iam-service
 
 # Install git hooks
 pnpm install
 
 # Copy environment variables
 cp .env.example .env.local
-# Edit .env.local with your local values
+# Edit .env.local — defaults work for local Docker setup
 
-# Start dependencies (PostgreSQL, RabbitMQ, MailHog)
+# Start dependencies (PostgreSQL on :5432, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
 docker compose up -d
 
 # Run the service
+export $(grep -v '^#' .env.local | xargs)
 ./mvnw spring-boot:run -Pdev
 # → API:      http://localhost:8080
 # → Actuator: http://localhost:8081/actuator/health
 # → Swagger:  http://localhost:8080/swagger-ui.html
+# → MailHog:  http://localhost:8025
 ```
 
 ## Environment Variables
@@ -172,9 +152,9 @@ docker compose up -d
 | `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
 | `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
 | `DEFAULT_TENANT_NAME`  | `Default Organization`       | Default tenant display name                      |
-| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime                        |
+| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
 
-> Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values for each environment.
+> Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
 
 ## Maven Commands
 
@@ -199,7 +179,7 @@ docker compose up -d
 
 ```bash
 # Build image
-docker build -t ORG/REPO:latest .
+docker build -t iqkv/foundation-iam-service:latest .
 
 # Run full stack (service + dependencies)
 docker compose -f compose.container.yaml up -d
@@ -207,13 +187,14 @@ docker compose -f compose.container.yaml up -d
 
 ## Monitoring
 
-| Endpoint                   | Description                                                         |
-| -------------------------- | ------------------------------------------------------------------- |
-| `GET /actuator/health`     | Liveness + readiness probes; includes `PlatformModeHealthIndicator` |
-| `GET /actuator/info`       | Build info + canonical `platform.rollout-mode`                      |
-| `GET /actuator/metrics`    | Application metrics                                                 |
-| `GET /actuator/prometheus` | Prometheus scrape endpoint                                          |
-| `GET /swagger-ui.html`     | API documentation                                                   |
+| Endpoint                     | Description                                                         |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `GET /actuator/health`       | Liveness + readiness probes; includes `PlatformModeHealthIndicator` |
+| `GET /actuator/info`         | Build info + canonical `platform.rollout-mode`                      |
+| `GET /actuator/metrics`      | Application metrics                                                 |
+| `GET /actuator/prometheus`   | Prometheus scrape endpoint                                          |
+| `GET /swagger-ui.html`       | API documentation                                                   |
+| `GET /.well-known/jwks.json` | Public JWK Set for JWT validation                                   |
 
 ## Project Structure
 
@@ -226,7 +207,7 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── lockout/          # Brute-force login lockout per identity
 ├── membership/       # TenantMembership, authorities (TENANT_OWNER, ADMIN, MEMBER)
 ├── passwordreset/    # Forgot/reset password flow + reaper job
-├── security/         # JWT authentication filter, claim names
+├── security/         # JWT authentication filter, claim names, JWKS endpoint
 ├── signup/           # SignupStrategy (multi-tenant / single-tenant)
 ├── tenant/           # Tenant lifecycle, provisioning, bootstrap strategies
 ├── tenancy/          # MyBatis schema interceptor, TenantContext, Liquibase runner
@@ -235,22 +216,13 @@ src/main/java/com/iqkv/foundation/iamservice/
 └── infrastructure/   # Spring config, security, persistence, messaging, metrics
 ```
 
----
+## License
 
-<details>
-  <summary><strong>✅ Pre-publish checklist (remove in final README)</strong></summary>
+This project is licensed under the Apache License. See the [LICENSE](LICENSE) file for details.
 
-- [ ] Title updated and logo added
-- [ ] Badges added (CI, license)
-- [ ] About section completed
-- [ ] API table reflects actual endpoints and auth requirements
-- [ ] Tech stack updated (remove unused entries, add missing ones)
-- [ ] Environment variables table matches `application.yml` bindings
-- [ ] Project structure tree updated to match actual packages
-- [ ] Links verified (docs, external resources)
-- [ ] Guidance blocks removed before publishing
+## Contributing
 
-</details>
+Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of Conduct](.github/CODE_OF_CONDUCT.md).
 
 ---
 
@@ -268,4 +240,4 @@ src/main/java/com/iqkv/foundation/iamservice/
 - **GitHub Integration**: Issue templates, labels, Dependabot, and CI workflows
 - **Quality Tools**: Checkstyle, JaCoCo (60% gate), ArchUnit, commit convention enforcement
 
-> See [AGENTS.md](AGENTS.md) for detailed project structure, DDD patterns, and AI agent guidelines.
+> See [AGENTS.md](AGENTS.md) for repository structure, DDD patterns, and agent guidelines.
