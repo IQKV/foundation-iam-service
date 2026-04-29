@@ -25,7 +25,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "iqkv.invitation")
 public record InvitationConfigurationProperties(
-    /** How long an invitation token remains valid. Default: 72 hours. */
+    // How long an invitation token remains valid. Default: 72 hours.
     @NotNull Duration tokenTtl
 ) {
 }

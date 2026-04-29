@@ -16,7 +16,6 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
-import jakarta.validation.Validator;
 import java.util.Locale;
 
 import org.springframework.context.MessageSource;
@@ -62,7 +61,7 @@ public class MessageSourceConfig implements WebMvcConfigurer {
   }
 
   /**
-   * Exposes the validator as the standard {@link Validator} bean used by Spring MVC.
+   * Exposes the validator as the standard {@link jakarta.validation.Validator} bean used by Spring MVC.
    */
   @Override
   public org.springframework.validation.Validator getValidator() {
