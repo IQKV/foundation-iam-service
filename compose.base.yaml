@@ -80,11 +80,11 @@ services:
       context: .
       dockerfile: ./Dockerfile
       target: builder
-    image: iqkv/foundation-iam-service:dev
+    image: iqkv/foundation-iam-service:local
     container_name: foundation-iam-service-dev
     environment:
       # Spring Configuration
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: local
       SPRING_APPLICATION_NAME: foundation-iam-service
 
       # Database Configuration
