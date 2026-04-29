@@ -21,16 +21,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -55,8 +54,8 @@ public class TenantServiceImpl implements TenantService {
   private final UserMapper userMapper;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
-                            final MessagingService messagingService,
-                            final UserMapper userMapper) {
+                           final MessagingService messagingService,
+                           final UserMapper userMapper) {
     this.tenantMapper = tenantMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;

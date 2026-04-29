@@ -27,7 +27,8 @@ public class NotificationEvent {
   private Map<String, Object> payload;
   private Instant occurredAt;
 
-  public NotificationEvent() {}
+  public NotificationEvent() {
+  }
 
   public NotificationEvent(final String recipientEmail, final String locale,
                            final NotificationEventType type, final Map<String, Object> payload,
@@ -39,18 +40,43 @@ public class NotificationEvent {
     this.occurredAt = occurredAt;
   }
 
-  public String getRecipientEmail() { return recipientEmail; }
-  public void setRecipientEmail(final String recipientEmail) { this.recipientEmail = recipientEmail; }
+  public String getRecipientEmail() {
+    return recipientEmail;
+  }
 
-  public String getLocale() { return locale; }
-  public void setLocale(final String locale) { this.locale = locale; }
+  public void setRecipientEmail(final String recipientEmail) {
+    this.recipientEmail = recipientEmail;
+  }
 
-  public NotificationEventType getType() { return type; }
-  public void setType(final NotificationEventType type) { this.type = type; }
+  public String getLocale() {
+    return locale;
+  }
 
-  public Map<String, Object> getPayload() { return payload; }
-  public void setPayload(final Map<String, Object> payload) { this.payload = payload; }
+  public void setLocale(final String locale) {
+    this.locale = locale;
+  }
 
-  public Instant getOccurredAt() { return occurredAt; }
-  public void setOccurredAt(final Instant occurredAt) { this.occurredAt = occurredAt; }
+  public NotificationEventType getType() {
+    return type;
+  }
+
+  public void setType(final NotificationEventType type) {
+    this.type = type;
+  }
+
+  public Map<String, Object> getPayload() {
+    return payload;
+  }
+
+  public void setPayload(final Map<String, Object> payload) {
+    this.payload = payload;
+  }
+
+  public Instant getOccurredAt() {
+    return occurredAt;
+  }
+
+  public void setOccurredAt(final Instant occurredAt) {
+    this.occurredAt = occurredAt;
+  }
 }

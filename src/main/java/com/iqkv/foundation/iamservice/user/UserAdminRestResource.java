@@ -16,13 +16,13 @@
 
 package com.iqkv.foundation.iamservice.user;
 
-import java.net.URI;
-import java.util.UUID;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.net.URI;
+import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -44,8 +44,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/admin/users")
@@ -88,8 +86,8 @@ public class UserAdminRestResource {
   @Operation(summary = "Create user", description = "Creates a new user with a random temporary password. The user should reset their password on first login.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "User created",
-          headers = @Header(name = "Location", description = "URL of the created user",
-              schema = @Schema(type = "string", format = "uri"))),
+                   headers = @Header(name = "Location", description = "URL of the created user",
+                                     schema = @Schema(type = "string", format = "uri"))),
       @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
       @ApiResponse(responseCode = "409", description = "Email already in use", content = @Content)
   })

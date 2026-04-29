@@ -16,37 +16,23 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.springframework.context.MessageSource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
-import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
-import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenSignatureException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
+import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
+import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
@@ -64,6 +50,19 @@ import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserSignupException;
 import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -387,8 +386,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(UserSignupException.class)
   public ResponseEntity<ProblemDetail> handleUserSignup(final UserSignupException ex,
-                                                              final HttpServletRequest request,
-                                                              final Locale locale) {
+                                                        final HttpServletRequest request,
+                                                        final Locale locale) {
     log.warn("User signup error: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.registration-error", locale),

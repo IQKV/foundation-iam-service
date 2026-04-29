@@ -16,13 +16,13 @@
 
 package com.iqkv.foundation.iamservice.tenancy;
 
-import java.io.IOException;
-
-import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -80,12 +80,12 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
     }
 
     return ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signup"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
   }
 
   private String resolveTenantId(final HttpServletRequest request) {

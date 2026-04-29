@@ -32,60 +32,71 @@
 
 package com.iqkv.foundation.iamservice.authentication.dto;
 
-import java.util.List;
-import java.util.UUID;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.UUID;
 
 public final class AuthenticationDtos {
 
-  private AuthenticationDtos() {}
+  private AuthenticationDtos() {
+  }
 
   public record SignInRequest(
       @Email @NotBlank String email,
-      @NotBlank String password) {}
+      @NotBlank String password) {
+  }
 
   public record SignInResponse(
       String accessToken,
       String refreshToken,
-      String tenantKey) {}
+      String tenantKey) {
+  }
 
   public record TokenResponse(
       String accessToken,
       String refreshToken,
-      String tenantKey) {}
+      String tenantKey) {
+  }
 
   public record RefreshTokenRequest(
-      @NotBlank String refreshToken) {}
+      @NotBlank String refreshToken) {
+  }
 
   public record ValidateTokenResponse(
       UUID userId,
       String email,
       String tenantId,
-      List<String> authorities) {}
+      List<String> authorities) {
+  }
 
   public record TenantDiscoveryRequest(
       @Email @NotBlank String email,
-      @NotBlank String password) {}
+      @NotBlank String password) {
+  }
 
   public record TenantMembershipSummary(
       String tenantKey,
       String tenantName,
       String membershipStatus,
-      List<String> authorities) {}
+      List<String> authorities) {
+  }
 
   public record VerifyEmailRequest(
-      @NotBlank @Size(min = 64, max = 64) String token) {}
+      @NotBlank @Size(min = 64, max = 64) String token) {
+  }
 
   public record ResendVerificationRequest(
-      @Email @NotBlank String email) {}
+      @Email @NotBlank String email) {
+  }
 
   public record ForgotPasswordRequest(
-      @Email @NotBlank String email) {}
+      @Email @NotBlank String email) {
+  }
 
   public record ResetPasswordRequest(
       @NotBlank @Size(min = 64, max = 64) String token,
-      @Size(min = 8, max = 128) String newPassword) {}
+      @Size(min = 8, max = 128) String newPassword) {
+  }
 }

@@ -35,32 +35,32 @@ public class RabbitMQConfig {
   // Shared exchange (all services publish here)
   // -------------------------------------------------------------------------
   public static final String EVENTS_EXCHANGE = "iqkv.events";
-  public static final String DLX_EXCHANGE    = "iqkv.dlx";
-  public static final String DLQ             = "iqkv.dlq";
+  public static final String DLX_EXCHANGE = "iqkv.dlx";
+  public static final String DLQ = "iqkv.dlq";
 
   // -------------------------------------------------------------------------
   // IAM queue names
   // -------------------------------------------------------------------------
-  public static final String USER_EVENTS_QUEUE         = "iqkv.iam.user.events";
-  public static final String NOTIFICATIONS_QUEUE       = "iqkv.iam.notifications";
+  public static final String USER_EVENTS_QUEUE = "iqkv.iam.user.events";
+  public static final String NOTIFICATIONS_QUEUE = "iqkv.iam.notifications";
   public static final String TENANT_PROVISIONING_QUEUE = "iqkv.iam.tenant.provisioning";
   public static final String SUBSCRIPTION_EVENTS_QUEUE = "iqkv.iam.subscription.events";
 
   // -------------------------------------------------------------------------
   // Routing keys — domain events (shared across services)
   // -------------------------------------------------------------------------
-  public static final String ROUTING_TENANT_CREATED             = "tenant.created";
-  public static final String ROUTING_TENANT_PROVISIONED         = "tenant.provisioned";
+  public static final String ROUTING_TENANT_CREATED = "tenant.created";
+  public static final String ROUTING_TENANT_PROVISIONED = "tenant.provisioned";
   public static final String ROUTING_TENANT_PROVISIONING_FAILED = "tenant.provisioning_failed";
-  public static final String ROUTING_TENANT_UPDATED             = "tenant.updated";
-  public static final String ROUTING_TENANT_DELETED             = "tenant.deleted";
-  public static final String ROUTING_TENANT_SUSPENDED           = "tenant.suspended";
-  public static final String ROUTING_USER_CREATED               = "user.created";
-  public static final String ROUTING_USER_UPDATED               = "user.updated";
-  public static final String ROUTING_USER_DELETED               = "user.deleted";
-  public static final String ROUTING_USER_REMOVED               = "user.removed";
-  public static final String ROUTING_USER_INVITED               = "user.invited";
-  public static final String ROUTING_SUBSCRIPTION_CANCELLED     = "subscription.cancelled";
+  public static final String ROUTING_TENANT_UPDATED = "tenant.updated";
+  public static final String ROUTING_TENANT_DELETED = "tenant.deleted";
+  public static final String ROUTING_TENANT_SUSPENDED = "tenant.suspended";
+  public static final String ROUTING_USER_CREATED = "user.created";
+  public static final String ROUTING_USER_UPDATED = "user.updated";
+  public static final String ROUTING_USER_DELETED = "user.deleted";
+  public static final String ROUTING_USER_REMOVED = "user.removed";
+  public static final String ROUTING_USER_INVITED = "user.invited";
+  public static final String ROUTING_SUBSCRIPTION_CANCELLED = "subscription.cancelled";
 
   // -------------------------------------------------------------------------
   // Routing keys — IAM notification emails (scoped to avoid conflicts)

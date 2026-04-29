@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when the password reset request rate limit is exceeded. Maps to HTTP 429. */
+/**
+ * Thrown when the password reset request rate limit is exceeded. Maps to HTTP 429.
+ */
 public class PasswordResetRateLimitException extends RuntimeException {
 
   private final long retryAfterSeconds;

@@ -25,16 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import com.iqkv.foundation.iamservice.denylist.TokenDenylistService;
 import com.iqkv.foundation.iamservice.email.EmailVerificationToken;
@@ -56,11 +46,20 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.TokenRevokedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitException;
+import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
-import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional

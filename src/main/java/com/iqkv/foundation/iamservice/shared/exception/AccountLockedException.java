@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when an account is temporarily locked due to too many failed login attempts. Maps to HTTP 403. */
+/**
+ * Thrown when an account is temporarily locked due to too many failed login attempts. Maps to HTTP 403.
+ */
 public class AccountLockedException extends RuntimeException {
 
   public AccountLockedException() {

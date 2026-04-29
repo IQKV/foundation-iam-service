@@ -20,14 +20,13 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.iqkv.foundation.iamservice.infrastructure.config.TenancyConfigurationProperties;
-import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 
 @Component
 public class StuckTenantReaperJob {
@@ -39,8 +38,8 @@ public class StuckTenantReaperJob {
   private final MessagingService messagingService;
 
   public StuckTenantReaperJob(final TenantMapper tenantMapper,
-                               final TenancyConfigurationProperties tenancyProps,
-                               final MessagingService messagingService) {
+                              final TenancyConfigurationProperties tenancyProps,
+                              final MessagingService messagingService) {
     this.tenantMapper = tenantMapper;
     this.tenancyProps = tenancyProps;
     this.messagingService = messagingService;
@@ -48,7 +47,7 @@ public class StuckTenantReaperJob {
 
   @Scheduled(cron = "0 */5 * * * *")
   @SchedulerLock(name = "StuckTenantReaperJob.reapStuckTenants",
-      lockAtMostFor = "PT4M", lockAtLeastFor = "PT1M")
+                 lockAtMostFor = "PT4M", lockAtLeastFor = "PT1M")
   public void reapStuckTenants() {
     final Instant cutoff = Instant.now().minus(tenancyProps.provisioningTimeout());
     final List<Tenant> stuckTenants = tenantMapper.findStuckProvisioning(cutoff);

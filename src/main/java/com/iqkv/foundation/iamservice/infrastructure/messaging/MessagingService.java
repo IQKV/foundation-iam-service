@@ -40,7 +40,7 @@ public class MessagingService {
   }
 
   public void publishTenantCreated(final String tenantKey, final String tenantName,
-                                    final String ownerEmail, final String ownerFirstName) {
+                                   final String ownerEmail, final String ownerFirstName) {
     final var event = new TenantEvent(tenantKey, tenantName, ownerEmail, ownerFirstName,
         TenantEvent.EventType.TENANT_CREATED, Instant.now());
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_TENANT_CREATED, event);

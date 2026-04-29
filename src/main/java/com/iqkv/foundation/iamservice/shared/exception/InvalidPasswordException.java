@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when a supplied password does not satisfy the password policy. Maps to HTTP 400. */
+/**
+ * Thrown when a supplied password does not satisfy the password policy. Maps to HTTP 400.
+ */
 public class InvalidPasswordException extends RuntimeException {
 
   public InvalidPasswordException(final String message) {

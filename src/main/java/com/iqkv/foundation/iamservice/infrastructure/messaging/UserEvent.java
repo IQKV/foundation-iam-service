@@ -33,7 +33,8 @@ public class UserEvent {
   private EventType eventType;
   private Instant occurredAt;
 
-  public UserEvent() {}
+  public UserEvent() {
+  }
 
   public UserEvent(final UUID userId, final String tenantId, final String email,
                    final EventType eventType, final Instant occurredAt) {
@@ -44,18 +45,43 @@ public class UserEvent {
     this.occurredAt = occurredAt;
   }
 
-  public UUID getUserId() { return userId; }
-  public void setUserId(final UUID userId) { this.userId = userId; }
+  public UUID getUserId() {
+    return userId;
+  }
 
-  public String getTenantId() { return tenantId; }
-  public void setTenantId(final String tenantId) { this.tenantId = tenantId; }
+  public void setUserId(final UUID userId) {
+    this.userId = userId;
+  }
 
-  public String getEmail() { return email; }
-  public void setEmail(final String email) { this.email = email; }
+  public String getTenantId() {
+    return tenantId;
+  }
 
-  public EventType getEventType() { return eventType; }
-  public void setEventType(final EventType eventType) { this.eventType = eventType; }
+  public void setTenantId(final String tenantId) {
+    this.tenantId = tenantId;
+  }
 
-  public Instant getOccurredAt() { return occurredAt; }
-  public void setOccurredAt(final Instant occurredAt) { this.occurredAt = occurredAt; }
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(final String email) {
+    this.email = email;
+  }
+
+  public EventType getEventType() {
+    return eventType;
+  }
+
+  public void setEventType(final EventType eventType) {
+    this.eventType = eventType;
+  }
+
+  public Instant getOccurredAt() {
+    return occurredAt;
+  }
+
+  public void setOccurredAt(final Instant occurredAt) {
+    this.occurredAt = occurredAt;
+  }
 }

@@ -17,4 +17,5 @@
 /**
  * Shared domain primitives used across bounded contexts (e.g. TenantContext, base value objects).
  */
+
 package com.iqkv.foundation.iamservice.shared.domain;

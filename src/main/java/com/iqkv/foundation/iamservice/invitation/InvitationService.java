@@ -24,9 +24,9 @@ public interface InvitationService {
   /**
    * Creates and sends an invitation email.
    *
-   * @param tenantKey  target tenant
-   * @param inviterId  UUID of the user sending the invite (must be TENANT_OWNER or ADMIN)
-   * @param request    email + role
+   * @param tenantKey target tenant
+   * @param inviterId UUID of the user sending the invite (must be TENANT_OWNER or ADMIN)
+   * @param request   email + role
    * @return the created invitation summary
    */
   InvitationDtos.InvitationResponse sendInvitation(

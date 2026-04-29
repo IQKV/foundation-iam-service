@@ -16,9 +16,9 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,4 +27,5 @@ import org.springframework.validation.annotation.Validated;
 public record InvitationConfigurationProperties(
     /** How long an invitation token remains valid. Default: 72 hours. */
     @NotNull Duration tokenTtl
-) {}
+) {
+}

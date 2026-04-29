@@ -37,7 +37,7 @@ public class ExpiredPasswordResetTokenReaperJob {
 
   @Scheduled(cron = "0 0 * * * *")
   @SchedulerLock(name = "ExpiredPasswordResetTokenReaperJob.cleanup",
-      lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
+                 lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
   public void cleanup() {
     log.debug("Cleaning up expired password reset tokens");
     passwordResetTokenMapper.deleteByExpiresAtBefore(Instant.now());

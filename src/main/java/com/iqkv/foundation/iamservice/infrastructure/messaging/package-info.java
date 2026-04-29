@@ -17,4 +17,5 @@
 /**
  * RabbitMQ event publishers and consumers (e.g. TenantProvisioningConsumer).
  */
+
 package com.iqkv.foundation.iamservice.infrastructure.messaging;

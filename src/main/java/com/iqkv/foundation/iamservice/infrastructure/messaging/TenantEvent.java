@@ -36,7 +36,8 @@ public class TenantEvent {
   private EventType eventType;
   private Instant occurredAt;
 
-  public TenantEvent() {}
+  public TenantEvent() {
+  }
 
   public TenantEvent(final String tenantKey, final String tenantName,
                      final String ownerEmail, final String ownerFirstName,
@@ -49,21 +50,51 @@ public class TenantEvent {
     this.occurredAt = occurredAt;
   }
 
-  public String getTenantKey() { return tenantKey; }
-  public void setTenantKey(final String tenantKey) { this.tenantKey = tenantKey; }
+  public String getTenantKey() {
+    return tenantKey;
+  }
 
-  public String getTenantName() { return tenantName; }
-  public void setTenantName(final String tenantName) { this.tenantName = tenantName; }
+  public void setTenantKey(final String tenantKey) {
+    this.tenantKey = tenantKey;
+  }
 
-  public String getOwnerEmail() { return ownerEmail; }
-  public void setOwnerEmail(final String ownerEmail) { this.ownerEmail = ownerEmail; }
+  public String getTenantName() {
+    return tenantName;
+  }
 
-  public String getOwnerFirstName() { return ownerFirstName; }
-  public void setOwnerFirstName(final String ownerFirstName) { this.ownerFirstName = ownerFirstName; }
+  public void setTenantName(final String tenantName) {
+    this.tenantName = tenantName;
+  }
 
-  public EventType getEventType() { return eventType; }
-  public void setEventType(final EventType eventType) { this.eventType = eventType; }
+  public String getOwnerEmail() {
+    return ownerEmail;
+  }
 
-  public Instant getOccurredAt() { return occurredAt; }
-  public void setOccurredAt(final Instant occurredAt) { this.occurredAt = occurredAt; }
+  public void setOwnerEmail(final String ownerEmail) {
+    this.ownerEmail = ownerEmail;
+  }
+
+  public String getOwnerFirstName() {
+    return ownerFirstName;
+  }
+
+  public void setOwnerFirstName(final String ownerFirstName) {
+    this.ownerFirstName = ownerFirstName;
+  }
+
+  public EventType getEventType() {
+    return eventType;
+  }
+
+  public void setEventType(final EventType eventType) {
+    this.eventType = eventType;
+  }
+
+  public Instant getOccurredAt() {
+    return occurredAt;
+  }
+
+  public void setOccurredAt(final Instant occurredAt) {
+    this.occurredAt = occurredAt;
+  }
 }

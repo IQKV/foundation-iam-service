@@ -73,7 +73,7 @@ public class DefaultTenantResolverImpl implements DefaultTenantResolver {
       if (!isValidNanoId(configuredKey)) {
         throw new DefaultTenantResolutionException(
             "Configured iqkv.tenancy.default-tenant-key '" + configuredKey
-                + "' is not a valid NanoID (must be 8 chars, alphabet [a-z0-9]).");
+            + "' is not a valid NanoID (must be 8 chars, alphabet [a-z0-9]).");
       }
       log.debug("Default tenant key resolved from configuration: {}", configuredKey);
       ensureTenantExists(configuredKey);

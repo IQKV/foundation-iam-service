@@ -29,27 +29,46 @@ public class SubscriptionEvent {
   private EventType eventType;
   private Instant occurredAt;
 
-  public SubscriptionEvent() {}
+  public SubscriptionEvent() {
+  }
 
   public SubscriptionEvent(final String tenantKey, final String externalSubscriptionId,
-                            final EventType eventType, final Instant occurredAt) {
+                           final EventType eventType, final Instant occurredAt) {
     this.tenantKey = tenantKey;
     this.externalSubscriptionId = externalSubscriptionId;
     this.eventType = eventType;
     this.occurredAt = occurredAt;
   }
 
-  public String getTenantKey() { return tenantKey; }
-  public void setTenantKey(final String tenantKey) { this.tenantKey = tenantKey; }
+  public String getTenantKey() {
+    return tenantKey;
+  }
 
-  public String getExternalSubscriptionId() { return externalSubscriptionId; }
+  public void setTenantKey(final String tenantKey) {
+    this.tenantKey = tenantKey;
+  }
+
+  public String getExternalSubscriptionId() {
+    return externalSubscriptionId;
+  }
+
   public void setExternalSubscriptionId(final String externalSubscriptionId) {
     this.externalSubscriptionId = externalSubscriptionId;
   }
 
-  public EventType getEventType() { return eventType; }
-  public void setEventType(final EventType eventType) { this.eventType = eventType; }
+  public EventType getEventType() {
+    return eventType;
+  }
 
-  public Instant getOccurredAt() { return occurredAt; }
-  public void setOccurredAt(final Instant occurredAt) { this.occurredAt = occurredAt; }
+  public void setEventType(final EventType eventType) {
+    this.eventType = eventType;
+  }
+
+  public Instant getOccurredAt() {
+    return occurredAt;
+  }
+
+  public void setOccurredAt(final Instant occurredAt) {
+    this.occurredAt = occurredAt;
+  }
 }

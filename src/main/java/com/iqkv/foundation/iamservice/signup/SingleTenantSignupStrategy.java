@@ -20,13 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
@@ -43,6 +36,12 @@ import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link SignupStrategy} implementation for {@code SINGLE_TENANT} mode.

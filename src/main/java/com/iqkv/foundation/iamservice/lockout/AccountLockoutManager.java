@@ -19,9 +19,8 @@ package com.iqkv.foundation.iamservice.lockout;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.stereotype.Component;
-
 import com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AccountLockoutManager {

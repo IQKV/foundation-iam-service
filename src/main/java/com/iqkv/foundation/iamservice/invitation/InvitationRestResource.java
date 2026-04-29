@@ -16,12 +16,12 @@
 
 package com.iqkv.foundation.iamservice.invitation;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.validation.Valid;
-
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,8 +37,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 
 @RestController
 @Tag(name = "Invitations", description = "Send, preview, accept, revoke, and list tenant invitations")
@@ -60,10 +58,10 @@ public class InvitationRestResource {
   @Operation(
       summary = "Send an invitation",
       description = "Creates a PENDING invitation and sends an email to the invitee. "
-          + "Requires a JWT scoped to {tenantKey} — the gateway resolves tenant context from the "
-          + "X-Tenant-ID request header, which must match the tenantKey path variable. "
-          + "Requires TENANT_OWNER or ADMIN authority within that tenant. "
-          + "Authority defaults to MEMBER when omitted. TENANT_OWNER is not grantable via invitation.")
+                    + "Requires a JWT scoped to {tenantKey} — the gateway resolves tenant context from the "
+                    + "X-Tenant-ID request header, which must match the tenantKey path variable. "
+                    + "Requires TENANT_OWNER or ADMIN authority within that tenant. "
+                    + "Authority defaults to MEMBER when omitted. TENANT_OWNER is not grantable via invitation.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "Invitation created and email sent"),
       @ApiResponse(responseCode = "400", description = "Invalid request body"),
@@ -89,8 +87,8 @@ public class InvitationRestResource {
   @Operation(
       summary = "List pending invitations",
       description = "Returns all PENDING invitations for the tenant. "
-          + "Requires a JWT scoped to {tenantKey} via the X-Tenant-ID header. "
-          + "Requires TENANT_OWNER or ADMIN authority within that tenant.")
+                    + "Requires a JWT scoped to {tenantKey} via the X-Tenant-ID header. "
+                    + "Requires TENANT_OWNER or ADMIN authority within that tenant.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Invitation list returned"),
       @ApiResponse(responseCode = "403", description = "Insufficient authority")
@@ -110,8 +108,8 @@ public class InvitationRestResource {
   @Operation(
       summary = "Revoke an invitation",
       description = "Sets the invitation status to REVOKED. "
-          + "Requires a JWT scoped to {tenantKey} via the X-Tenant-ID header. "
-          + "The original inviter, a TENANT_OWNER, or an ADMIN of that tenant may revoke.")
+                    + "Requires a JWT scoped to {tenantKey} via the X-Tenant-ID header. "
+                    + "The original inviter, a TENANT_OWNER, or an ADMIN of that tenant may revoke.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Invitation revoked"),
       @ApiResponse(responseCode = "403", description = "Insufficient authority"),
@@ -135,8 +133,8 @@ public class InvitationRestResource {
   @Operation(
       summary = "Preview an invitation",
       description = "Returns tenant name, invited email, role, and expiry. "
-          + "The 'requiresSignup' flag tells the UI which form to render. "
-          + "Returns 404 for expired, revoked, or non-existent tokens.")
+                    + "The 'requiresSignup' flag tells the UI which form to render. "
+                    + "Returns 404 for expired, revoked, or non-existent tokens.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Invitation preview returned"),
       @ApiResponse(responseCode = "404", description = "Invitation not found or no longer valid")
@@ -150,9 +148,9 @@ public class InvitationRestResource {
   @Operation(
       summary = "Accept an invitation",
       description = "Accepts the invitation and returns a JWT token pair scoped to the invited tenant. "
-          + "For new users: firstName, lastName, and password are required. "
-          + "For existing users: only password is required (used to verify identity). "
-          + "Returns 404 for expired, revoked, or non-existent tokens.")
+                    + "For new users: firstName, lastName, and password are required. "
+                    + "For existing users: only password is required (used to verify identity). "
+                    + "Returns 404 for expired, revoked, or non-existent tokens.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Invitation accepted, token pair returned"),
       @ApiResponse(responseCode = "400", description = "Invalid request body"),

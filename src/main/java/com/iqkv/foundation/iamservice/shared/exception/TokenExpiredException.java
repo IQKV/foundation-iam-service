@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown for an expired refresh token. Maps to HTTP 401. */
+/**
+ * Thrown for an expired refresh token. Maps to HTTP 401.
+ */
 public class TokenExpiredException extends RuntimeException {
 
   public TokenExpiredException() {

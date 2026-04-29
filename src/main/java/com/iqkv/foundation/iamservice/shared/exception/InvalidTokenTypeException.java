@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when the JWT type claim is not "refresh" during token refresh. Maps to HTTP 401. */
+/**
+ * Thrown when the JWT type claim is not "refresh" during token refresh. Maps to HTTP 401.
+ */
 public class InvalidTokenTypeException extends RuntimeException {
 
   public InvalidTokenTypeException() {

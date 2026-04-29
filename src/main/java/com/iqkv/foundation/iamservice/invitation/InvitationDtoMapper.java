@@ -24,7 +24,8 @@ import java.time.ZoneOffset;
  */
 public final class InvitationDtoMapper {
 
-  private InvitationDtoMapper() {}
+  private InvitationDtoMapper() {
+  }
 
   public static InvitationDtos.InvitationResponse toResponse(final TenantInvitation invitation) {
     if (invitation == null) {

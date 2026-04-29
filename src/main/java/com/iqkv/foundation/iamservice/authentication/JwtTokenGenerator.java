@@ -41,7 +41,7 @@ public class JwtTokenGenerator {
   private final RSAPrivateKey privateKey;
 
   public JwtTokenGenerator(final AuthConfigurationProperties authProps,
-                            final ResourceLoader resourceLoader) {
+                           final ResourceLoader resourceLoader) {
     this.authProps = authProps;
     this.privateKey = loadPrivateKey(authProps.jwt().privateKeyPath(), resourceLoader);
   }

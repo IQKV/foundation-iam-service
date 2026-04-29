@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when a PENDING invitation already exists for the same (tenantKey, email). Maps to HTTP 409. */
+/**
+ * Thrown when a PENDING invitation already exists for the same (tenantKey, email). Maps to HTTP 409.
+ */
 public class InvitationAlreadyPendingException extends RuntimeException {
 
   public InvitationAlreadyPendingException(final String email) {

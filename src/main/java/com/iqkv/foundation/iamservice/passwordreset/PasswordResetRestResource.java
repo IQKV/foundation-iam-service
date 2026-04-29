@@ -18,6 +18,7 @@ package com.iqkv.foundation.iamservice.passwordreset;
 
 import jakarta.validation.Valid;
 
+import com.iqkv.foundation.iamservice.passwordreset.dto.PasswordResetDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iqkv.foundation.iamservice.passwordreset.dto.PasswordResetDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users/password")
@@ -43,8 +42,8 @@ public class PasswordResetRestResource {
 
   @PostMapping("/forgot")
   @Operation(summary = "Initiate password reset",
-      description = "Sends a password reset email if the address is registered. "
-          + "Always returns 200 to avoid email enumeration. Rate-limited per email address.")
+             description = "Sends a password reset email if the address is registered. "
+                           + "Always returns 200 to avoid email enumeration. Rate-limited per email address.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Reset email sent (or silently ignored if email not found)"),
       @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
@@ -57,8 +56,8 @@ public class PasswordResetRestResource {
 
   @PostMapping("/reset")
   @Operation(summary = "Complete password reset",
-      description = "Consumes the single-use reset token and sets a new password. "
-          + "The token expires after the configured TTL (default 1 hour).")
+             description = "Consumes the single-use reset token and sets a new password. "
+                           + "The token expires after the configured TTL (default 1 hour).")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Password updated"),
       @ApiResponse(responseCode = "400", description = "Invalid or expired token")

@@ -20,7 +20,8 @@ import com.iqkv.foundation.iamservice.tenant.Tenant;
 
 public final class TenantDtoMapper {
 
-  private TenantDtoMapper() {}
+  private TenantDtoMapper() {
+  }
 
   public static TenantDtos.TenantResponse toResponse(final Tenant tenant) {
     return new TenantDtos.TenantResponse(

@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when a TenantMembership already exists for (userId, tenantKey) during signup. Maps to HTTP 409. */
+/**
+ * Thrown when a TenantMembership already exists for (userId, tenantKey) during signup. Maps to HTTP 409.
+ */
 public class TenantMembershipAlreadyExistsException extends RuntimeException {
 
   public TenantMembershipAlreadyExistsException() {

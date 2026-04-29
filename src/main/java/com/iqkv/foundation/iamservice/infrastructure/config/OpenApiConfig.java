@@ -34,14 +34,14 @@ import org.springframework.context.annotation.Configuration;
 )
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI()
-            .info(new Info()
-                .title("IAM Service API")
-                .description("Identity and Access Management Service — multi-tenant JWT RS256 authentication")
-                .version("1.0.0"))
-            .addServersItem(new Server().url("/").description("Default"))
-            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
-    }
+  @Bean
+  public OpenAPI openAPI() {
+    return new OpenAPI()
+        .info(new Info()
+            .title("IAM Service API")
+            .description("Identity and Access Management Service — multi-tenant JWT RS256 authentication")
+            .version("1.0.0"))
+        .addServersItem(new Server().url("/").description("Default"))
+        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+  }
 }

@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown for an invalid JWT signature. Maps to HTTP 401. */
+/**
+ * Thrown for an invalid JWT signature. Maps to HTTP 401.
+ */
 public class InvalidTokenSignatureException extends RuntimeException {
 
   public InvalidTokenSignatureException() {

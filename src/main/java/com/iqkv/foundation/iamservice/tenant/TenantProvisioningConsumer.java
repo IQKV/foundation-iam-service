@@ -18,16 +18,15 @@ package com.iqkv.foundation.iamservice.tenant;
 
 import java.time.LocalDateTime;
 
+import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.TenantEvent;
+import com.iqkv.foundation.iamservice.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
-import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
-import com.iqkv.foundation.iamservice.infrastructure.messaging.TenantEvent;
-import com.iqkv.foundation.iamservice.tenancy.TenantLiquibaseRunner;
 
 @Component
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")

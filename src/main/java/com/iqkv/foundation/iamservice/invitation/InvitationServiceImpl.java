@@ -24,13 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.iqkv.foundation.iamservice.authentication.JwtTokenGenerator;
 import com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
@@ -48,7 +41,6 @@ import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
@@ -57,6 +49,12 @@ import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional

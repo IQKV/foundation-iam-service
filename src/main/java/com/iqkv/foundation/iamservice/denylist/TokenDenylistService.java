@@ -52,7 +52,7 @@ public class TokenDenylistService {
 
   @Scheduled(cron = "0 0 * * * *")
   @SchedulerLock(name = "TokenDenylistService.cleanupExpired",
-      lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
+                 lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
   public void cleanupExpired() {
     log.debug("Cleaning up expired token denylist entries");
     mapper.deleteByExpiresAtBefore(Instant.now());

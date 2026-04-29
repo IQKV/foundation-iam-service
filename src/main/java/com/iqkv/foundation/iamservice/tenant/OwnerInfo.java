@@ -16,4 +16,5 @@
 
 package com.iqkv.foundation.iamservice.tenant;
 
-public record OwnerInfo(String email, String firstName) {}
+public record OwnerInfo(String email, String firstName) {
+}

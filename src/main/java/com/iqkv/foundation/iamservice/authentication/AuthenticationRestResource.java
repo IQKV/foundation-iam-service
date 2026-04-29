@@ -16,12 +16,15 @@
 
 package com.iqkv.foundation.iamservice.authentication;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-
+import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.user.UserService;
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,11 +37,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
-import com.iqkv.foundation.iamservice.security.JwtClaimNames;
-import com.iqkv.foundation.iamservice.user.UserService;
-import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/auth")
@@ -56,8 +54,8 @@ public class AuthenticationRestResource {
 
   @PostMapping("/signup")
   @Operation(summary = "Register a new user and create a tenant",
-      description = "Creates a global user account, a new tenant, and a TENANT_OWNER membership in one step. "
-          + "Returns 201 with tenantStatus=PROVISIONING; poll GET /api/v1/iam/tenants/{tenantKey} until ACTIVE.")
+             description = "Creates a global user account, a new tenant, and a TENANT_OWNER membership in one step. "
+                           + "Returns 201 with tenantStatus=PROVISIONING; poll GET /api/v1/iam/tenants/{tenantKey} until ACTIVE.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "User and tenant created"),
       @ApiResponse(responseCode = "409", description = "Tenant name already taken or user already a member")
@@ -72,8 +70,8 @@ public class AuthenticationRestResource {
 
   @PostMapping("/signin")
   @Operation(summary = "Sign in with email and password",
-      description = "Authenticates a user within the tenant identified by X-Tenant-ID header. "
-          + "Returns an RS256 access token (15 min) and refresh token (7 days).")
+             description = "Authenticates a user within the tenant identified by X-Tenant-ID header. "
+                           + "Returns an RS256 access token (15 min) and refresh token (7 days).")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Tokens issued"),
       @ApiResponse(responseCode = "401", description = "Invalid credentials"),
@@ -86,8 +84,8 @@ public class AuthenticationRestResource {
 
   @PostMapping("/refresh")
   @Operation(summary = "Refresh access token",
-      description = "Issues a new access token and refresh token pair using a valid refresh token. "
-          + "The refresh token type claim must equal 'refresh'.")
+             description = "Issues a new access token and refresh token pair using a valid refresh token. "
+                           + "The refresh token type claim must equal 'refresh'.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "New token pair issued"),
       @ApiResponse(responseCode = "401", description = "Invalid, expired, or wrong-type token"),
@@ -101,7 +99,7 @@ public class AuthenticationRestResource {
   @PostMapping("/signout")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Sign out (revoke current token)",
-      description = "Adds the current token's JTI to the denylist. Subsequent requests with this token return 401.")
+             description = "Adds the current token's JTI to the denylist. Subsequent requests with this token return 401.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Signed out"),
       @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -118,7 +116,7 @@ public class AuthenticationRestResource {
   @PostMapping("/signout-all")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Sign out from all sessions",
-      description = "Sets last_global_signout_at on the user record. All tokens issued before this timestamp are revoked.")
+             description = "Sets last_global_signout_at on the user record. All tokens issued before this timestamp are revoked.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "All sessions invalidated"),
       @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -134,8 +132,8 @@ public class AuthenticationRestResource {
   @PostMapping("/validate")
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Validate token and return user context",
-      description = "Decodes the Bearer token, checks the denylist, and returns userId, email, tenantId, and authorities. "
-          + "Intended for API gateway introspection.")
+             description = "Decodes the Bearer token, checks the denylist, and returns userId, email, tenantId, and authorities. "
+                           + "Intended for API gateway introspection.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Token valid, user context returned"),
       @ApiResponse(responseCode = "401", description = "Token invalid or revoked")

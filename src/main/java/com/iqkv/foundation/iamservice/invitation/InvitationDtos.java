@@ -16,14 +16,14 @@
 
 package com.iqkv.foundation.iamservice.invitation;
 
-import java.time.Instant;
-import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * DTOs for the invitation vertical slice.
@@ -31,7 +31,8 @@ import jakarta.validation.constraints.Size;
  */
 public final class InvitationDtos {
 
-  private InvitationDtos() {}
+  private InvitationDtos() {
+  }
 
   // -------------------------------------------------------------------------
   // Requests
@@ -47,7 +48,8 @@ public final class InvitationDtos {
   public record SendInvitationRequest(
       @NotBlank(message = "Email is required") @Email(message = "Must be a valid email address") @Size(max = 255, message = "Email must not exceed 255 characters") String email,
       @Pattern(regexp = "ADMIN|MEMBER", message = "Authority must be ADMIN or MEMBER") String authority
-  ) {}
+  ) {
+  }
 
   /**
    * Body for {@code POST /invitations/{token}/accept}.
@@ -61,13 +63,16 @@ public final class InvitationDtos {
       @Size(max = 100, message = "First name must not exceed 100 characters") String firstName,
       @Size(max = 100, message = "Last name must not exceed 100 characters") String lastName,
       @NotBlank(message = "Password is required") @Size(min = 8, max = 128, message = "Password must be between 8 and 128 characters") String password
-  ) {}
+  ) {
+  }
 
   // -------------------------------------------------------------------------
   // Responses
   // -------------------------------------------------------------------------
 
-  /** Returned after a successful {@code POST /tenants/{tenantKey}/invitations}. */
+  /**
+   * Returned after a successful {@code POST /tenants/{tenantKey}/invitations}.
+   */
   public record InvitationResponse(
       UUID invitationId,
       String tenantKey,
@@ -76,7 +81,8 @@ public final class InvitationDtos {
       String status,
       Instant expiresAt,
       Instant createdAt
-  ) {}
+  ) {
+  }
 
   /**
    * Returned by {@code GET /invitations/{token}}.
@@ -89,12 +95,16 @@ public final class InvitationDtos {
       String authority,
       Instant expiresAt,
       boolean requiresSignup
-  ) {}
+  ) {
+  }
 
-  /** Returned after a successful {@code POST /invitations/{token}/accept}. */
+  /**
+   * Returned after a successful {@code POST /invitations/{token}/accept}.
+   */
   public record AcceptInvitationResponse(
       String accessToken,
       String refreshToken,
       String tenantKey
-  ) {}
+  ) {
+  }
 }

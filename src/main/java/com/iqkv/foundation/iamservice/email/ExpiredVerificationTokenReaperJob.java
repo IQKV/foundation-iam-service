@@ -37,7 +37,7 @@ public class ExpiredVerificationTokenReaperJob {
 
   @Scheduled(cron = "0 0 * * * *")
   @SchedulerLock(name = "ExpiredVerificationTokenReaperJob.cleanup",
-      lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
+                 lockAtMostFor = "PT55M", lockAtLeastFor = "PT5M")
   public void cleanup() {
     log.debug("Cleaning up expired email verification tokens");
     emailVerificationTokenMapper.deleteByExpiresAtBefore(Instant.now());

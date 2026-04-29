@@ -16,16 +16,16 @@
 
 package com.iqkv.foundation.iamservice.security;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.denylist.TokenDenylistService;
 import com.iqkv.foundation.iamservice.user.UserMapper;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -53,8 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final UserMapper userMapper;
 
   public JwtAuthenticationFilter(final JwtDecoder jwtDecoder,
-                                  final TokenDenylistService tokenDenylistService,
-                                  final UserMapper userMapper) {
+                                 final TokenDenylistService tokenDenylistService,
+                                 final UserMapper userMapper) {
     this.jwtDecoder = jwtDecoder;
     this.tokenDenylistService = tokenDenylistService;
     this.userMapper = userMapper;
@@ -118,14 +118,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     return ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signup"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
-        || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
   }
 
   private void writeRevoked(final HttpServletResponse response) throws IOException {

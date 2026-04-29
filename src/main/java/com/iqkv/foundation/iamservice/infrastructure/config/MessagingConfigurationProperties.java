@@ -5,4 +5,5 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "iqkv.messaging.rabbitmq")
-public record MessagingConfigurationProperties(boolean enabled) {}
+public record MessagingConfigurationProperties(boolean enabled) {
+}

@@ -21,7 +21,8 @@ import com.iqkv.foundation.iamservice.user.User;
 
 public final class UserDtoMapper {
 
-  private UserDtoMapper() {}
+  private UserDtoMapper() {
+  }
 
   public static UserDtos.UserResponse toResponse(final User user) {
     return new UserDtos.UserResponse(

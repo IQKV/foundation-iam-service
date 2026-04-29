@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when the email verification resend rate limit is exceeded. Maps to HTTP 429. */
+/**
+ * Thrown when the email verification resend rate limit is exceeded. Maps to HTTP 429.
+ */
 public class VerificationRateLimitException extends RuntimeException {
 
   private final long retryAfterSeconds;

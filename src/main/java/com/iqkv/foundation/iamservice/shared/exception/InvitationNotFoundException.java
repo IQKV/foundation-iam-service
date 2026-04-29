@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when an invitation token is not found, expired, or already used. Maps to HTTP 404. */
+/**
+ * Thrown when an invitation token is not found, expired, or already used. Maps to HTTP 404.
+ */
 public class InvitationNotFoundException extends RuntimeException {
 
   public InvitationNotFoundException() {

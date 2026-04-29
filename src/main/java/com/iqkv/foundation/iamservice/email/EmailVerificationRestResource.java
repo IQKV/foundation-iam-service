@@ -18,6 +18,8 @@ package com.iqkv.foundation.iamservice.email;
 
 import jakarta.validation.Valid;
 
+import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
+import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,9 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
-import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users/email")
@@ -44,7 +43,7 @@ public class EmailVerificationRestResource {
 
   @PostMapping("/verify")
   @Operation(summary = "Verify email address",
-      description = "Consumes a one-time 64-char hex token sent to the user's email and marks the address as verified.")
+             description = "Consumes a one-time 64-char hex token sent to the user's email and marks the address as verified.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Email verified"),
       @ApiResponse(responseCode = "400", description = "Invalid or expired token")
@@ -57,8 +56,8 @@ public class EmailVerificationRestResource {
 
   @PostMapping("/resend-verification")
   @Operation(summary = "Resend email verification",
-      description = "Generates a new verification token and sends it to the given email address. "
-          + "Rate-limited to prevent abuse.")
+             description = "Generates a new verification token and sends it to the given email address. "
+                           + "Rate-limited to prevent abuse.")
   @ApiResponses({
       @ApiResponse(responseCode = "202", description = "Verification email queued"),
       @ApiResponse(responseCode = "429", description = "Rate limit exceeded")

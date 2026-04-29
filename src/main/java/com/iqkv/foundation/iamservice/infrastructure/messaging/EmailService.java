@@ -16,11 +16,11 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.util.Locale;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;

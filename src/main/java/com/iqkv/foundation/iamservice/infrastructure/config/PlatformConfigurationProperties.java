@@ -1,9 +1,9 @@
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import jakarta.validation.constraints.NotNull;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * Configuration properties for platform-wide settings.

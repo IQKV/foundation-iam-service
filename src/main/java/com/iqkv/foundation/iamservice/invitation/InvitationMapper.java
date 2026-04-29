@@ -33,10 +33,14 @@ public interface InvitationMapper {
 
   Optional<TenantInvitation> findById(UUID id);
 
-  /** Returns all non-terminal invitations for a tenant (PENDING only). */
+  /**
+   * Returns all non-terminal invitations for a tenant (PENDING only).
+   */
   List<TenantInvitation> findPendingByTenantKey(String tenantKey);
 
-  /** Returns all invitations for a tenant regardless of status (for management views). */
+  /**
+   * Returns all invitations for a tenant regardless of status (for management views).
+   */
   List<TenantInvitation> findByTenantKey(String tenantKey);
 
   boolean existsPendingForTenantAndEmail(
@@ -53,7 +57,9 @@ public interface InvitationMapper {
       @Param("acceptedAt") Instant acceptedAt,
       @Param("updatedAt") java.time.LocalDateTime updatedAt);
 
-  /** Bulk-expire all PENDING invitations whose TTL has passed. Used by the reaper job. */
+  /**
+   * Bulk-expire all PENDING invitations whose TTL has passed. Used by the reaper job.
+   */
   int expireStale(
       @Param("now") Instant now,
       @Param("updatedAt") java.time.LocalDateTime updatedAt);

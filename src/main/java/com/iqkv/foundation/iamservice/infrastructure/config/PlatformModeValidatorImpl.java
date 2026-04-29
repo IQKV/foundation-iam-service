@@ -39,7 +39,7 @@ public class PlatformModeValidatorImpl implements PlatformModeValidator, Applica
   public void validate() {
     if (platformConfig == null || platformConfig.rolloutMode() == null) {
       final String message = "Platform rollout mode is not configured. "
-          + "Please set 'iqkv.platform.rollout-mode' to either 'MULTI_TENANT' or 'SINGLE_TENANT'.";
+                             + "Please set 'iqkv.platform.rollout-mode' to either 'MULTI_TENANT' or 'SINGLE_TENANT'.";
       log.error("Platform mode validation failed: {}", message);
       throw new InvalidPlatformModeException(message);
     }

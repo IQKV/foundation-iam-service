@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when a token has been explicitly revoked (added to the denylist). Maps to HTTP 401. */
+/**
+ * Thrown when a token has been explicitly revoked (added to the denylist). Maps to HTTP 401.
+ */
 public class TokenRevokedException extends RuntimeException {
 
   public TokenRevokedException() {

@@ -29,4 +29,5 @@
  * <p>The {@code tenant_invitations} table lives in the system schema ({@code public}) so tokens
  * can be resolved before tenant context is established.
  */
+
 package com.iqkv.foundation.iamservice.invitation;

@@ -24,7 +24,7 @@ package com.iqkv.foundation.iamservice.invitation;
  *           ──▶ REVOKED   (inviter or TENANT_OWNER cancels)
  *           ──▶ EXPIRED   (reaper job, TTL exceeded)
  * </pre>
- *
+ * <p>
  * Transitions from ACCEPTED, REVOKED, or EXPIRED are not allowed.
  * A new invitation record must be created to re-invite.
  */

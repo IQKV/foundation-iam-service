@@ -42,5 +42,6 @@ public final class JwtClaimNames {
 
   public static final String ISSUER = "foundation-iam-service";
 
-  private JwtClaimNames() {}
+  private JwtClaimNames() {
+  }
 }

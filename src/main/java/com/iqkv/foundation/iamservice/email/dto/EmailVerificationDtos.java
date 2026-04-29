@@ -21,9 +21,12 @@ import jakarta.validation.constraints.NotBlank;
 
 public final class EmailVerificationDtos {
 
-  private EmailVerificationDtos() {}
+  private EmailVerificationDtos() {
+  }
 
-  public record VerifyEmailRequest(@NotBlank String token) {}
+  public record VerifyEmailRequest(@NotBlank String token) {
+  }
 
-  public record ResendVerificationRequest(@NotBlank @Email String email) {}
+  public record ResendVerificationRequest(@NotBlank @Email String email) {
+  }
 }

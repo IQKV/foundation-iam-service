@@ -17,4 +17,5 @@
 /**
  * MyBatis mappers, interceptors (MyBatisSchemaInterceptor), and Liquibase runner.
  */
+
 package com.iqkv.foundation.iamservice.infrastructure.persistence;

@@ -1,15 +1,14 @@
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPlatformModeException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Validated
 @ConfigurationProperties(prefix = "iqkv.tenancy")

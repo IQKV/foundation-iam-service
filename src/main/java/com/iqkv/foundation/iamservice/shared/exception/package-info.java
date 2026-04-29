@@ -17,4 +17,5 @@
 /**
  * Common exceptions: MembershipNotFoundException, TenantNotFoundException, etc.
  */
+
 package com.iqkv.foundation.iamservice.shared.exception;

@@ -37,10 +37,8 @@ public interface SignupStrategy {
    *
    * @param request the registration request
    * @return signup result containing user, tenant, membership, and granted authorities
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException
-   *     if tenant name is taken (multi-tenant only)
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException
-   *     if user is already a member of the tenant
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException           if tenant name is taken (multi-tenant only)
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException if user is already a member of the tenant
    */
   SignupResult execute(UserDtos.RegisterUserRequest request);
 }

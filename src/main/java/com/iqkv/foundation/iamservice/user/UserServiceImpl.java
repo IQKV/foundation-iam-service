@@ -24,12 +24,6 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.iqkv.foundation.iamservice.email.EmailVerificationToken;
 import com.iqkv.foundation.iamservice.email.EmailVerificationTokenMapper;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
@@ -44,6 +38,11 @@ import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.signup.SignupStrategy;
 import com.iqkv.foundation.iamservice.user.dto.UserDtoMapper;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -107,7 +106,7 @@ public class UserServiceImpl implements UserService {
 
     // Publish verification email notification (mode-independent, requirement 4.7)
     final String verificationUrl = notificationProps.baseUrl()
-        + "/api/v1/iam/users/email/verify?token=" + tokenHex;
+                                   + "/api/v1/iam/users/email/verify?token=" + tokenHex;
     final var notificationEvent = new NotificationEvent(
         canonicalUser.getEmail(),
         notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",

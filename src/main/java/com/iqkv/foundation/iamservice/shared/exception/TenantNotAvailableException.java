@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when tenant status is DELETED or PROVISIONING_FAILED during sign-in. Maps to HTTP 403. */
+/**
+ * Thrown when tenant status is DELETED or PROVISIONING_FAILED during sign-in. Maps to HTTP 403.
+ */
 public class TenantNotAvailableException extends RuntimeException {
 
   public TenantNotAvailableException(final String message) {

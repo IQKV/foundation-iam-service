@@ -16,11 +16,14 @@
 
 package com.iqkv.foundation.iamservice.user;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.validation.Valid;
-
+import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
+import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -39,11 +42,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
-import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
-import com.iqkv.foundation.iamservice.security.JwtClaimNames;
-import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 
 @RestController
 @RequestMapping("/api/v1/iam/users")
@@ -64,7 +62,7 @@ public class UserRestResource {
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Get current user profile")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
-      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Profile retrieved"),
       @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -80,7 +78,7 @@ public class UserRestResource {
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Update current user profile")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
-      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Profile updated"),
       @ApiResponse(responseCode = "400", description = "Validation error"),
@@ -99,7 +97,7 @@ public class UserRestResource {
   @SecurityRequirement(name = "bearerAuth")
   @Operation(summary = "Delete current user membership from tenant")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
-      description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Membership removed"),
       @ApiResponse(responseCode = "401", description = "Unauthorized"),

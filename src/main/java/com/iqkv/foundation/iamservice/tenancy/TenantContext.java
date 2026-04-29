@@ -24,7 +24,8 @@ public final class TenantContext {
 
   private static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
 
-  private TenantContext() {}
+  private TenantContext() {
+  }
 
   /**
    * Sets the current tenant key for this thread.

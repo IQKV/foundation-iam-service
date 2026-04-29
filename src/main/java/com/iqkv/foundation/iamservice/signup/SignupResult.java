@@ -33,4 +33,5 @@ public record SignupResult(
     Tenant tenant,
     TenantMembership membership,
     List<String> authorities
-) {}
+) {
+}

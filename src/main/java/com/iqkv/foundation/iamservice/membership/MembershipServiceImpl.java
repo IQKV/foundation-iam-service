@@ -19,10 +19,9 @@ package com.iqkv.foundation.iamservice.membership;
 import java.util.List;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,7 +31,7 @@ public class MembershipServiceImpl implements MembershipService {
   private final TenantMemberAuthorityMapper authorityMapper;
 
   public MembershipServiceImpl(final TenantMembershipMapper membershipMapper,
-                                final TenantMemberAuthorityMapper authorityMapper) {
+                               final TenantMemberAuthorityMapper authorityMapper) {
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
   }

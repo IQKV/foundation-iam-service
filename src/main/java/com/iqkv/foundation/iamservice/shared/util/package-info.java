@@ -17,4 +17,5 @@
 /**
  * Utility classes (e.g. NanoIdGenerator for tenantKey generation).
  */
+
 package com.iqkv.foundation.iamservice.shared.util;

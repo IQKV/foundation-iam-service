@@ -18,9 +18,9 @@ package com.iqkv.foundation.iamservice.shared.exception;
 
 public sealed class TenantManagementException extends RuntimeException
     permits TenantAlreadyExistsException,
-            TenantNotFoundException,
-            SchemaProvisioningException,
-            InvalidTenantStateException {
+    TenantNotFoundException,
+    SchemaProvisioningException,
+    InvalidTenantStateException {
 
   protected TenantManagementException(final String message) {
     super(message);

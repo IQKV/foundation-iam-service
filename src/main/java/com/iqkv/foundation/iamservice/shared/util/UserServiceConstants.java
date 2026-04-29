@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.util;
 
-/** Service-wide string constants for the IAM service. */
+/**
+ * Service-wide string constants for the IAM service.
+ */
 public final class UserServiceConstants {
 
   // Authority constants
@@ -53,5 +55,6 @@ public final class UserServiceConstants {
   public static final String MDC_CORRELATION_ID = "correlationId";
   public static final String MDC_TENANT_ID = "tenantId";
 
-  private UserServiceConstants() {}
+  private UserServiceConstants() {
+  }
 }

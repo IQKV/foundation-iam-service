@@ -22,12 +22,15 @@ import jakarta.validation.constraints.Size;
 
 public final class PasswordResetDtos {
 
-  private PasswordResetDtos() {}
+  private PasswordResetDtos() {
+  }
 
   public record ForgotPasswordRequest(
-      @NotBlank @Email String email) {}
+      @NotBlank @Email String email) {
+  }
 
   public record ResetPasswordRequest(
       @NotBlank String token,
-      @NotBlank @Size(min = 8, max = 128) String newPassword) {}
+      @NotBlank @Size(min = 8, max = 128) String newPassword) {
+  }
 }

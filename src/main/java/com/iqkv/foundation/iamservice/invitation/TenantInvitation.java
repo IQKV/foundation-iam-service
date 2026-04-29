@@ -149,7 +149,9 @@ public class TenantInvitation {
     this.updatedBy = updatedBy;
   }
 
-  /** Returns {@code true} if the invitation is still usable. */
+  /**
+   * Returns {@code true} if the invitation is still usable.
+   */
   public boolean isPending() {
     return status == InvitationStatus.PENDING && Instant.now().isBefore(expiresAt);
   }

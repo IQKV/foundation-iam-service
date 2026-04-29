@@ -16,21 +16,23 @@
 
 package com.iqkv.foundation.iamservice.tenant.dto;
 
-import java.time.LocalDateTime;
-
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 
 public final class TenantDtos {
 
-  private TenantDtos() {}
+  private TenantDtos() {
+  }
 
-  public record UpdateTenantStatusRequest(@NotNull TenantStatus status) {}
+  public record UpdateTenantStatusRequest(@NotNull TenantStatus status) {
+  }
 
   public record TenantResponse(
       String tenantKey,
       String name,
       TenantStatus status,
-      LocalDateTime createdAt) {}
+      LocalDateTime createdAt) {
+  }
 }

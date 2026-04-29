@@ -16,17 +16,17 @@
 
 package com.iqkv.foundation.iamservice.user.dto;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public final class UserDtos {
 
-  private UserDtos() {}
+  private UserDtos() {
+  }
 
   public record RegisterUserRequest(
       @Email @NotBlank String email,
@@ -37,11 +37,13 @@ public final class UserDtos {
       String password,
       @NotBlank @Size(max = 100) String firstName,
       @NotBlank @Size(max = 100) String lastName,
-      @Size(max = 100) String tenantName) {}
+      @Size(max = 100) String tenantName) {
+  }
 
   public record UpdateUserRequest(
       @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {}
+      @NotBlank @Size(max = 100) String lastName) {
+  }
 
   public record UserResponse(
       UUID id,
@@ -50,28 +52,33 @@ public final class UserDtos {
       String lastName,
       String status,
       boolean emailVerified,
-      LocalDateTime createdAt) {}
+      LocalDateTime createdAt) {
+  }
 
   public record SignupResponse(
       UUID userId,
       String email,
       String tenantKey,
-      String tenantStatus) {}
+      String tenantStatus) {
+  }
 
   public record AdminCreateUserRequest(
       @Email @NotBlank String email,
       @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {}
+      @NotBlank @Size(max = 100) String lastName) {
+  }
 
   public record AdminUpdateUserRequest(
       @Size(max = 100) String firstName,
       @Size(max = 100) String lastName,
-      String status) {}
+      String status) {
+  }
 
   public record PagedUserResponse(
       java.util.List<UserResponse> content,
       int page,
       int size,
       long totalElements,
-      int totalPages) {}
+      int totalPages) {
+  }
 }

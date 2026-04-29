@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when an email verification token is invalid or expired. Maps to HTTP 400. */
+/**
+ * Thrown when an email verification token is invalid or expired. Maps to HTTP 400.
+ */
 public class InvalidVerificationTokenException extends RuntimeException {
 
   public InvalidVerificationTokenException(final String message) {

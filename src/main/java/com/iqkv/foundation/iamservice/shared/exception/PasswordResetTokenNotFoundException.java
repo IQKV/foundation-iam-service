@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-/** Thrown when a password reset token is not found or already consumed. Maps to HTTP 400. */
+/**
+ * Thrown when a password reset token is not found or already consumed. Maps to HTTP 400.
+ */
 public class PasswordResetTokenNotFoundException extends RuntimeException {
 
   public PasswordResetTokenNotFoundException() {

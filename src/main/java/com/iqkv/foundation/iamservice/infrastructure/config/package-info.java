@@ -17,4 +17,5 @@
 /**
  * Spring configuration classes (MyBatis, RabbitMQ, Security, ShedLock, etc.).
  */
+
 package com.iqkv.foundation.iamservice.infrastructure.config;

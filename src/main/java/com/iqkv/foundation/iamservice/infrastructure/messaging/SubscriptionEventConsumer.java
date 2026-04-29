@@ -16,17 +16,16 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantService;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")
