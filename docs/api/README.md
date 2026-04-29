@@ -36,10 +36,10 @@ Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /tenants/{tenantKey}` 
 
 ### Password Reset
 
-| Method | Path                          | Auth   | Description                            |
-| ------ | ----------------------------- | ------ | -------------------------------------- |
-| `POST` | `/users/password/forgot`      | public | Initiate password reset (rate-limited) |
-| `POST` | `/users/password/reset`       | public | Complete password reset with token     |
+| Method | Path                     | Auth   | Description                            |
+| ------ | ------------------------ | ------ | -------------------------------------- |
+| `POST` | `/users/password/forgot` | public | Initiate password reset (rate-limited) |
+| `POST` | `/users/password/reset`  | public | Complete password reset with token     |
 
 `POST /users/password/forgot` always returns `200` to avoid email enumeration.
 Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 15-minute window.
@@ -57,14 +57,14 @@ Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 
 
 ### Tenant Management
 
-| Method   | Path                                      | Auth                                          | Description                    |
-| -------- | ----------------------------------------- | --------------------------------------------- | ------------------------------ |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status              |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status       |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning      |
-| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email          |
-| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations       |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation    |
+| Method   | Path                                      | Auth                                          | Description                 |
+| -------- | ----------------------------------------- | --------------------------------------------- | --------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status           |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status    |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning   |
+| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
+| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
 
 `POST /tenants/{tenantKey}/retry-provisioning` is only valid when the tenant is in `PROVISIONING_FAILED` state.
 
@@ -99,9 +99,9 @@ For existing users: only `password` is required (used to verify identity).
 
 ### JWKS
 
-| Method | Path                    | Auth   | Description                                    |
-| ------ | ----------------------- | ------ | ---------------------------------------------- |
-| `GET`  | `/.well-known/jwks.json`| public | RSA public key set for RS256 JWT verification  |
+| Method | Path                     | Auth   | Description                                   |
+| ------ | ------------------------ | ------ | --------------------------------------------- |
+| `GET`  | `/.well-known/jwks.json` | public | RSA public key set for RS256 JWT verification |
 
 Consumed by the gateway and any downstream service that validates JWTs locally.
 
