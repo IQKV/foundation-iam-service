@@ -5,8 +5,8 @@ services:
     container_name: foundation-iam-postgres-dev
     environment:
       POSTGRES_DB: iam
-      POSTGRES_USER: iam
-      POSTGRES_PASSWORD: iam
+      POSTGRES_USER: svc_iam_dba
+      POSTGRES_PASSWORD: svc_iam_dba
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -16,7 +16,7 @@ services:
     networks:
       - iam-service-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U iam -d iam -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U svc_iam_dba -d iam -h localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,8 +44,8 @@ services:
     image: rabbitmq:3.13-management-alpine
     container_name: foundation-iam-rabbitmq-dev
     environment:
-      RABBITMQ_DEFAULT_USER: iam
-      RABBITMQ_DEFAULT_PASS: iam
+      RABBITMQ_DEFAULT_USER: svc_iam_rmq
+      RABBITMQ_DEFAULT_PASS: svc_iam_rmq
       RABBITMQ_DEFAULT_VHOST: /
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,info}] disk_free_limit 2147483648
     ports:
@@ -91,14 +91,14 @@ services:
       DB_HOST: postgres-iam
       DB_PORT: 5432
       DB_NAME: iam
-      DB_USERNAME: iam
-      DB_PASSWORD: iam
+      DB_USERNAME: svc_iam_dba
+      DB_PASSWORD: svc_iam_dba
 
       # RabbitMQ Configuration
       RABBITMQ_HOST: rabbitmq-iam
       RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: iam
-      RABBITMQ_PASSWORD: iam
+      RABBITMQ_USERNAME: svc_iam_rmq
+      RABBITMQ_PASSWORD: svc_iam_rmq
 
       # Mail Configuration (MailHog)
       MAIL_HOST: mailhog

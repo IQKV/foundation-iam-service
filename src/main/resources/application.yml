@@ -64,18 +64,18 @@ iqkv:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
     name: ${DB_NAME:iam}
-    username: ${DB_USERNAME:iam}
-    password: ${DB_PASSWORD:iam}
+    username: ${DB_USERNAME:svc_iam_dba}
+    password: ${DB_PASSWORD:svc_iam_dba}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:iam}
-    password: ${RABBITMQ_PASSWORD:iam}
+    username: ${RABBITMQ_USERNAME:svc_iam_rmq}
+    password: ${RABBITMQ_PASSWORD:svc_iam_rmq}
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:dev}
-    password: ${MAIL_PASSWORD:dev}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     from: ${MAIL_FROM:noreply@iqkv.com}
     from-name: ${MAIL_FROM_NAME:IQ Key Value}
     reply-to: ${MAIL_REPLY_TO:}
