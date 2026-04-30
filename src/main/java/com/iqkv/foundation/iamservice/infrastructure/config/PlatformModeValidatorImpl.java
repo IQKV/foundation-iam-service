@@ -28,6 +28,11 @@ public class PlatformModeValidatorImpl implements PlatformModeValidator, Applica
       final TenancyConfigurationProperties tenancyConfig) {
     this.platformConfig = platformConfig;
     this.tenancyConfig = tenancyConfig;
+    // Eagerly resolve the mode so getMode() never returns UNKNOWN during normal startup.
+    // Full validation (including SINGLE_TENANT constraints) still runs in ApplicationRunner.run().
+    if (platformConfig != null && platformConfig.rolloutMode() != null) {
+      this.validatedMode = platformConfig.rolloutMode();
+    }
   }
 
   @Override
