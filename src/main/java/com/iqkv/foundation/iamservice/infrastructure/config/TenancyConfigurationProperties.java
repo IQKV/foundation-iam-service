@@ -17,7 +17,8 @@ public record TenancyConfigurationProperties(
     @NotBlank String defaultSchema,
     @NotNull Duration provisioningTimeout,
     String defaultTenantKey,
-    String defaultTenantName
+    // Display name shown in UI — blank would result in unnamed tenants
+    @NotBlank String defaultTenantName
 ) {
 
   private static final Pattern NANOID_PATTERN = Pattern.compile("^[a-z0-9]{8}$");
@@ -36,6 +37,10 @@ public record TenancyConfigurationProperties(
                 "Invalid defaultTenantKey format: '%s'. Must be exactly 8 characters using alphabet [a-z0-9].",
                 defaultTenantKey));
       }
+    }
+    // Validate provisioningTimeout is positive
+    if (provisioningTimeout != null && (provisioningTimeout.isZero() || provisioningTimeout.isNegative())) {
+      throw new InvalidPlatformModeException("provisioningTimeout must be a positive duration, got: " + provisioningTimeout);
     }
   }
 

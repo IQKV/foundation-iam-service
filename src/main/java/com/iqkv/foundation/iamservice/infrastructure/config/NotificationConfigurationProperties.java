@@ -3,6 +3,7 @@ package com.iqkv.foundation.iamservice.infrastructure.config;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -11,8 +12,10 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "iqkv.notification")
 public record NotificationConfigurationProperties(
     @Valid @NotNull Mail mail,
-    @NotBlank String defaultLocale,
-    @NotBlank String baseUrl
+    // BCP 47 locale tag: e.g. "en", "en-US", "fr"
+    @NotBlank @Pattern(regexp = "^[a-z]{2}(-[A-Z]{2})?$", message = "defaultLocale must be a valid BCP 47 language tag (e.g. 'en' or 'en-US')") String defaultLocale,
+    // Must be a valid http/https URL — used as base for all email links
+    @NotBlank @Pattern(regexp = "^https?://.+", message = "baseUrl must be a valid http or https URL") String baseUrl
 ) {
 
   public record Mail(@NotBlank String from, @NotBlank String fromName, String replyTo) {

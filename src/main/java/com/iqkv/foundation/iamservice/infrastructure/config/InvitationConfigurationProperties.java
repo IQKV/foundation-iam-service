@@ -1,21 +1,6 @@
-/*
- * Copyright 2026 IQKV Foundation Team.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 
@@ -26,6 +11,20 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "iqkv.invitation")
 public record InvitationConfigurationProperties(
     // How long an invitation token remains valid. Default: 72 hours.
-    @NotNull Duration tokenTtl
+    // Must be positive — PT0S would expire all invitations immediately upon creation.
+    @NotNull Duration tokenTtl,
+    // How often the reaper job runs to expire stale invitations. Default: 1 hour.
+    // Must be positive — PT0S would cause continuous reaper execution.
+    @NotNull Duration reaperInterval
 ) {
+
+  @PostConstruct
+  public void validate() {
+    if (tokenTtl != null && (tokenTtl.isZero() || tokenTtl.isNegative())) {
+      throw new IllegalStateException("iqkv.invitation.token-ttl must be a positive duration, got: " + tokenTtl);
+    }
+    if (reaperInterval != null && (reaperInterval.isZero() || reaperInterval.isNegative())) {
+      throw new IllegalStateException("iqkv.invitation.reaper-interval must be a positive duration, got: " + reaperInterval);
+    }
+  }
 }
