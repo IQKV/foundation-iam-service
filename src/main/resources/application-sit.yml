@@ -11,8 +11,8 @@ spring:
 logging:
   level:
     com.iqkv: DEBUG
-    org.mybatis: DEBUG
-    liquibase: DEBUG
+    org.mybatis: INFO
+    liquibase: INFO
 
 iqkv:
   db:
