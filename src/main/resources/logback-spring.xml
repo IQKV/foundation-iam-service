@@ -55,6 +55,7 @@
     <logger name="org.springframework.web" level="${LOG_LEVEL_SPRING}"/>
     <logger name="org.springframework.amqp" level="${LOG_LEVEL_MESSAGING}"/>
     <logger name="org.springframework.rabbit" level="${LOG_LEVEL_MESSAGING}"/>
+    <logger name="org.mybatis" level="${LOG_LEVEL_SQL}"/>
     <logger name="liquibase" level="INFO"/>
     
     <!-- Default: Text format for local/dev -->
