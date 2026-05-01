@@ -95,6 +95,6 @@ public class SingleTenantBootstrapStrategy implements TenantBootstrapStrategy, A
 
   private String resolveTenantName() {
     final String configuredName = tenancyConfig.defaultTenantName();
-    return (configuredName != null && !configuredName.isBlank()) ? configuredName : "Default Organization";
+    return (configuredName != null && !configuredName.isBlank()) ? configuredName : "Acme Corp.";
   }
 }

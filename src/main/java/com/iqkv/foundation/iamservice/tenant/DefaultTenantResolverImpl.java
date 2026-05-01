@@ -53,7 +53,7 @@ public class DefaultTenantResolverImpl implements DefaultTenantResolver {
   private static final Pattern NANOID_PATTERN = Pattern.compile("^[a-z0-9]{8}$");
 
   private static final String TENANT_MODE_ORIGIN_SINGLE_BOOTSTRAP = "SINGLE_BOOTSTRAP";
-  private static final String DEFAULT_TENANT_NAME = "Default Organization";
+  private static final String DEFAULT_TENANT_NAME = "Acme Corp.";
 
   private final TenantMapper tenantMapper;
   private final TenancyConfigurationProperties tenancyConfig;

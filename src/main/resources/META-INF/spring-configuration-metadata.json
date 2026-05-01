@@ -265,7 +265,7 @@
       "name": "iqkv.tenancy.default-tenant-name",
       "type": "java.lang.String",
       "description": "Display name for the default tenant in SINGLE tenancy mode.",
-      "defaultValue": "Default Organization"
+      "defaultValue": "Acme Corp."
     },
     {
       "name": "iqkv.tenancy.schema-prefix",

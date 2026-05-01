@@ -106,7 +106,7 @@ iqkv:
     # Example: abc12345
     default-tenant-key: ${DEFAULT_TENANT_KEY:}
     # Display name for the default tenant in SINGLE_TENANT mode
-    default-tenant-name: ${DEFAULT_TENANT_NAME:Default Organization}
+    default-tenant-name: ${DEFAULT_TENANT_NAME:Acme Corp.}
     schema-prefix: t_
     default-schema: public
     provisioning-timeout: PT10M

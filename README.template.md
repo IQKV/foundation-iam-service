@@ -1,6 +1,6 @@
 # Foundation IAM Service 🔐
 
-Identity and Access Management microservice for the IQKV platform. Owns user accounts, tenant lifecycle, memberships, and RS256 token issuance. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
+Identity and Access Management microservice for the Key Value Platform. Owns user accounts, tenant lifecycle, memberships, and RS256 token issuance. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
 
 ## About
 
@@ -151,7 +151,7 @@ export $(grep -v '^#' .env.local | xargs)
 | `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                                 |
 | `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
 | `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
-| `DEFAULT_TENANT_NAME`  | `Default Organization`       | Default tenant display name                      |
+| `DEFAULT_TENANT_NAME`  | `Acme Corp.`       | Default tenant display name                      |
 | `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
