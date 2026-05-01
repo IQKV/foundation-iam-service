@@ -151,7 +151,7 @@ export $(grep -v '^#' .env.local | xargs)
 | `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                                 |
 | `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
 | `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
-| `DEFAULT_TENANT_NAME`  | `Acme Corp.`       | Default tenant display name                      |
+| `DEFAULT_TENANT_NAME`  | `Acme Corp.`                 | Default tenant display name                      |
 | `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
