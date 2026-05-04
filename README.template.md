@@ -52,7 +52,7 @@ Base path: `/api/v1/iam`
 | `POST`   | `/users/password/forgot`           | public                    | Initiate password reset (rate-limited)       |
 | `POST`   | `/users/password/reset`            | public                    | Complete password reset with token           |
 
-### User Admin — `/api/v1/iam/admin/users`
+### User Operator — `/api/v1/iam/operator/users`
 
 | Method   | Path                | Auth        | Description                         |
 | -------- | ------------------- | ----------- | ----------------------------------- |

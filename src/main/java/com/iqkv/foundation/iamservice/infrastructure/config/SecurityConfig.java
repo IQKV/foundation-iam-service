@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -48,6 +49,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final AuthConfigurationProperties authProps;
@@ -81,7 +83,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/email/resend-verification").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/forgot").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/reset").permitAll()
-            .requestMatchers("/api/v1/iam/admin/users/**").permitAll()
+            .requestMatchers("/api/v1/iam/operator/**").hasAuthority("PLATFORM_OPERATOR")
+            .requestMatchers("/api/v1/iam/operator/users/**").permitAll()
             // Invitation accept flow — public (no JWT required)
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/invitations/*").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/invitations/*/accept").permitAll()

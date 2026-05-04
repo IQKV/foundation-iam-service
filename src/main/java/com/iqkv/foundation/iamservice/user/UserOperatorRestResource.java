@@ -30,8 +30,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,22 +48,26 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/v1/iam/admin/users")
-@Tag(name = "User Admin", description = "Admin CRUD operations for users")
+@RequestMapping("/api/v1/iam/operator/users")
+@Tag(name = "User Operator", description = "Platform operator CRUD operations for users — requires PLATFORM_OPERATOR authority")
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasAuthority('PLATFORM_OPERATOR')")
 @Validated
-public class UserAdminRestResource {
+public class UserOperatorRestResource {
 
   private final UserService userService;
 
-  public UserAdminRestResource(final UserService userService) {
+  public UserOperatorRestResource(final UserService userService) {
     this.userService = userService;
   }
 
   @GetMapping
-  @Operation(summary = "List users", description = "Returns a paginated list of all users, ordered by creation date descending.")
+  @Operation(summary = "List users", description = "Returns a paginated list of all users across all tenants, ordered by creation date descending.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Page of users returned"),
-      @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content)
+      @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content)
   })
   public ResponseEntity<UserDtos.PagedUserResponse> listUsers(
       @Parameter(description = "Zero-based page index", example = "0")
@@ -75,6 +81,8 @@ public class UserAdminRestResource {
   @Operation(summary = "Get user by ID")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   public ResponseEntity<UserDtos.UserResponse> getUser(
@@ -89,6 +97,8 @@ public class UserAdminRestResource {
                    headers = @Header(name = "Location", description = "URL of the created user",
                                      schema = @Schema(type = "string", format = "uri"))),
       @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content),
       @ApiResponse(responseCode = "409", description = "Email already in use", content = @Content)
   })
   public ResponseEntity<UserDtos.UserResponse> createUser(
@@ -106,6 +116,8 @@ public class UserAdminRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User updated"),
       @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   public ResponseEntity<UserDtos.UserResponse> replaceUser(
@@ -119,6 +131,8 @@ public class UserAdminRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User patched"),
       @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   public ResponseEntity<UserDtos.UserResponse> patchUser(
@@ -131,6 +145,8 @@ public class UserAdminRestResource {
   @Operation(summary = "Delete user", description = "Permanently deletes the user and all associated memberships (cascade).")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "User deleted"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_OPERATOR required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   public ResponseEntity<Void> deleteUser(
