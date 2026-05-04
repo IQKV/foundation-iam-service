@@ -19,7 +19,7 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 
 - **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
 - **Signup by invitation** — existing TENANT_OWNER or ADMIN sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
-- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `PLAFORM_OPERATOR`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
@@ -74,11 +74,11 @@ Base path: `/api/v1/iam`
 
 ### Tenant Management
 
-| Method   | Path                                      | Auth                                          | Description                 |
-| -------- | ----------------------------------------- | --------------------------------------------- | --------------------------- |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status           |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status    |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning   |
+| Method   | Path                                      | Auth                                                     | Description                 |
+| -------- | ----------------------------------------- | -------------------------------------------------------- | --------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                                       | Get tenant status           |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                                       | Transition tenant status    |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                                       | Retry failed provisioning   |
 | `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
 | `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
 | `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
@@ -90,16 +90,16 @@ Base path: `/api/v1/iam`
 | `GET`  | `/invitations/{token}`        | public | Preview invitation — token resolves tenant |
 | `POST` | `/invitations/{token}/accept` | public | Accept invitation — token resolves tenant  |
 
-### Admin
+### Platform Operator
 
-| Method   | Path                | Auth | Description                     |
-| -------- | ------------------- | ---- | ------------------------------- |
-| `GET`    | `/admin/users`      | JWT  | List all users (paginated)      |
-| `GET`    | `/admin/users/{id}` | JWT  | Get user by ID                  |
-| `POST`   | `/admin/users`      | JWT  | Create user                     |
-| `PUT`    | `/admin/users/{id}` | JWT  | Replace user (full update)      |
-| `PATCH`  | `/admin/users/{id}` | JWT  | Partially update user           |
-| `DELETE` | `/admin/users/{id}` | JWT  | Delete user and all memberships |
+| Method   | Path                   | Auth | Description                     |
+| -------- | ---------------------- | ---- | ------------------------------- |
+| `GET`    | `/operator/users`      | JWT  | List all users (paginated)      |
+| `GET`    | `/operator/users/{id}` | JWT  | Get user by ID                  |
+| `POST`   | `/operator/users`      | JWT  | Create user                     |
+| `PUT`    | `/operator/users/{id}` | JWT  | Replace user (full update)      |
+| `PATCH`  | `/operator/users/{id}` | JWT  | Partially update user           |
+| `DELETE` | `/operator/users/{id}` | JWT  | Delete user and all memberships |
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 

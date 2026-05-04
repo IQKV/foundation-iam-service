@@ -8,7 +8,7 @@ The IAM service is the identity backbone of the platform:
 
 - **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
 - **Signup by invitation** — existing `TENANT_OWNER` or `ADMIN` sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
-- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `PLAFORM_OPERATOR`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
@@ -54,14 +54,14 @@ Base path: `/api/v1/iam`
 
 ### User Operator — `/api/v1/iam/operator/users`
 
-| Method   | Path                | Auth        | Description                         |
-| -------- | ------------------- | ----------- | ----------------------------------- |
-| `GET`    | `/admin/users`      | JWT `ADMIN` | List users (paginated)              |
-| `GET`    | `/admin/users/{id}` | JWT `ADMIN` | Get user by UUID                    |
-| `POST`   | `/admin/users`      | JWT `ADMIN` | Create user with temporary password |
-| `PUT`    | `/admin/users/{id}` | JWT `ADMIN` | Replace user (full update)          |
-| `PATCH`  | `/admin/users/{id}` | JWT `ADMIN` | Partially update user               |
-| `DELETE` | `/admin/users/{id}` | JWT `ADMIN` | Delete user and all memberships     |
+| Method   | Path                   | Auth                   | Description                         |
+| -------- | ---------------------- | ---------------------- | ----------------------------------- |
+| `GET`    | `/operator/users`      | JWT `PLAFORM_OPERATOR` | List users (paginated)              |
+| `GET`    | `/operator/users/{id}` | JWT `PLAFORM_OPERATOR` | Get user by UUID                    |
+| `POST`   | `/operator/users`      | JWT `PLAFORM_OPERATOR` | Create user with temporary password |
+| `PUT`    | `/operator/users/{id}` | JWT `PLAFORM_OPERATOR` | Replace user (full update)          |
+| `PATCH`  | `/operator/users/{id}` | JWT `PLAFORM_OPERATOR` | Partially update user               |
+| `DELETE` | `/operator/users/{id}` | JWT `PLAFORM_OPERATOR` | Delete user and all memberships     |
 
 ### Tenant — `/api/v1/iam/tenants`
 
@@ -73,13 +73,13 @@ Base path: `/api/v1/iam`
 
 ### Invitations
 
-| Method   | Path                                    | Auth                                       | Description                                    |
-| -------- | --------------------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email                          |
-| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations                       |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation                              |
-| `GET`    | `/invitations/{token}`                  | public                                     | Preview invitation (tenant name, role, expiry) |
-| `POST`   | `/invitations/{token}/accept`           | public                                     | Accept invitation; returns token pair          |
+| Method   | Path                                    | Auth                                                  | Description                                    |
+| -------- | --------------------------------------- | ----------------------------------------------------- | ---------------------------------------------- |
+| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLAFORM_OPERATOR` + `X-Tenant-ID` | Send invitation email                          |
+| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLAFORM_OPERATOR` + `X-Tenant-ID` | List pending invitations                       |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`PLAFORM_OPERATOR` + `X-Tenant-ID` | Revoke invitation                              |
+| `GET`    | `/invitations/{token}`                  | public                                                | Preview invitation (tenant name, role, expiry) |
+| `POST`   | `/invitations/{token}/accept`           | public                                                | Accept invitation; returns token pair          |
 
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
@@ -231,7 +231,7 @@ Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of 
 - **Persistence**: MyBatis with XML mappers + PostgreSQL; Liquibase manages both system and per-tenant schema migrations; `is_default` column on `public.tenants` marks the single-mode default tenant with a partial unique index
 - **Messaging**: RabbitMQ for async domain events (tenant provisioning); ShedLock guards scheduled cleanup jobs (expired tokens, stuck tenants)
 - **Security**: Spring Security + JJWT RS256; JTI denylist for token revocation; `last_global_signout_at` for session-wide invalidation; brute-force lockout per identity
-- **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`); tenant-scoped endpoints require a JWT scoped to the target tenant via `X-Tenant-ID` header
+- **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant authorities (`TENANT_OWNER`, `PLAFORM_OPERATOR`, `MEMBER`); tenant-scoped endpoints require a JWT scoped to the target tenant via `X-Tenant-ID` header
 - **Platform rollout mode**: Controlled via `iqkv.platform.rollout-mode` (`MULTI_TENANT` | `SINGLE_TENANT`); must be identical across IAM, Billing, and Gateway; IAM publishes canonical mode via `/actuator/info` under `platform.rollout-mode`; service fails readiness on invalid/missing mode
 - **Single-tenant mode**: Strategy pattern (`SignupStrategy`, `TenantBootstrapStrategy`) branches behavior at startup and signup; `SingleTenantBootstrapStrategy` idempotently provisions the default tenant on `ApplicationReadyEvent`; `SingleTenantSignupStrategy` joins users to the default tenant with `MEMBER` authority — no tenant creation, no `TENANT_OWNER` grant
 - **Invitations**: Token-based signup-by-invitation flow; token resolves tenant context so accept endpoints are tenant-agnostic; `authority` defaults to `MEMBER`; ShedLock-guarded reaper expires stale tokens

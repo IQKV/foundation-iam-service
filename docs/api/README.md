@@ -57,11 +57,11 @@ Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 
 
 ### Tenant Management
 
-| Method   | Path                                      | Auth                                          | Description                 |
-| -------- | ----------------------------------------- | --------------------------------------------- | --------------------------- |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status           |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status    |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning   |
+| Method   | Path                                      | Auth                                                     | Description                 |
+| -------- | ----------------------------------------- | -------------------------------------------------------- | --------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                                       | Get tenant status           |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                                       | Transition tenant status    |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                                       | Retry failed provisioning   |
 | `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
 | `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
 | `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
@@ -84,16 +84,16 @@ For existing users: only `password` is required (used to verify identity).
 
 ---
 
-### Admin
+### Platform Operator
 
-| Method   | Path                | Auth | Description                     |
-| -------- | ------------------- | ---- | ------------------------------- |
-| `GET`    | `/admin/users`      | JWT  | List all users (paginated)      |
-| `GET`    | `/admin/users/{id}` | JWT  | Get user by ID                  |
-| `POST`   | `/admin/users`      | JWT  | Create user                     |
-| `PUT`    | `/admin/users/{id}` | JWT  | Replace user (full update)      |
-| `PATCH`  | `/admin/users/{id}` | JWT  | Partially update user           |
-| `DELETE` | `/admin/users/{id}` | JWT  | Delete user and all memberships |
+| Method   | Path                   | Auth | Description                     |
+| -------- | ---------------------- | ---- | ------------------------------- |
+| `GET`    | `/operator/users`      | JWT  | List all users (paginated)      |
+| `GET`    | `/operator/users/{id}` | JWT  | Get user by ID                  |
+| `POST`   | `/operator/users`      | JWT  | Create user                     |
+| `PUT`    | `/operator/users/{id}` | JWT  | Replace user (full update)      |
+| `PATCH`  | `/operator/users/{id}` | JWT  | Partially update user           |
+| `DELETE` | `/operator/users/{id}` | JWT  | Delete user and all memberships |
 
 ---
 
