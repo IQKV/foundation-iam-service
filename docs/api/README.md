@@ -57,11 +57,11 @@ Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 
 
 ### Tenant Management
 
-| Method   | Path                                      | Auth                                                     | Description                 |
-| -------- | ----------------------------------------- | -------------------------------------------------------- | --------------------------- |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                                       | Get tenant status           |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                                       | Transition tenant status    |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                                       | Retry failed provisioning   |
+| Method   | Path                                      | Auth                                          | Description                 |
+| -------- | ----------------------------------------- | --------------------------------------------- | --------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status           |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status    |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning   |
 | `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
 | `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
 | `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
