@@ -37,12 +37,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p>Returns 400 with a problem+json body when the tenant cannot be resolved.
  * Always clears the tenant context in a {@code finally} block.
+ *
+ * <p><strong>Temporary:</strong> when no tenant can be resolved the filter falls back to
+ * {@value #DEFAULT_DEMO_TENANT} to support demo/development environments.
+ * Remove this fallback before going to production.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class TenantExtractionFilter extends OncePerRequestFilter {
 
   private static final String TENANT_HEADER = "X-Tenant-ID";
+
+  // TODO: remove demo fallback before production
+  private static final String DEFAULT_DEMO_TENANT = "demo0001";
 
   private final JwtDecoder jwtDecoder;
 
@@ -56,13 +63,9 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
                                   final FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      final String tenantId = resolveTenantId(request);
-      if (tenantId == null) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("application/problem+json");
-        response.getWriter().write("{\"title\":\"Tenant ID required\",\"status\":400}");
-        return;
-      }
+      final String resolved = resolveTenantId(request);
+      // TODO: remove demo fallback before production
+      final String tenantId = (resolved != null) ? resolved : DEFAULT_DEMO_TENANT;
       TenantContext.setCurrentTenant(tenantId);
       filterChain.doFilter(request, response);
     } finally {
