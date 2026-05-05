@@ -21,8 +21,10 @@ import javax.sql.DataSource;
 
 import com.iqkv.foundation.iamservice.infrastructure.mybatis.UuidTypeHandler;
 import com.iqkv.foundation.iamservice.tenancy.MyBatisSchemaInterceptor;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -30,13 +32,21 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 /**
  * MyBatis configuration: registers the schema interceptor and configures mapper locations.
  *
- * <p>Mapper scanning is intentionally NOT declared here. The authoritative {@code @MapperScan}
- * lives on {@link com.iqkv.foundation.iamservice.IamServiceApplication} and lists only the
- * concrete mapper packages. A broad scan here would pick up non-mapper interfaces (e.g.
- * {@code PlatformModeValidator}) and cause MyBatis to throw
- * "Invalid bound statement (not found)" at runtime.
  */
 @Configuration
+@MapperScan(
+    basePackages = {
+        "com.iqkv.foundation.iamservice.denylist",
+        "com.iqkv.foundation.iamservice.email",
+        "com.iqkv.foundation.iamservice.invitation",
+        "com.iqkv.foundation.iamservice.lockout",
+        "com.iqkv.foundation.iamservice.membership",
+        "com.iqkv.foundation.iamservice.passwordreset",
+        "com.iqkv.foundation.iamservice.tenant",
+        "com.iqkv.foundation.iamservice.user"
+    },
+    annotationClass = Mapper.class
+)
 public class MyBatisConfig {
 
   @Bean

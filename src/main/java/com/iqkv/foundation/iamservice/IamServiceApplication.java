@@ -19,8 +19,6 @@ package com.iqkv.foundation.iamservice;
 import java.util.TimeZone;
 
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
-import org.apache.ibatis.annotations.Mapper;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -30,19 +28,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "PT55M")
 @ConfigurationPropertiesScan
-@MapperScan(
-    basePackages = {
-        "com.iqkv.foundation.iamservice.denylist",
-        "com.iqkv.foundation.iamservice.email",
-        "com.iqkv.foundation.iamservice.invitation",
-        "com.iqkv.foundation.iamservice.lockout",
-        "com.iqkv.foundation.iamservice.membership",
-        "com.iqkv.foundation.iamservice.passwordreset",
-        "com.iqkv.foundation.iamservice.tenant",
-        "com.iqkv.foundation.iamservice.user"
-    },
-    annotationClass = Mapper.class
-)
 public class IamServiceApplication {
 
   public static void main(String[] args) {
