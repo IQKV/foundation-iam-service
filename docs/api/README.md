@@ -84,16 +84,16 @@ For existing users: only `password` is required (used to verify identity).
 
 ---
 
-### Platform Operator
+### Platform Admin
 
-| Method   | Path                   | Auth | Description                     |
-| -------- | ---------------------- | ---- | ------------------------------- |
-| `GET`    | `/operator/users`      | JWT  | List all users (paginated)      |
-| `GET`    | `/operator/users/{id}` | JWT  | Get user by ID                  |
-| `POST`   | `/operator/users`      | JWT  | Create user                     |
-| `PUT`    | `/operator/users/{id}` | JWT  | Replace user (full update)      |
-| `PATCH`  | `/operator/users/{id}` | JWT  | Partially update user           |
-| `DELETE` | `/operator/users/{id}` | JWT  | Delete user and all memberships |
+| Method   | Path                | Auth | Description                     |
+| -------- | ------------------- | ---- | ------------------------------- |
+| `GET`    | `/admin/users`      | JWT  | List all users (paginated)      |
+| `GET`    | `/admin/users/{id}` | JWT  | Get user by ID                  |
+| `POST`   | `/admin/users`      | JWT  | Create user                     |
+| `PUT`    | `/admin/users/{id}` | JWT  | Replace user (full update)      |
+| `PATCH`  | `/admin/users/{id}` | JWT  | Partially update user           |
+| `DELETE` | `/admin/users/{id}` | JWT  | Delete user and all memberships |
 
 ---
 

@@ -24,18 +24,18 @@ public final class UserServiceConstants {
   // Authority constants
 
   /**
-   * Platform-level authority granted to platform operators.
+   * Platform-level authority granted to platform admins.
    *
    * <p><strong>NOT tenant-scoped.</strong> This authority is independent of any tenant membership
    * and is never automatically assigned during any signup flow (single-tenant or multi-tenant).
    * It must be granted explicitly by a platform administrator through an out-of-band process.
    *
-   * <p>Grants access to operator-only operations such as plan catalog management
+   * <p>Grants access to platfrom admin-only operations such as plan catalog management
    * (create, update, delete entries in the plan catalog).
    *
    * <p>Requirements: 13.1, 13.4
    */
-  public static final String AUTHORITY_PLATFORM_OPERATOR = "PLATFORM_OPERATOR";
+  public static final String AUTHORITY_PLATFORM_ADMIN = "PLATFORM_ADMIN";
 
   public static final String AUTHORITY_TENANT_OWNER = "TENANT_OWNER";
   public static final String AUTHORITY_ADMIN = "ADMIN";
