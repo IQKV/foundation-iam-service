@@ -33,6 +33,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent
 import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.signup.SignupStrategy;
@@ -175,9 +176,10 @@ public class UserServiceImpl implements UserService {
       try {
         user.setStatus(AccountStatus.valueOf(request.status()));
       } catch (final IllegalArgumentException e) {
-        throw new IllegalArgumentException(
-            "Invalid status value: '" + request.status() + "'. Allowed values: "
-            + java.util.Arrays.toString(AccountStatus.values()));
+        final String[] allowed = java.util.Arrays.stream(AccountStatus.values())
+            .map(Enum::name)
+            .toArray(String[]::new);
+        throw new InvalidAccountStatusException(request.status(), allowed);
       }
     }
     user.setUpdatedAt(LocalDateTime.now());

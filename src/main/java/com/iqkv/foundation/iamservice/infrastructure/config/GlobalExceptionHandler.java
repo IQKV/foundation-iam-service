@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
@@ -120,6 +121,19 @@ public class GlobalExceptionHandler {
     log.warn("Constraint violation: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.constraint-violation", locale),
+        400,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(InvalidAccountStatusException.class)
+  public ResponseEntity<ProblemDetail> handleInvalidAccountStatus(final InvalidAccountStatusException ex,
+                                                                  final HttpServletRequest request,
+                                                                  final Locale locale) {
+    log.warn("Invalid account status: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.validation-failed", locale),
         400,
         ex.getMessage(),
         request);
