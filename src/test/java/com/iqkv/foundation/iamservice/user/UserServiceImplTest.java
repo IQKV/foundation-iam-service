@@ -140,11 +140,11 @@ class UserServiceImplTest {
     var user1 = createUser("user1@example.com", "User", "One");
     var user2 = createUser("user2@example.com", "User", "Two");
 
-    when(userMapper.findAll(10, 0)).thenReturn(List.of(user1, user2));
+    when(userMapper.findAll(10, 0, "createdAt", "desc")).thenReturn(List.of(user1, user2));
     when(userMapper.countAll()).thenReturn(2L);
 
     // Act
-    var result = userService.listUsers(0, 10);
+    var result = userService.listUsers(0, 10, "createdAt", "desc");
 
     // Assert
     assertThat(result).isNotNull();

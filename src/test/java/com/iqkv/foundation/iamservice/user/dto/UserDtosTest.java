@@ -60,6 +60,7 @@ class UserDtosTest {
   void shouldCreateUserResponse() {
     var userId = UUID.randomUUID();
     var createdAt = LocalDateTime.now();
+    var updatedAt = LocalDateTime.now();
     var response = new UserDtos.UserResponse(
         userId,
         "user@example.com",
@@ -67,7 +68,8 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
-        createdAt
+        createdAt,
+        updatedAt
     );
 
     assertThat(response.id()).isEqualTo(userId);
@@ -77,6 +79,7 @@ class UserDtosTest {
     assertThat(response.status()).isEqualTo("ACTIVE");
     assertThat(response.emailVerified()).isTrue();
     assertThat(response.createdAt()).isEqualTo(createdAt);
+    assertThat(response.updatedAt()).isEqualTo(updatedAt);
   }
 
   @Test
@@ -135,6 +138,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        LocalDateTime.now(),
         LocalDateTime.now()
     );
     var content = List.of(userResponse);
