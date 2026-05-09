@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
     if (request.status() != null) {
       try {
         user.setStatus(AccountStatus.valueOf(request.status()));
-      } catch (IllegalArgumentException e) {
+      } catch (final IllegalArgumentException e) {
         throw new IllegalArgumentException(
             "Invalid status value: '" + request.status() + "'. Allowed values: "
             + java.util.Arrays.toString(AccountStatus.values()));
