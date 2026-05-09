@@ -124,9 +124,17 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDtos.PagedUserResponse listUsers(final int page, final int size) {
+  public UserDtos.PagedUserResponse listUsers(final int page, final int size,
+                                              final String sortBy, final String sortDir) {
+    // Allowlist validation — prevents any unsanitised value reaching the ${}
+    // substitution in UserMapper.xml. The <choose> block is the last line of
+    // defence; this guard makes the intent explicit and testable.
+    final String safeSortBy = java.util.Set.of("email", "firstName", "lastName", "updatedAt", "createdAt")
+        .contains(sortBy) ? sortBy : "createdAt";
+    final String safeSortDir = "asc".equalsIgnoreCase(sortDir) ? "asc" : "desc";
+
     final int offset = page * size;
-    final var users = userMapper.findAll(size, offset).stream()
+    final var users = userMapper.findAll(size, offset, safeSortBy, safeSortDir).stream()
         .map(UserDtoMapper::toResponse)
         .toList();
     final long total = userMapper.countAll();

@@ -52,7 +52,8 @@ public final class UserDtos {
       String lastName,
       String status,
       boolean emailVerified,
-      LocalDateTime createdAt) {
+      LocalDateTime createdAt,
+      LocalDateTime updatedAt) {
   }
 
   public record SignupResponse(

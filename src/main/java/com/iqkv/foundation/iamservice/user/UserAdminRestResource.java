@@ -58,7 +58,7 @@ public class UserAdminRestResource {
   }
 
   @GetMapping
-  @Operation(summary = "List users", description = "Returns a paginated list of all users across all tenants, ordered by creation date descending.")
+  @Operation(summary = "List users", description = "Returns a paginated list of all users across all tenants.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Page of users returned"),
       @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
@@ -69,8 +69,12 @@ public class UserAdminRestResource {
       @Parameter(description = "Zero-based page index", example = "0")
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @Parameter(description = "Page size (1–100)", example = "20")
-      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
-    return ResponseEntity.ok(userService.listUsers(page, size));
+      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
+      @Parameter(description = "Sort field: email | firstName | lastName | updatedAt | createdAt", example = "createdAt")
+      @RequestParam(defaultValue = "createdAt") String sortBy,
+      @Parameter(description = "Sort direction: asc | desc", example = "desc")
+      @RequestParam(defaultValue = "desc") String sortDir) {
+    return ResponseEntity.ok(userService.listUsers(page, size, sortBy, sortDir));
   }
 
   @GetMapping("/{id}")

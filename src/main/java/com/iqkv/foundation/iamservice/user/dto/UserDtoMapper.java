@@ -32,7 +32,8 @@ public final class UserDtoMapper {
         user.getLastName(),
         user.getStatus() != null ? user.getStatus().name() : null,
         user.isEmailVerified(),
-        user.getCreatedAt());
+        user.getCreatedAt(),
+        user.getUpdatedAt());
   }
 
   public static UserDtos.SignupResponse toSignupResponse(final User user, final Tenant tenant) {

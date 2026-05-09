@@ -55,7 +55,19 @@
                email_verified, last_global_signout_at,
                created_at, updated_at, created_by, updated_by
         FROM public.users
-        ORDER BY created_at DESC
+        ORDER BY
+            <choose>
+                <when test="sortBy == 'email'">email</when>
+                <when test="sortBy == 'firstName'">first_name</when>
+                <when test="sortBy == 'lastName'">last_name</when>
+                <when test="sortBy == 'updatedAt'">updated_at</when>
+                <otherwise>created_at</otherwise>
+            </choose>
+            <choose>
+                <when test="sortDir == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+            , id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
