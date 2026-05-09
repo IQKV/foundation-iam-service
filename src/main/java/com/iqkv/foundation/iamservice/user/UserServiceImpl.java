@@ -172,7 +172,13 @@ public class UserServiceImpl implements UserService {
       user.setLastName(request.lastName());
     }
     if (request.status() != null) {
-      user.setStatus(AccountStatus.valueOf(request.status()));
+      try {
+        user.setStatus(AccountStatus.valueOf(request.status()));
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException(
+            "Invalid status value: '" + request.status() + "'. Allowed values: "
+            + java.util.Arrays.toString(AccountStatus.values()));
+      }
     }
     user.setUpdatedAt(LocalDateTime.now());
     user.setUpdatedBy("system");

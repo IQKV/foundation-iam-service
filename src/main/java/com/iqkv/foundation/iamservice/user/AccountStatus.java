@@ -17,5 +17,8 @@
 package com.iqkv.foundation.iamservice.user;
 
 public enum AccountStatus {
-  ACTIVE
+  ACTIVE,
+  LOCKED,
+  SUSPENDED,
+  DELETED
 }
