@@ -25,19 +25,24 @@ import org.junit.jupiter.api.Test;
 class AccountStatusTest {
 
   @Test
-  @DisplayName("Should have ACTIVE status")
+  @DisplayName("Should have all expected status values")
   void shouldHaveActiveStatus() {
     var statuses = AccountStatus.values();
 
-    assertThat(statuses).contains(AccountStatus.ACTIVE);
-    assertThat(statuses).hasSize(1);
+    assertThat(statuses).containsExactlyInAnyOrder(
+        AccountStatus.ACTIVE,
+        AccountStatus.LOCKED,
+        AccountStatus.SUSPENDED,
+        AccountStatus.DELETED
+    );
   }
 
   @Test
   @DisplayName("Should convert from string")
   void shouldConvertFromString() {
-    var active = AccountStatus.valueOf("ACTIVE");
-
-    assertThat(active).isEqualTo(AccountStatus.ACTIVE);
+    assertThat(AccountStatus.valueOf("ACTIVE")).isEqualTo(AccountStatus.ACTIVE);
+    assertThat(AccountStatus.valueOf("LOCKED")).isEqualTo(AccountStatus.LOCKED);
+    assertThat(AccountStatus.valueOf("SUSPENDED")).isEqualTo(AccountStatus.SUSPENDED);
+    assertThat(AccountStatus.valueOf("DELETED")).isEqualTo(AccountStatus.DELETED);
   }
 }
