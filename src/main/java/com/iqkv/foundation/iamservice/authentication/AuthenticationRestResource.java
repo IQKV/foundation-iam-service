@@ -82,6 +82,22 @@ public class AuthenticationRestResource {
     return ResponseEntity.ok(authenticationService.signIn(request));
   }
 
+  @PostMapping("/admin/signin")
+  @Operation(summary = "Platform admin sign-in",
+             description = "Authenticates a user using platform-level roles only. "
+                           + "No X-Tenant-ID header is required or used. "
+                           + "Returns 403 if the user has no platform-level roles (e.g. PLATFORM_ADMIN). "
+                           + "The issued access token carries a null tenant_id claim.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Tokens issued"),
+      @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+      @ApiResponse(responseCode = "403", description = "Account locked or no platform-level roles")
+  })
+  public ResponseEntity<AuthenticationDtos.TokenResponse> adminSignIn(
+      @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {
+    return ResponseEntity.ok(authenticationService.adminSignIn(request));
+  }
+
   @PostMapping("/refresh")
   @Operation(summary = "Refresh access token",
              description = "Issues a new access token and refresh token pair using a valid refresh token. "

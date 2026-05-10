@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260510000000" author="iqkv">
+        <comment>
+            Platform-level roles keyed directly to users, bypassing tenant membership.
+            PLATFORM_ADMIN is stored here — not in tenant_member_authorities.
+        </comment>
+
+        <createTable tableName="user_platform_roles" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_user_platform_roles_user_id"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="role" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="granted_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="granted_by" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uq_user_platform_roles_user_role"
+                tableName="user_platform_roles"
+                schemaName="public"
+                columnNames="user_id, role"/>
+
+        <createIndex indexName="idx_user_platform_roles_user_id"
+                     tableName="user_platform_roles"
+                     schemaName="public">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

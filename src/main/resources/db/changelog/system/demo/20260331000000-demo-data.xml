@@ -9,10 +9,10 @@
         Demo seed data — local/dev only (context: demo).
 
         Tenant   : demo0001
-        Password : TenantAdmin123!  (BCrypt 12, shared by all demo users)
-        Authority: TENANT_OWNER (all users)
+        Password : TenantAdmin123!  (BCrypt 12, shared by all demo tenant users)
+        Authority: TENANT_OWNER (all tenant users)
 
-        Users (30 total):
+        Users (30 total, tenant-scoped):
           00000000-0000-0000-0001-000000000001  admin@demo.iqkv.com
           00000000-0000-0000-0001-000000000002  alice.johnson@demo.iqkv.com
           00000000-0000-0000-0001-000000000003  bob.smith@demo.iqkv.com
@@ -43,6 +43,11 @@
           00000000-0000-0000-0001-000000000028  aaron.king@demo.iqkv.com
           00000000-0000-0000-0001-000000000029  bella.wright@demo.iqkv.com
           00000000-0000-0000-0001-000000000030  carlos.scott@demo.iqkv.com
+
+        Platform admin (no tenant membership):
+          00000000-0000-0000-0001-000000000031  platform.admin@iqkv.com
+          Password : PlatformAdmin123!
+          Sign-in  : POST /api/v1/iam/auth/admin/signin  (no X-Tenant-ID header)
     -->
 
     <changeSet id="20260331000000-demo-tenant" author="iqkv" context="demo">
@@ -941,6 +946,47 @@
                 <where>membership_id IN (
                     SELECT id FROM public.tenant_memberships WHERE tenant_key = 'demo0001'
                 )</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!--
+        Demo platform admin user — context: demo.
+
+        This user has NO tenant membership. Authentication goes through
+        POST /api/v1/iam/auth/admin/signin (no X-Tenant-ID required).
+
+        Email    : platform.admin@iqkv.com
+        Password : PlatformAdmin123!  (BCrypt 12)
+        Role     : PLATFORM_ADMIN (user_platform_roles, not tenant_member_authorities)
+    -->
+    <changeSet id="20260510000001-demo-platform-admin" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0001-000000000031"/>
+            <column name="email"          value="platform.admin@iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$8/3GY/ePEi53F85X4MzrzORv.nHIIcIW/F/qnLgyX4uLgc0xqF2su"/>
+            <column name="first_name"     value="Platform"/>
+            <column name="last_name"      value="Admin"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-10T00:00:00"/>
+            <column name="updated_at"     valueDate="2026-05-10T00:00:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="user_platform_roles" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id"    value="00000000-0000-0000-0001-000000000031"/>
+            <column name="role"       value="PLATFORM_ADMIN"/>
+            <column name="granted_at" valueDate="2026-05-10T00:00:00"/>
+            <column name="granted_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="user_platform_roles" schemaName="public">
+                <where>user_id = '00000000-0000-0000-0001-000000000031'</where>
+            </delete>
+            <delete tableName="users" schemaName="public">
+                <where>id = '00000000-0000-0000-0001-000000000031'</where>
             </delete>
         </rollback>
     </changeSet>

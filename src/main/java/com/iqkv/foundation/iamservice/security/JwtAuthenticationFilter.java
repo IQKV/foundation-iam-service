@@ -120,6 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     return ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signup"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))

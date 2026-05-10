@@ -24,6 +24,13 @@ public interface AuthenticationService {
 
   AuthenticationDtos.TokenResponse signIn(AuthenticationDtos.SignInRequest request);
 
+  /**
+   * Platform admin sign-in. No tenant context required.
+   * Authenticates the user globally and loads authorities exclusively from {@code user_platform_roles}.
+   * Returns 403 if the user has no platform-level roles.
+   */
+  AuthenticationDtos.TokenResponse adminSignIn(AuthenticationDtos.SignInRequest request);
+
   AuthenticationDtos.TokenResponse refresh(AuthenticationDtos.RefreshTokenRequest request);
 
   void signOut(String jti, String userId, String expiresAt);

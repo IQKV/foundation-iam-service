@@ -35,6 +35,7 @@ import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenE
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.NoPlatformRoleException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
@@ -262,6 +263,19 @@ public class GlobalExceptionHandler {
                                                                 final HttpServletRequest request,
                                                                 final Locale locale) {
     log.warn("Membership not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.forbidden", locale),
+        403,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(NoPlatformRoleException.class)
+  public ResponseEntity<ProblemDetail> handleNoPlatformRole(final NoPlatformRoleException ex,
+                                                            final HttpServletRequest request,
+                                                            final Locale locale) {
+    log.warn("Platform admin sign-in rejected — no platform roles: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.forbidden", locale),
         403,
