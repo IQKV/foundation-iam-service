@@ -73,13 +73,13 @@ Base path: `/api/v1/iam`
 
 ### Invitations
 
-| Method   | Path                                    | Auth                                                | Description                                    |
-| -------- | --------------------------------------- | --------------------------------------------------- | ---------------------------------------------- |
-| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Send invitation email                          |
-| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | List pending invitations                       |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Revoke invitation                              |
+| Method   | Path                                    | Auth                                                | Description                                         |
+| -------- | --------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Send invitation email                               |
+| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | List pending invitations                            |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Revoke invitation                                   |
 | `GET`    | `/invitations/{token}`                  | public                                              | Preview invitation (tenant name, authority, expiry) |
-| `POST`   | `/invitations/{token}/accept`           | public                                              | Accept invitation; returns token pair          |
+| `POST`   | `/invitations/{token}/accept`           | public                                              | Accept invitation; returns token pair               |
 
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
