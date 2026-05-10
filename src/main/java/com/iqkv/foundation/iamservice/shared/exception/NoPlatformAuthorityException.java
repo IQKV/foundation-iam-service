@@ -20,9 +20,9 @@ package com.iqkv.foundation.iamservice.shared.exception;
  * Thrown when a user attempts platform admin sign-in but has no platform-level authortities.
  * Maps to HTTP 403.
  */
-public class NoPlatformRoleException extends RuntimeException {
+public class NoPlatformAuthorityException extends RuntimeException {
 
-  public NoPlatformRoleException() {
+  public NoPlatformAuthorityException() {
     super("User does not have any platform-level authortities");
   }
 }

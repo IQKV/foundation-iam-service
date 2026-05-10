@@ -41,7 +41,7 @@ import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
-import com.iqkv.foundation.iamservice.shared.exception.NoPlatformRoleException;
+import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
@@ -172,7 +172,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       // Record the failed attempt to prevent user enumeration via timing differences,
       // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
       accountLockoutManager.reset(request.email());
-      throw new NoPlatformRoleException();
+      throw new NoPlatformAuthorityException();
     }
 
     accountLockoutManager.reset(request.email());

@@ -35,7 +35,7 @@ import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenE
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.NoPlatformRoleException;
+import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
@@ -271,8 +271,8 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
-  @ExceptionHandler(NoPlatformRoleException.class)
-  public ResponseEntity<ProblemDetail> handleNoPlatformRole(final NoPlatformRoleException ex,
+  @ExceptionHandler(NoPlatformAuthorityException.class)
+  public ResponseEntity<ProblemDetail> handleNoPlatformAuthority(final NoPlatformAuthorityException ex,
                                                             final HttpServletRequest request,
                                                             final Locale locale) {
     log.warn("Platform admin sign-in rejected — no platform authortities: {}", ex.getMessage());
