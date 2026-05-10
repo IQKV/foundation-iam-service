@@ -218,6 +218,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
+  public AuthenticationDtos.TokenResponse adminRefresh(final AuthenticationDtos.RefreshTokenRequest request) {
+    final Jwt jwt;
+    try {
+      jwt = jwtDecoder.decode(request.refreshToken());
+    } catch (final JwtException e) {
+      throw new BadCredentialsException("Invalid token signature", e);
+    }
+
+    final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
+    if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
+      throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
+    }
+
+    final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
+    final var user = userMapper.findByEmail(email)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
+    if (platformAuthorities.isEmpty()) {
+      throw new NoPlatformAuthorityException();
+    }
+
+    final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
+    final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
+
+    return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, null);
+  }
+
+  @Override
   public void signOut(final String jti, final String userId, final String expiresAt) {
     tokenDenylistService.denyToken(jti, UUID.fromString(userId), Instant.parse(expiresAt));
   }

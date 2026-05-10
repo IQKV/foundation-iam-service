@@ -98,6 +98,21 @@ public class AuthenticationRestResource {
     return ResponseEntity.ok(authenticationService.adminSignIn(request));
   }
 
+  @PostMapping("/admin/refresh")
+  @Operation(summary = "Platform admin token refresh",
+             description = "Issues a new platform-scoped access token and refresh token pair using a valid refresh token. "
+                           + "No X-Tenant-ID header is required or used. "
+                           + "Returns 403 if the user no longer holds any platform-level authorities.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "New token pair issued"),
+      @ApiResponse(responseCode = "401", description = "Invalid, expired, or wrong-type token"),
+      @ApiResponse(responseCode = "403", description = "User no longer has platform-level authorities")
+  })
+  public ResponseEntity<AuthenticationDtos.TokenResponse> adminRefresh(
+      @Valid @RequestBody final AuthenticationDtos.RefreshTokenRequest request) {
+    return ResponseEntity.ok(authenticationService.adminRefresh(request));
+  }
+
   @PostMapping("/refresh")
   @Operation(summary = "Refresh access token",
              description = "Issues a new access token and refresh token pair using a valid refresh token. "

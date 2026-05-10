@@ -78,6 +78,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/tenants").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/signin").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/admin/signin").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/admin/refresh").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/refresh").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/validate").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/email/verify").permitAll()

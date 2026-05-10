@@ -33,6 +33,13 @@ public interface AuthenticationService {
 
   AuthenticationDtos.TokenResponse refresh(AuthenticationDtos.RefreshTokenRequest request);
 
+  /**
+   * Platform admin token refresh. No tenant context required.
+   * Validates the refresh token, re-loads platform authorities, and issues a new token pair.
+   * Returns 401 if the token is invalid or expired, 403 if the user no longer has platform authorities.
+   */
+  AuthenticationDtos.TokenResponse adminRefresh(AuthenticationDtos.RefreshTokenRequest request);
+
   void signOut(String jti, String userId, String expiresAt);
 
   void signOutAll(String userId, String jti, String expiresAt);
