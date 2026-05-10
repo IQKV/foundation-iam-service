@@ -84,6 +84,8 @@ class AuthenticationServiceImplTest {
   private MessagingService messagingService;
   @Mock
   private NotificationConfigurationProperties notificationProps;
+  @Mock
+  private com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper platformAuthorityMapper;
 
   private AuthenticationServiceImpl authenticationService;
 
@@ -105,7 +107,8 @@ class AuthenticationServiceImplTest {
         tokenDenylistService,
         emailVerificationTokenMapper,
         messagingService,
-        notificationProps
+        notificationProps,
+        platformAuthorityMapper
     );
 
     testUser = new User();
