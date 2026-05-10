@@ -1,7 +1,7 @@
 > ## 🤔 What is this service all about?
 >
 > - Multi-tenant Identity and Access Management microservice for the IQ Key Value platform.
-> - A single user account can belong to multiple tenants with different roles in each.
+> - A single user account can belong to multiple tenants with different authortities in each.
 > - Make the project easy to maintain with **8 issue templates**.
 > - Quick-start documentation
 > - Manage issues with **20 issue labels**.

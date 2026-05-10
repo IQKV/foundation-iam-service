@@ -84,14 +84,14 @@ public class AuthenticationRestResource {
 
   @PostMapping("/admin/signin")
   @Operation(summary = "Platform admin sign-in",
-             description = "Authenticates a user using platform-level roles only. "
+             description = "Authenticates a user using platform-level authortities only. "
                            + "No X-Tenant-ID header is required or used. "
-                           + "Returns 403 if the user has no platform-level roles (e.g. PLATFORM_ADMIN). "
+                           + "Returns 403 if the user has no platform-level authortities (e.g. PLATFORM_ADMIN). "
                            + "The issued access token carries a null tenant_id claim.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Tokens issued"),
       @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-      @ApiResponse(responseCode = "403", description = "Account locked or no platform-level roles")
+      @ApiResponse(responseCode = "403", description = "Account locked or no platform-level authortities")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> adminSignIn(
       @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {

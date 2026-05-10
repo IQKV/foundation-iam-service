@@ -958,7 +958,7 @@
 
         Email    : platform.admin@iqkv.com
         Password : PlatformAdmin123!  (BCrypt 12)
-        Role     : PLATFORM_ADMIN (user_platform_roles, not tenant_member_authorities)
+        Role     : PLATFORM_ADMIN (platform_authorities, not tenant_member_authorities)
     -->
     <changeSet id="20260510000001-demo-platform-admin" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
@@ -974,15 +974,15 @@
             <column name="created_by"     value="system"/>
             <column name="updated_by"     value="system"/>
         </insert>
-        <insert tableName="user_platform_roles" schemaName="public">
+        <insert tableName="platform_authorities" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0004-000000000001"/>
             <column name="user_id"    value="00000000-0000-0000-0001-000000000031"/>
-            <column name="role"       value="PLATFORM_ADMIN"/>
+            <column name="authority"       value="PLATFORM_ADMIN"/>
             <column name="granted_at" valueDate="2026-05-10T00:00:00"/>
             <column name="granted_by" value="system"/>
         </insert>
         <rollback>
-            <delete tableName="user_platform_roles" schemaName="public">
+            <delete tableName="platform_authorities" schemaName="public">
                 <where>user_id = '00000000-0000-0000-0001-000000000031'</where>
             </delete>
             <delete tableName="users" schemaName="public">

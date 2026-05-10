@@ -140,7 +140,7 @@ drone secret add --repository IQKV/foundation-iam-service --name SMTP_PASSWORD -
 
 The service connects to these external infrastructure components:
 
-- **PostgreSQL**: Identity data storage (users, tenants, roles, permissions)
+- **PostgreSQL**: Identity data storage (users, tenants, authortities, permissions)
 - **RabbitMQ**: Event messaging and inter-service communication
 - **SMTP Server**: Email verification and notification delivery
 

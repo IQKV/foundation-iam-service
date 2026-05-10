@@ -26,7 +26,7 @@ public interface InvitationService {
    *
    * @param tenantKey target tenant
    * @param inviterId UUID of the user sending the invite (must be TENANT_OWNER or ADMIN)
-   * @param request   email + role
+   * @param request   email + authority
    * @return the created invitation summary
    */
   InvitationDtos.InvitationResponse sendInvitation(

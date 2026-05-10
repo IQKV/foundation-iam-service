@@ -37,7 +37,7 @@ import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.platformrole.UserPlatformRoleMapper;
+import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
@@ -85,7 +85,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final EmailVerificationTokenMapper emailVerificationTokenMapper;
   private final MessagingService messagingService;
   private final NotificationConfigurationProperties notificationProps;
-  private final UserPlatformRoleMapper userPlatformRoleMapper;
+  private final PlatformAuthorityMapper platformAuthorityMapper;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -100,7 +100,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final EmailVerificationTokenMapper emailVerificationTokenMapper,
       final MessagingService messagingService,
       final NotificationConfigurationProperties notificationProps,
-      final UserPlatformRoleMapper userPlatformRoleMapper) {
+      final PlatformAuthorityMapper platformAuthorityMapper) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -113,7 +113,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.emailVerificationTokenMapper = emailVerificationTokenMapper;
     this.messagingService = messagingService;
     this.notificationProps = notificationProps;
-    this.userPlatformRoleMapper = userPlatformRoleMapper;
+    this.platformAuthorityMapper = platformAuthorityMapper;
   }
 
   @Override
@@ -167,8 +167,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       throw new BadCredentialsException("Invalid credentials");
     }
 
-    final List<String> platformRoles = userPlatformRoleMapper.findRoleValuesByUserId(user.getId());
-    if (platformRoles.isEmpty()) {
+    final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
+    if (platformAuthorities.isEmpty()) {
       // Record the failed attempt to prevent user enumeration via timing differences,
       // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
       accountLockoutManager.reset(request.email());
@@ -178,7 +178,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     accountLockoutManager.reset(request.email());
 
     // tenant_id is null for platform-scoped tokens — no tenant context applies.
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformRoles);
+    final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
 
     return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);

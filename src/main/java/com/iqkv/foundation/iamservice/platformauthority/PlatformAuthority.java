@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.platformrole;
+package com.iqkv.foundation.iamservice.platformauthority;
 
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * A platform-level role assigned directly to a user, independent of any tenant membership.
- * Used for roles such as {@code PLATFORM_ADMIN} that span the entire platform.
+ * A platform-level authority assigned directly to a user, independent of any tenant membership.
+ * Used for authortities such as {@code PLATFORM_ADMIN} that span the entire platform.
  */
-public class UserPlatformRole {
+public class PlatformAuthority {
 
   private UUID id;
   private UUID userId;
-  private String role;
+  private String authority;
   private Instant grantedAt;
   private String grantedBy;
 
@@ -48,11 +48,11 @@ public class UserPlatformRole {
   }
 
   public String getRole() {
-    return role;
+    return authority;
   }
 
-  public void setRole(final String role) {
-    this.role = role;
+  public void setRole(final String authority) {
+    this.authority = authority;
   }
 
   public Instant getGrantedAt() {

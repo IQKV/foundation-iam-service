@@ -275,7 +275,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ProblemDetail> handleNoPlatformRole(final NoPlatformRoleException ex,
                                                             final HttpServletRequest request,
                                                             final Locale locale) {
-    log.warn("Platform admin sign-in rejected — no platform roles: {}", ex.getMessage());
+    log.warn("Platform admin sign-in rejected — no platform authortities: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.forbidden", locale),
         403,

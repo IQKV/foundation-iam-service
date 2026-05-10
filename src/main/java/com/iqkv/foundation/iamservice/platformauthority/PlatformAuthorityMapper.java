@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.iqkv.foundation.iamservice.platformrole;
+package com.iqkv.foundation.iamservice.platformauthority;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,13 +22,13 @@ import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface UserPlatformRoleMapper {
+public interface PlatformAuthorityMapper {
 
-  void insert(UserPlatformRole role);
+  void insert(PlatformAuthority authority);
 
-  List<String> findRoleValuesByUserId(UUID userId);
+  List<String> findAuthorityValuesByUserId(UUID userId);
 
-  boolean existsByUserIdAndRole(UUID userId, String role);
+  boolean existsByUserIdAndRole(UUID userId, String authority);
 
-  void deleteByUserIdAndRole(UUID userId, String role);
+  void deleteByUserIdAndRole(UUID userId, String authority);
 }

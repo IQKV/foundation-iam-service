@@ -132,7 +132,7 @@ public class InvitationRestResource {
   @GetMapping("/api/v1/iam/invitations/{token}")
   @Operation(
       summary = "Preview an invitation",
-      description = "Returns tenant name, invited email, role, and expiry. "
+      description = "Returns tenant name, invited email, authority, and expiry. "
                     + "The 'requiresSignup' flag tells the UI which form to render. "
                     + "Returns 404 for expired, revoked, or non-existent tokens.")
   @ApiResponses({

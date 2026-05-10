@@ -7,21 +7,21 @@
 
     <changeSet id="20260510000000" author="iqkv">
         <comment>
-            Platform-level roles keyed directly to users, bypassing tenant membership.
+            Platform-level authortities keyed directly to users, bypassing tenant membership.
             PLATFORM_ADMIN is stored here — not in tenant_member_authorities.
         </comment>
 
-        <createTable tableName="user_platform_roles" schemaName="public">
+        <createTable tableName="platform_authorities" schemaName="public">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="UUID">
                 <constraints nullable="false"
-                             foreignKeyName="fk_user_platform_roles_user_id"
+                             foreignKeyName="fk_platform_authorities_user_id"
                              references="public.users(id)"
                              deleteCascade="true"/>
             </column>
-            <column name="role" type="VARCHAR(100)">
+            <column name="authority" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="granted_at" type="TIMESTAMP">
@@ -31,13 +31,13 @@
         </createTable>
 
         <addUniqueConstraint
-                constraintName="uq_user_platform_roles_user_role"
-                tableName="user_platform_roles"
+                constraintName="uq_platform_authorities_user_authority"
+                tableName="platform_authorities"
                 schemaName="public"
-                columnNames="user_id, role"/>
+                columnNames="user_id, authority"/>
 
-        <createIndex indexName="idx_user_platform_roles_user_id"
-                     tableName="user_platform_roles"
+        <createIndex indexName="idx_platform_authorities_user_id"
+                     tableName="platform_authorities"
                      schemaName="public">
             <column name="user_id"/>
         </createIndex>
