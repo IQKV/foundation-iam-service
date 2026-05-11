@@ -87,6 +87,13 @@ public interface TenantService {
   // ─── Platform admin ────────────────────────────────────────────────────────
 
   /**
+   * Returns the total number of tenants across all statuses.
+   *
+   * @return total tenant count
+   */
+  TenantDtos.TenantCountResponse countTenants();
+
+  /**
    * Returns a paginated, sorted, and optionally filtered list of tenants.
    *
    * @param query encapsulates pagination, sort, and optional filters

@@ -80,6 +80,10 @@ public final class TenantDtos {
       LocalDateTime updatedAt) {
   }
 
+  /** Total tenant count returned by the admin count endpoint. */
+  public record TenantCountResponse(long total) {
+  }
+
   /** Paginated list of tenants returned by the admin list endpoint. */
   public record PagedTenantResponse(
       List<AdminTenantResponse> content,

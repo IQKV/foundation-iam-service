@@ -153,6 +153,12 @@ public class TenantServiceImpl implements TenantService {
 
   @Override
   @Transactional(readOnly = true)
+  public TenantDtos.TenantCountResponse countTenants() {
+    return new TenantDtos.TenantCountResponse(tenantMapper.countAll(null, null));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public TenantDtos.PagedTenantResponse listTenants(final TenantDtos.TenantListQuery query) {
     final String safeSortBy = Set.of("name", "tenantKey", "updatedAt", "createdAt")
         .contains(query.sortBy()) ? query.sortBy() : "createdAt";

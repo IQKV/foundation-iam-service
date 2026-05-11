@@ -23,6 +23,7 @@ import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -66,6 +67,18 @@ public class TenantAdminRestResource {
   public ResponseEntity<TenantDtos.PagedTenantResponse> listTenants(
       @ModelAttribute @Valid TenantDtos.TenantListQuery query) {
     return ResponseEntity.ok(tenantService.listTenants(query));
+  }
+
+  @GetMapping("/count")
+  @Operation(summary = "Count tenants", description = "Returns the total number of tenants across all statuses.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Total tenant count returned",
+                   content = @Content(schema = @Schema(implementation = TenantDtos.TenantCountResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content)
+  })
+  public ResponseEntity<TenantDtos.TenantCountResponse> countTenants() {
+    return ResponseEntity.ok(tenantService.countTenants());
   }
 
   @GetMapping("/{tenantKey}")
