@@ -16,8 +16,14 @@
 
 package com.iqkv.foundation.iamservice.tenant.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 
@@ -26,13 +32,88 @@ public final class TenantDtos {
   private TenantDtos() {
   }
 
+  // ─── Self-service DTOs (used by TenantRestResource) ───────────────────────
+
   public record UpdateTenantStatusRequest(@NotNull TenantStatus status) {
   }
 
+  /** Slim response used by the self-service tenant endpoint. */
   public record TenantResponse(
       String tenantKey,
       String name,
       TenantStatus status,
       LocalDateTime createdAt) {
+  }
+
+  // ─── Admin DTOs (used by TenantAdminRestResource) ─────────────────────────
+
+  /**
+   * Request body for full tenant rename (PUT semantics).
+   * Only {@code name} is replaced; status and other fields are unchanged.
+   */
+  public record UpdateTenantRequest(
+      @NotBlank @Size(max = 100) String name) {
+  }
+
+  /**
+   * Request body for partial tenant update (PATCH semantics).
+   * Any field may be {@code null} to indicate no change.
+   */
+  public record AdminUpdateTenantRequest(
+      @Size(max = 100) String name,
+      TenantStatus status) {
+  }
+
+  /**
+   * Rich tenant response returned by admin endpoints.
+   * Includes all fields from the {@code Tenant} entity.
+   */
+  public record AdminTenantResponse(
+      UUID id,
+      String tenantKey,
+      String name,
+      TenantStatus status,
+      Boolean isDefault,
+      String tenantModeOrigin,
+      String createdBy,
+      LocalDateTime createdAt,
+      LocalDateTime updatedAt) {
+  }
+
+  /** Paginated list of tenants returned by the admin list endpoint. */
+  public record PagedTenantResponse(
+      List<AdminTenantResponse> content,
+      int page,
+      int size,
+      long totalElements,
+      int totalPages) {
+  }
+
+  /**
+   * Query parameters for the admin tenant list endpoint.
+   *
+   * <p>Bound from HTTP query string via {@code @ModelAttribute} in the controller.
+   * All filter/sort fields are optional — absent values fall back to safe defaults
+   * in the service layer.
+   *
+   * @param page    zero-based page index (default 0)
+   * @param size    page size 1–100 (default 20)
+   * @param sortBy  sort field: name | tenantKey | createdAt | updatedAt
+   * @param sortDir sort direction: asc | desc
+   * @param search  free-text search on name and tenantKey (case-insensitive)
+   * @param status  exact status filter: PROVISIONING | ACTIVE | SUSPENDED | DELETED | PROVISIONING_FAILED
+   */
+  public record TenantListQuery(
+      @Min(0) int page,
+      @Min(1) @Max(100) int size,
+      String sortBy,
+      String sortDir,
+      String search,
+      String status) {
+
+    /** Canonical defaults applied when the controller binds an empty query string. */
+    public TenantListQuery() {
+      this(0, 20, "createdAt", "desc", null, null);
+    }
   }
 }

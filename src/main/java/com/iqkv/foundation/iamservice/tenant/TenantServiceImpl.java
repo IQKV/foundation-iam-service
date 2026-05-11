@@ -17,6 +17,7 @@
 package com.iqkv.foundation.iamservice.tenant;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
+import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
+import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,8 @@ public class TenantServiceImpl implements TenantService {
     this.messagingService = messagingService;
     this.userMapper = userMapper;
   }
+
+  // ─── Self-service ──────────────────────────────────────────────────────────
 
   @Override
   public Tenant createTenant(final String tenantName, final UUID ownerUserId) {
@@ -142,5 +147,95 @@ public class TenantServiceImpl implements TenantService {
 
     log.info("Tenant provisioning retry initiated: tenantKey={}", tenantKey);
     return tenant;
+  }
+
+  // ─── Platform admin ────────────────────────────────────────────────────────
+
+  @Override
+  @Transactional(readOnly = true)
+  public TenantDtos.PagedTenantResponse listTenants(final TenantDtos.TenantListQuery query) {
+    final String safeSortBy = Set.of("name", "tenantKey", "updatedAt", "createdAt")
+        .contains(query.sortBy()) ? query.sortBy() : "createdAt";
+    final String safeSortDir = "asc".equalsIgnoreCase(query.sortDir()) ? "asc" : "desc";
+
+    final String safeSearch = (query.search() != null && !query.search().isBlank())
+        ? query.search().strip() : null;
+    final String safeStatus = Arrays.stream(TenantStatus.values())
+        .map(Enum::name)
+        .filter(name -> name.equalsIgnoreCase(query.status()))
+        .findFirst()
+        .orElse(null);
+
+    final int offset = query.page() * query.size();
+    final var tenants = tenantMapper.findAll(query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus)
+        .stream()
+        .map(TenantDtoMapper::toAdminResponse)
+        .toList();
+    final long total = tenantMapper.countAll(safeSearch, safeStatus);
+    final int totalPages = (int) Math.ceil((double) total / query.size());
+    return new TenantDtos.PagedTenantResponse(tenants, query.page(), query.size(), total, totalPages);
+  }
+
+  @Override
+  public TenantDtos.AdminTenantResponse updateTenant(final String tenantKey,
+                                                     final TenantDtos.UpdateTenantRequest request) {
+    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+
+    if (!tenant.getName().equals(request.name()) && tenantMapper.existsByName(request.name())) {
+      throw new TenantAlreadyExistsException("Tenant name already taken: " + request.name());
+    }
+
+    tenant.setName(request.name());
+    tenant.setUpdatedAt(LocalDateTime.now());
+    tenant.setUpdatedBy("system");
+    tenantMapper.update(tenant);
+
+    log.info("Tenant renamed by admin: tenantKey={}, name={}", tenantKey, request.name());
+    return TenantDtoMapper.toAdminResponse(tenant);
+  }
+
+  @Override
+  public TenantDtos.AdminTenantResponse patchTenant(final String tenantKey,
+                                                    final TenantDtos.AdminUpdateTenantRequest request) {
+    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+
+    if (request.name() != null) {
+      if (!tenant.getName().equals(request.name()) && tenantMapper.existsByName(request.name())) {
+        throw new TenantAlreadyExistsException("Tenant name already taken: " + request.name());
+      }
+      tenant.setName(request.name());
+    }
+
+    if (request.status() != null) {
+      final String transition = tenant.getStatus() + "->" + request.status();
+      if (!ALLOWED_TRANSITIONS.contains(transition)) {
+        throw new InvalidTenantStateException("Invalid status transition: " + transition);
+      }
+      tenant.setStatus(request.status());
+
+      if (request.status() == TenantStatus.SUSPENDED) {
+        messagingService.publishTenantSuspended(tenantKey);
+      } else if (request.status() == TenantStatus.DELETED) {
+        messagingService.publishTenantDeleted(tenantKey);
+      }
+    }
+
+    tenant.setUpdatedAt(LocalDateTime.now());
+    tenant.setUpdatedBy("system");
+    tenantMapper.update(tenant);
+
+    log.info("Tenant patched by admin: tenantKey={}", tenantKey);
+    return TenantDtoMapper.toAdminResponse(tenant);
+  }
+
+  @Override
+  public void deleteTenant(final String tenantKey) {
+    tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+    tenantMapper.deleteByTenantKey(tenantKey);
+    messagingService.publishTenantDeleted(tenantKey);
+    log.info("Tenant deleted by admin: tenantKey={}", tenantKey);
   }
 }

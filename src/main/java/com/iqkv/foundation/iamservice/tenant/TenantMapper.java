@@ -17,8 +17,10 @@
 package com.iqkv.foundation.iamservice.tenant;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -30,12 +32,24 @@ public interface TenantMapper {
 
   Optional<Tenant> findByTenantKey(String tenantKey);
 
+  Optional<Tenant> findById(@Param("id") UUID id);
+
   List<Tenant> findByStatus(String status);
 
   boolean existsByName(String name);
 
   void updateStatus(@Param("tenantKey") String tenantKey, @Param("status") String status,
-                    @Param("updatedAt") java.time.LocalDateTime updatedAt);
+                    @Param("updatedAt") LocalDateTime updatedAt);
+
+  void update(Tenant tenant);
+
+  void deleteByTenantKey(@Param("tenantKey") String tenantKey);
+
+  List<Tenant> findAll(@Param("limit") int limit, @Param("offset") int offset,
+                       @Param("sortBy") String sortBy, @Param("sortDir") String sortDir,
+                       @Param("search") String search, @Param("status") String status);
+
+  long countAll(@Param("search") String search, @Param("status") String status);
 
   List<Tenant> findStuckProvisioning(@Param("olderThan") Instant olderThan);
 

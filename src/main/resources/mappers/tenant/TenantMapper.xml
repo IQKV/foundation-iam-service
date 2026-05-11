@@ -33,6 +33,69 @@
         WHERE tenant_key = #{tenantKey}
     </select>
 
+    <select id="findById" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        FROM public.tenants
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="tenantResultMap">
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        FROM public.tenants
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(name)       LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY
+            <choose>
+                <when test="sortBy == 'name'">name</when>
+                <when test="sortBy == 'tenantKey'">tenant_key</when>
+                <when test="sortBy == 'updatedAt'">updated_at</when>
+                <otherwise>created_at</otherwise>
+            </choose>
+            <choose>
+                <when test="sortDir == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+            , id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM public.tenants
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(name)       LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
+        UPDATE public.tenants
+        SET name       = #{name},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE tenant_key = #{tenantKey}
+    </update>
+
+    <delete id="deleteByTenantKey">
+        DELETE FROM public.tenants WHERE tenant_key = #{tenantKey}
+    </delete>
+
     <select id="findByStatus" resultMap="tenantResultMap">
         SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
         FROM public.tenants

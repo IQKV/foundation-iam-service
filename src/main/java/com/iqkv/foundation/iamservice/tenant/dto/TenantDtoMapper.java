@@ -23,11 +23,32 @@ public final class TenantDtoMapper {
   private TenantDtoMapper() {
   }
 
+  /**
+   * Maps a {@link Tenant} to the slim self-service {@link TenantDtos.TenantResponse}.
+   * Used by {@code TenantRestResource} (TENANT_OWNER surface).
+   */
   public static TenantDtos.TenantResponse toResponse(final Tenant tenant) {
     return new TenantDtos.TenantResponse(
         tenant.getTenantKey(),
         tenant.getName(),
         tenant.getStatus(),
         tenant.getCreatedAt());
+  }
+
+  /**
+   * Maps a {@link Tenant} to the rich {@link TenantDtos.AdminTenantResponse}.
+   * Used by {@code TenantAdminRestResource} (PLATFORM_ADMIN surface).
+   */
+  public static TenantDtos.AdminTenantResponse toAdminResponse(final Tenant tenant) {
+    return new TenantDtos.AdminTenantResponse(
+        tenant.getId(),
+        tenant.getTenantKey(),
+        tenant.getName(),
+        tenant.getStatus(),
+        tenant.getIsDefault(),
+        tenant.getTenantModeOrigin(),
+        tenant.getCreatedBy(),
+        tenant.getCreatedAt(),
+        tenant.getUpdatedAt());
   }
 }
