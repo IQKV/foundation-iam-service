@@ -87,6 +87,7 @@
     <update id="update" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         UPDATE public.tenants
         SET name       = #{name},
+            status     = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
             updated_at = #{updatedAt},
             updated_by = #{updatedBy}
         WHERE tenant_key = #{tenantKey}
