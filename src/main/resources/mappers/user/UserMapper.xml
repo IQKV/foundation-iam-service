@@ -50,36 +50,64 @@
         SELECT EXISTS (SELECT 1 FROM public.users WHERE email = #{email})
     </select>
 
-    <select id="findAll" resultMap="userResultMap">
-        SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, last_global_signout_at,
-               created_at, updated_at, created_by, updated_by
-        FROM public.users
+    <resultMap id="userWithOrganizationsResultMap"
+               type="com.iqkv.foundation.iamservice.user.UserWithOrganizations">
+        <id     property="id"            column="id"/>
+        <result property="email"         column="email"/>
+        <result property="firstName"     column="first_name"/>
+        <result property="lastName"      column="last_name"/>
+        <result property="status"        column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="emailVerified" column="email_verified"/>
+        <result property="createdAt"     column="created_at"/>
+        <result property="updatedAt"     column="updated_at"/>
+        <result property="organizations" column="organizations"
+                typeHandler="com.iqkv.foundation.iamservice.infrastructure.mybatis.StringArrayTypeHandler"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="userWithOrganizationsResultMap">
+        SELECT u.id,
+               u.email,
+               u.first_name,
+               u.last_name,
+               u.status,
+               u.email_verified,
+               u.created_at,
+               u.updated_at,
+               array_agg(t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations
+        FROM public.users u
+        LEFT JOIN public.tenant_memberships m
+               ON m.user_id = u.id
+        LEFT JOIN public.tenants t
+               ON t.tenant_key = m.tenant_key
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
-                AND status = #{status}::account_status
+                AND u.status = #{status}::account_status
             </if>
         </where>
+        GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
+                 u.email_verified, u.created_at, u.updated_at
         ORDER BY
             <choose>
-                <when test="sortBy == 'email'">email</when>
-                <when test="sortBy == 'firstName'">first_name</when>
-                <when test="sortBy == 'lastName'">last_name</when>
-                <when test="sortBy == 'updatedAt'">updated_at</when>
-                <otherwise>created_at</otherwise>
+                <when test="sortBy == 'email'">u.email</when>
+                <when test="sortBy == 'firstName'">u.first_name</when>
+                <when test="sortBy == 'lastName'">u.last_name</when>
+                <when test="sortBy == 'updatedAt'">u.updated_at</when>
+                <otherwise>u.created_at</otherwise>
             </choose>
             <choose>
                 <when test="sortDir == 'asc'">ASC</when>
                 <otherwise>DESC</otherwise>
             </choose>
-            , id ASC
+            , u.id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

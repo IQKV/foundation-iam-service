@@ -23,6 +23,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public final class UserDtos {
@@ -54,6 +55,7 @@ public final class UserDtos {
       String lastName,
       String status,
       boolean emailVerified,
+      List<String> organizations,
       LocalDateTime createdAt,
       LocalDateTime updatedAt) {
   }
