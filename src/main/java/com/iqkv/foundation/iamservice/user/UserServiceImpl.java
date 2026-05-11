@@ -125,6 +125,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
+  public UserDtos.UserCountResponse countUsers() {
+    return new UserDtos.UserCountResponse(userMapper.countAll(null, null));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public UserDtos.PagedUserResponse listUsers(final UserDtos.UserListQuery query) {
     // Allowlist validation — prevents any unsanitised value reaching the ${}
     // substitution in UserMapper.xml. The <choose> block is the last line of

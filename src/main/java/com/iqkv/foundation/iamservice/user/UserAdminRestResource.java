@@ -72,6 +72,18 @@ public class UserAdminRestResource {
     return ResponseEntity.ok(userService.listUsers(query));
   }
 
+  @GetMapping("/count")
+  @Operation(summary = "Count users", description = "Returns the total number of user accounts across all tenants.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Total user count returned",
+                   content = @Content(schema = @Schema(implementation = UserDtos.UserCountResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content)
+  })
+  public ResponseEntity<UserDtos.UserCountResponse> countUsers() {
+    return ResponseEntity.ok(userService.countUsers());
+  }
+
   @GetMapping("/{id}")
   @Operation(summary = "Get user by ID")
   @ApiResponses({

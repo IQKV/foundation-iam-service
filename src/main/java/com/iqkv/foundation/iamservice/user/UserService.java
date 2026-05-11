@@ -72,6 +72,13 @@ public interface UserService {
   UserDtos.UserResponse getUserById(UUID userId);
 
   /**
+   * Returns the total number of user accounts across all tenants.
+   *
+   * @return total user count
+   */
+  UserDtos.UserCountResponse countUsers();
+
+  /**
    * Returns a paginated, sorted, and optionally filtered list of users across all tenants.
    *
    * <p>Intended for platform admin use only. Sort and filter values are validated

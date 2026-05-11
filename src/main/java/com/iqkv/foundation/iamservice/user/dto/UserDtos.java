@@ -79,6 +79,9 @@ public final class UserDtos {
       String status) {
   }
 
+  public record UserCountResponse(long total) {
+  }
+
   public record PagedUserResponse(
       java.util.List<UserResponse> content,
       int page,
