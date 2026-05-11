@@ -17,8 +17,6 @@
 package com.iqkv.foundation.iamservice.user;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.UUID;
 
@@ -37,13 +35,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -62,23 +60,16 @@ public class UserAdminRestResource {
   }
 
   @GetMapping
-  @Operation(summary = "List users", description = "Returns a paginated list of all users across all tenants.")
+  @Operation(summary = "List users", description = "Returns a paginated, sorted, and optionally filtered list of users across all tenants.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Page of users returned"),
-      @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+      @ApiResponse(responseCode = "400", description = "Invalid query parameters", content = @Content),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
       @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content)
   })
   public ResponseEntity<UserDtos.PagedUserResponse> listUsers(
-      @Parameter(description = "Zero-based page index", example = "0")
-      @RequestParam(defaultValue = "0") @Min(0) int page,
-      @Parameter(description = "Page size (1–100)", example = "20")
-      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
-      @Parameter(description = "Sort field: email | firstName | lastName | updatedAt | createdAt", example = "createdAt")
-      @RequestParam(defaultValue = "createdAt") String sortBy,
-      @Parameter(description = "Sort direction: asc | desc", example = "desc")
-      @RequestParam(defaultValue = "desc") String sortDir) {
-    return ResponseEntity.ok(userService.listUsers(page, size, sortBy, sortDir));
+      @ModelAttribute @Valid UserDtos.UserListQuery query) {
+    return ResponseEntity.ok(userService.listUsers(query));
   }
 
   @GetMapping("/{id}")

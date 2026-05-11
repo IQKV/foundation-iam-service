@@ -72,25 +72,19 @@ public interface UserService {
   UserDtos.UserResponse getUserById(UUID userId);
 
   /**
-   * Returns a paginated, sorted list of all users across all tenants.
+   * Returns a paginated, sorted, and optionally filtered list of users across all tenants.
    *
-   * <p>Intended for platform admin use only. The {@code sortBy} and {@code sortDir}
-   * values are validated against an allowlist in the implementation before being
-   * forwarded to the SQL layer — invalid values silently fall back to
-   * {@code createdAt DESC} rather than throwing.
+   * <p>Intended for platform admin use only. Sort and filter values are validated
+   * against allowlists in the implementation — invalid values fall back to safe
+   * defaults rather than throwing.
    *
-   * <p>Valid {@code sortBy} values: {@code email}, {@code firstName}, {@code lastName},
-   * {@code updatedAt}, {@code createdAt}.
-   *
-   * @param page    zero-based page index
-   * @param size    number of records per page (1–100)
-   * @param sortBy  field name to sort by; falls back to {@code createdAt} if unrecognised
-   * @param sortDir {@code "asc"} or {@code "desc"} (case-insensitive); defaults to
-   *                {@code "desc"} for any other value
+   * @param query encapsulates pagination ({@code page}, {@code size}), sort
+   *              ({@code sortBy}, {@code sortDir}), and optional filters
+   *              ({@code search}, {@code status})
    * @return a {@link UserDtos.PagedUserResponse} containing the content slice and
    *         pagination metadata
    */
-  UserDtos.PagedUserResponse listUsers(int page, int size, String sortBy, String sortDir);
+  UserDtos.PagedUserResponse listUsers(UserDtos.UserListQuery query);
 
   /**
    * Creates a new user account via the platform admin flow.

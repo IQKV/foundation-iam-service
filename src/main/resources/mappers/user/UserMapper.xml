@@ -55,6 +55,18 @@
                email_verified, last_global_signout_at,
                created_at, updated_at, created_by, updated_by
         FROM public.users
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}::account_status
+            </if>
+        </where>
         ORDER BY
             <choose>
                 <when test="sortBy == 'email'">email</when>
@@ -72,7 +84,20 @@
     </select>
 
     <select id="countAll" resultType="long">
-        SELECT COUNT(*) FROM public.users
+        SELECT COUNT(*)
+        FROM public.users
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}::account_status
+            </if>
+        </where>
     </select>
 
     <delete id="deleteById">

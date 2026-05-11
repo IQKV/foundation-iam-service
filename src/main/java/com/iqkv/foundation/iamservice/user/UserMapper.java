@@ -36,9 +36,10 @@ public interface UserMapper {
   boolean existsByEmail(String email);
 
   List<User> findAll(@Param("limit") int limit, @Param("offset") int offset,
-                     @Param("sortBy") String sortBy, @Param("sortDir") String sortDir);
+                     @Param("sortBy") String sortBy, @Param("sortDir") String sortDir,
+                     @Param("search") String search, @Param("status") String status);
 
-  long countAll();
+  long countAll(@Param("search") String search, @Param("status") String status);
 
   void update(User user);
 

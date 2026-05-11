@@ -125,22 +125,30 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDtos.PagedUserResponse listUsers(final int page, final int size,
-                                              final String sortBy, final String sortDir) {
+  public UserDtos.PagedUserResponse listUsers(final UserDtos.UserListQuery query) {
     // Allowlist validation — prevents any unsanitised value reaching the ${}
     // substitution in UserMapper.xml. The <choose> block is the last line of
     // defence; this guard makes the intent explicit and testable.
     final String safeSortBy = java.util.Set.of("email", "firstName", "lastName", "updatedAt", "createdAt")
-        .contains(sortBy) ? sortBy : "createdAt";
-    final String safeSortDir = "asc".equalsIgnoreCase(sortDir) ? "asc" : "desc";
+        .contains(query.sortBy()) ? query.sortBy() : "createdAt";
+    final String safeSortDir = "asc".equalsIgnoreCase(query.sortDir()) ? "asc" : "desc";
 
-    final int offset = page * size;
-    final var users = userMapper.findAll(size, offset, safeSortBy, safeSortDir).stream()
+    // Normalise filter params — blank/null treated as "no filter".
+    final String safeSearch = (query.search() != null && !query.search().isBlank())
+        ? query.search().strip() : null;
+    final String safeStatus = java.util.Arrays.stream(AccountStatus.values())
+        .map(Enum::name)
+        .filter(name -> name.equalsIgnoreCase(query.status()))
+        .findFirst()
+        .orElse(null);
+
+    final int offset = query.page() * query.size();
+    final var users = userMapper.findAll(query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus).stream()
         .map(UserDtoMapper::toResponse)
         .toList();
-    final long total = userMapper.countAll();
-    final int totalPages = (int) Math.ceil((double) total / size);
-    return new UserDtos.PagedUserResponse(users, page, size, total, totalPages);
+    final long total = userMapper.countAll(safeSearch, safeStatus);
+    final int totalPages = (int) Math.ceil((double) total / query.size());
+    return new UserDtos.PagedUserResponse(users, query.page(), query.size(), total, totalPages);
   }
 
   @Override

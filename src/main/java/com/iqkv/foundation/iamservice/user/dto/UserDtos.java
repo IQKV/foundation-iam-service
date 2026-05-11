@@ -17,6 +17,8 @@
 package com.iqkv.foundation.iamservice.user.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -81,5 +83,33 @@ public final class UserDtos {
       int size,
       long totalElements,
       int totalPages) {
+  }
+
+  /**
+   * Query parameters for the admin user list endpoint.
+   *
+   * <p>Bound from HTTP query string via {@code @ModelAttribute} in the controller.
+   * All filter/sort fields are optional — absent values fall back to safe defaults
+   * in the service layer.
+   *
+   * @param page    zero-based page index (default 0)
+   * @param size    page size 1–100 (default 20)
+   * @param sortBy  sort field: email | firstName | lastName | updatedAt | createdAt
+   * @param sortDir sort direction: asc | desc
+   * @param search  free-text search on email, first name, last name (case-insensitive)
+   * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
+   */
+  public record UserListQuery(
+      @Min(0) int page,
+      @Min(1) @Max(100) int size,
+      String sortBy,
+      String sortDir,
+      String search,
+      String status) {
+
+    /** Canonical defaults applied when the controller binds an empty query string. */
+    public UserListQuery() {
+      this(0, 20, "createdAt", "desc", null, null);
+    }
   }
 }
