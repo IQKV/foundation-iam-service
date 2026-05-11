@@ -17,9 +17,11 @@
 package com.iqkv.foundation.iamservice.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -40,6 +42,7 @@ import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -330,6 +333,140 @@ class AuthenticationServiceImplTest {
     verify(emailVerificationTokenMapper).deleteByUserId(testUser.getId());
     verify(emailVerificationTokenMapper).insert(any(EmailVerificationToken.class));
     verify(messagingService).publishNotification(any());
+  }
+
+  // -------------------------------------------------------------------------
+  // AccountStatus enforcement tests
+  // -------------------------------------------------------------------------
+
+  @Test
+  @DisplayName("signIn — suspended user should be rejected with AccountNotActiveException")
+  void signIn_suspendedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.SUSPENDED);
+    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    try {
+      when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
+      when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      assertThatThrownBy(() -> authenticationService.signIn(
+          new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
+          .isInstanceOf(AccountNotActiveException.class);
+
+      verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
+    } finally {
+      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    }
+  }
+
+  @Test
+  @DisplayName("signIn — deleted user should be rejected with AccountNotActiveException")
+  void signIn_deletedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.DELETED);
+    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    try {
+      when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
+      when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      assertThatThrownBy(() -> authenticationService.signIn(
+          new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
+          .isInstanceOf(AccountNotActiveException.class);
+
+      verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
+    } finally {
+      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    }
+  }
+
+  @Test
+  @DisplayName("signIn — locked (status) user should be rejected with AccountNotActiveException")
+  void signIn_lockedStatusUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.LOCKED);
+    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    try {
+      when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
+      when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      assertThatThrownBy(() -> authenticationService.signIn(
+          new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
+          .isInstanceOf(AccountNotActiveException.class);
+
+      verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
+    } finally {
+      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    }
+  }
+
+  @Test
+  @DisplayName("adminSignIn — suspended user should be rejected with AccountNotActiveException")
+  void adminSignIn_suspendedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.SUSPENDED);
+    when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+    assertThatThrownBy(() -> authenticationService.adminSignIn(
+        new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
+        .isInstanceOf(AccountNotActiveException.class);
+
+    verifyNoInteractions(accountLockoutManager, passwordEncoder, platformAuthorityMapper, jwtTokenGenerator);
+  }
+
+  @Test
+  @DisplayName("adminSignIn — deleted user should be rejected with AccountNotActiveException")
+  void adminSignIn_deletedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.DELETED);
+    when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+    assertThatThrownBy(() -> authenticationService.adminSignIn(
+        new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
+        .isInstanceOf(AccountNotActiveException.class);
+
+    verifyNoInteractions(accountLockoutManager, passwordEncoder, platformAuthorityMapper, jwtTokenGenerator);
+  }
+
+  @Test
+  @DisplayName("refresh — suspended user should be rejected with AccountNotActiveException")
+  void refresh_suspendedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.SUSPENDED);
+    var jwt = createMockJwt("user@example.com", "test-tenant", JwtClaimNames.TYPE_REFRESH);
+    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    try {
+      when(jwtDecoder.decode("refresh-token")).thenReturn(jwt);
+      when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      assertThatThrownBy(() -> authenticationService.refresh(
+          new AuthenticationDtos.RefreshTokenRequest("refresh-token")))
+          .isInstanceOf(AccountNotActiveException.class);
+
+      verifyNoInteractions(membershipService, jwtTokenGenerator);
+    } finally {
+      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    }
+  }
+
+  @Test
+  @DisplayName("adminRefresh — suspended user should be rejected with AccountNotActiveException")
+  void adminRefresh_suspendedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.SUSPENDED);
+    var jwt = createMockJwt("user@example.com", null, JwtClaimNames.TYPE_REFRESH);
+    when(jwtDecoder.decode("refresh-token")).thenReturn(jwt);
+    when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+    assertThatThrownBy(() -> authenticationService.adminRefresh(
+        new AuthenticationDtos.RefreshTokenRequest("refresh-token")))
+        .isInstanceOf(AccountNotActiveException.class);
+
+    verifyNoInteractions(platformAuthorityMapper, jwtTokenGenerator);
+  }
+
+  @Test
+  @DisplayName("listUserTenants — suspended user should be rejected with AccountNotActiveException")
+  void listUserTenants_suspendedUser_throwsAccountNotActiveException() {
+    testUser.setStatus(AccountStatus.SUSPENDED);
+    when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+    assertThatThrownBy(() -> authenticationService.listUserTenants("user@example.com", "password123"))
+        .isInstanceOf(AccountNotActiveException.class);
+
+    verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipMapper, jwtTokenGenerator);
   }
 
   private Jwt createMockJwt(String email, String tenantId, String type) {

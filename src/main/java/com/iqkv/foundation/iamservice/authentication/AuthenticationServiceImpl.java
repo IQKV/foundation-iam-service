@@ -40,6 +40,7 @@ import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
+import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
@@ -52,6 +53,7 @@ import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
+import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +135,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final var user = userMapper.findByEmail(request.email())
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
+
     if (accountLockoutManager.isLocked(request.email())) {
       throw new AccountLockedException();
     }
@@ -157,6 +163,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public AuthenticationDtos.TokenResponse adminSignIn(final AuthenticationDtos.SignInRequest request) {
     final var user = userMapper.findByEmail(request.email())
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
 
     if (accountLockoutManager.isLocked(request.email())) {
       throw new AccountLockedException();
@@ -208,6 +218,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final var user = userMapper.findByEmail(email)
         .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
+
     final var membership = membershipService.resolveMembership(user.getId(), currentTenant);
     final var authorities = membershipService.getAuthorities(membership.getId());
 
@@ -234,6 +248,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
     final var user = userMapper.findByEmail(email)
         .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
 
     final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
     if (platformAuthorities.isEmpty()) {
@@ -289,6 +307,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     final var user = userMapper.findByEmail(email)
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
 
     if (accountLockoutManager.isLocked(email)) {
       throw new AccountLockedException();

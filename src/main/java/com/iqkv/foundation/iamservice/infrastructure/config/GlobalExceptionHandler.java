@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
+import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
@@ -332,6 +333,19 @@ public class GlobalExceptionHandler {
         msg("error.title.account-locked", locale),
         403,
         msg("error.detail.account-locked", locale),
+        request);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(AccountNotActiveException.class)
+  public ResponseEntity<ProblemDetail> handleAccountNotActive(final AccountNotActiveException ex,
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
+    log.warn("Account not active: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.account-not-active", locale),
+        403,
+        msg("error.detail.account-not-active", locale),
         request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }

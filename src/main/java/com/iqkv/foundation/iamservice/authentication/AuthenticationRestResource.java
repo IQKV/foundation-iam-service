@@ -75,7 +75,7 @@ public class AuthenticationRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Tokens issued"),
       @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-      @ApiResponse(responseCode = "403", description = "Account locked, tenant suspended, or no membership")
+      @ApiResponse(responseCode = "403", description = "Account not active (suspended/locked/deleted), account locked by brute-force policy, tenant suspended, or no membership")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> signIn(
       @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {
@@ -91,7 +91,7 @@ public class AuthenticationRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Tokens issued"),
       @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-      @ApiResponse(responseCode = "403", description = "Account locked or no platform-level authortities")
+      @ApiResponse(responseCode = "403", description = "Account not active (suspended/locked/deleted), account locked by brute-force policy, or no platform-level authortities")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> adminSignIn(
       @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {
