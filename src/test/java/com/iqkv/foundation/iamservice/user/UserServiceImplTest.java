@@ -137,14 +137,14 @@ class UserServiceImplTest {
   @DisplayName("Should list users with pagination successfully")
   void shouldListUsersSuccessfully() {
     // Arrange
-    var user1 = createUser("user1@example.com", "User", "One");
-    var user2 = createUser("user2@example.com", "User", "Two");
+    var user1 = createUserProjection("user1@example.com", "User", "One");
+    var user2 = createUserProjection("user2@example.com", "User", "Two");
 
-    when(userMapper.findAll(10, 0, "createdAt", "desc")).thenReturn(List.of(user1, user2));
-    when(userMapper.countAll()).thenReturn(2L);
+    when(userMapper.findAll(10, 0, "createdAt", "desc", null, null)).thenReturn(List.of(user1, user2));
+    when(userMapper.countAll(null, null)).thenReturn(2L);
 
     // Act
-    var result = userService.listUsers(0, 10, "createdAt", "desc");
+    var result = userService.listUsers(new UserDtos.UserListQuery(0, 10, "createdAt", "desc", null, null));
 
     // Assert
     assertThat(result).isNotNull();
@@ -283,5 +283,18 @@ class UserServiceImplTest {
     user.setEmailVerified(true);
     user.setCreatedAt(LocalDateTime.now());
     return user;
+  }
+
+  private UserWithOrganizations createUserProjection(String email, String firstName, String lastName) {
+    var projection = new UserWithOrganizations();
+    projection.setId(UUID.randomUUID());
+    projection.setEmail(email);
+    projection.setFirstName(firstName);
+    projection.setLastName(lastName);
+    projection.setStatus(AccountStatus.ACTIVE);
+    projection.setEmailVerified(true);
+    projection.setCreatedAt(LocalDateTime.now());
+    projection.setOrganizations(List.of());
+    return projection;
   }
 }

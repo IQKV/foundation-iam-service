@@ -68,6 +68,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        List.of(),
         createdAt,
         updatedAt
     );
@@ -138,6 +139,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        List.of(),
         LocalDateTime.now(),
         LocalDateTime.now()
     );
