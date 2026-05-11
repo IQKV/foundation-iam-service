@@ -208,7 +208,7 @@ public class TenantServiceImpl implements TenantService {
       tenant.setName(request.name());
     }
 
-    if (request.status() != null) {
+    if (request.status() != null && request.status() != tenant.getStatus()) {
       final String transition = tenant.getStatus() + "->" + request.status();
       if (!ALLOWED_TRANSITIONS.contains(transition)) {
         throw new InvalidTenantStateException("Invalid status transition: " + transition);
