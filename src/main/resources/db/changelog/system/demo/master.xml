@@ -7,5 +7,8 @@
 
     <!-- Demo data migrations for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/20260331000000-demo-data.xml"/>
+    <include file="db/changelog/system/demo/20260511000000-demo-tenant-owner.xml"/>
+    <include file="db/changelog/system/demo/20260511000001-demo-admin-users.xml"/>
+    <include file="db/changelog/system/demo/20260511000002-demo-member-users.xml"/>
 
 </databaseChangeLog>
