@@ -84,6 +84,33 @@ public final class TenantDtos {
   public record TenantCountResponse(long total) {
   }
 
+  /** Member count for a specific tenant. */
+  public record TenantMemberCountResponse(String tenantKey, long total) {
+  }
+
+  /**
+   * Query parameters for the tenant member list endpoint.
+   *
+   * @param page    zero-based page index (default 0)
+   * @param size    page size 1–100 (default 20)
+   * @param sortBy  sort field: email | firstName | lastName | updatedAt | createdAt
+   * @param sortDir sort direction: asc | desc
+   * @param search  free-text search on email, first name, last name (case-insensitive)
+   * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
+   */
+  public record TenantMemberListQuery(
+      @Min(0) int page,
+      @Min(1) @Max(100) int size,
+      String sortBy,
+      String sortDir,
+      String search,
+      String status) {
+
+    public TenantMemberListQuery() {
+      this(0, 20, "createdAt", "desc", null, null);
+    }
+  }
+
   /** Paginated list of tenants returned by the admin list endpoint. */
   public record PagedTenantResponse(
       List<AdminTenantResponse> content,

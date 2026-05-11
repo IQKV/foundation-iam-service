@@ -38,6 +38,8 @@ public interface TenantMembershipMapper {
 
   List<TenantMembership> findByTenantKey(String tenantKey);
 
+  long countByTenantKey(@Param("tenantKey") String tenantKey);
+
   List<TenantMembership> findByUserId(UUID userId);
 
   void deleteById(UUID id);

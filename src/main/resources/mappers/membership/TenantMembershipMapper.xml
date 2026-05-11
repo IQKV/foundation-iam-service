@@ -45,6 +45,12 @@
         WHERE tenant_key = #{tenantKey}
     </select>
 
+    <select id="countByTenantKey" resultType="long">
+        SELECT COUNT(*)
+        FROM public.tenant_memberships
+        WHERE tenant_key = #{tenantKey}
+    </select>
+
     <select id="findByUserId" resultMap="membershipResultMap">
         SELECT id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by
         FROM public.tenant_memberships

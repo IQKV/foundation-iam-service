@@ -81,6 +81,37 @@ public class TenantAdminRestResource {
     return ResponseEntity.ok(tenantService.countTenants());
   }
 
+  @GetMapping("/{tenantKey}/members")
+  @Operation(summary = "List tenant members",
+             description = "Returns a paginated, sorted, and optionally filtered list of users belonging to the given tenant.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Page of members returned"),
+      @ApiResponse(responseCode = "400", description = "Invalid query parameters", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
+  })
+  public ResponseEntity<com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse> listTenantMembers(
+      @Parameter(description = "8-char tenant key") @PathVariable String tenantKey,
+      @ModelAttribute @Valid TenantDtos.TenantMemberListQuery query) {
+    return ResponseEntity.ok(tenantService.listMembersByTenantKey(tenantKey, query));
+  }
+
+  @GetMapping("/{tenantKey}/members/count")
+  @Operation(summary = "Count tenant members",
+             description = "Returns the total number of members (users) belonging to the given tenant.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Member count returned",
+                   content = @Content(schema = @Schema(implementation = TenantDtos.TenantMemberCountResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
+  })
+  public ResponseEntity<TenantDtos.TenantMemberCountResponse> countTenantMembers(
+      @Parameter(description = "8-char tenant key") @PathVariable String tenantKey) {
+    return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
+  }
+
   @GetMapping("/{tenantKey}")
   @Operation(summary = "Get tenant by key")
   @ApiResponses({

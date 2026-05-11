@@ -41,6 +41,18 @@ public interface UserMapper {
 
   long countAll(@Param("search") String search, @Param("status") String status);
 
+  List<UserWithOrganizations> findMembersByTenantKey(@Param("tenantKey") String tenantKey,
+                                                     @Param("limit") int limit,
+                                                     @Param("offset") int offset,
+                                                     @Param("sortBy") String sortBy,
+                                                     @Param("sortDir") String sortDir,
+                                                     @Param("search") String search,
+                                                     @Param("status") String status);
+
+  long countMembersByTenantKey(@Param("tenantKey") String tenantKey,
+                               @Param("search") String search,
+                               @Param("status") String status);
+
   void update(User user);
 
   void deleteById(@Param("id") UUID id);

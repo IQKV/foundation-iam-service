@@ -22,7 +22,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
+import com.iqkv.foundation.iamservice.user.AccountStatus;
+import com.iqkv.foundation.iamservice.user.UserMapper;
+import com.iqkv.foundation.iamservice.user.dto.UserDtoMapper;
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
@@ -53,13 +58,16 @@ public class TenantServiceImpl implements TenantService {
   );
 
   private final TenantMapper tenantMapper;
+  private final TenantMembershipMapper membershipMapper;
   private final MessagingService messagingService;
   private final UserMapper userMapper;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
+                           final TenantMembershipMapper membershipMapper,
                            final MessagingService messagingService,
                            final UserMapper userMapper) {
     this.tenantMapper = tenantMapper;
+    this.membershipMapper = membershipMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;
   }
@@ -150,6 +158,43 @@ public class TenantServiceImpl implements TenantService {
   }
 
   // ─── Platform admin ────────────────────────────────────────────────────────
+
+  @Override
+  @Transactional(readOnly = true)
+  public UserDtos.PagedUserResponse listMembersByTenantKey(final String tenantKey,
+                                                           final TenantDtos.TenantMemberListQuery query) {
+    tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+
+    final String safeSortBy = java.util.Set.of("email", "firstName", "lastName", "updatedAt", "createdAt")
+        .contains(query.sortBy()) ? query.sortBy() : "createdAt";
+    final String safeSortDir = "asc".equalsIgnoreCase(query.sortDir()) ? "asc" : "desc";
+    final String safeSearch = (query.search() != null && !query.search().isBlank())
+        ? query.search().strip() : null;
+    final String safeStatus = Arrays.stream(AccountStatus.values())
+        .map(Enum::name)
+        .filter(name -> name.equalsIgnoreCase(query.status()))
+        .findFirst()
+        .orElse(null);
+
+    final int offset = query.page() * query.size();
+    final var users = userMapper.findMembersByTenantKey(
+            tenantKey, query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus)
+        .stream()
+        .map(UserDtoMapper::toResponse)
+        .toList();
+    final long total = userMapper.countMembersByTenantKey(tenantKey, safeSearch, safeStatus);
+    final int totalPages = (int) Math.ceil((double) total / query.size());
+    return new UserDtos.PagedUserResponse(users, query.page(), query.size(), total, totalPages);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public TenantDtos.TenantMemberCountResponse countMembersByTenantKey(final String tenantKey) {
+    tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+    return new TenantDtos.TenantMemberCountResponse(tenantKey, membershipMapper.countByTenantKey(tenantKey));
+  }
 
   @Override
   @Transactional(readOnly = true)

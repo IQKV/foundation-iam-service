@@ -128,6 +128,75 @@
         </where>
     </select>
 
+    <!-- ── Tenant-scoped member queries ──────────────────────────────────── -->
+
+    <select id="findMembersByTenantKey" resultMap="userWithOrganizationsResultMap">
+        SELECT u.id,
+               u.email,
+               u.first_name,
+               u.last_name,
+               u.status,
+               u.email_verified,
+               u.created_at,
+               u.updated_at,
+               array_agg(t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations
+        FROM public.users u
+        INNER JOIN public.tenant_memberships m
+                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        LEFT JOIN public.tenant_memberships m2
+               ON m2.user_id = u.id
+        LEFT JOIN public.tenants t
+               ON t.tenant_key = m2.tenant_key
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND u.status = #{status}
+            </if>
+        </where>
+        GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
+                 u.email_verified, u.created_at, u.updated_at
+        ORDER BY
+            <choose>
+                <when test="sortBy == 'email'">u.email</when>
+                <when test="sortBy == 'firstName'">u.first_name</when>
+                <when test="sortBy == 'lastName'">u.last_name</when>
+                <when test="sortBy == 'updatedAt'">u.updated_at</when>
+                <otherwise>u.created_at</otherwise>
+            </choose>
+            <choose>
+                <when test="sortDir == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+            , u.id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countMembersByTenantKey" resultType="long">
+        SELECT COUNT(DISTINCT u.id)
+        FROM public.users u
+        INNER JOIN public.tenant_memberships m
+                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND u.status = #{status}
+            </if>
+        </where>
+    </select>
+
     <delete id="deleteById">
         DELETE FROM public.users WHERE id = #{id}
     </delete>
