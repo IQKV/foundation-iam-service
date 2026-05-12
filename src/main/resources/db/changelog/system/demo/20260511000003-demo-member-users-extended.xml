@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Adds 50 additional tenant-scoped MEMBER users for demo0001.
+
+        Password : TenantMember123!  (BCrypt 12)
+        Authority: MEMBER
+
+        Users (00000000-0000-0000-0101-000000000039 .. 000000000088):
+          039  ethan.clarke@demo.iqkv.com      (Ethan Clarke)
+          040  sophia.turner@demo.iqkv.com     (Sophia Turner)
+          041  mason.evans@demo.iqkv.com       (Mason Evans)
+          042  ava.collins@demo.iqkv.com       (Ava Collins)
+          043  logan.stewart@demo.iqkv.com     (Logan Stewart)
+          044  isabella.sanchez@demo.iqkv.com  (Isabella Sanchez)
+          045  lucas.morris@demo.iqkv.com      (Lucas Morris)
+          046  mia.rogers@demo.iqkv.com        (Mia Rogers)
+          047  jackson.reed@demo.iqkv.com      (Jackson Reed)
+          048  charlotte.cook@demo.iqkv.com    (Charlotte Cook)
+          049  aiden.morgan@demo.iqkv.com      (Aiden Morgan)
+          050  amelia.bell@demo.iqkv.com       (Amelia Bell)
+          051  elijah.murphy@demo.iqkv.com     (Elijah Murphy)
+          052  harper.bailey@demo.iqkv.com     (Harper Bailey)
+          053  oliver.rivera@demo.iqkv.com     (Oliver Rivera)
+          054  evelyn.cooper@demo.iqkv.com     (Evelyn Cooper)
+          055  benjamin.richardson@demo.iqkv.com (Benjamin Richardson)
+          056  abigail.cox@demo.iqkv.com       (Abigail Cox)
+          057  sebastian.howard@demo.iqkv.com  (Sebastian Howard)
+          058  emily.ward@demo.iqkv.com        (Emily Ward)
+          059  matthew.torres@demo.iqkv.com    (Matthew Torres)
+          060  elizabeth.peterson@demo.iqkv.com (Elizabeth Peterson)
+          061  henry.gray@demo.iqkv.com        (Henry Gray)
+          062  sofia.ramirez@demo.iqkv.com     (Sofia Ramirez)
+          063  alexander.james@demo.iqkv.com   (Alexander James)
+          064  victoria.watson@demo.iqkv.com   (Victoria Watson)
+          065  daniel.brooks@demo.iqkv.com     (Daniel Brooks)
+          066  scarlett.kelly@demo.iqkv.com    (Scarlett Kelly)
+          067  michael.sanders@demo.iqkv.com   (Michael Sanders)
+          068  grace.price@demo.iqkv.com       (Grace Price)
+          069  owen.bennett@demo.iqkv.com      (Owen Bennett)
+          070  chloe.wood@demo.iqkv.com        (Chloe Wood)
+          071  ryan.barnes@demo.iqkv.com       (Ryan Barnes)
+          072  zoey.ross@demo.iqkv.com         (Zoey Ross)
+          073  nathan.henderson@demo.iqkv.com  (Nathan Henderson)
+          074  lily.coleman@demo.iqkv.com      (Lily Coleman)
+          075  dylan.jenkins@demo.iqkv.com     (Dylan Jenkins)
+          076  hannah.perry@demo.iqkv.com      (Hannah Perry)
+          077  caleb.powell@demo.iqkv.com      (Caleb Powell)
+          078  stella.patterson@demo.iqkv.com  (Stella Patterson)
+          079  julian.hughes@demo.iqkv.com     (Julian Hughes)
+          080  nora.flores@demo.iqkv.com       (Nora Flores)
+          081  levi.washington@demo.iqkv.com   (Levi Washington)
+          082  penelope.butler@demo.iqkv.com   (Penelope Butler)
+          083  isaac.simmons@demo.iqkv.com     (Isaac Simmons)
+          084  riley.foster@demo.iqkv.com      (Riley Foster)
+          085  wyatt.gonzales@demo.iqkv.com    (Wyatt Gonzales)
+          086  layla.bryant@demo.iqkv.com      (Layla Bryant)
+          087  gabriel.alexander@demo.iqkv.com (Gabriel Alexander)
+          088  zoe.russell@demo.iqkv.com       (Zoe Russell)
+
+        Sign-in  : POST /api/v1/iam/auth/signin
+                   Header: X-Tenant-ID: demo0001
+    -->
+
+    <changeSet id="20260511000003-demo-member-users-extended" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000039"/>
+            <column name="email"          value="ethan.clarke@demo.iqkv.com"/>
+            <!-- TenantMember123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Ethan"/>
+            <column name="last_name"      value="Clarke"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:00:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:00:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000040"/>
+            <column name="email"          value="sophia.turner@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Sophia"/>
+            <column name="last_name"      value="Turner"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:01:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:01:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000041"/>
+            <column name="email"          value="mason.evans@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Mason"/>
+            <column name="last_name"      value="Evans"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:02:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:02:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000042"/>
+            <column name="email"          value="ava.collins@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Ava"/>
+            <column name="last_name"      value="Collins"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:03:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:03:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000043"/>
+            <column name="email"          value="logan.stewart@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Logan"/>
+            <column name="last_name"      value="Stewart"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:04:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:04:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000044"/>
+            <column name="email"          value="isabella.sanchez@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Isabella"/>
+            <column name="last_name"      value="Sanchez"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:05:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:05:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000045"/>
+            <column name="email"          value="lucas.morris@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Lucas"/>
+            <column name="last_name"      value="Morris"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:06:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:06:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000046"/>
+            <column name="email"          value="mia.rogers@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Mia"/>
+            <column name="last_name"      value="Rogers"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:07:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:07:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000047"/>
+            <column name="email"          value="jackson.reed@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Jackson"/>
+            <column name="last_name"      value="Reed"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:08:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:08:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000048"/>
+            <column name="email"          value="charlotte.cook@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Charlotte"/>
+            <column name="last_name"      value="Cook"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:09:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:09:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000049"/>
+            <column name="email"          value="aiden.morgan@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Aiden"/>
+            <column name="last_name"      value="Morgan"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:10:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:10:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0101-000000000050"/>
+            <column name="email"          value="amelia.bell@demo.iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="first_name"     value="Amelia"/>
+            <column name="last_name"      value="Bell"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-05-11T14:11:00"/>
+            <column name="updated_at"     valueDate="2026-05-11T14:11:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>

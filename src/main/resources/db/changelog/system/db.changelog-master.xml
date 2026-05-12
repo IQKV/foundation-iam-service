@@ -14,8 +14,8 @@
     <include file="db/changelog/system/20260115120600-create-shedlock-table.xml"/>
     <include file="db/changelog/system/20260115120700-create-email-verification-tokens-table.xml"/>
     <include file="db/changelog/system/20260115120800-create-password-reset-tokens-table.xml"/>
-    <include file="db/changelog/system/20260424130000-create-tenant-invitations-table.xml"/>
     <include file="db/changelog/system/20260125140000-add-default-tenant-marker.xml"/>
+    <include file="db/changelog/system/20260424130000-create-tenant-invitations-table.xml"/>
     <include file="db/changelog/system/20260510000000-create-platform-authorities-table.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->

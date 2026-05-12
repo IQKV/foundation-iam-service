@@ -53,8 +53,7 @@
         Password : TenantAdmin123!  (BCrypt 12, shared by all demo tenant users)
         Authority: MEMBER (all tenant users)
 
-        Users (30 total, tenant-scoped):
-          00000000-0000-0000-0101-000000000001  tenant.owner@demo.iqkv.com
+        Users (29 total, tenant-scoped; tenant.owner is seeded in 20260511000000-demo-tenant-owner.xml):
           00000000-0000-0000-0101-000000000002  alice.johnson@demo.iqkv.com
           00000000-0000-0000-0101-000000000003  bob.smith@demo.iqkv.com
           00000000-0000-0000-0101-000000000004  carol.white@demo.iqkv.com
@@ -107,20 +106,7 @@
 
     <changeSet id="20260331000000-demo-users" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000001"/>
-            <column name="email"          value="tenant.owner@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
-            <column name="first_name"     value="Demo"/>
-            <column name="last_name"      value="Admin"/>
-            <column name="status"         value="ACTIVE"/>
-            <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-30T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-30T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
-        </insert>
-        <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000002"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000002"/>
             <column name="email"          value="alice.johnson@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Alice"/>
@@ -133,7 +119,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000003"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000003"/>
             <column name="email"          value="bob.smith@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Bob"/>
@@ -146,7 +132,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000004"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000004"/>
             <column name="email"          value="carol.white@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Carol"/>
@@ -159,7 +145,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000005"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000005"/>
             <column name="email"          value="david.brown@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="David"/>
@@ -172,7 +158,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000006"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000006"/>
             <column name="email"          value="emma.davis@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Emma"/>
@@ -185,7 +171,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000007"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000007"/>
             <column name="email"          value="frank.miller@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Frank"/>
@@ -198,7 +184,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000008"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000008"/>
             <column name="email"          value="grace.wilson@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Grace"/>
@@ -211,7 +197,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000009"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000009"/>
             <column name="email"          value="henry.moore@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Henry"/>
@@ -224,7 +210,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000010"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000010"/>
             <column name="email"          value="isabella.taylor@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Isabella"/>
@@ -237,7 +223,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000011"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000011"/>
             <column name="email"          value="james.anderson@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="James"/>
@@ -250,7 +236,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000012"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000012"/>
             <column name="email"          value="kate.thomas@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Kate"/>
@@ -263,7 +249,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000013"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000013"/>
             <column name="email"          value="liam.jackson@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Liam"/>
@@ -276,7 +262,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000014"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000014"/>
             <column name="email"          value="mia.harris@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Mia"/>
@@ -289,7 +275,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000015"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000015"/>
             <column name="email"          value="noah.martin@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Noah"/>
@@ -302,7 +288,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000016"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000016"/>
             <column name="email"          value="olivia.garcia@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Olivia"/>
@@ -315,7 +301,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000017"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000017"/>
             <column name="email"          value="peter.martinez@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Peter"/>
@@ -328,7 +314,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000018"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000018"/>
             <column name="email"          value="quinn.robinson@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Quinn"/>
@@ -341,7 +327,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000019"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000019"/>
             <column name="email"          value="rachel.clark@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Rachel"/>
@@ -354,7 +340,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000020"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000020"/>
             <column name="email"          value="samuel.rodriguez@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Samuel"/>
@@ -367,7 +353,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000021"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000021"/>
             <column name="email"          value="tina.lewis@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Tina"/>
@@ -380,7 +366,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000022"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000022"/>
             <column name="email"          value="uma.lee@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Uma"/>
@@ -393,7 +379,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000023"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000023"/>
             <column name="email"          value="victor.walker@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Victor"/>
@@ -406,7 +392,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000024"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000024"/>
             <column name="email"          value="wendy.hall@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Wendy"/>
@@ -419,7 +405,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000025"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000025"/>
             <column name="email"          value="xander.allen@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Xander"/>
@@ -432,7 +418,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000026"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000026"/>
             <column name="email"          value="yara.young@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Yara"/>
@@ -445,7 +431,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000027"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000027"/>
             <column name="email"          value="zoe.hernandez@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Zoe"/>
@@ -458,7 +444,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000028"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000028"/>
             <column name="email"          value="aaron.king@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Aaron"/>
@@ -471,7 +457,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000029"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000029"/>
             <column name="email"          value="bella.wright@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Bella"/>
@@ -484,7 +470,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000030"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000030"/>
             <column name="email"          value="carlos.scott@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Carlos"/>
@@ -499,21 +485,21 @@
         <rollback>
             <delete tableName="users" schemaName="public">
                 <where>id IN (
-                    '00000000-0000-0000-0001-000000000001','00000000-0000-0000-0001-000000000002',
-                    '00000000-0000-0000-0001-000000000003','00000000-0000-0000-0001-000000000004',
-                    '00000000-0000-0000-0001-000000000005','00000000-0000-0000-0001-000000000006',
-                    '00000000-0000-0000-0001-000000000007','00000000-0000-0000-0001-000000000008',
-                    '00000000-0000-0000-0001-000000000009','00000000-0000-0000-0001-000000000010',
-                    '00000000-0000-0000-0001-000000000011','00000000-0000-0000-0001-000000000012',
-                    '00000000-0000-0000-0001-000000000013','00000000-0000-0000-0001-000000000014',
-                    '00000000-0000-0000-0001-000000000015','00000000-0000-0000-0001-000000000016',
-                    '00000000-0000-0000-0001-000000000017','00000000-0000-0000-0001-000000000018',
-                    '00000000-0000-0000-0001-000000000019','00000000-0000-0000-0001-000000000020',
-                    '00000000-0000-0000-0001-000000000021','00000000-0000-0000-0001-000000000022',
-                    '00000000-0000-0000-0001-000000000023','00000000-0000-0000-0001-000000000024',
-                    '00000000-0000-0000-0001-000000000025','00000000-0000-0000-0001-000000000026',
-                    '00000000-0000-0000-0001-000000000027','00000000-0000-0000-0001-000000000028',
-                    '00000000-0000-0000-0001-000000000029','00000000-0000-0000-0001-000000000030'
+                    '00000000-0000-0000-0101-000000000002',
+                    '00000000-0000-0000-0101-000000000003','00000000-0000-0000-0101-000000000004',
+                    '00000000-0000-0000-0101-000000000005','00000000-0000-0000-0101-000000000006',
+                    '00000000-0000-0000-0101-000000000007','00000000-0000-0000-0101-000000000008',
+                    '00000000-0000-0000-0101-000000000009','00000000-0000-0000-0101-000000000010',
+                    '00000000-0000-0000-0101-000000000011','00000000-0000-0000-0101-000000000012',
+                    '00000000-0000-0000-0101-000000000013','00000000-0000-0000-0101-000000000014',
+                    '00000000-0000-0000-0101-000000000015','00000000-0000-0000-0101-000000000016',
+                    '00000000-0000-0000-0101-000000000017','00000000-0000-0000-0101-000000000018',
+                    '00000000-0000-0000-0101-000000000019','00000000-0000-0000-0101-000000000020',
+                    '00000000-0000-0000-0101-000000000021','00000000-0000-0000-0101-000000000022',
+                    '00000000-0000-0000-0101-000000000023','00000000-0000-0000-0101-000000000024',
+                    '00000000-0000-0000-0101-000000000025','00000000-0000-0000-0101-000000000026',
+                    '00000000-0000-0000-0101-000000000027','00000000-0000-0000-0101-000000000028',
+                    '00000000-0000-0000-0101-000000000029','00000000-0000-0000-0101-000000000030'
                 )</where>
             </delete>
         </rollback>
@@ -521,18 +507,8 @@
 
     <changeSet id="20260331000000-demo-memberships" author="iqkv" context="demo">
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000001"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000001"/>
-            <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
-            <column name="created_at" valueDate="2026-01-15T12:00:00"/>
-            <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
-            <column name="created_by" value="system"/>
-            <column name="updated_by" value="system"/>
-        </insert>
-        <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000002"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000002"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000002"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -542,7 +518,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000003"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000003"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000003"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -552,7 +528,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000004"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000004"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000004"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -562,7 +538,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000005"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000005"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000005"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -572,7 +548,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000006"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000006"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000006"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -582,7 +558,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000007"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000007"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000007"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -592,7 +568,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000008"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000008"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000008"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -602,7 +578,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000009"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000009"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000009"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -612,7 +588,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000010"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000010"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000010"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -622,7 +598,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000011"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000011"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000011"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -632,7 +608,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000012"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000012"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000012"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -642,7 +618,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000013"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000013"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000013"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -652,7 +628,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000014"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000014"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000014"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -662,7 +638,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000015"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000015"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000015"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -672,7 +648,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000016"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000016"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000016"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -682,7 +658,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000017"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000017"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000017"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -692,7 +668,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000018"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000018"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000018"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -702,7 +678,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000019"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000019"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000019"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -712,7 +688,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000020"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000020"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000020"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -722,7 +698,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000021"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000021"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000021"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -732,7 +708,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000022"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000022"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000022"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -742,7 +718,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000023"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000023"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000023"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -752,7 +728,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000024"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000024"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000024"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -762,7 +738,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000025"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000025"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000025"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -772,7 +748,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000026"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000026"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000026"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -782,7 +758,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000027"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000027"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000027"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -792,7 +768,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000028"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000028"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000028"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -802,7 +778,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000029"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000029"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000029"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -812,7 +788,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000030"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000030"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000030"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
@@ -828,11 +804,6 @@
     </changeSet>
 
     <changeSet id="20260331000000-demo-authorities" author="iqkv" context="demo">
-        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000001"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-000000000001"/>
-            <column name="authority"     value="TENANT_OWNER"/>
-        </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000002"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000002"/>

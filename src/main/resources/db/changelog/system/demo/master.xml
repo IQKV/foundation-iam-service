@@ -10,5 +10,6 @@
     <include file="db/changelog/system/demo/20260511000000-demo-tenant-owner.xml"/>
     <include file="db/changelog/system/demo/20260511000001-demo-admin-users.xml"/>
     <include file="db/changelog/system/demo/20260511000002-demo-member-users.xml"/>
+    <include file="db/changelog/system/demo/20260511000003-demo-member-users-extended.xml"/>
 
 </databaseChangeLog>
