@@ -12,9 +12,9 @@
         Authority: MEMBER
 
         Users:
-          00000000-0000-0000-0001-000000000036  john.member@demo.iqkv.com   (John Member)
-          00000000-0000-0000-0001-000000000037  lisa.member@demo.iqkv.com   (Lisa Member)
-          00000000-0000-0000-0001-000000000038  tom.member@demo.iqkv.com    (Tom Member)
+          00000000-0000-0000-0101-000000000036  john.member@demo.iqkv.com   (John Member)
+          00000000-0000-0000-0101-000000000037  lisa.member@demo.iqkv.com   (Lisa Member)
+          00000000-0000-0000-0101-000000000038  tom.member@demo.iqkv.com    (Tom Member)
 
         Sign-in  : POST /api/v1/iam/auth/signin
                    Header: X-Tenant-ID: demo0001
@@ -22,7 +22,7 @@
 
     <changeSet id="20260511000002-demo-member-users" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000036"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000036"/>
             <column name="email"          value="john.member@demo.iqkv.com"/>
             <!-- TenantMember123! — BCrypt cost 12 -->
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
@@ -36,7 +36,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000037"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000037"/>
             <column name="email"          value="lisa.member@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Lisa"/>
@@ -49,7 +49,7 @@
             <column name="updated_by"     value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000038"/>
+            <column name="id"             value="00000000-0000-0000-0101-000000000038"/>
             <column name="email"          value="tom.member@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Tom"/>
@@ -64,9 +64,9 @@
         <rollback>
             <delete tableName="users" schemaName="public">
                 <where>id IN (
-                    '00000000-0000-0000-0001-000000000036',
-                    '00000000-0000-0000-0001-000000000037',
-                    '00000000-0000-0000-0001-000000000038'
+                    '00000000-0000-0000-0101-000000000036',
+                    '00000000-0000-0000-0101-000000000037',
+                    '00000000-0000-0000-0101-000000000038'
                 )</where>
             </delete>
         </rollback>
@@ -75,7 +75,7 @@
     <changeSet id="20260511000002-demo-member-memberships" author="iqkv" context="demo">
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000036"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000036"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000036"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T13:01:00"/>
@@ -85,7 +85,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000037"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000037"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000037"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T13:02:00"/>
@@ -95,7 +95,7 @@
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
             <column name="id"         value="00000000-0000-0000-0002-000000000038"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000038"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000038"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T13:03:00"/>

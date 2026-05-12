@@ -6,48 +6,85 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <!--
+        Demo platform admin user — context: demo.
+
+        This user has NO tenant membership. Authentication goes through
+        POST /api/v1/iam/auth/admin/signin (no X-Tenant-ID required).
+
+        Email    : platform.admin@iqkv.com
+        Password : PlatformAdmin123!  (BCrypt 12)
+        Role     : PLATFORM_ADMIN (platform_authorities, not tenant_member_authorities)
+    -->
+    <changeSet id="20260301000001-demo-platform-admin" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0001-000000000001"/>
+            <column name="email"          value="platform.admin@iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$8/3GY/ePEi53F85X4MzrzORv.nHIIcIW/F/qnLgyX4uLgc0xqF2su"/>
+            <column name="first_name"     value="Platform"/>
+            <column name="last_name"      value="Admin"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-03-01T00:00:00"/>
+            <column name="updated_at"     valueDate="2026-03-01T00:00:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+        <insert tableName="platform_authorities" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id"    value="00000000-0000-0000-0001-000000000001"/>
+            <column name="authority"       value="PLATFORM_ADMIN"/>
+            <column name="granted_at" valueDate="2026-03-01T00:00:00"/>
+            <column name="granted_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="platform_authorities" schemaName="public">
+                <where>user_id = '00000000-0000-0000-0001-000000000001'</where>
+            </delete>
+            <delete tableName="users" schemaName="public">
+                <where>id = '00000000-0000-0000-0001-000000000001'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!--
         Demo seed data — local/dev only (context: demo).
 
         Tenant   : demo0001
         Password : TenantAdmin123!  (BCrypt 12, shared by all demo tenant users)
-        Authority: TENANT_OWNER (all tenant users)
+        Authority: MEMBER (all tenant users)
 
         Users (30 total, tenant-scoped):
-          00000000-0000-0000-0001-000000000001  admin@demo.iqkv.com
-          00000000-0000-0000-0001-000000000002  alice.johnson@demo.iqkv.com
-          00000000-0000-0000-0001-000000000003  bob.smith@demo.iqkv.com
-          00000000-0000-0000-0001-000000000004  carol.white@demo.iqkv.com
-          00000000-0000-0000-0001-000000000005  david.brown@demo.iqkv.com
-          00000000-0000-0000-0001-000000000006  emma.davis@demo.iqkv.com
-          00000000-0000-0000-0001-000000000007  frank.miller@demo.iqkv.com
-          00000000-0000-0000-0001-000000000008  grace.wilson@demo.iqkv.com
-          00000000-0000-0000-0001-000000000009  henry.moore@demo.iqkv.com
-          00000000-0000-0000-0001-000000000010  isabella.taylor@demo.iqkv.com
-          00000000-0000-0000-0001-000000000011  james.anderson@demo.iqkv.com
-          00000000-0000-0000-0001-000000000012  kate.thomas@demo.iqkv.com
-          00000000-0000-0000-0001-000000000013  liam.jackson@demo.iqkv.com
-          00000000-0000-0000-0001-000000000014  mia.harris@demo.iqkv.com
-          00000000-0000-0000-0001-000000000015  noah.martin@demo.iqkv.com
-          00000000-0000-0000-0001-000000000016  olivia.garcia@demo.iqkv.com
-          00000000-0000-0000-0001-000000000017  peter.martinez@demo.iqkv.com
-          00000000-0000-0000-0001-000000000018  quinn.robinson@demo.iqkv.com
-          00000000-0000-0000-0001-000000000019  rachel.clark@demo.iqkv.com
-          00000000-0000-0000-0001-000000000020  samuel.rodriguez@demo.iqkv.com
-          00000000-0000-0000-0001-000000000021  tina.lewis@demo.iqkv.com
-          00000000-0000-0000-0001-000000000022  uma.lee@demo.iqkv.com
-          00000000-0000-0000-0001-000000000023  victor.walker@demo.iqkv.com
-          00000000-0000-0000-0001-000000000024  wendy.hall@demo.iqkv.com
-          00000000-0000-0000-0001-000000000025  xander.allen@demo.iqkv.com
-          00000000-0000-0000-0001-000000000026  yara.young@demo.iqkv.com
-          00000000-0000-0000-0001-000000000027  zoe.hernandez@demo.iqkv.com
-          00000000-0000-0000-0001-000000000028  aaron.king@demo.iqkv.com
-          00000000-0000-0000-0001-000000000029  bella.wright@demo.iqkv.com
-          00000000-0000-0000-0001-000000000030  carlos.scott@demo.iqkv.com
+          00000000-0000-0000-0101-000000000001  tenant.owner@demo.iqkv.com
+          00000000-0000-0000-0101-000000000002  alice.johnson@demo.iqkv.com
+          00000000-0000-0000-0101-000000000003  bob.smith@demo.iqkv.com
+          00000000-0000-0000-0101-000000000004  carol.white@demo.iqkv.com
+          00000000-0000-0000-0101-000000000005  david.brown@demo.iqkv.com
+          00000000-0000-0000-0101-000000000006  emma.davis@demo.iqkv.com
+          00000000-0000-0000-0101-000000000007  frank.miller@demo.iqkv.com
+          00000000-0000-0000-0101-000000000008  grace.wilson@demo.iqkv.com
+          00000000-0000-0000-0101-000000000009  henry.moore@demo.iqkv.com
+          00000000-0000-0000-0101-000000000010  isabella.taylor@demo.iqkv.com
+          00000000-0000-0000-0101-000000000011  james.anderson@demo.iqkv.com
+          00000000-0000-0000-0101-000000000012  kate.thomas@demo.iqkv.com
+          00000000-0000-0000-0101-000000000013  liam.jackson@demo.iqkv.com
+          00000000-0000-0000-0101-000000000014  mia.harris@demo.iqkv.com
+          00000000-0000-0000-0101-000000000015  noah.martin@demo.iqkv.com
+          00000000-0000-0000-0101-000000000016  olivia.garcia@demo.iqkv.com
+          00000000-0000-0000-0101-000000000017  peter.martinez@demo.iqkv.com
+          00000000-0000-0000-0101-000000000018  quinn.robinson@demo.iqkv.com
+          00000000-0000-0000-0101-000000000019  rachel.clark@demo.iqkv.com
+          00000000-0000-0000-0101-000000000020  samuel.rodriguez@demo.iqkv.com
+          00000000-0000-0000-0101-000000000021  tina.lewis@demo.iqkv.com
+          00000000-0000-0000-0101-000000000022  uma.lee@demo.iqkv.com
+          00000000-0000-0000-0101-000000000023  victor.walker@demo.iqkv.com
+          00000000-0000-0000-0101-000000000024  wendy.hall@demo.iqkv.com
+          00000000-0000-0000-0101-000000000025  xander.allen@demo.iqkv.com
+          00000000-0000-0000-0101-000000000026  yara.young@demo.iqkv.com
+          00000000-0000-0000-0101-000000000027  zoe.hernandez@demo.iqkv.com
+          00000000-0000-0000-0101-000000000028  aaron.king@demo.iqkv.com
+          00000000-0000-0000-0101-000000000029  bella.wright@demo.iqkv.com
+          00000000-0000-0000-0101-000000000030  carlos.scott@demo.iqkv.com
 
-        Platform admin (no tenant membership):
-          00000000-0000-0000-0001-000000000031  platform.admin@iqkv.com
-          Password : PlatformAdmin123!
-          Sign-in  : POST /api/v1/iam/auth/admin/signin  (no X-Tenant-ID header)
     -->
 
     <changeSet id="20260331000000-demo-tenant" author="iqkv" context="demo">
@@ -71,7 +108,7 @@
     <changeSet id="20260331000000-demo-users" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0001-000000000001"/>
-            <column name="email"          value="admin@demo.iqkv.com"/>
+            <column name="email"          value="tenant.owner@demo.iqkv.com"/>
             <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
             <column name="first_name"     value="Demo"/>
             <column name="last_name"      value="Admin"/>
@@ -799,194 +836,153 @@
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000002"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000002"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000003"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000003"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000004"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000004"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000005"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000005"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000006"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000006"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000007"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000007"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000008"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000008"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000009"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000009"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000010"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000010"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000011"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000011"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000012"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000012"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000013"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000013"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000014"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000014"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000015"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000015"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000016"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000016"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000017"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000017"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000018"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000018"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000019"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000019"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000020"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000020"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000021"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000021"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000022"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000022"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000023"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000023"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000024"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000024"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000025"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000025"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000026"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000026"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000027"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000027"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000028"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000028"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000029"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000029"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
             <column name="id"            value="00000000-0000-0000-0003-000000000030"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000030"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority"     value="MEMBER"/>
         </insert>
         <rollback>
             <delete tableName="tenant_member_authorities" schemaName="public">
                 <where>membership_id IN (
                     SELECT id FROM public.tenant_memberships WHERE tenant_key = 'demo0001'
                 )</where>
-            </delete>
-        </rollback>
-    </changeSet>
-
-    <!--
-        Demo platform admin user — context: demo.
-
-        This user has NO tenant membership. Authentication goes through
-        POST /api/v1/iam/auth/admin/signin (no X-Tenant-ID required).
-
-        Email    : platform.admin@iqkv.com
-        Password : PlatformAdmin123!  (BCrypt 12)
-        Role     : PLATFORM_ADMIN (platform_authorities, not tenant_member_authorities)
-    -->
-    <changeSet id="20260510000001-demo-platform-admin" author="iqkv" context="demo">
-        <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000031"/>
-            <column name="email"          value="platform.admin@iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$8/3GY/ePEi53F85X4MzrzORv.nHIIcIW/F/qnLgyX4uLgc0xqF2su"/>
-            <column name="first_name"     value="Platform"/>
-            <column name="last_name"      value="Admin"/>
-            <column name="status"         value="ACTIVE"/>
-            <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-05-10T00:00:00"/>
-            <column name="updated_at"     valueDate="2026-05-10T00:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
-        </insert>
-        <insert tableName="platform_authorities" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0004-000000000001"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000031"/>
-            <column name="authority"       value="PLATFORM_ADMIN"/>
-            <column name="granted_at" valueDate="2026-05-10T00:00:00"/>
-            <column name="granted_by" value="system"/>
-        </insert>
-        <rollback>
-            <delete tableName="platform_authorities" schemaName="public">
-                <where>user_id = '00000000-0000-0000-0001-000000000031'</where>
-            </delete>
-            <delete tableName="users" schemaName="public">
-                <where>id = '00000000-0000-0000-0001-000000000031'</where>
             </delete>
         </rollback>
     </changeSet>
