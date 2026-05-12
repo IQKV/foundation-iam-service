@@ -56,8 +56,7 @@ public interface UserService {
    *
    * @param request validated registration payload containing email, password, name, and
    *                optional tenant name
-   * @return a {@link UserDtos.SignupResponse} with the new user ID, email, tenant key,
-   * and initial tenant status
+   * @return a {@link UserDtos.SignupResponse} with the new user ID, email, tenant key, and initial tenant status
    */
   UserDtos.SignupResponse registerUser(UserDtos.RegisterUserRequest request);
 
@@ -87,8 +86,7 @@ public interface UserService {
    * @param query encapsulates pagination ({@code page}, {@code size}), sort
    *              ({@code sortBy}, {@code sortDir}), and optional filters
    *              ({@code search}, {@code status})
-   * @return a {@link UserDtos.PagedUserResponse} containing the content slice and
-   * pagination metadata
+   * @return a {@link UserDtos.PagedUserResponse} containing the content slice and pagination metadata
    */
   UserDtos.PagedUserResponse listUsers(UserDtos.UserListQuery query);
 
