@@ -274,8 +274,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NoPlatformAuthorityException.class)
   public ResponseEntity<ProblemDetail> handleNoPlatformAuthority(final NoPlatformAuthorityException ex,
-                                                            final HttpServletRequest request,
-                                                            final Locale locale) {
+                                                                 final HttpServletRequest request,
+                                                                 final Locale locale) {
     log.warn("Platform admin sign-in rejected — no platform authortities: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.forbidden", locale),

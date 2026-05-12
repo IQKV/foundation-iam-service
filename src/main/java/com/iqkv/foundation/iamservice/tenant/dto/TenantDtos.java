@@ -37,7 +37,9 @@ public final class TenantDtos {
   public record UpdateTenantStatusRequest(@NotNull TenantStatus status) {
   }
 
-  /** Slim response used by the self-service tenant endpoint. */
+  /**
+   * Slim response used by the self-service tenant endpoint.
+   */
   public record TenantResponse(
       String tenantKey,
       String name,
@@ -80,11 +82,15 @@ public final class TenantDtos {
       LocalDateTime updatedAt) {
   }
 
-  /** Total tenant count returned by the admin count endpoint. */
+  /**
+   * Total tenant count returned by the admin count endpoint.
+   */
   public record TenantCountResponse(long total) {
   }
 
-  /** Member count for a specific tenant. */
+  /**
+   * Member count for a specific tenant.
+   */
   public record TenantMemberCountResponse(String tenantKey, long total) {
   }
 
@@ -111,7 +117,9 @@ public final class TenantDtos {
     }
   }
 
-  /** Paginated list of tenants returned by the admin list endpoint. */
+  /**
+   * Paginated list of tenants returned by the admin list endpoint.
+   */
   public record PagedTenantResponse(
       List<AdminTenantResponse> content,
       int page,
@@ -142,7 +150,9 @@ public final class TenantDtos {
       String search,
       String status) {
 
-    /** Canonical defaults applied when the controller binds an empty query string. */
+    /**
+     * Canonical defaults applied when the controller binds an empty query string.
+     */
     public TenantListQuery() {
       this(0, 20, "createdAt", "desc", null, null);
     }

@@ -57,7 +57,7 @@ public interface UserService {
    * @param request validated registration payload containing email, password, name, and
    *                optional tenant name
    * @return a {@link UserDtos.SignupResponse} with the new user ID, email, tenant key,
-   *         and initial tenant status
+   * and initial tenant status
    */
   UserDtos.SignupResponse registerUser(UserDtos.RegisterUserRequest request);
 
@@ -66,8 +66,7 @@ public interface UserService {
    *
    * @param userId the UUID of the user to fetch
    * @return the user's public profile as a {@link UserDtos.UserResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException
-   *         if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   UserDtos.UserResponse getUserById(UUID userId);
 
@@ -89,7 +88,7 @@ public interface UserService {
    *              ({@code sortBy}, {@code sortDir}), and optional filters
    *              ({@code search}, {@code status})
    * @return a {@link UserDtos.PagedUserResponse} containing the content slice and
-   *         pagination metadata
+   * pagination metadata
    */
   UserDtos.PagedUserResponse listUsers(UserDtos.UserListQuery query);
 
@@ -114,14 +113,13 @@ public interface UserService {
    * {@code updatedAt} is set to {@code now()} and {@code updatedBy} is recorded
    * as the provided actor identifier.
    *
-   * @param userId     UUID of the user to update
-   * @param firstName  new first name (must not be blank)
-   * @param lastName   new last name (must not be blank)
-   * @param updatedBy  identifier of the actor performing the update (user ID or
-   *                   {@code "system"} for admin operations)
+   * @param userId    UUID of the user to update
+   * @param firstName new first name (must not be blank)
+   * @param lastName  new last name (must not be blank)
+   * @param updatedBy identifier of the actor performing the update (user ID or
+   *                  {@code "system"} for admin operations)
    * @return the updated user as a {@link UserDtos.UserResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException
-   *         if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   UserDtos.UserResponse updateUser(UUID userId, String firstName, String lastName, String updatedBy);
 
@@ -136,10 +134,9 @@ public interface UserService {
    * @param request partial update payload; any field may be {@code null} to indicate
    *                no change
    * @return the updated user as a {@link UserDtos.UserResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException
-   *         if no user exists with the given ID
-   * @throws IllegalArgumentException if {@code status} is non-null but not a valid
-   *         {@link AccountStatus} name
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   * @throws IllegalArgumentException                                              if {@code status} is non-null but not a valid
+   *                                                                               {@link AccountStatus} name
    */
   UserDtos.UserResponse patchUser(UUID userId, UserDtos.AdminUpdateUserRequest request);
 
@@ -155,8 +152,7 @@ public interface UserService {
    *
    * @param userId    UUID of the user whose membership is being removed
    * @param tenantKey the 8-character NanoID identifying the tenant
-   * @throws com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException
-   *         if the user is not a member of the specified tenant
+   * @throws com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException if the user is not a member of the specified tenant
    */
   void deleteUser(UUID userId, String tenantKey);
 
@@ -171,8 +167,7 @@ public interface UserService {
    * while keeping the account intact.
    *
    * @param userId UUID of the user to delete
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException
-   *         if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   void deleteUserById(UUID userId);
 }

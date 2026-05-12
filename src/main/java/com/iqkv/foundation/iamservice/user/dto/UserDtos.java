@@ -112,7 +112,9 @@ public final class UserDtos {
       String search,
       String status) {
 
-    /** Canonical defaults applied when the controller binds an empty query string. */
+    /**
+     * Canonical defaults applied when the controller binds an empty query string.
+     */
     public UserListQuery() {
       this(0, 20, "createdAt", "desc", null, null);
     }

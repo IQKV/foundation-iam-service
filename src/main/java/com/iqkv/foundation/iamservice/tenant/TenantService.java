@@ -43,8 +43,7 @@ public interface TenantService {
    * @param tenantName  human-readable name (must be unique)
    * @param ownerUserId UUID of the user who will own the tenant
    * @return the newly created {@link Tenant}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException
-   *         if a tenant with the same name already exists
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException if a tenant with the same name already exists
    */
   Tenant createTenant(String tenantName, UUID ownerUserId);
 
@@ -53,8 +52,7 @@ public interface TenantService {
    *
    * @param tenantKey the tenant's unique key
    * @return the {@link Tenant}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
   Tenant getTenantByKey(String tenantKey);
 
@@ -65,10 +63,8 @@ public interface TenantService {
    * @param tenantKey the tenant's unique key
    * @param newStatus the target status
    * @return the updated {@link Tenant}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
-   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException
-   *         if the transition is not allowed
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException     if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException if the transition is not allowed
    */
   Tenant updateTenantStatus(String tenantKey, TenantStatus newStatus);
 
@@ -77,10 +73,8 @@ public interface TenantService {
    *
    * @param tenantKey the tenant's unique key
    * @return the updated {@link Tenant}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
-   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException
-   *         if the tenant is not in {@code PROVISIONING_FAILED} state
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException     if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException if the tenant is not in {@code PROVISIONING_FAILED} state
    */
   Tenant retryProvisioning(String tenantKey);
 
@@ -93,8 +87,7 @@ public interface TenantService {
    * @param tenantKey the tenant's unique key
    * @param query     encapsulates pagination, sort, and optional filters
    * @return a {@link com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
   com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse listMembersByTenantKey(
       String tenantKey, TenantDtos.TenantMemberListQuery query);
@@ -104,8 +97,7 @@ public interface TenantService {
    *
    * @param tenantKey the tenant's unique key
    * @return member count response
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
   TenantDtos.TenantMemberCountResponse countMembersByTenantKey(String tenantKey);
 
@@ -130,10 +122,8 @@ public interface TenantService {
    * @param tenantKey the tenant's unique key
    * @param request   payload containing the new name
    * @return the updated tenant as a {@link TenantDtos.AdminTenantResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException
-   *         if the new name is already taken by another tenant
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException      if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException if the new name is already taken by another tenant
    */
   TenantDtos.AdminTenantResponse updateTenant(String tenantKey, TenantDtos.UpdateTenantRequest request);
 
@@ -144,10 +134,8 @@ public interface TenantService {
    * @param tenantKey the tenant's unique key
    * @param request   partial update payload; any field may be {@code null}
    * @return the updated tenant as a {@link TenantDtos.AdminTenantResponse}
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
-   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException
-   *         if the requested status transition is not allowed
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException     if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException if the requested status transition is not allowed
    */
   TenantDtos.AdminTenantResponse patchTenant(String tenantKey, TenantDtos.AdminUpdateTenantRequest request);
 
@@ -156,8 +144,7 @@ public interface TenantService {
    * Publishes a {@code tenant.deleted} domain event.
    *
    * @param tenantKey the tenant's unique key
-   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException
-   *         if no tenant exists with the given key
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
   void deleteTenant(String tenantKey);
 }
