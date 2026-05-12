@@ -748,672 +748,870 @@
             </delete>
         </rollback>
     </changeSet>
-    <changeSet id="20260511000003-demo-member-memberships-extended" author="iqkv" context="demo">        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000039"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000039"/>
+
+    <changeSet id="20260511000003-demo-member-memberships-extended" author="iqkv" context="demo">
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000039"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000039"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:00:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000040"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000040"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000040"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000040"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:01:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:01:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000041"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000041"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000041"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000041"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:02:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:02:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000042"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000042"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000042"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000042"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:03:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:03:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000043"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000043"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000043"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000043"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:04:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:04:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000044"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000044"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000044"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000044"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:05:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:05:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000045"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000045"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000045"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000045"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:06:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:06:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000046"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000046"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000046"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000046"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:07:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:07:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000047"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000047"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000047"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000047"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:08:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:08:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000048"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000048"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000048"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000048"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:09:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:09:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000049"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000049"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000049"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000049"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:10:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:10:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000050"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000050"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000050"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000050"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:11:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:11:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000051"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000051"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000051"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000051"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:12:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:12:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000052"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000052"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000052"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000052"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:13:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:13:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000053"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000053"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000053"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000053"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:14:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:14:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000054"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000054"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000054"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000054"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:15:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:15:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000055"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000055"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000055"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000055"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:16:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:16:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000056"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000056"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000056"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000056"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:17:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:17:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000057"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000057"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000057"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000057"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:18:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:18:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000058"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000058"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000058"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000058"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:19:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:19:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000059"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000059"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000059"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000059"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:20:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:20:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000060"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000060"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000060"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000060"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:21:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:21:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000061"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000061"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000061"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000061"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:22:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:22:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000062"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000062"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000062"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000062"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:23:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:23:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000063"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000063"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000063"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000063"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:24:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:24:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000064"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000064"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000064"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000064"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:25:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:25:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000065"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000065"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000065"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000065"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:26:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:26:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000066"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000066"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000066"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000066"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:27:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:27:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000067"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000067"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000067"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000067"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:28:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:28:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000068"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000068"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000068"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000068"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:29:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:29:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000069"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000069"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000069"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000069"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:30:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:30:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000070"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000070"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000070"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000070"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:31:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:31:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000071"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000071"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000071"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000071"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:32:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:32:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000072"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000072"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000072"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000072"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:33:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:33:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000073"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000073"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000073"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000073"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:34:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:34:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000074"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000074"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000074"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000074"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:35:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:35:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000075"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000075"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000075"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000075"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:36:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:36:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000076"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000076"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000076"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000076"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:37:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:37:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000077"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000077"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000077"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000077"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:38:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:38:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000078"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000078"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000078"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000078"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:39:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:39:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000079"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000079"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000079"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000079"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:40:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:40:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000080"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000080"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000080"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000080"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:41:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:41:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000081"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000081"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000081"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000081"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:42:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:42:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000082"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000082"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000082"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000082"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:43:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:43:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000083"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000083"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000083"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000083"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:44:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:44:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000084"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000084"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000084"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000084"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:45:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:45:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000085"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000085"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000085"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000085"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:46:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:46:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000086"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000086"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000086"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000086"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:47:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:47:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000087"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000087"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000087"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000087"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:48:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:48:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-0000000000000000000088"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-0000000000000000000088"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0002-000000000088"/>
+            <column name="user_id"    value="00000000-0000-0000-0101-000000000088"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="status"     value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T15:49:00"/>
             <column name="updated_at" valueDate="2026-05-11T15:49:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
-        </insert>        <rollback>
+        </insert>
+        <rollback>
             <delete tableName="tenant_memberships" schemaName="public">
-                <where>tenant_key = 'demo0001' AND user_id IN (
-                    SELECT id FROM public.users WHERE id BETWEEN
-                    '00000000-0000-0000-0101-000000000039' AND '00000000-0000-0000-0101-000000000088'
+                <where>id IN (
+                    '00000000-0000-0000-0002-000000000039',
+                    '00000000-0000-0000-0002-000000000040',
+                    '00000000-0000-0000-0002-000000000041',
+                    '00000000-0000-0000-0002-000000000042',
+                    '00000000-0000-0000-0002-000000000043',
+                    '00000000-0000-0000-0002-000000000044',
+                    '00000000-0000-0000-0002-000000000045',
+                    '00000000-0000-0000-0002-000000000046',
+                    '00000000-0000-0000-0002-000000000047',
+                    '00000000-0000-0000-0002-000000000048',
+                    '00000000-0000-0000-0002-000000000049',
+                    '00000000-0000-0000-0002-000000000050',
+                    '00000000-0000-0000-0002-000000000051',
+                    '00000000-0000-0000-0002-000000000052',
+                    '00000000-0000-0000-0002-000000000053',
+                    '00000000-0000-0000-0002-000000000054',
+                    '00000000-0000-0000-0002-000000000055',
+                    '00000000-0000-0000-0002-000000000056',
+                    '00000000-0000-0000-0002-000000000057',
+                    '00000000-0000-0000-0002-000000000058',
+                    '00000000-0000-0000-0002-000000000059',
+                    '00000000-0000-0000-0002-000000000060',
+                    '00000000-0000-0000-0002-000000000061',
+                    '00000000-0000-0000-0002-000000000062',
+                    '00000000-0000-0000-0002-000000000063',
+                    '00000000-0000-0000-0002-000000000064',
+                    '00000000-0000-0000-0002-000000000065',
+                    '00000000-0000-0000-0002-000000000066',
+                    '00000000-0000-0000-0002-000000000067',
+                    '00000000-0000-0000-0002-000000000068',
+                    '00000000-0000-0000-0002-000000000069',
+                    '00000000-0000-0000-0002-000000000070',
+                    '00000000-0000-0000-0002-000000000071',
+                    '00000000-0000-0000-0002-000000000072',
+                    '00000000-0000-0000-0002-000000000073',
+                    '00000000-0000-0000-0002-000000000074',
+                    '00000000-0000-0000-0002-000000000075',
+                    '00000000-0000-0000-0002-000000000076',
+                    '00000000-0000-0000-0002-000000000077',
+                    '00000000-0000-0000-0002-000000000078',
+                    '00000000-0000-0000-0002-000000000079',
+                    '00000000-0000-0000-0002-000000000080',
+                    '00000000-0000-0000-0002-000000000081',
+                    '00000000-0000-0000-0002-000000000082',
+                    '00000000-0000-0000-0002-000000000083',
+                    '00000000-0000-0000-0002-000000000084',
+                    '00000000-0000-0000-0002-000000000085',
+                    '00000000-0000-0000-0002-000000000086',
+                    '00000000-0000-0000-0002-000000000087',
+                    '00000000-0000-0000-0002-000000000088'
                 )</where>
             </delete>
         </rollback>
     </changeSet>
-    <changeSet id="20260511000003-demo-member-authorities-extended" author="iqkv" context="demo">        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000039"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000039"/>
+
+    <changeSet id="20260511000003-demo-member-authorities-extended" author="iqkv" context="demo">
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000039"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000039"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000040"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000040"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000040"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000040"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000041"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000041"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000041"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000041"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000042"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000042"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000042"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000042"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000043"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000043"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000043"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000043"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000044"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000044"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000044"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000044"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000045"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000045"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000045"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000045"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000046"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000046"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000046"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000046"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000047"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000047"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000047"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000047"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000048"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000048"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000048"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000048"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000049"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000049"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000049"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000049"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000050"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000050"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000050"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000050"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000051"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000051"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000051"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000051"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000052"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000052"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000052"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000052"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000053"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000053"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000053"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000053"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000054"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000054"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000054"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000054"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000055"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000055"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000055"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000055"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000056"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000056"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000056"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000056"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000057"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000057"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000057"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000057"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000058"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000058"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000058"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000058"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000059"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000059"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000059"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000059"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000060"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000060"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000060"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000060"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000061"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000061"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000061"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000061"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000062"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000062"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000062"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000062"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000063"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000063"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000063"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000063"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000064"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000064"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000064"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000064"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000065"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000065"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000065"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000065"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000066"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000066"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000066"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000066"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000067"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000067"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000067"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000067"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000068"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000068"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000068"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000068"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000069"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000069"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000069"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000069"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000070"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000070"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000070"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000070"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000071"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000071"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000071"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000071"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000072"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000072"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000072"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000072"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000073"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000073"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000073"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000073"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000074"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000074"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000074"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000074"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000075"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000075"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000075"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000075"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000076"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000076"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000076"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000076"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000077"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000077"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000077"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000077"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000078"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000078"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000078"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000078"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000079"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000079"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000079"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000079"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000080"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000080"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000080"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000080"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000081"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000081"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000081"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000081"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000082"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000082"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000082"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000082"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000083"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000083"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000083"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000083"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000084"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000084"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000084"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000084"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000085"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000085"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000085"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000085"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000086"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000086"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000086"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000086"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000087"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000087"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000087"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000087"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-0000000000000000000088"/>
-            <column name="membership_id" value="00000000-0000-0000-0002-0000000000000000000088"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id"            value="00000000-0000-0000-0003-000000000088"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000088"/>
             <column name="authority"     value="MEMBER"/>
-        </insert>        <rollback>
+        </insert>
+        <rollback>
             <delete tableName="tenant_member_authorities" schemaName="public">
-                <where>membership_id IN (
-                    SELECT id FROM public.tenant_memberships WHERE user_id IN (
-                        SELECT id FROM public.users WHERE id BETWEEN
-                        '00000000-0000-0000-0101-000000000039' AND '00000000-0000-0000-0101-000000000088'
-                    )
+                <where>id IN (
+                    '00000000-0000-0000-0003-000000000039',
+                    '00000000-0000-0000-0003-000000000040',
+                    '00000000-0000-0000-0003-000000000041',
+                    '00000000-0000-0000-0003-000000000042',
+                    '00000000-0000-0000-0003-000000000043',
+                    '00000000-0000-0000-0003-000000000044',
+                    '00000000-0000-0000-0003-000000000045',
+                    '00000000-0000-0000-0003-000000000046',
+                    '00000000-0000-0000-0003-000000000047',
+                    '00000000-0000-0000-0003-000000000048',
+                    '00000000-0000-0000-0003-000000000049',
+                    '00000000-0000-0000-0003-000000000050',
+                    '00000000-0000-0000-0003-000000000051',
+                    '00000000-0000-0000-0003-000000000052',
+                    '00000000-0000-0000-0003-000000000053',
+                    '00000000-0000-0000-0003-000000000054',
+                    '00000000-0000-0000-0003-000000000055',
+                    '00000000-0000-0000-0003-000000000056',
+                    '00000000-0000-0000-0003-000000000057',
+                    '00000000-0000-0000-0003-000000000058',
+                    '00000000-0000-0000-0003-000000000059',
+                    '00000000-0000-0000-0003-000000000060',
+                    '00000000-0000-0000-0003-000000000061',
+                    '00000000-0000-0000-0003-000000000062',
+                    '00000000-0000-0000-0003-000000000063',
+                    '00000000-0000-0000-0003-000000000064',
+                    '00000000-0000-0000-0003-000000000065',
+                    '00000000-0000-0000-0003-000000000066',
+                    '00000000-0000-0000-0003-000000000067',
+                    '00000000-0000-0000-0003-000000000068',
+                    '00000000-0000-0000-0003-000000000069',
+                    '00000000-0000-0000-0003-000000000070',
+                    '00000000-0000-0000-0003-000000000071',
+                    '00000000-0000-0000-0003-000000000072',
+                    '00000000-0000-0000-0003-000000000073',
+                    '00000000-0000-0000-0003-000000000074',
+                    '00000000-0000-0000-0003-000000000075',
+                    '00000000-0000-0000-0003-000000000076',
+                    '00000000-0000-0000-0003-000000000077',
+                    '00000000-0000-0000-0003-000000000078',
+                    '00000000-0000-0000-0003-000000000079',
+                    '00000000-0000-0000-0003-000000000080',
+                    '00000000-0000-0000-0003-000000000081',
+                    '00000000-0000-0000-0003-000000000082',
+                    '00000000-0000-0000-0003-000000000083',
+                    '00000000-0000-0000-0003-000000000084',
+                    '00000000-0000-0000-0003-000000000085',
+                    '00000000-0000-0000-0003-000000000086',
+                    '00000000-0000-0000-0003-000000000087',
+                    '00000000-0000-0000-0003-000000000088'
                 )</where>
             </delete>
         </rollback>
