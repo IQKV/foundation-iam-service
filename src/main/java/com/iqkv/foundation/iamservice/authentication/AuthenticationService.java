@@ -51,4 +51,13 @@ public interface AuthenticationService {
   void verifyEmail(String token);
 
   void resendVerification(String email);
+
+  /**
+   * Returns the provisioning status of a tenant by its key.
+   * Used by the public post-signup polling endpoint — no authentication required.
+   *
+   * @param tenantKey the tenant's unique key
+   * @return the current status string: PROVISIONING, ACTIVE, or PROVISIONING_FAILED
+   */
+  String getProvisioningStatus(String tenantKey);
 }

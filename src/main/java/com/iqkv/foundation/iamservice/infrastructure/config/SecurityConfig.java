@@ -75,6 +75,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**").permitAll()
             .requestMatchers("/.well-known/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/signup").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/signup/status/*").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/tenants").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/signin").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/admin/signin").permitAll()

@@ -52,6 +52,7 @@ import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitExce
 import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
+import com.iqkv.foundation.iamservice.tenant.TenantService;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.UserMapper;
@@ -88,6 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final MessagingService messagingService;
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformAuthorityMapper platformAuthorityMapper;
+  private final TenantService tenantService;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -102,7 +104,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final EmailVerificationTokenMapper emailVerificationTokenMapper,
       final MessagingService messagingService,
       final NotificationConfigurationProperties notificationProps,
-      final PlatformAuthorityMapper platformAuthorityMapper) {
+      final PlatformAuthorityMapper platformAuthorityMapper,
+      final TenantService tenantService) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -116,6 +119,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.messagingService = messagingService;
     this.notificationProps = notificationProps;
     this.platformAuthorityMapper = platformAuthorityMapper;
+    this.tenantService = tenantService;
   }
 
   @Override
@@ -414,5 +418,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     } catch (final Exception e) {
       log.warn("Failed to publish VERIFY_EMAIL notification for user {}", user.getId(), e);
     }
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public String getProvisioningStatus(final String tenantKey) {
+    return tenantService.getProvisioningStatus(tenantKey);
   }
 }

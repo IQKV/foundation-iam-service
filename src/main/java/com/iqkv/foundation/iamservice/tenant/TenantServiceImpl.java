@@ -74,6 +74,15 @@ public class TenantServiceImpl implements TenantService {
   // ─── Self-service ──────────────────────────────────────────────────────────
 
   @Override
+  @Transactional(readOnly = true)
+  public String getProvisioningStatus(final String tenantKey) {
+    return tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey))
+        .getStatus()
+        .name();
+  }
+
+  @Override
   public Tenant createTenant(final String tenantName, final UUID ownerUserId) {
     if (tenantMapper.existsByName(tenantName)) {
       throw new TenantAlreadyExistsException("Tenant name already taken");

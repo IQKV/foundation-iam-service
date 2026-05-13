@@ -99,4 +99,13 @@ public final class AuthenticationDtos {
       @NotBlank @Size(min = 64, max = 64) String token,
       @Size(min = 8, max = 128) String newPassword) {
   }
+
+  /**
+   * Response for the public post-signup provisioning status polling endpoint.
+   * Only exposes the tenant key and its current provisioning status.
+   */
+  public record SignupStatusResponse(
+      String tenantKey,
+      String tenantStatus) {
+  }
 }

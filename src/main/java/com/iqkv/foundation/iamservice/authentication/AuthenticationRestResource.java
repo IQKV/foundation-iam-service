@@ -33,6 +33,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +57,7 @@ public class AuthenticationRestResource {
   @PostMapping("/signup")
   @Operation(summary = "Register a new user and create a tenant",
              description = "Creates a global user account, a new tenant, and a TENANT_OWNER membership in one step. "
-                           + "Returns 201 with tenantStatus=PROVISIONING; poll GET /api/v1/iam/tenants/{tenantKey} until ACTIVE.")
+                           + "Returns 201 with tenantStatus=PROVISIONING; poll GET /api/v1/iam/auth/signup/status/{tenantKey} until ACTIVE.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "User and tenant created"),
       @ApiResponse(responseCode = "409", description = "Tenant name already taken or user already a member")
@@ -66,6 +68,21 @@ public class AuthenticationRestResource {
     return ResponseEntity
         .created(URI.create("/api/v1/iam/users/me"))
         .body(response);
+  }
+
+  @GetMapping("/signup/status/{tenantKey}")
+  @Operation(summary = "Poll tenant provisioning status after signup",
+             description = "Public endpoint — returns only the provisioning status of the tenant. "
+                           + "Poll until tenantStatus is ACTIVE before attempting sign-in. "
+                           + "Returns PROVISIONING, ACTIVE, or PROVISIONING_FAILED.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Status returned"),
+      @ApiResponse(responseCode = "404", description = "Tenant not found")
+  })
+  public ResponseEntity<AuthenticationDtos.SignupStatusResponse> signupStatus(
+      @PathVariable final String tenantKey) {
+    final String status = authenticationService.getProvisioningStatus(tenantKey);
+    return ResponseEntity.ok(new AuthenticationDtos.SignupStatusResponse(tenantKey, status));
   }
 
   @PostMapping("/signin")

@@ -37,6 +37,16 @@ public interface TenantService {
   // ─── Self-service ──────────────────────────────────────────────────────────
 
   /**
+   * Returns the provisioning status of a tenant by its key.
+   * Intended for the post-signup polling flow — no authentication required at the call site.
+   *
+   * @param tenantKey the tenant's unique key
+   * @return the current {@link TenantStatus} as a string
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
+   */
+  String getProvisioningStatus(String tenantKey);
+
+  /**
    * Creates a new tenant owned by the given user.
    * Publishes a {@code tenant.created} domain event.
    *
