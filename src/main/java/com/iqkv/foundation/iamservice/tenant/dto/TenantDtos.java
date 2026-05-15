@@ -77,6 +77,37 @@ public final class TenantDtos {
   }
 
   /**
+   * Single member row returned by the tenant-scoped member list.
+   *
+   * <p>{@code tenantAuthorities} contains only the authorities this user holds
+   * within the specific tenant being queried — not across all tenants.
+   * {@code organizations} lists all tenant names the user belongs to (cross-tenant context).
+   */
+  public record TenantMemberResponse(
+      UUID id,
+      String email,
+      String firstName,
+      String lastName,
+      String status,
+      boolean emailVerified,
+      List<String> tenantAuthorities,
+      List<String> organizations,
+      LocalDateTime createdAt,
+      LocalDateTime updatedAt) {
+  }
+
+  /**
+   * Paginated list of tenant members returned by the admin tenant member list endpoint.
+   */
+  public record PagedTenantMemberResponse(
+      List<TenantMemberResponse> content,
+      int page,
+      int size,
+      long totalElements,
+      int totalPages) {
+  }
+
+  /**
    * Rich tenant response returned by admin endpoints.
    * Includes all fields from the {@code Tenant} entity.
    */

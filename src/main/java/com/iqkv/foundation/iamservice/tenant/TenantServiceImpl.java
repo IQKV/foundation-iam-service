@@ -31,8 +31,6 @@ import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.UserMapper;
-import com.iqkv.foundation.iamservice.user.dto.UserDtoMapper;
-import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -169,8 +167,8 @@ public class TenantServiceImpl implements TenantService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDtos.PagedUserResponse listMembersByTenantKey(final String tenantKey,
-                                                           final TenantDtos.TenantMemberListQuery query) {
+  public TenantDtos.PagedTenantMemberResponse listMembersByTenantKey(final String tenantKey,
+                                                                      final TenantDtos.TenantMemberListQuery query) {
     tenantMapper.findByTenantKey(tenantKey)
         .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
 
@@ -186,14 +184,14 @@ public class TenantServiceImpl implements TenantService {
         .orElse(null);
 
     final int offset = query.page() * query.size();
-    final var users = userMapper.findMembersByTenantKey(
+    final var members = userMapper.findMembersByTenantKeyScoped(
             tenantKey, query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus)
         .stream()
-        .map(UserDtoMapper::toResponse)
+        .map(TenantDtoMapper::toTenantMemberResponse)
         .toList();
     final long total = userMapper.countMembersByTenantKey(tenantKey, safeSearch, safeStatus);
     final int totalPages = (int) Math.ceil((double) total / query.size());
-    return new UserDtos.PagedUserResponse(users, query.page(), query.size(), total, totalPages);
+    return new TenantDtos.PagedTenantMemberResponse(members, query.page(), query.size(), total, totalPages);
   }
 
   @Override

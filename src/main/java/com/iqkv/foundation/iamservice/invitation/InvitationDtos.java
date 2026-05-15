@@ -17,10 +17,13 @@
 package com.iqkv.foundation.iamservice.invitation;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -66,6 +69,17 @@ public final class InvitationDtos {
   ) {
   }
 
+  /**
+   * Body for {@code POST /admin/invitations} — platform operator proposes an invitation for any tenant.
+   */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record AdminProposeInvitationRequest(
+      @NotBlank(message = "Tenant key is required") @Size(min = 8, max = 21, message = "Tenant key must be between 8 and 21 characters") String tenantKey,
+      @NotBlank(message = "Email is required") @Email(message = "Must be a valid email address") @Size(max = 255, message = "Email must not exceed 255 characters") String email,
+      @Pattern(regexp = "ADMIN|MEMBER", message = "Authority must be ADMIN or MEMBER") String authority
+  ) {
+  }
+
   // -------------------------------------------------------------------------
   // Responses
   // -------------------------------------------------------------------------
@@ -106,5 +120,62 @@ public final class InvitationDtos {
       String refreshToken,
       String tenantKey
   ) {
+  }
+
+  // -------------------------------------------------------------------------
+  // Admin DTOs (used by InvitationAdminRestResource)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Full invitation view for platform operators — includes inviter and lifecycle timestamps.
+   */
+  public record AdminInvitationResponse(
+      UUID invitationId,
+      String tenantKey,
+      String email,
+      String authority,
+      String status,
+      UUID invitedBy,
+      Instant expiresAt,
+      Instant acceptedAt,
+      Instant createdAt,
+      Instant updatedAt
+  ) {
+  }
+
+  public record InvitationCountResponse(long total) {
+  }
+
+  public record PagedInvitationAdminResponse(
+      List<AdminInvitationResponse> content,
+      int page,
+      int size,
+      long totalElements,
+      int totalPages) {
+  }
+
+  /**
+   * Query parameters for the admin invitation list endpoint.
+   *
+   * @param page      zero-based page index (default 0)
+   * @param size      page size 1–100 (default 20)
+   * @param sortBy    sort field: email | tenantKey | status | expiresAt | createdAt | updatedAt
+   * @param sortDir   sort direction: asc | desc
+   * @param search    free-text search on invited email (case-insensitive)
+   * @param status    exact status filter: PENDING | ACCEPTED | REVOKED | EXPIRED
+   * @param tenantKey exact tenant key filter
+   */
+  public record InvitationListQuery(
+      @Min(0) int page,
+      @Min(1) @Max(100) int size,
+      String sortBy,
+      String sortDir,
+      String search,
+      String status,
+      String tenantKey) {
+
+    public InvitationListQuery() {
+      this(0, 20, "createdAt", "desc", null, null, null);
+    }
   }
 }

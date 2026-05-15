@@ -38,6 +38,31 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findByIdWithAuthorities" resultMap="userWithOrganizationsResultMap">
+        SELECT u.id,
+               u.email,
+               u.first_name,
+               u.last_name,
+               u.status,
+               u.email_verified,
+               u.created_at,
+               u.updated_at,
+               array_agg(DISTINCT t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
+               array_agg(DISTINCT a.authority ORDER BY a.authority)
+                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        FROM public.users u
+        LEFT JOIN public.tenant_memberships m
+               ON m.user_id = u.id
+        LEFT JOIN public.tenants t
+               ON t.tenant_key = m.tenant_key
+        LEFT JOIN public.tenant_member_authorities a
+               ON a.membership_id = m.id
+        WHERE u.id = #{id}
+        GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
+                 u.email_verified, u.created_at, u.updated_at
+    </select>
+
     <select id="findByEmail" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
                email_verified, last_global_signout_at,
@@ -52,16 +77,18 @@
 
     <resultMap id="userWithOrganizationsResultMap"
                type="com.iqkv.foundation.iamservice.user.UserWithOrganizations">
-        <id     property="id"            column="id"/>
-        <result property="email"         column="email"/>
-        <result property="firstName"     column="first_name"/>
-        <result property="lastName"      column="last_name"/>
-        <result property="status"        column="status"
+        <id     property="id"                   column="id"/>
+        <result property="email"                column="email"/>
+        <result property="firstName"            column="first_name"/>
+        <result property="lastName"             column="last_name"/>
+        <result property="status"               column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="emailVerified" column="email_verified"/>
-        <result property="createdAt"     column="created_at"/>
-        <result property="updatedAt"     column="updated_at"/>
-        <result property="organizations" column="organizations"
+        <result property="emailVerified"        column="email_verified"/>
+        <result property="createdAt"            column="created_at"/>
+        <result property="updatedAt"            column="updated_at"/>
+        <result property="organizations"        column="organizations"
+                typeHandler="com.iqkv.foundation.iamservice.infrastructure.mybatis.StringArrayTypeHandler"/>
+        <result property="membershipAuthorities" column="membership_authorities"
                 typeHandler="com.iqkv.foundation.iamservice.infrastructure.mybatis.StringArrayTypeHandler"/>
     </resultMap>
 
@@ -74,13 +101,17 @@
                u.email_verified,
                u.created_at,
                u.updated_at,
-               array_agg(t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations
+               array_agg(DISTINCT t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
+               array_agg(DISTINCT a.authority ORDER BY a.authority)
+                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         LEFT JOIN public.tenant_memberships m
                ON m.user_id = u.id
         LEFT JOIN public.tenants t
                ON t.tenant_key = m.tenant_key
+        LEFT JOIN public.tenant_member_authorities a
+               ON a.membership_id = m.id
         <where>
             <if test="search != null and search != ''">
                 (
@@ -142,6 +173,10 @@
 
     <!-- ── Tenant-scoped member queries ──────────────────────────────────── -->
 
+    <!--
+        findMembersByTenantKey: retained for backward-compatibility.
+        Prefer findMembersByTenantKeyScoped for new tenant-UI consumers.
+    -->
     <select id="findMembersByTenantKey" resultMap="userWithOrganizationsResultMap">
         SELECT u.id,
                u.email,
@@ -151,11 +186,76 @@
                u.email_verified,
                u.created_at,
                u.updated_at,
-               array_agg(t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations
+               array_agg(DISTINCT t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
+               array_agg(DISTINCT a.authority ORDER BY a.authority)
+                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         INNER JOIN public.tenant_memberships m
                 ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        LEFT JOIN public.tenant_member_authorities a
+               ON a.membership_id = m.id
+        LEFT JOIN public.tenant_memberships m2
+               ON m2.user_id = u.id
+        LEFT JOIN public.tenants t
+               ON t.tenant_key = m2.tenant_key
+        <where>
+            <if test="search != null and search != ''">
+                (
+                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND u.status = #{status}
+            </if>
+        </where>
+        GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
+                 u.email_verified, u.created_at, u.updated_at
+        ORDER BY
+            <choose>
+                <when test="sortBy == 'email'">u.email</when>
+                <when test="sortBy == 'firstName'">u.first_name</when>
+                <when test="sortBy == 'lastName'">u.last_name</when>
+                <when test="sortBy == 'updatedAt'">u.updated_at</when>
+                <otherwise>u.created_at</otherwise>
+            </choose>
+            <choose>
+                <when test="sortDir == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+            , u.id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!--
+        findMembersByTenantKeyScoped: canonical query for the tenant member list UI.
+
+        membership_authorities  → authorities in THIS tenant only (from m / a join).
+        organizations           → all tenant names the user belongs to (from m2 / t join).
+
+        The authority scope is intentionally narrow: the UI shows what role a user
+        has in the tenant being viewed, not a cross-tenant aggregate.
+    -->
+    <select id="findMembersByTenantKeyScoped" resultMap="userWithOrganizationsResultMap">
+        SELECT u.id,
+               u.email,
+               u.first_name,
+               u.last_name,
+               u.status,
+               u.email_verified,
+               u.created_at,
+               u.updated_at,
+               array_agg(DISTINCT t.name ORDER BY t.name)
+                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
+               array_agg(DISTINCT a.authority ORDER BY a.authority)
+                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        FROM public.users u
+        INNER JOIN public.tenant_memberships m
+                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        LEFT JOIN public.tenant_member_authorities a
+               ON a.membership_id = m.id
         LEFT JOIN public.tenant_memberships m2
                ON m2.user_id = u.id
         LEFT JOIN public.tenants t

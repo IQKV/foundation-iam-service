@@ -31,6 +31,8 @@ public interface UserMapper {
 
   Optional<User> findById(UUID id);
 
+  Optional<UserWithOrganizations> findByIdWithAuthorities(UUID id);
+
   Optional<User> findByEmail(String email);
 
   boolean existsByEmail(String email);
@@ -50,6 +52,26 @@ public interface UserMapper {
                                                      @Param("sortDir") String sortDir,
                                                      @Param("search") String search,
                                                      @Param("status") String status);
+
+  /**
+   * Tenant-scoped member list query.
+   *
+   * <p>Returns members of the given tenant with {@code membershipAuthorities} populated
+   * from <em>only that tenant's</em> {@code tenant_member_authorities} rows.
+   * {@code organizations} still aggregates all tenant names the user belongs to
+   * (cross-tenant context, useful for the admin UI).
+   *
+   * <p>Distinct from {@link #findMembersByTenantKey} which is retained for
+   * backward-compatibility but carries the same authority semantics.
+   * This method is the canonical source for the tenant member list UI.
+   */
+  List<UserWithOrganizations> findMembersByTenantKeyScoped(@Param("tenantKey") String tenantKey,
+                                                           @Param("limit") int limit,
+                                                           @Param("offset") int offset,
+                                                           @Param("sortBy") String sortBy,
+                                                           @Param("sortDir") String sortDir,
+                                                           @Param("search") String search,
+                                                           @Param("status") String status);
 
   long countMembersByTenantKey(@Param("tenantKey") String tenantKey,
                                @Param("search") String search,

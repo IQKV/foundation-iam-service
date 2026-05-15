@@ -16,7 +16,11 @@
 
 package com.iqkv.foundation.iamservice.tenant.dto;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.iqkv.foundation.iamservice.tenant.Tenant;
+import com.iqkv.foundation.iamservice.user.UserWithOrganizations;
 
 public final class TenantDtoMapper {
 
@@ -50,5 +54,32 @@ public final class TenantDtoMapper {
         tenant.getCreatedBy(),
         tenant.getCreatedAt(),
         tenant.getUpdatedAt());
+  }
+
+  /**
+   * Maps a {@link UserWithOrganizations} projection to a {@link TenantDtos.TenantMemberResponse}.
+   *
+   * <p>Used by the tenant-scoped member list query ({@code findMembersByTenantKeyScoped}).
+   * The projection's {@code membershipAuthorities} field carries only the authorities
+   * for the queried tenant — it is surfaced here as {@code tenantAuthorities} to make
+   * the scope explicit and avoid confusion with the cross-tenant {@code membershipAuthorities}
+   * field on {@link com.iqkv.foundation.iamservice.user.dto.UserDtos.UserResponse}.
+   */
+  public static TenantDtos.TenantMemberResponse toTenantMemberResponse(final UserWithOrganizations projection) {
+    final List<String> tenantAuthorities = projection.getMembershipAuthorities() != null
+        ? projection.getMembershipAuthorities() : Collections.emptyList();
+    final List<String> organizations = projection.getOrganizations() != null
+        ? projection.getOrganizations() : Collections.emptyList();
+    return new TenantDtos.TenantMemberResponse(
+        projection.getId(),
+        projection.getEmail(),
+        projection.getFirstName(),
+        projection.getLastName(),
+        projection.getStatus() != null ? projection.getStatus().name() : null,
+        projection.isEmailVerified(),
+        tenantAuthorities,
+        organizations,
+        projection.getCreatedAt(),
+        projection.getUpdatedAt());
   }
 }

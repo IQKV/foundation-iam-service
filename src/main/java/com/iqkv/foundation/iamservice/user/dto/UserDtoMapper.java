@@ -41,13 +41,15 @@ public final class UserDtoMapper {
         user.getStatus() != null ? user.getStatus().name() : null,
         user.isEmailVerified(),
         Collections.emptyList(),
+        Collections.emptyList(),
         user.getCreatedAt(),
         user.getUpdatedAt());
   }
 
   /**
    * Maps a {@link UserWithOrganizations} projection to a {@link UserDtos.UserResponse}.
-   * Used by the admin list query where tenant names are aggregated in SQL.
+   * Used by the admin list and detail queries where tenant names and membership
+   * authorities are aggregated in SQL.
    */
   public static UserDtos.UserResponse toResponse(final UserWithOrganizations projection) {
     return new UserDtos.UserResponse(
@@ -58,6 +60,7 @@ public final class UserDtoMapper {
         projection.getStatus() != null ? projection.getStatus().name() : null,
         projection.isEmailVerified(),
         projection.getOrganizations() != null ? projection.getOrganizations() : Collections.emptyList(),
+        projection.getMembershipAuthorities() != null ? projection.getMembershipAuthorities() : Collections.emptyList(),
         projection.getCreatedAt(),
         projection.getUpdatedAt());
   }

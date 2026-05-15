@@ -95,4 +95,52 @@
           AND expires_at &lt; #{now}
     </update>
 
+    <select id="findAll" resultMap="invitationResultMap">
+        SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
+               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        FROM public.tenant_invitations
+        <where>
+            <if test="search != null and search != ''">
+                LOWER(invited_email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="tenantKey != null and tenantKey != ''">
+                AND tenant_key = #{tenantKey}
+            </if>
+        </where>
+        ORDER BY
+            <choose>
+                <when test="sortBy == 'email'">invited_email</when>
+                <when test="sortBy == 'tenantKey'">tenant_key</when>
+                <when test="sortBy == 'status'">status</when>
+                <when test="sortBy == 'expiresAt'">expires_at</when>
+                <when test="sortBy == 'updatedAt'">updated_at</when>
+                <otherwise>created_at</otherwise>
+            </choose>
+            <choose>
+                <when test="sortDir == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+            , id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM public.tenant_invitations
+        <where>
+            <if test="search != null and search != ''">
+                LOWER(invited_email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="tenantKey != null and tenantKey != ''">
+                AND tenant_key = #{tenantKey}
+            </if>
+        </where>
+    </select>
+
 </mapper>

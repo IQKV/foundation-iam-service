@@ -63,4 +63,18 @@ public interface InvitationMapper {
   int expireStale(
       @Param("now") Instant now,
       @Param("updatedAt") java.time.LocalDateTime updatedAt);
+
+  List<TenantInvitation> findAll(
+      @Param("limit") int limit,
+      @Param("offset") int offset,
+      @Param("sortBy") String sortBy,
+      @Param("sortDir") String sortDir,
+      @Param("search") String search,
+      @Param("status") String status,
+      @Param("tenantKey") String tenantKey);
+
+  long countAll(
+      @Param("search") String search,
+      @Param("status") String status,
+      @Param("tenantKey") String tenantKey);
 }

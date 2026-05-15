@@ -215,9 +215,9 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(readOnly = true)
   public UserDtos.UserResponse getUserById(final UUID userId) {
-    final User user = userMapper.findById(userId)
+    return userMapper.findByIdWithAuthorities(userId)
+        .map(UserDtoMapper::toResponse)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
-    return UserDtoMapper.toResponse(user);
   }
 
   @Override

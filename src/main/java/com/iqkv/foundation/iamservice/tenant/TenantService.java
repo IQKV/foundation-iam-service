@@ -94,12 +94,15 @@ public interface TenantService {
    * Returns a paginated, sorted, and optionally filtered list of users
    * who are members of the given tenant.
    *
+   * <p>Each row carries {@code tenantAuthorities} scoped to this tenant only,
+   * plus {@code organizations} listing all tenants the user belongs to.
+   *
    * @param tenantKey the tenant's unique key
    * @param query     encapsulates pagination, sort, and optional filters
-   * @return a {@link com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse}
+   * @return a {@link TenantDtos.PagedTenantMemberResponse}
    * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
-  com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse listMembersByTenantKey(
+  TenantDtos.PagedTenantMemberResponse listMembersByTenantKey(
       String tenantKey, TenantDtos.TenantMemberListQuery query);
 
   /**

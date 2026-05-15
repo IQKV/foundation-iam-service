@@ -87,7 +87,8 @@ public class TenantAdminRestResource {
 
   @GetMapping("/{tenantKey}/members")
   @Operation(summary = "List tenant members",
-             description = "Returns a paginated, sorted, and optionally filtered list of users belonging to the given tenant.")
+             description = "Returns a paginated, sorted, and optionally filtered list of users belonging to the given tenant. "
+                           + "Each row includes tenantAuthorities scoped to this tenant only.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Page of members returned"),
       @ApiResponse(responseCode = "400", description = "Invalid query parameters", content = @Content),
@@ -95,7 +96,7 @@ public class TenantAdminRestResource {
       @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
       @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
   })
-  public ResponseEntity<com.iqkv.foundation.iamservice.user.dto.UserDtos.PagedUserResponse> listTenantMembers(
+  public ResponseEntity<TenantDtos.PagedTenantMemberResponse> listTenantMembers(
       @Parameter(description = "8-char tenant key") @PathVariable String tenantKey,
       @ModelAttribute @Valid TenantDtos.TenantMemberListQuery query) {
     return ResponseEntity.ok(tenantService.listMembersByTenantKey(tenantKey, query));

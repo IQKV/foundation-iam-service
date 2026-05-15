@@ -41,6 +41,23 @@ public final class InvitationDtoMapper {
         invitation.getCreatedAt().toInstant(ZoneOffset.UTC));
   }
 
+  public static InvitationDtos.AdminInvitationResponse toAdminResponse(final TenantInvitation invitation) {
+    if (invitation == null) {
+      throw new IllegalArgumentException("invitation must not be null");
+    }
+    return new InvitationDtos.AdminInvitationResponse(
+        invitation.getId(),
+        invitation.getTenantKey(),
+        invitation.getInvitedEmail(),
+        invitation.getAuthority(),
+        invitation.getStatus().name(),
+        invitation.getInvitedBy(),
+        invitation.getExpiresAt(),
+        invitation.getAcceptedAt(),
+        invitation.getCreatedAt().toInstant(ZoneOffset.UTC),
+        invitation.getUpdatedAt().toInstant(ZoneOffset.UTC));
+  }
+
   public static InvitationDtos.InvitationPreviewResponse toPreviewResponse(
       final TenantInvitation invitation,
       final String tenantName,

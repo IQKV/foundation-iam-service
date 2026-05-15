@@ -43,6 +43,7 @@ import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingE
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
+import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -153,67 +154,13 @@ public class InvitationServiceImpl implements InvitationService {
       throw new org.springframework.security.access.AccessDeniedException(
           "Insufficient authority to grant " + authority);
     }
-    // Guard: no duplicate PENDING invite
-    if (invitationMapper.existsPendingForTenantAndEmail(tenantKey, normalizedEmail)) {
-      throw new InvitationAlreadyPendingException(normalizedEmail);
-    }
+    assertInviteeEligible(tenantKey, normalizedEmail);
 
-    // Guard: invitee is not already an ACTIVE member
-    userMapper.findByEmail(normalizedEmail).ifPresent(existingUser -> {
-      if (membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), tenantKey)) {
-        throw new TenantMembershipAlreadyExistsException();
-      }
-    });
-
-    // Generate token
-    final byte[] bytes = new byte[32];
-    SECURE_RANDOM.nextBytes(bytes);
-    final String tokenValue = HexFormat.of().formatHex(bytes);
-
-    final var invitation = new TenantInvitation();
-    invitation.setId(UUID.randomUUID());
-    invitation.setTenantKey(tenantKey);
-    invitation.setInvitedEmail(normalizedEmail);
-    invitation.setInvitedBy(inviterId);
-    invitation.setAuthority(authority);
-    invitation.setToken(tokenValue);
-    invitation.setStatus(InvitationStatus.PENDING);
-    invitation.setExpiresAt(Instant.now().plus(invitationProps.tokenTtl()));
-    invitation.setCreatedAt(LocalDateTime.now());
-    invitation.setUpdatedAt(LocalDateTime.now());
-    invitation.setCreatedBy(inviterId.toString());
-    invitation.setUpdatedBy(inviterId.toString());
-    invitationMapper.insert(invitation);
-
-    // Publish user.invited domain event
-    messagingService.publishUserInvited(invitation, tenant.getName());
-
-    // Send invitation email
-    final var inviter = userMapper.findById(inviterId).orElse(null);
-    final String inviterName = inviter != null
-        ? inviter.getFirstName() + " " + inviter.getLastName()
-        : tenant.getName();
-    final String acceptUrl = notificationProps.baseUrl() + "/accept-invitation?token=" + tokenValue;
-
-    final var event = new NotificationEvent(
-        normalizedEmail,
-        notificationProps.defaultLocale(),
-        NotificationEventType.INVITATION,
-        Map.of(
-            "inviterName", inviterName,
-            "tenantName", tenant.getName(),
-            "authority", invitation.getAuthority(),
-            "acceptUrl", acceptUrl,
-            "expiresAt", invitation.getExpiresAt().toString()),
-        Instant.now());
-    try {
-      messagingService.publishNotification(event);
-    } catch (final Exception e) {
-      log.warn("Failed to publish INVITATION notification for invitationId={}", invitation.getId(), e);
-    }
+    final TenantInvitation invitation = persistAndNotifyInvitation(
+        tenant, inviterId, normalizedEmail, authority);
 
     log.info("Invitation sent: invitationId={} tenantKey={} email={} authority={}",
-        invitation.getId(), tenantKey, normalizedEmail, request.authority());
+        invitation.getId(), tenantKey, normalizedEmail, authority);
 
     return InvitationDtoMapper.toResponse(invitation);
   }
@@ -336,8 +283,180 @@ public class InvitationServiceImpl implements InvitationService {
   }
 
   // -------------------------------------------------------------------------
+  // Platform admin
+  // -------------------------------------------------------------------------
+
+  @Override
+  @Transactional(readOnly = true)
+  public InvitationDtos.PagedInvitationAdminResponse listInvitationsAdmin(
+      final InvitationDtos.InvitationListQuery query) {
+    final var filters = normalizeAdminListFilters(query);
+    final int offset = query.page() * query.size();
+    final var content = invitationMapper.findAll(
+            query.size(), offset, filters.sortBy(), filters.sortDir(),
+            filters.search(), filters.status(), filters.tenantKey()).stream()
+        .map(InvitationDtoMapper::toAdminResponse)
+        .toList();
+    final long total = invitationMapper.countAll(filters.search(), filters.status(), filters.tenantKey());
+    final int totalPages = (int) Math.ceil((double) total / query.size());
+    return new InvitationDtos.PagedInvitationAdminResponse(
+        content, query.page(), query.size(), total, totalPages);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public InvitationDtos.InvitationCountResponse countInvitationsAdmin(
+      final InvitationDtos.InvitationListQuery query) {
+    final var filters = normalizeAdminListFilters(query);
+    return new InvitationDtos.InvitationCountResponse(
+        invitationMapper.countAll(filters.search(), filters.status(), filters.tenantKey()));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public InvitationDtos.AdminInvitationResponse getInvitationById(final UUID invitationId) {
+    return invitationMapper.findById(invitationId)
+        .map(InvitationDtoMapper::toAdminResponse)
+        .orElseThrow(InvitationNotFoundException::new);
+  }
+
+  @Override
+  public InvitationDtos.AdminInvitationResponse proposeInvitation(
+      final UUID proposerId,
+      final InvitationDtos.AdminProposeInvitationRequest request) {
+
+    if (platformConfig.rolloutMode() == RolloutMode.SINGLE_TENANT) {
+      throw new org.springframework.security.access.AccessDeniedException(
+          "Invitations are not available in SINGLE_TENANT mode");
+    }
+
+    userMapper.findById(proposerId)
+        .orElseThrow(() -> new UserNotFoundException("Proposer not found: " + proposerId));
+
+    final String tenantKey = request.tenantKey().strip();
+    final Tenant tenant = requireActiveTenant(tenantKey);
+    final String normalizedEmail = request.email().toLowerCase();
+    final String authority = resolveInvitationAuthority(request.authority());
+
+    assertInviteeEligible(tenantKey, normalizedEmail);
+
+    final TenantInvitation invitation = persistAndNotifyInvitation(
+        tenant, proposerId, normalizedEmail, authority);
+
+    log.info("Invitation proposed by platform admin: invitationId={} tenantKey={} email={} proposerId={}",
+        invitation.getId(), tenantKey, normalizedEmail, proposerId);
+
+    return InvitationDtoMapper.toAdminResponse(invitation);
+  }
+
+  @Override
+  public void revokeInvitationById(final UUID invitationId) {
+    final TenantInvitation invitation = invitationMapper.findById(invitationId)
+        .orElseThrow(InvitationNotFoundException::new);
+
+    if (invitation.getStatus() != InvitationStatus.PENDING) {
+      throw new InvitationNotFoundException("Invitation is no longer pending");
+    }
+
+    invitationMapper.updateStatus(invitationId, InvitationStatus.REVOKED.name(), LocalDateTime.now());
+    log.info("Invitation revoked by platform admin: invitationId={} tenantKey={}",
+        invitationId, invitation.getTenantKey());
+  }
+
+  // -------------------------------------------------------------------------
   // Private helpers
   // -------------------------------------------------------------------------
+
+  private record AdminListFilters(String sortBy, String sortDir, String search, String status, String tenantKey) {
+  }
+
+  private AdminListFilters normalizeAdminListFilters(final InvitationDtos.InvitationListQuery query) {
+    final String safeSortBy = java.util.Set.of(
+            "email", "tenantKey", "status", "expiresAt", "createdAt", "updatedAt")
+        .contains(query.sortBy()) ? query.sortBy() : "createdAt";
+    final String safeSortDir = "asc".equalsIgnoreCase(query.sortDir()) ? "asc" : "desc";
+    final String safeSearch = (query.search() != null && !query.search().isBlank())
+        ? query.search().strip() : null;
+    final String safeStatus = java.util.Arrays.stream(InvitationStatus.values())
+        .map(Enum::name)
+        .filter(name -> name.equalsIgnoreCase(query.status()))
+        .findFirst()
+        .orElse(null);
+    final String safeTenantKey = (query.tenantKey() != null && !query.tenantKey().isBlank())
+        ? query.tenantKey().strip() : null;
+    return new AdminListFilters(safeSortBy, safeSortDir, safeSearch, safeStatus, safeTenantKey);
+  }
+
+  private String resolveInvitationAuthority(final String requestedAuthority) {
+    return (requestedAuthority != null && !requestedAuthority.isBlank())
+        ? requestedAuthority
+        : "MEMBER";
+  }
+
+  private void assertInviteeEligible(final String tenantKey, final String normalizedEmail) {
+    if (invitationMapper.existsPendingForTenantAndEmail(tenantKey, normalizedEmail)) {
+      throw new InvitationAlreadyPendingException(normalizedEmail);
+    }
+
+    userMapper.findByEmail(normalizedEmail).ifPresent(existingUser -> {
+      if (membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), tenantKey)) {
+        throw new TenantMembershipAlreadyExistsException();
+      }
+    });
+  }
+
+  private TenantInvitation persistAndNotifyInvitation(
+      final Tenant tenant,
+      final UUID inviterId,
+      final String normalizedEmail,
+      final String authority) {
+
+    final byte[] bytes = new byte[32];
+    SECURE_RANDOM.nextBytes(bytes);
+    final String tokenValue = HexFormat.of().formatHex(bytes);
+
+    final var invitation = new TenantInvitation();
+    invitation.setId(UUID.randomUUID());
+    invitation.setTenantKey(tenant.getTenantKey());
+    invitation.setInvitedEmail(normalizedEmail);
+    invitation.setInvitedBy(inviterId);
+    invitation.setAuthority(authority);
+    invitation.setToken(tokenValue);
+    invitation.setStatus(InvitationStatus.PENDING);
+    invitation.setExpiresAt(Instant.now().plus(invitationProps.tokenTtl()));
+    invitation.setCreatedAt(LocalDateTime.now());
+    invitation.setUpdatedAt(LocalDateTime.now());
+    invitation.setCreatedBy(inviterId.toString());
+    invitation.setUpdatedBy(inviterId.toString());
+    invitationMapper.insert(invitation);
+
+    messagingService.publishUserInvited(invitation, tenant.getName());
+
+    final var inviter = userMapper.findById(inviterId).orElse(null);
+    final String inviterName = inviter != null
+        ? inviter.getFirstName() + " " + inviter.getLastName()
+        : tenant.getName();
+    final String acceptUrl = notificationProps.baseUrl() + "/accept-invitation?token=" + tokenValue;
+
+    final var event = new NotificationEvent(
+        normalizedEmail,
+        notificationProps.defaultLocale(),
+        NotificationEventType.INVITATION,
+        Map.of(
+            "inviterName", inviterName,
+            "tenantName", tenant.getName(),
+            "authority", invitation.getAuthority(),
+            "acceptUrl", acceptUrl,
+            "expiresAt", invitation.getExpiresAt().toString()),
+        Instant.now());
+    try {
+      messagingService.publishNotification(event);
+    } catch (final Exception e) {
+      log.warn("Failed to publish INVITATION notification for invitationId={}", invitation.getId(), e);
+    }
+
+    return invitation;
+  }
 
   /**
    * Resolves an existing user (verifying password) or creates a new one.

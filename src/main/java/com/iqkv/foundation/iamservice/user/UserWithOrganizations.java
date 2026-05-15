@@ -21,11 +21,16 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Read-only projection used by the admin user list query.
+ * Read-only projection used by the admin user list and single-user detail queries.
  *
- * <p>Extends the core user fields with an aggregated list of organization
- * (tenant) names the user belongs to, populated via a single SQL LEFT JOIN
- * with {@code array_agg} — no N+1 lookups.
+ * <p>Extends the core user fields with:
+ * <ul>
+ *   <li>{@code organizations} — aggregated tenant names the user belongs to,
+ *       populated via {@code array_agg} in a single SQL query — no N+1 lookups.</li>
+ *   <li>{@code membershipAuthorities} — distinct authority strings the user holds
+ *       across all tenant memberships (e.g. {@code TENANT_OWNER}, {@code ADMIN},
+ *       {@code MEMBER}), also aggregated in the same query.</li>
+ * </ul>
  */
 public class UserWithOrganizations {
 
@@ -38,6 +43,7 @@ public class UserWithOrganizations {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private List<String> organizations;
+  private List<String> membershipAuthorities;
 
   public UUID getId() {
     return id;
@@ -109,5 +115,13 @@ public class UserWithOrganizations {
 
   public void setOrganizations(final List<String> organizations) {
     this.organizations = organizations;
+  }
+
+  public List<String> getMembershipAuthorities() {
+    return membershipAuthorities;
+  }
+
+  public void setMembershipAuthorities(final List<String> membershipAuthorities) {
+    this.membershipAuthorities = membershipAuthorities;
   }
 }

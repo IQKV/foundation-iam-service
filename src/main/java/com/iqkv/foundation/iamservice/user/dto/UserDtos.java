@@ -56,6 +56,7 @@ public final class UserDtos {
       String status,
       boolean emailVerified,
       List<String> organizations,
+      List<String> membershipAuthorities,
       LocalDateTime createdAt,
       LocalDateTime updatedAt) {
   }

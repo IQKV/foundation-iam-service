@@ -67,4 +67,20 @@ public interface InvitationService {
    * Caller must be TENANT_OWNER or ADMIN.
    */
   List<InvitationDtos.InvitationResponse> listInvitations(String tenantKey);
+
+  // -------------------------------------------------------------------------
+  // Platform admin operations (PLATFORM_ADMIN authority)
+  // -------------------------------------------------------------------------
+
+  InvitationDtos.PagedInvitationAdminResponse listInvitationsAdmin(InvitationDtos.InvitationListQuery query);
+
+  InvitationDtos.InvitationCountResponse countInvitationsAdmin(InvitationDtos.InvitationListQuery query);
+
+  InvitationDtos.AdminInvitationResponse getInvitationById(UUID invitationId);
+
+  InvitationDtos.AdminInvitationResponse proposeInvitation(
+      UUID proposerId,
+      InvitationDtos.AdminProposeInvitationRequest request);
+
+  void revokeInvitationById(UUID invitationId);
 }
