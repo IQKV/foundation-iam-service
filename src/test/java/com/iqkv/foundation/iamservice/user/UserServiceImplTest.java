@@ -181,8 +181,10 @@ class UserServiceImplTest {
   void shouldGetUserByIdSuccessfully() {
     // Arrange
     var userId = testUser.getId();
+    var projection = createUserProjection("user@example.com", "John", "Doe");
+    projection.setId(userId);
 
-    when(userMapper.findById(userId)).thenReturn(Optional.of(testUser));
+    when(userMapper.findByIdWithAuthorities(userId)).thenReturn(Optional.of(projection));
 
     // Act
     var result = userService.getUserById(userId);
@@ -295,6 +297,7 @@ class UserServiceImplTest {
     projection.setEmailVerified(true);
     projection.setCreatedAt(LocalDateTime.now());
     projection.setOrganizations(List.of());
+    projection.setMembershipAuthorities(List.of());
     return projection;
   }
 }
