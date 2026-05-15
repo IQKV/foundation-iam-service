@@ -17,7 +17,9 @@
 package com.iqkv.foundation.iamservice.tenant;
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,9 +52,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TenantAdminRestResource {
 
   private final TenantService tenantService;
+  private final MembershipService membershipService;
 
-  public TenantAdminRestResource(final TenantService tenantService) {
+  public TenantAdminRestResource(final TenantService tenantService, final MembershipService membershipService) {
     this.tenantService = tenantService;
+    this.membershipService = membershipService;
   }
 
   @GetMapping
@@ -110,6 +114,41 @@ public class TenantAdminRestResource {
   public ResponseEntity<TenantDtos.TenantMemberCountResponse> countTenantMembers(
       @Parameter(description = "8-char tenant key") @PathVariable String tenantKey) {
     return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
+  }
+
+  @GetMapping("/{tenantKey}/members/{userId}/authorities")
+  @Operation(summary = "Get tenant member authorities")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant or member not found", content = @Content)
+  })
+  public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> getMemberAuthorities(
+      @Parameter(description = "8-char tenant key") @PathVariable String tenantKey,
+      @Parameter(description = "User UUID") @PathVariable UUID userId) {
+    var membership = membershipService.resolveMembership(userId, tenantKey);
+    var authorities = membershipService.getAuthorities(membership.getId());
+    return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
+  }
+
+  @PutMapping("/{tenantKey}/members/{userId}/authorities")
+  @Operation(summary = "Update tenant member authorities", description = "Full replacement of authorities for the tenant member.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities updated"),
+      @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant or member not found", content = @Content)
+  })
+  public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> updateMemberAuthorities(
+      @Parameter(description = "8-char tenant key") @PathVariable String tenantKey,
+      @Parameter(description = "User UUID") @PathVariable UUID userId,
+      @Valid @RequestBody TenantDtos.AdminUpdateMemberAuthoritiesRequest request) {
+    membershipService.updateMemberAuthorities(userId, tenantKey, request.authorities());
+    var membership = membershipService.resolveMembership(userId, tenantKey);
+    var authorities = membershipService.getAuthorities(membership.getId());
+    return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
   }
 
   @GetMapping("/{tenantKey}")

@@ -37,9 +37,11 @@ public interface UserMapper {
 
   List<UserWithOrganizations> findAll(@Param("limit") int limit, @Param("offset") int offset,
                                       @Param("sortBy") String sortBy, @Param("sortDir") String sortDir,
-                                      @Param("search") String search, @Param("status") String status);
+                                      @Param("search") String search, @Param("status") String status,
+                                      @Param("excludePlatformAdmins") Boolean excludePlatformAdmins);
 
-  long countAll(@Param("search") String search, @Param("status") String status);
+  long countAll(@Param("search") String search, @Param("status") String status,
+                @Param("excludePlatformAdmins") Boolean excludePlatformAdmins);
 
   List<UserWithOrganizations> findMembersByTenantKey(@Param("tenantKey") String tenantKey,
                                                      @Param("limit") int limit,

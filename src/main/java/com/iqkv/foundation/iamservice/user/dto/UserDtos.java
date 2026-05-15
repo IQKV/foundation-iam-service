@@ -79,6 +79,22 @@ public final class UserDtos {
       String status) {
   }
 
+  public record AdminUpdateUserAuthoritiesRequest(
+      List<String> authorities) {
+  }
+
+  public record UserAuthoritiesResponse(
+      UUID userId,
+      List<String> authorities) {
+  }
+
+  public record UserMembershipResponse(
+      String tenantKey,
+      String tenantName,
+      String status,
+      List<String> authorities) {
+  }
+
   public record UserCountResponse(long total) {
   }
 
@@ -103,6 +119,7 @@ public final class UserDtos {
    * @param sortDir sort direction: asc | desc
    * @param search  free-text search on email, first name, last name (case-insensitive)
    * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
+   * @param excludePlatformAdmins if true, omits users who hold the PLATFORM_ADMIN authority
    */
   public record UserListQuery(
       @Min(0) int page,
@@ -110,13 +127,14 @@ public final class UserDtos {
       String sortBy,
       String sortDir,
       String search,
-      String status) {
+      String status,
+      Boolean excludePlatformAdmins) {
 
     /**
      * Canonical defaults applied when the controller binds an empty query string.
      */
     public UserListQuery() {
-      this(0, 20, "createdAt", "desc", null, null);
+      this(0, 20, "createdAt", "desc", null, null, false);
     }
   }
 }

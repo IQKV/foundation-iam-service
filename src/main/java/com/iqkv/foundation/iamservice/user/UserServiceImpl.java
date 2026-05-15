@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(readOnly = true)
   public UserDtos.UserCountResponse countUsers() {
-    return new UserDtos.UserCountResponse(userMapper.countAll(null, null));
+    return new UserDtos.UserCountResponse(userMapper.countAll(null, null, Boolean.FALSE));
   }
 
   @Override
@@ -149,10 +149,12 @@ public class UserServiceImpl implements UserService {
         .orElse(null);
 
     final int offset = query.page() * query.size();
-    final var users = userMapper.findAll(query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus).stream()
+    final Boolean excludeAdmins = query.excludePlatformAdmins() != null ? query.excludePlatformAdmins() : Boolean.FALSE;
+    
+    final var users = userMapper.findAll(query.size(), offset, safeSortBy, safeSortDir, safeSearch, safeStatus, excludeAdmins).stream()
         .map(UserDtoMapper::toResponse)
         .toList();
-    final long total = userMapper.countAll(safeSearch, safeStatus);
+    final long total = userMapper.countAll(safeSearch, safeStatus, excludeAdmins);
     final int totalPages = (int) Math.ceil((double) total / query.size());
     return new UserDtos.PagedUserResponse(users, query.page(), query.size(), total, totalPages);
   }

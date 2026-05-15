@@ -92,6 +92,12 @@
             <if test="status != null and status != ''">
                 AND u.status = #{status}
             </if>
+            <if test="excludePlatformAdmins != null and excludePlatformAdmins == true">
+                AND NOT EXISTS (
+                    SELECT 1 FROM public.platform_authorities pa 
+                    WHERE pa.user_id = u.id AND pa.authority = 'PLATFORM_ADMIN'
+                )
+            </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
                  u.email_verified, u.created_at, u.updated_at
@@ -124,6 +130,12 @@
             </if>
             <if test="status != null and status != ''">
                 AND status = #{status}
+            </if>
+            <if test="excludePlatformAdmins != null and excludePlatformAdmins == true">
+                AND NOT EXISTS (
+                    SELECT 1 FROM public.platform_authorities pa 
+                    WHERE pa.user_id = public.users.id AND pa.authority = 'PLATFORM_ADMIN'
+                )
             </if>
         </where>
     </select>

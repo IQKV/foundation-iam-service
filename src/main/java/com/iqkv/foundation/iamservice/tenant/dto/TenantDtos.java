@@ -66,6 +66,16 @@ public final class TenantDtos {
       TenantStatus status) {
   }
 
+  public record AdminUpdateMemberAuthoritiesRequest(
+      List<String> authorities) {
+  }
+
+  public record MemberAuthoritiesResponse(
+      UUID userId,
+      String tenantKey,
+      List<String> authorities) {
+  }
+
   /**
    * Rich tenant response returned by admin endpoints.
    * Includes all fields from the {@code Tenant} entity.

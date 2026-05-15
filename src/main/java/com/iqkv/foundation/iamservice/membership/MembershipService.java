@@ -24,4 +24,8 @@ public interface MembershipService {
   TenantMembership resolveMembership(UUID userId, String tenantKey);
 
   List<String> getAuthorities(UUID membershipId);
+
+  void updateMemberAuthorities(UUID userId, String tenantKey, List<String> authorities);
+
+  List<com.iqkv.foundation.iamservice.user.dto.UserDtos.UserMembershipResponse> getUserMemberships(UUID userId);
 }

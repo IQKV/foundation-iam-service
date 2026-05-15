@@ -18,8 +18,11 @@ package com.iqkv.foundation.iamservice.user;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.membership.MembershipService;
+import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityService;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -54,9 +57,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class UserAdminRestResource {
 
   private final UserService userService;
+  private final PlatformAuthorityService platformAuthorityService;
+  private final MembershipService membershipService;
 
-  public UserAdminRestResource(final UserService userService) {
+  public UserAdminRestResource(final UserService userService,
+                               final PlatformAuthorityService platformAuthorityService,
+                               final MembershipService membershipService) {
     this.userService = userService;
+    this.platformAuthorityService = platformAuthorityService;
+    this.membershipService = membershipService;
   }
 
   @GetMapping
@@ -146,6 +155,51 @@ public class UserAdminRestResource {
       @Parameter(description = "User UUID") @PathVariable UUID id,
       @RequestBody UserDtos.AdminUpdateUserRequest request) {
     return ResponseEntity.ok(userService.patchUser(id, request));
+  }
+
+  @GetMapping("/{id}/authorities")
+  @Operation(summary = "Get user platform authorities")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<UserDtos.UserAuthoritiesResponse> getUserAuthorities(
+      @Parameter(description = "User UUID") @PathVariable UUID id) {
+    List<String> authorities = platformAuthorityService.getUserAuthorities(id);
+    return ResponseEntity.ok(new UserDtos.UserAuthoritiesResponse(id, authorities));
+  }
+
+  @PutMapping("/{id}/authorities")
+  @Operation(summary = "Update user platform authorities", description = "Full replacement of platform authorities for the user.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities updated"),
+      @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<UserDtos.UserAuthoritiesResponse> updateUserAuthorities(
+      @Parameter(description = "User UUID") @PathVariable UUID id,
+      @Valid @RequestBody UserDtos.AdminUpdateUserAuthoritiesRequest request) {
+    platformAuthorityService.updateUserAuthorities(id, request.authorities(), "system");
+    List<String> authorities = platformAuthorityService.getUserAuthorities(id);
+    return ResponseEntity.ok(new UserDtos.UserAuthoritiesResponse(id, authorities));
+  }
+
+  @GetMapping("/{id}/memberships")
+  @Operation(summary = "Get user tenant memberships")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Memberships found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<List<UserDtos.UserMembershipResponse>> getUserMemberships(
+      @Parameter(description = "User UUID") @PathVariable UUID id) {
+    userService.getUserById(id);
+    return ResponseEntity.ok(membershipService.getUserMemberships(id));
   }
 
   @DeleteMapping("/{id}")
