@@ -68,7 +68,8 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
-        List.of(),
+        List.of("Acme Corp"),
+        List.of("MEMBER"),
         createdAt,
         updatedAt
     );
@@ -79,6 +80,8 @@ class UserDtosTest {
     assertThat(response.lastName()).isEqualTo("Doe");
     assertThat(response.status()).isEqualTo("ACTIVE");
     assertThat(response.emailVerified()).isTrue();
+    assertThat(response.organizations()).containsExactly("Acme Corp");
+    assertThat(response.membershipAuthorities()).containsExactly("MEMBER");
     assertThat(response.createdAt()).isEqualTo(createdAt);
     assertThat(response.updatedAt()).isEqualTo(updatedAt);
   }
@@ -139,6 +142,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        List.of(),
         List.of(),
         LocalDateTime.now(),
         LocalDateTime.now()
