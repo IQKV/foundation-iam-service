@@ -140,11 +140,11 @@ class UserServiceImplTest {
     var user1 = createUserProjection("user1@example.com", "User", "One");
     var user2 = createUserProjection("user2@example.com", "User", "Two");
 
-    when(userMapper.findAll(10, 0, "createdAt", "desc", null, null)).thenReturn(List.of(user1, user2));
-    when(userMapper.countAll(null, null)).thenReturn(2L);
+    when(userMapper.findAll(10, 0, "createdAt", "desc", null, null, null)).thenReturn(List.of(user1, user2));
+    when(userMapper.countAll(null, null, null)).thenReturn(2L);
 
     // Act
-    var result = userService.listUsers(new UserDtos.UserListQuery(0, 10, "createdAt", "desc", null, null));
+    var result = userService.listUsers(new UserDtos.UserListQuery(0, 10, "createdAt", "desc", null, null, null));
 
     // Assert
     assertThat(result).isNotNull();

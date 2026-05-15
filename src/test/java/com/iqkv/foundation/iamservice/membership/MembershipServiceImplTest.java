@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ class MembershipServiceImplTest {
   private TenantMembershipMapper membershipMapper;
   @Mock
   private TenantMemberAuthorityMapper authorityMapper;
+  @Mock
+  private TenantMapper tenantMapper;
 
   private MembershipServiceImpl membershipService;
 
@@ -46,7 +49,7 @@ class MembershipServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    membershipService = new MembershipServiceImpl(membershipMapper, authorityMapper);
+    membershipService = new MembershipServiceImpl(membershipMapper, authorityMapper, tenantMapper);
 
     testMembership = new TenantMembership();
     testMembership.setId(UUID.randomUUID());
