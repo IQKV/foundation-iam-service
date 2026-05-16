@@ -84,6 +84,20 @@ public final class UserDtos {
       List<String> authorities) {
   }
 
+  /**
+   * Body for {@code PATCH /admin/users/{id}/password} — admin-forced password change.
+   *
+   * <p>No current password is required; the platform admin sets the new password directly.
+   * All existing sessions for the target user are invalidated after the change.
+   */
+  public record AdminSetUserPasswordRequest(
+      @NotBlank @Size(min = 8, max = 128)
+      @Pattern(
+          regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
+          message = "{validation.password.pattern}")
+      String newPassword) {
+  }
+
   public record UserAuthoritiesResponse(
       UUID userId,
       List<String> authorities) {

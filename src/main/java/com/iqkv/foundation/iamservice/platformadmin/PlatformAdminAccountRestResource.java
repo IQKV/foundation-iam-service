@@ -34,6 +34,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -92,5 +93,26 @@ public class PlatformAdminAccountRestResource {
       @Valid @RequestBody final PlatformAdminDtos.AdminUpdateAccountRequest request) {
     final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
     return ResponseEntity.ok(platformAdminAccountService.updateAccount(userId, request));
+  }
+
+  @PostMapping("/password")
+  @Operation(
+      summary = "Change own password",
+      description = "Allows the authenticated platform operator to change their own password. "
+                    + "Requires the current password for re-authentication. "
+                    + "On success, all existing sessions are invalidated.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Password changed — all sessions invalidated"),
+      @ApiResponse(responseCode = "400", description = "Validation error or new password does not meet policy", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized or current password incorrect", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<Void> changePassword(
+      @AuthenticationPrincipal final Jwt jwt,
+      @Valid @RequestBody final PlatformAdminDtos.AdminChangePasswordRequest request) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    platformAdminAccountService.changePassword(userId, request.currentPassword(), request.newPassword());
+    return ResponseEntity.noContent().build();
   }
 }

@@ -30,4 +30,20 @@ public interface PlatformAdminAccountService {
   PlatformAdminDtos.AdminAccountResponse updateAccount(
       UUID userId,
       PlatformAdminDtos.AdminUpdateAccountRequest request);
+
+  /**
+   * Changes the authenticated platform operator's own password.
+   *
+   * <p>Verifies {@code currentPassword} against the stored hash before accepting
+   * {@code newPassword}. On success, all existing sessions for the user are
+   * invalidated by updating {@code last_global_signout_at}.
+   *
+   * @param userId          UUID of the authenticated platform operator
+   * @param currentPassword the operator's current plaintext password (for re-authentication)
+   * @param newPassword     the desired new password (must satisfy the platform password policy)
+   * @throws org.springframework.security.authentication.BadCredentialsException if {@code currentPassword} is wrong
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if the user does not exist
+   * @throws com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException if the user is not a platform operator
+   */
+  void changePassword(UUID userId, String currentPassword, String newPassword);
 }

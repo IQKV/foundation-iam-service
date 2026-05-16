@@ -23,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.iqkv.foundation.iamservice.email.EmailVerificationToken;
 import com.iqkv.foundation.iamservice.email.EmailVerificationTokenMapper;
@@ -34,6 +35,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublishe
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.signup.SignupStrategy;
@@ -52,6 +54,8 @@ public class UserServiceImpl implements UserService {
   private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+  private static final Pattern PASSWORD_PATTERN =
+      Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$");
 
   private final UserMapper userMapper;
   private final TenantMembershipMapper membershipMapper;
@@ -210,6 +214,24 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     userMapper.deleteById(userId);
     log.info("User deleted: userId={}", userId);
+  }
+
+  @Override
+  public void setUserPassword(final UUID userId, final String newPassword, final String actorId) {
+    userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+
+    if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
+        || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
+      throw new InvalidPasswordException("New password does not meet the password policy requirements");
+    }
+
+    final String newHash = passwordEncoder.encode(newPassword);
+    userMapper.updatePassword(userId, newHash, Instant.now());
+
+    // Invalidate all existing sessions for the target user
+    userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
+    log.info("Password changed by admin: userId={}, actorId={}", userId, actorId);
   }
 
   @Override

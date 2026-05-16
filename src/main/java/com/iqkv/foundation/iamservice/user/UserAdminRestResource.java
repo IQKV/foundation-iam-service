@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityService;
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +36,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -213,6 +216,29 @@ public class UserAdminRestResource {
   public ResponseEntity<Void> deleteUser(
       @Parameter(description = "User UUID") @PathVariable UUID id) {
     userService.deleteUserById(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{id}/password")
+  @Operation(
+      summary = "Set user password",
+      description = "Forcibly sets a new password for any user. "
+                    + "No current password is required — this is an administrative override. "
+                    + "The new password must satisfy the platform password policy. "
+                    + "All existing sessions for the target user are invalidated on success.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Password set — all user sessions invalidated"),
+      @ApiResponse(responseCode = "400", description = "Validation error or password does not meet policy", content = @Content),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<Void> setUserPassword(
+      @Parameter(description = "User UUID") @PathVariable UUID id,
+      @Valid @RequestBody UserDtos.AdminSetUserPasswordRequest request,
+      @AuthenticationPrincipal Jwt jwt) {
+    final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    userService.setUserPassword(id, request.newPassword(), actorId);
     return ResponseEntity.noContent().build();
   }
 }

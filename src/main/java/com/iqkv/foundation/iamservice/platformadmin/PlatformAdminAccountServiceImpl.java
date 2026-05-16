@@ -16,16 +16,21 @@
 
 package com.iqkv.foundation.iamservice.platformadmin;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.iqkv.foundation.iamservice.platformadmin.dto.PlatformAdminDtos;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +38,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PlatformAdminAccountServiceImpl implements PlatformAdminAccountService {
 
+  private static final Pattern PASSWORD_PATTERN =
+      Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$");
+
   private final UserMapper userMapper;
   private final PlatformAuthorityMapper platformAuthorityMapper;
+  private final PasswordEncoder passwordEncoder;
 
   public PlatformAdminAccountServiceImpl(
       final UserMapper userMapper,
-      final PlatformAuthorityMapper platformAuthorityMapper) {
+      final PlatformAuthorityMapper platformAuthorityMapper,
+      final PasswordEncoder passwordEncoder) {
     this.userMapper = userMapper;
     this.platformAuthorityMapper = platformAuthorityMapper;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Override
@@ -63,6 +74,28 @@ public class PlatformAdminAccountServiceImpl implements PlatformAdminAccountServ
     userMapper.update(user);
     final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(userId);
     return PlatformAdminDtoMapper.toAccountResponse(user, platformAuthorities);
+  }
+
+  @Override
+  public void changePassword(final UUID userId, final String currentPassword, final String newPassword) {
+    final User user = requirePlatformOperator(userId);
+
+    // Re-authenticate: verify the supplied current password
+    if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+      throw new BadCredentialsException("Current password is incorrect");
+    }
+
+    // Validate new password strength (same policy as signup / password reset)
+    if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
+        || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
+      throw new InvalidPasswordException("New password does not meet the password policy requirements");
+    }
+
+    final String newHash = passwordEncoder.encode(newPassword);
+    userMapper.updatePassword(userId, newHash, Instant.now());
+
+    // Invalidate all existing sessions — same pattern as password reset
+    userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
   }
 
   private User requirePlatformOperator(final UUID userId) {

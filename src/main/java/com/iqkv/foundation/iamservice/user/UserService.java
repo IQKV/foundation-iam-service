@@ -168,4 +168,20 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   void deleteUserById(UUID userId);
+
+  /**
+   * Forcibly sets a new password for any user (platform admin operation).
+   *
+   * <p>No current password is required — this is an administrative override.
+   * The new password must satisfy the platform password policy. On success,
+   * all existing sessions for the target user are invalidated by updating
+   * {@code last_global_signout_at}.
+   *
+   * @param userId      UUID of the user whose password is being changed
+   * @param newPassword the new plaintext password (must satisfy the password policy)
+   * @param actorId     identifier of the admin performing the operation (for audit)
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
+   */
+  void setUserPassword(UUID userId, String newPassword, String actorId);
 }

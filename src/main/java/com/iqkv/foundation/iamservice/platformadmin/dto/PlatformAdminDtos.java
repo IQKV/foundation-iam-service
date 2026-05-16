@@ -17,6 +17,7 @@
 package com.iqkv.foundation.iamservice.platformadmin.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,5 +55,20 @@ public final class PlatformAdminDtos {
   public record AdminUpdateAccountRequest(
       @NotBlank @Size(max = 100) String firstName,
       @NotBlank @Size(max = 100) String lastName) {
+  }
+
+  /**
+   * Body for {@code PATCH /auth/admin/me/password} — self-service password change.
+   *
+   * <p>Requires the caller to supply their current password for re-authentication
+   * before the new password is accepted.
+   */
+  public record AdminChangePasswordRequest(
+      @NotBlank String currentPassword,
+      @NotBlank @Size(min = 8, max = 128)
+      @Pattern(
+          regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
+          message = "{validation.password.pattern}")
+      String newPassword) {
   }
 }
