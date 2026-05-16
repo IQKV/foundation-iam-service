@@ -436,7 +436,7 @@ public class InvitationServiceImpl implements InvitationService {
     final String inviterName = inviter != null
         ? inviter.getFirstName() + " " + inviter.getLastName()
         : tenant.getName();
-    final String acceptUrl = notificationProps.baseUrl() + "/accept-invitation?token=" + tokenValue;
+    final String acceptUrl = notificationProps.baseUrl() + "/invite/" + tokenValue;
 
     final var event = new NotificationEvent(
         normalizedEmail,
