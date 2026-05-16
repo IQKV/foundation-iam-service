@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PlatformAdminAccountService Unit Tests")
@@ -49,6 +50,8 @@ class PlatformAdminAccountServiceImplTest {
   private UserMapper userMapper;
   @Mock
   private PlatformAuthorityMapper platformAuthorityMapper;
+  @Mock
+  private PasswordEncoder passwordEncoder;
 
   private PlatformAdminAccountServiceImpl service;
 
@@ -57,7 +60,7 @@ class PlatformAdminAccountServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    service = new PlatformAdminAccountServiceImpl(userMapper, platformAuthorityMapper);
+    service = new PlatformAdminAccountServiceImpl(userMapper, platformAuthorityMapper, passwordEncoder);
     platformAdmin = new User();
     platformAdmin.setId(userId);
     platformAdmin.setEmail("admin@example.com");
