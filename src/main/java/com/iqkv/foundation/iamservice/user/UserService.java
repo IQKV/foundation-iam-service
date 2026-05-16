@@ -184,4 +184,20 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
    */
   void setUserPassword(UUID userId, String newPassword, String actorId);
+
+  /**
+   * Self-service password change for the authenticated user.
+   *
+   * <p>Verifies {@code currentPassword} against the stored hash before accepting
+   * {@code newPassword}. On success, all existing sessions for the user are
+   * invalidated by updating {@code last_global_signout_at}.
+   *
+   * @param userId          UUID of the authenticated user
+   * @param currentPassword the user's current plaintext password (for re-authentication)
+   * @param newPassword     the desired new password (must satisfy the platform password policy)
+   * @throws org.springframework.security.authentication.BadCredentialsException if {@code currentPassword} is wrong
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
+   */
+  void changePassword(UUID userId, String currentPassword, String newPassword);
 }

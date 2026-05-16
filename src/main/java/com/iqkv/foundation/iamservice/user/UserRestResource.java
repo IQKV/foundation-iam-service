@@ -23,6 +23,7 @@ import java.util.UUID;
 import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.user.UserService;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -121,5 +122,29 @@ public class UserRestResource {
       @Valid @RequestBody final AuthenticationDtos.TenantDiscoveryRequest request) {
     return ResponseEntity.ok(
         authenticationService.listUserTenants(request.email(), request.password()));
+  }
+
+  @PostMapping("/me/password")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Change own password",
+      description = "Allows the authenticated user to change their own password. "
+                    + "Requires the current password for re-authentication. "
+                    + "On success, all existing sessions are invalidated.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Password changed — all sessions invalidated"),
+      @ApiResponse(responseCode = "400", description = "Validation error or new password does not meet policy"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized or current password incorrect"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<Void> changePassword(
+      @AuthenticationPrincipal final Jwt jwt,
+      @Valid @RequestBody final UserDtos.ChangePasswordRequest request) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    userService.changePassword(userId, request.currentPassword(), request.newPassword());
+    return ResponseEntity.noContent().build();
   }
 }

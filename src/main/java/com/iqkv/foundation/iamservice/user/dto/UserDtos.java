@@ -85,6 +85,21 @@ public final class UserDtos {
   }
 
   /**
+   * Body for {@code POST /users/me/password} — self-service password change.
+   *
+   * <p>Requires the caller to supply their current password for re-authentication
+   * before the new password is accepted.
+   */
+  public record ChangePasswordRequest(
+      @NotBlank String currentPassword,
+      @NotBlank @Size(min = 8, max = 128)
+      @Pattern(
+          regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
+          message = "{validation.password.pattern}")
+      String newPassword) {
+  }
+
+  /**
    * Body for {@code PATCH /admin/users/{id}/password} — admin-forced password change.
    *
    * <p>No current password is required; the platform admin sets the new password directly.

@@ -235,6 +235,30 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public void changePassword(final UUID userId, final String currentPassword, final String newPassword) {
+    final User user = userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+
+    // Re-authenticate: verify the supplied current password
+    if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+      throw new org.springframework.security.authentication.BadCredentialsException("Current password is incorrect");
+    }
+
+    // Validate new password strength (same policy as signup / password reset)
+    if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
+        || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
+      throw new InvalidPasswordException("New password does not meet the password policy requirements");
+    }
+
+    final String newHash = passwordEncoder.encode(newPassword);
+    userMapper.updatePassword(userId, newHash, Instant.now());
+
+    // Invalidate all existing sessions — same pattern as password reset
+    userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
+    log.info("Password changed by user: userId={}", userId);
+  }
+
+  @Override
   @Transactional(readOnly = true)
   public UserDtos.UserResponse getUserById(final UUID userId) {
     return userMapper.findByIdWithAuthorities(userId)
