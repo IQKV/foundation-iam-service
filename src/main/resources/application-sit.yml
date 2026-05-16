@@ -7,6 +7,10 @@ spring:
   liquibase:
     enabled: true
     contexts: demo
+  mail:
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 
 logging:
   level:
