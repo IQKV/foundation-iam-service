@@ -4,11 +4,11 @@ Identity and Access Management microservice for the Key Value Platform. Owns use
 
 ## About
 
-The IAM service is the identity backbone of the platform:
+The IAM service handles the full identity lifecycle for a SaaS platform:
 
 - **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
 - **Signup by invitation** — existing `TENANT_OWNER` or `ADMIN` sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
-- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `PLATFORM_ADMIN`, `MEMBER`)
+- **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
@@ -28,58 +28,110 @@ The IAM service is the identity backbone of the platform:
 
 Base path: `/api/v1/iam`
 
-### Authentication — `/api/v1/iam/auth`
+### Authentication
 
-| Method | Path                | Auth                   | Description                                                                         |
-| ------ | ------------------- | ---------------------- | ----------------------------------------------------------------------------------- |
-| `POST` | `/auth/signup`      | public                 | Register user + create tenant (multi-tenant) or join default tenant (single-tenant) |
-| `POST` | `/auth/signin`      | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair                                  |
-| `POST` | `/auth/refresh`     | public                 | Exchange refresh token for a new token pair                                         |
-| `POST` | `/auth/signout`     | JWT                    | Revoke current token (JTI denylist)                                                 |
-| `POST` | `/auth/signout-all` | JWT                    | Invalidate all sessions via `last_global_signout_at`                                |
-| `POST` | `/auth/validate`    | JWT                    | Validate token and return user context (gateway introspection)                      |
+| Method | Path                              | Auth          | Description                                                      |
+| ------ | --------------------------------- | ------------- | ---------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public        | Register user and create tenant                                  |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status after signup                     |
+| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair                                      |
+| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in (platform-scoped token, null `tenant_id`) |
+| `POST` | `/auth/admin/refresh`             | public        | Refresh platform-scoped token pair                               |
+| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens                                   |
+| `POST` | `/auth/signout`                   | JWT           | Revoke current session                                           |
+| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally                                     |
+| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection                         |
 
-### User — `/api/v1/iam/users`
+### Platform Admin Account
 
-| Method   | Path                               | Auth                      | Description                                  |
-| -------- | ---------------------------------- | ------------------------- | -------------------------------------------- |
-| `GET`    | `/users/me`                        | JWT + `X-Tenant-ID`       | Get current user profile                     |
-| `PATCH`  | `/users/me`                        | JWT + `X-Tenant-ID`       | Update current user profile                  |
-| `DELETE` | `/users/me`                        | JWT + `X-Tenant-ID`       | Remove current user's membership from tenant |
-| `POST`   | `/users/tenants`                   | public (credential-gated) | Discover tenants for a user                  |
-| `POST`   | `/users/email/verify`              | public                    | Verify email address via one-time token      |
-| `POST`   | `/users/email/resend-verification` | public                    | Resend email verification                    |
-| `POST`   | `/users/password/forgot`           | public                    | Initiate password reset (rate-limited)       |
-| `POST`   | `/users/password/reset`            | public                    | Complete password reset with token           |
+| Method  | Path                      | Auth                 | Description                                                               |
+| ------- | ------------------------- | -------------------- | ------------------------------------------------------------------------- |
+| `GET`   | `/auth/admin/me`          | JWT `PLATFORM_ADMIN` | Get own platform operator profile                                         |
+| `PATCH` | `/auth/admin/me`          | JWT `PLATFORM_ADMIN` | Update own first/last name                                                |
+| `POST`  | `/auth/admin/me/password` | JWT `PLATFORM_ADMIN` | Change own password (requires current password; invalidates all sessions) |
 
-### User Admin — `/api/v1/iam/admin/users`
+### User Profile
 
-| Method   | Path                | Auth                 | Description                         |
-| -------- | ------------------- | -------------------- | ----------------------------------- |
-| `GET`    | `/admin/users`      | JWT `PLATFORM_ADMIN` | List users (paginated)              |
-| `GET`    | `/admin/users/{id}` | JWT `PLATFORM_ADMIN` | Get user by UUID                    |
-| `POST`   | `/admin/users`      | JWT `PLATFORM_ADMIN` | Create user with temporary password |
-| `PUT`    | `/admin/users/{id}` | JWT `PLATFORM_ADMIN` | Replace user (full update)          |
-| `PATCH`  | `/admin/users/{id}` | JWT `PLATFORM_ADMIN` | Partially update user               |
-| `DELETE` | `/admin/users/{id}` | JWT `PLATFORM_ADMIN` | Delete user and all memberships     |
+| Method   | Path                 | Auth                      | Description                                                               |
+| -------- | -------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| `GET`    | `/users/me`          | JWT + `X-Tenant-ID`       | Get own profile                                                           |
+| `PATCH`  | `/users/me`          | JWT + `X-Tenant-ID`       | Update own profile                                                        |
+| `DELETE` | `/users/me`          | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
+| `POST`   | `/users/me/password` | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/tenants`     | public (credential-gated) | Discover tenants by credentials                                           |
 
-### Tenant — `/api/v1/iam/tenants`
+### Password Reset
 
-| Method  | Path                                      | Auth                               | Description               |
-| ------- | ----------------------------------------- | ---------------------------------- | ------------------------- |
-| `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID` | Get tenant details        |
-| `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` + `X-Tenant-ID` | Update tenant status      |
-| `POST`  | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Retry failed provisioning |
+| Method | Path                     | Auth   | Description                            |
+| ------ | ------------------------ | ------ | -------------------------------------- |
+| `POST` | `/users/password/forgot` | public | Initiate password reset (rate-limited) |
+| `POST` | `/users/password/reset`  | public | Complete password reset with token     |
 
-### Invitations
+### Email Verification
 
-| Method   | Path                                    | Auth                                                | Description                                         |
-| -------- | --------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
-| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Send invitation email                               |
-| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | List pending invitations                            |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` + `X-Tenant-ID` | Revoke invitation                                   |
-| `GET`    | `/invitations/{token}`                  | public                                              | Preview invitation (tenant name, authority, expiry) |
-| `POST`   | `/invitations/{token}/accept`           | public                                              | Accept invitation; returns token pair               |
+| Method | Path                               | Auth   | Description                              |
+| ------ | ---------------------------------- | ------ | ---------------------------------------- |
+| `POST` | `/users/email/verify`              | public | Verify email address with one-time token |
+| `POST` | `/users/email/resend-verification` | public | Resend verification email (rate-limited) |
+
+### Tenant Management
+
+| Method   | Path                                      | Auth                                       | Description                 |
+| -------- | ----------------------------------------- | ------------------------------------------ | --------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant status           |
+| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status    |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning   |
+| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email       |
+| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations    |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
+
+### Invitations (public)
+
+| Method | Path                          | Auth   | Description                                |
+| ------ | ----------------------------- | ------ | ------------------------------------------ |
+| `GET`  | `/invitations/{token}`        | public | Preview invitation — token resolves tenant |
+| `POST` | `/invitations/{token}/accept` | public | Accept invitation — token resolves tenant  |
+
+### Platform Admin — Users
+
+| Method   | Path                            | Auth                 | Description                                        |
+| -------- | ------------------------------- | -------------------- | -------------------------------------------------- |
+| `GET`    | `/admin/users`                  | JWT `PLATFORM_ADMIN` | List all users (paginated, filterable)             |
+| `GET`    | `/admin/users/count`            | JWT `PLATFORM_ADMIN` | Total user count                                   |
+| `GET`    | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Get user by ID                                     |
+| `POST`   | `/admin/users`                  | JWT `PLATFORM_ADMIN` | Create user                                        |
+| `PUT`    | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Replace user (full update)                         |
+| `PATCH`  | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Partially update user                              |
+| `DELETE` | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Delete user and all memberships                    |
+| `GET`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Get user platform authorities                      |
+| `PUT`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Replace user platform authorities                  |
+| `GET`    | `/admin/users/{id}/memberships` | JWT `PLATFORM_ADMIN` | Get user tenant memberships                        |
+| `POST`   | `/admin/users/{id}/password`    | JWT `PLATFORM_ADMIN` | Force-set user password (invalidates all sessions) |
+
+### Platform Admin — Tenants
+
+| Method   | Path                                                      | Auth                 | Description                                 |
+| -------- | --------------------------------------------------------- | -------------------- | ------------------------------------------- |
+| `GET`    | `/admin/tenants`                                          | JWT `PLATFORM_ADMIN` | List all tenants (paginated, filterable)    |
+| `GET`    | `/admin/tenants/count`                                    | JWT `PLATFORM_ADMIN` | Total tenant count                          |
+| `GET`    | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Get tenant by key                           |
+| `PUT`    | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Rename tenant                               |
+| `PATCH`  | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Partially update tenant                     |
+| `DELETE` | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Delete tenant and all associated data       |
+| `GET`    | `/admin/tenants/{tenantKey}/members`                      | JWT `PLATFORM_ADMIN` | List tenant members (paginated, filterable) |
+| `GET`    | `/admin/tenants/{tenantKey}/members/count`                | JWT `PLATFORM_ADMIN` | Total member count for tenant               |
+| `GET`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Get member's tenant authorities             |
+| `PUT`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Replace member's tenant authorities         |
+
+### Platform Admin — Invitations
+
+| Method   | Path                       | Auth                 | Description                                                 |
+| -------- | -------------------------- | -------------------- | ----------------------------------------------------------- |
+| `GET`    | `/admin/invitations`       | JWT `PLATFORM_ADMIN` | List invitations across all tenants (paginated, filterable) |
+| `GET`    | `/admin/invitations/count` | JWT `PLATFORM_ADMIN` | Total invitation count (with optional filters)              |
+| `GET`    | `/admin/invitations/{id}`  | JWT `PLATFORM_ADMIN` | Get invitation by ID                                        |
+| `POST`   | `/admin/invitations`       | JWT `PLATFORM_ADMIN` | Propose invitation for any active tenant                    |
+| `DELETE` | `/admin/invitations/{id}`  | JWT `PLATFORM_ADMIN` | Revoke invitation                                           |
 
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
@@ -89,13 +141,12 @@ JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 
 - Java 25 / Spring Boot 4.0
 - MyBatis 3.x (no JPA) + PostgreSQL 17
-- Liquibase (system + per-tenant schema migrations)
-- RabbitMQ (async tenant provisioning events)
-- JJWT 0.13 RS256 (token issuance and validation)
-- ShedLock 7.x (distributed scheduled cleanup jobs)
-- Thymeleaf (transactional email templates)
+- Liquibase for schema migrations
+- RabbitMQ for async tenant provisioning
+- JJWT 0.13 (RS256 signing)
+- ShedLock 7.x for distributed scheduled jobs
+- Thymeleaf for email templates
 - Micrometer + Prometheus
-- springdoc-openapi (Swagger UI)
 
 ## Prerequisites
 
@@ -121,7 +172,7 @@ cp .env.example .env.local
 # Start dependencies (PostgreSQL on :5432, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
 docker compose up -d
 
-# Run the service
+# Run the service (load .env.local first to activate the local Spring profile)
 export $(grep -v '^#' .env.local | xargs)
 ./mvnw spring-boot:run -Pdev
 # → API:      http://localhost:8080
@@ -136,14 +187,14 @@ export $(grep -v '^#' .env.local | xargs)
 | ---------------------- | ---------------------------- | ------------------------------------------------ |
 | `ROLLOUT_MODE`         | `MULTI_TENANT`               | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
 | `DB_HOST`              | `localhost`                  | PostgreSQL host                                  |
-| `DB_PORT`              | `5432`                       | PostgreSQL port                                  |
+| `DB_PORT`              | `5432`                       | PostgreSQL port (host-mapped from Docker)        |
 | `DB_NAME`              | `iam`                        | Database name                                    |
-| `DB_USERNAME`          | `iam`                        | Database user                                    |
-| `DB_PASSWORD`          | `iam`                        | Database password                                |
+| `DB_USERNAME`          | `svc_iam_dba`                | Database user                                    |
+| `DB_PASSWORD`          | `svc_iam_dba`                | Database password                                |
 | `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                                    |
 | `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                               |
-| `RABBITMQ_USERNAME`    | `iam`                        | RabbitMQ user                                    |
-| `RABBITMQ_PASSWORD`    | `iam`                        | RabbitMQ password                                |
+| `RABBITMQ_USERNAME`    | `svc_iam_rmq`                | RabbitMQ user                                    |
+| `RABBITMQ_PASSWORD`    | `svc_iam_rmq`                | RabbitMQ password                                |
 | `MAIL_HOST`            | `localhost`                  | SMTP host                                        |
 | `MAIL_PORT`            | `587`                        | SMTP port                                        |
 | `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                                   |
@@ -152,9 +203,9 @@ export $(grep -v '^#' .env.local | xargs)
 | `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
 | `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
 | `DEFAULT_TENANT_NAME`  | `Acme Corp.`                 | Default tenant display name                      |
-| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
+| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token TTL (ISO-8601 duration)         |
 
-> Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
+Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
 
 ## Maven Commands
 
@@ -185,6 +236,8 @@ docker build -t iqkv/foundation-iam-service:latest .
 docker compose -f compose.container.yaml up -d
 ```
 
+The Dockerfile uses a multi-stage build: Maven compiles in `eclipse-temurin:25-jdk-alpine`, the runtime stage uses `eclipse-temurin:25-jre-alpine` with a non-root `appuser` and layered JAR extraction for optimal cache reuse.
+
 ## Monitoring
 
 | Endpoint                     | Description                                                         |
@@ -196,24 +249,27 @@ docker compose -f compose.container.yaml up -d
 | `GET /swagger-ui.html`       | API documentation                                                   |
 | `GET /.well-known/jwks.json` | Public JWK Set for JWT validation                                   |
 
+A Grafana dashboard (`docker/grafana/`) provides real-time visibility into service health and JVM metrics using Prometheus as the data source.
+
 ## Project Structure
 
 ```
 src/main/java/com/iqkv/foundation/iamservice/
-├── authentication/   # Signin, signup, token refresh, signout, validate
-├── denylist/         # JTI denylist for token revocation
-├── email/            # Email verification token + reaper job
-├── invitation/       # Token-based invite flow + reaper job
-├── lockout/          # Brute-force login lockout per identity
-├── membership/       # TenantMembership, authorities (TENANT_OWNER, ADMIN, MEMBER)
-├── passwordreset/    # Forgot/reset password flow + reaper job
-├── security/         # JWT authentication filter, claim names, JWKS endpoint
-├── signup/           # SignupStrategy (multi-tenant / single-tenant)
-├── tenant/           # Tenant lifecycle, provisioning, bootstrap strategies
-├── tenancy/          # MyBatis schema interceptor, TenantContext, Liquibase runner
-├── user/             # User profile, admin CRUD
-├── shared/           # Common exceptions, utilities, value objects
-└── infrastructure/   # Spring config, security, persistence, messaging, metrics
+├── authentication/     # Signin, signup, token refresh, signout flows
+├── denylist/           # JTI denylist for token revocation
+├── email/              # Thymeleaf email templates and sending
+├── infrastructure/     # Spring config, security, MyBatis, RabbitMQ setup
+├── invitation/         # Signup by invitation — send, preview, accept, revoke, reaper job
+├── lockout/            # Brute-force login attempt tracking
+├── membership/         # TenantMembership — per-tenant authorities
+├── passwordreset/      # Password reset token lifecycle
+├── platformadmin/      # Platform operator self-service account
+├── security/           # JWT RS256 signing/validation, JWKS endpoint
+├── shared/             # Common exceptions, utilities, value objects
+├── signup/             # SignupStrategy (multi-tenant / single-tenant)
+├── tenancy/            # Liquibase multi-tenant schema management
+├── tenant/             # Tenant lifecycle (provisioning, status transitions)
+└── user/               # User profile management
 ```
 
 ## License
