@@ -16,27 +16,50 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Configures RabbitMQ message serialization/deserialization using Jackson.
+ * Configures RabbitMQ message serialization/deserialization using Jackson 2.x.
  *
  * <p>This replaces the default {@code SimpleMessageConverter} (which only supports
  * String, byte[], and Serializable) with {@code Jackson2JsonMessageConverter} to
  * enable automatic JSON serialization of event POJOs.
  *
- * <p>The converter uses the same {@link JsonMapper} bean configured in
- * {@link JacksonJsonMapperConfig}, ensuring consistent JSON handling across
- * REST APIs, messaging, and internal serialization.
+ * <p>Note: Spring AMQP requires Jackson 2.x ({@code com.fasterxml.jackson.databind.ObjectMapper}),
+ * so we create a separate ObjectMapper bean for RabbitMQ with the same configuration
+ * as the Jackson 3.x JsonMapper used elsewhere in the application.
  */
 @Configuration
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")
 class RabbitMQMessageConverterConfig {
+
+  /**
+   * Configures Jackson 2.x ObjectMapper for RabbitMQ message conversion.
+   *
+   * <p>Configuration mirrors {@link JacksonJsonMapperConfig} to ensure consistent
+   * JSON handling across REST APIs and messaging.
+   *
+   * @return an ObjectMapper configured for RabbitMQ message serialization
+   */
+  @Bean
+  ObjectMapper rabbitObjectMapper() {
+    final ObjectMapper mapper = new ObjectMapper();
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    mapper.disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES);
+    mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    mapper.findAndRegisterModules(); // Auto-discover Jackson modules (Java 8 time, etc.)
+    return mapper;
+  }
 
   /**
    * Configures Jackson-based message converter for RabbitMQ.
@@ -44,11 +67,11 @@ class RabbitMQMessageConverterConfig {
    * <p>Spring Boot auto-configures {@code RabbitTemplate} and {@code RabbitListenerContainerFactory}
    * to use this converter when present in the application context.
    *
-   * @param jsonMapper the Jackson JSON mapper configured with application-wide settings
+   * @param rabbitObjectMapper the Jackson 2.x ObjectMapper for message serialization
    * @return a message converter that serializes/deserializes messages as JSON
    */
   @Bean
-  MessageConverter rabbitMessageConverter(final JsonMapper jsonMapper) {
-    return new Jackson2JsonMessageConverter(jsonMapper);
+  MessageConverter rabbitMessageConverter(final ObjectMapper rabbitObjectMapper) {
+    return new Jackson2JsonMessageConverter(rabbitObjectMapper);
   }
 }
