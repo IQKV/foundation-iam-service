@@ -305,7 +305,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public List<AuthenticationDtos.TenantMembershipSummary> listUserTenants(
       final String email, final String password) {
 
