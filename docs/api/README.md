@@ -9,28 +9,42 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ### Authentication
 
-| Method | Path                | Auth          | Description                              |
-| ------ | ------------------- | ------------- | ---------------------------------------- |
-| `POST` | `/auth/signup`      | public        | Register user and create tenant          |
-| `POST` | `/auth/signin`      | `X-Tenant-ID` | Sign in, receive token pair              |
-| `POST` | `/auth/refresh`     | `X-Tenant-ID` | Rotate access + refresh tokens           |
-| `POST` | `/auth/signout`     | JWT           | Revoke current session (JTI denylist)    |
-| `POST` | `/auth/signout-all` | JWT           | Revoke all sessions globally             |
-| `POST` | `/auth/validate`    | JWT           | Validate token for gateway introspection |
+| Method | Path                              | Auth          | Description                              |
+| ------ | --------------------------------- | ------------- | ---------------------------------------- |
+| `POST` | `/auth/signup`                    | public        | Register user and create tenant          |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status          |
+| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair              |
+| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in                   |
+| `POST` | `/auth/admin/refresh`             | public        | Refresh platform admin token pair        |
+| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens           |
+| `POST` | `/auth/signout`                   | JWT           | Revoke current session (JTI denylist)    |
+| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally             |
+| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection |
 
 `POST /auth/signup` creates a global user account, a new tenant, and a `TENANT_OWNER` membership in one step.
-Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /tenants/{tenantKey}` until `ACTIVE`.
+Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{tenantKey}` until `ACTIVE`.
+
+---
+
+### Platform Admin Account
+
+| Method  | Path                      | Auth | Description                                    |
+| ------- | ------------------------- | ---- | ---------------------------------------------- |
+| `GET`   | `/auth/admin/me`          | JWT  | Get own platform operator profile              |
+| `PATCH` | `/auth/admin/me`          | JWT  | Update own profile (firstName, lastName)       |
+| `POST`  | `/auth/admin/me/password` | JWT  | Change own password (invalidates all sessions) |
 
 ---
 
 ### User Profile
 
-| Method   | Path             | Auth   | Description                               |
-| -------- | ---------------- | ------ | ----------------------------------------- |
-| `GET`    | `/users/me`      | JWT    | Get own profile                           |
-| `PATCH`  | `/users/me`      | JWT    | Update own profile (firstName, lastName)  |
-| `DELETE` | `/users/me`      | JWT    | Remove own membership from current tenant |
-| `POST`   | `/users/tenants` | public | Discover tenants by credentials           |
+| Method   | Path                 | Auth   | Description                               |
+| -------- | -------------------- | ------ | ----------------------------------------- |
+| `GET`    | `/users/me`          | JWT    | Get own profile                           |
+| `PATCH`  | `/users/me`          | JWT    | Update own profile (firstName, lastName)  |
+| `DELETE` | `/users/me`          | JWT    | Remove own membership from current tenant |
+| `POST`   | `/users/me/password` | JWT    | Change own password                       |
+| `POST`   | `/users/tenants`     | public | Discover tenants by credentials           |
 
 ---
 
@@ -86,14 +100,48 @@ For existing users: only `password` is required (used to verify identity).
 
 ### Platform Admin
 
-| Method   | Path                | Auth | Description                     |
-| -------- | ------------------- | ---- | ------------------------------- |
-| `GET`    | `/admin/users`      | JWT  | List all users (paginated)      |
-| `GET`    | `/admin/users/{id}` | JWT  | Get user by ID                  |
-| `POST`   | `/admin/users`      | JWT  | Create user                     |
-| `PUT`    | `/admin/users/{id}` | JWT  | Replace user (full update)      |
-| `PATCH`  | `/admin/users/{id}` | JWT  | Partially update user           |
-| `DELETE` | `/admin/users/{id}` | JWT  | Delete user and all memberships |
+| Method   | Path                            | Auth | Description                     |
+| -------- | ------------------------------- | ---- | ------------------------------- |
+| `GET`    | `/admin/users`                  | JWT  | List all users (paginated)      |
+| `GET`    | `/admin/users/count`            | JWT  | Count users                     |
+| `GET`    | `/admin/users/{id}`             | JWT  | Get user by ID                  |
+| `POST`   | `/admin/users`                  | JWT  | Create user                     |
+| `PUT`    | `/admin/users/{id}`             | JWT  | Replace user (full update)      |
+| `PATCH`  | `/admin/users/{id}`             | JWT  | Partially update user           |
+| `DELETE` | `/admin/users/{id}`             | JWT  | Delete user and all memberships |
+| `GET`    | `/admin/users/{id}/authorities` | JWT  | Get user platform authorities   |
+| `PUT`    | `/admin/users/{id}/authorities` | JWT  | Replace platform authorities    |
+| `GET`    | `/admin/users/{id}/memberships` | JWT  | Get user tenant memberships     |
+| `POST`   | `/admin/users/{id}/password`    | JWT  | Force-set user password         |
+
+---
+
+### Tenant Admin
+
+| Method   | Path                                                      | Auth | Description                       |
+| -------- | --------------------------------------------------------- | ---- | --------------------------------- |
+| `GET`    | `/admin/tenants`                                          | JWT  | List all tenants (paginated)      |
+| `GET`    | `/admin/tenants/count`                                    | JWT  | Count tenants                     |
+| `GET`    | `/admin/tenants/{tenantKey}`                              | JWT  | Get tenant by key                 |
+| `PUT`    | `/admin/tenants/{tenantKey}`                              | JWT  | Rename tenant                     |
+| `PATCH`  | `/admin/tenants/{tenantKey}`                              | JWT  | Partially update tenant           |
+| `DELETE` | `/admin/tenants/{tenantKey}`                              | JWT  | Delete tenant and associated data |
+| `GET`    | `/admin/tenants/{tenantKey}/members`                      | JWT  | List tenant members (paginated)   |
+| `GET`    | `/admin/tenants/{tenantKey}/members/count`                | JWT  | Count tenant members              |
+| `GET`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT  | Get member tenant authorities     |
+| `PUT`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT  | Replace member tenant authorities |
+
+---
+
+### Invitation Admin
+
+| Method   | Path                       | Auth | Description                              |
+| -------- | -------------------------- | ---- | ---------------------------------------- |
+| `GET`    | `/admin/invitations`       | JWT  | List invitations (paginated, filterable) |
+| `GET`    | `/admin/invitations/count` | JWT  | Count invitations                        |
+| `GET`    | `/admin/invitations/{id}`  | JWT  | Get invitation by ID                     |
+| `POST`   | `/admin/invitations`       | JWT  | Propose invitation for a tenant          |
+| `DELETE` | `/admin/invitations/{id}`  | JWT  | Revoke a pending invitation              |
 
 ---
 
