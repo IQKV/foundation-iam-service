@@ -100,6 +100,8 @@ public class EmailService {
       case PASSWORD_RESET_INITIATE -> "email/password-reset/initiate";
       case PASSWORD_RESET_CONFIRMED -> "email/password-reset/confirmed";
       case INVITATION -> "email/invitation/invite";
+      case TENANT_OWNER_WELCOME -> "email/signup/tenant-owner-welcome";
+      case INVITATION_ACCEPTED -> "email/invitation/accepted";
     };
   }
 
@@ -110,6 +112,8 @@ public class EmailService {
       case PASSWORD_RESET_INITIATE -> "email.password-reset.initiate.subject";
       case PASSWORD_RESET_CONFIRMED -> "email.password-reset.confirmed.subject";
       case INVITATION -> "email.invitation.subject";
+      case TENANT_OWNER_WELCOME -> "email.tenant-owner-welcome.subject";
+      case INVITATION_ACCEPTED -> "email.invitation-accepted.subject";
     };
   }
 }

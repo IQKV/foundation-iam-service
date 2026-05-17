@@ -123,6 +123,27 @@ public class UserServiceImpl implements UserService {
         Instant.now());
     messagingService.publishNotification(notificationEvent);
 
+    // Send tenant-owner welcome email when the user becomes a TENANT_OWNER (MULTI_TENANT signup).
+    // The email is fire-and-forget — a failure must never roll back the registration transaction.
+    if (result.authorities().contains(com.iqkv.foundation.iamservice.shared.util.UserServiceConstants.AUTHORITY_TENANT_OWNER)) {
+      try {
+        final String dashboardUrl = notificationProps.baseUrl() + "/dashboard";
+        final var welcomeEvent = new NotificationEvent(
+            canonicalUser.getEmail(),
+            notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
+            NotificationEventType.TENANT_OWNER_WELCOME,
+            Map.of(
+                "firstName", canonicalUser.getFirstName(),
+                "tenantName", result.tenant().getName(),
+                "tenantKey", result.tenant().getTenantKey(),
+                "dashboardUrl", dashboardUrl),
+            Instant.now());
+        messagingService.publishNotification(welcomeEvent);
+      } catch (final Exception e) {
+        log.warn("Failed to publish TENANT_OWNER_WELCOME notification for userId={}", canonicalUser.getId(), e);
+      }
+    }
+
     log.info("User registered: userId={}, tenantKey={}", canonicalUser.getId(), result.tenant().getTenantKey());
     return UserDtoMapper.toSignupResponse(canonicalUser, result.tenant());
   }

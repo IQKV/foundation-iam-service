@@ -230,6 +230,26 @@ public class InvitationServiceImpl implements InvitationService {
     log.info("Invitation accepted: invitationId={} userId={} tenantKey={}",
         invitation.getId(), user.getId(), tenantKey);
 
+    // Send invitation-accepted welcome email (fire-and-forget — must not affect the accept transaction).
+    try {
+      final Tenant tenant = tenantMapper.findByTenantKey(tenantKey).orElse(null);
+      final String tenantName = tenant != null ? tenant.getName() : tenantKey;
+      final String dashboardUrl = notificationProps.baseUrl() + "/dashboard";
+      final var acceptedEvent = new NotificationEvent(
+          user.getEmail(),
+          notificationProps.defaultLocale(),
+          NotificationEventType.INVITATION_ACCEPTED,
+          Map.of(
+              "firstName", user.getFirstName(),
+              "tenantName", tenantName,
+              "authority", invitation.getAuthority(),
+              "dashboardUrl", dashboardUrl),
+          Instant.now());
+      messagingService.publishNotification(acceptedEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish INVITATION_ACCEPTED notification for invitationId={}", invitation.getId(), e);
+    }
+
     return new InvitationDtos.AcceptInvitationResponse(accessToken, refreshToken, tenantKey);
   }
 

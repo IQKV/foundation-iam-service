@@ -21,5 +21,9 @@ public enum NotificationEventType {
   EMAIL_VERIFIED,
   PASSWORD_RESET_INITIATE,
   PASSWORD_RESET_CONFIRMED,
-  INVITATION
+  INVITATION,
+  /** Sent to the new tenant owner after their tenant is created during multi-tenant signup. */
+  TENANT_OWNER_WELCOME,
+  /** Sent to the invitee after they successfully accept a tenant invitation. */
+  INVITATION_ACCEPTED
 }
