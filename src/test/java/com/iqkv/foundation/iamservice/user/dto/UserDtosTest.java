@@ -33,14 +33,14 @@ class UserDtosTest {
   void shouldCreateRegisterUserRequest() {
     var request = new UserDtos.RegisterUserRequest(
         "user@example.com",
-        "Password123!",
+        "ChangeMePass123!",
         "John",
         "Doe",
         "Test Tenant"
     );
 
     assertThat(request.email()).isEqualTo("user@example.com");
-    assertThat(request.password()).isEqualTo("Password123!");
+    assertThat(request.password()).isEqualTo("ChangeMePass123!");
     assertThat(request.firstName()).isEqualTo("John");
     assertThat(request.lastName()).isEqualTo("Doe");
     assertThat(request.tenantName()).isEqualTo("Test Tenant");

@@ -9,7 +9,7 @@
         Adds a dedicated tenant owner user for demo0001.
 
         User     : tenant.owner@demo.iqkv.com
-        Password : TenantOwner123!  (BCrypt 12)
+        Password : ChangeMePass123!  (BCrypt 12)
         UUID     : 00000000-0000-0000-0101-000000000032
         Authority: TENANT_OWNER
 
@@ -21,8 +21,8 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000032"/>
             <column name="email"          value="tenant.owner@demo.iqkv.com"/>
-            <!-- TenantOwner123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <!-- ChangeMePass123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Tenant"/>
             <column name="last_name"      value="Owner"/>
             <column name="status"         value="ACTIVE"/>

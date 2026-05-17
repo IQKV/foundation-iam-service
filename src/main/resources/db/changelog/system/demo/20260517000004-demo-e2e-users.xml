@@ -11,8 +11,8 @@
         Designed for Playwright end-to-end tests. Covers every distinct auth path
         and permission boundary in a single, self-contained changeset.
 
-        Password : TenantAdmin123!  (BCrypt 12, same hash used across all demo users)
-        Hash     : $2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK
+        Password : ChangeMePass123!  (BCrypt 12, same hash used across all demo users)
+        Hash     : $2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku
 
         ── Platform scope (no tenant membership) ──────────────────────────────────
           00000000-0000-0000-0001-000000000089  jonathan.pierce@iqkv.com   PLATFORM_ADMIN
@@ -43,8 +43,8 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0001-000000000089"/>
             <column name="email"          value="jonathan.pierce@iqkv.com"/>
-            <!-- TenantAdmin123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <!-- ChangeMePass123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Jonathan"/>
             <column name="last_name"      value="Pierce"/>
             <column name="status"         value="ACTIVE"/>
@@ -84,8 +84,8 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000090"/>
             <column name="email"          value="margaret.hayes@demo.iqkv.com"/>
-            <!-- TenantAdmin123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <!-- ChangeMePass123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Margaret"/>
             <column name="last_name"      value="Hayes"/>
             <column name="status"         value="ACTIVE"/>
@@ -98,7 +98,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000091"/>
             <column name="email"          value="richard.stone@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Richard"/>
             <column name="last_name"      value="Stone"/>
             <column name="status"         value="ACTIVE"/>
@@ -178,8 +178,8 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000092"/>
             <column name="email"          value="natalie.cross@demo.iqkv.com"/>
-            <!-- TenantAdmin123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <!-- ChangeMePass123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Natalie"/>
             <column name="last_name"      value="Cross"/>
             <column name="status"         value="ACTIVE"/>
@@ -192,7 +192,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000093"/>
             <column name="email"          value="patrick.quinn@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Patrick"/>
             <column name="last_name"      value="Quinn"/>
             <column name="status"         value="ACTIVE"/>
@@ -272,8 +272,8 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000094"/>
             <column name="email"          value="diana.fletcher@demo.iqkv.com"/>
-            <!-- TenantAdmin123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <!-- ChangeMePass123! — BCrypt cost 12 -->
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Diana"/>
             <column name="last_name"      value="Fletcher"/>
             <column name="status"         value="ACTIVE"/>
@@ -286,7 +286,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000095"/>
             <column name="email"          value="steven.marsh@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Steven"/>
             <column name="last_name"      value="Marsh"/>
             <column name="status"         value="ACTIVE"/>
@@ -299,7 +299,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000096"/>
             <column name="email"          value="claire.newton@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Claire"/>
             <column name="last_name"      value="Newton"/>
             <column name="status"         value="ACTIVE"/>
@@ -312,7 +312,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000097"/>
             <column name="email"          value="brandon.holt@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Brandon"/>
             <column name="last_name"      value="Holt"/>
             <column name="status"         value="ACTIVE"/>
@@ -325,7 +325,7 @@
         <insert tableName="users" schemaName="public">
             <column name="id"             value="00000000-0000-0000-0101-000000000098"/>
             <column name="email"          value="vanessa.grant@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$XfKe/7oVzBAvPbTSM5vBG.hhwQTFoWxXbwmAy6.9h6hLIElo5c1MK"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name"     value="Vanessa"/>
             <column name="last_name"      value="Grant"/>
             <column name="status"         value="ACTIVE"/>
