@@ -25,5 +25,7 @@ public enum NotificationEventType {
   /** Sent to the new tenant owner after their tenant is created during multi-tenant signup. */
   TENANT_OWNER_WELCOME,
   /** Sent to the invitee after they successfully accept a tenant invitation. */
-  INVITATION_ACCEPTED
+  INVITATION_ACCEPTED,
+  /** Sent to the user after a successful self-service or admin-initiated password change. */
+  PASSWORD_CHANGED
 }

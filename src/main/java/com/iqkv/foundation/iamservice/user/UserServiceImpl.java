@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void setUserPassword(final UUID userId, final String newPassword, final String actorId) {
-    userMapper.findById(userId)
+    final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
     if (newPassword == null || newPassword.length() < 8 || newPassword.length() > 128
@@ -253,6 +253,21 @@ public class UserServiceImpl implements UserService {
     // Invalidate all existing sessions for the target user
     userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
     log.info("Password changed by admin: userId={}, actorId={}", userId, actorId);
+
+    // Notify the user — fire-and-forget, must not affect the operation outcome
+    try {
+      final var event = new NotificationEvent(
+          user.getEmail(),
+          notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
+          NotificationEventType.PASSWORD_CHANGED,
+          Map.of(
+              "firstName", user.getFirstName() != null ? user.getFirstName() : "",
+              "changedByAdmin", true),
+          Instant.now());
+      messagingService.publishNotification(event);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_CHANGED notification for userId={}", userId, e);
+    }
   }
 
   @Override
@@ -277,6 +292,21 @@ public class UserServiceImpl implements UserService {
     // Invalidate all existing sessions — same pattern as password reset
     userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
     log.info("Password changed by user: userId={}", userId);
+
+    // Notify the user — fire-and-forget, must not affect the operation outcome
+    try {
+      final var event = new NotificationEvent(
+          user.getEmail(),
+          notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
+          NotificationEventType.PASSWORD_CHANGED,
+          Map.of(
+              "firstName", user.getFirstName() != null ? user.getFirstName() : "",
+              "changedByAdmin", false),
+          Instant.now());
+      messagingService.publishNotification(event);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_CHANGED notification for userId={}", userId, e);
+    }
   }
 
   @Override
