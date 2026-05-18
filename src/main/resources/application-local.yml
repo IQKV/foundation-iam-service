@@ -32,7 +32,7 @@ iqkv:
       expiry: PT30M
       refresh-expiry: P30D
     security:
-      min-length: 6
+      min-length: 8
   messaging:
     rabbitmq:
       enabled: true
