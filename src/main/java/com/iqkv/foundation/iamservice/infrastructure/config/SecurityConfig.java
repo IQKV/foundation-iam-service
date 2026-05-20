@@ -90,8 +90,8 @@ public class SecurityConfig {
             // Invitation accept flow — public (no JWT required)
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/invitations/*").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/invitations/*/accept").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/iam/tenants/**").hasAuthority("TENANT_OWNER")
-            .requestMatchers(HttpMethod.PATCH, "/api/v1/iam/tenants/**").hasAuthority("TENANT_OWNER")
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/tenants/**").hasAnyAuthority("TENANT_OWNER", "ADMIN")
+            .requestMatchers(HttpMethod.PATCH, "/api/v1/iam/tenants/**").hasAnyAuthority("TENANT_OWNER", "ADMIN")
             .anyRequest().authenticated()
         )
         .oauth2ResourceServer(oauth2 -> oauth2

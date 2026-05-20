@@ -17,7 +17,10 @@
 package com.iqkv.foundation.iamservice.tenant;
 
 import jakarta.validation.Valid;
+import java.util.Objects;
 
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +32,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -98,5 +104,50 @@ public class TenantRestResource {
       @PathVariable final String tenantKey) {
     final Tenant tenant = tenantService.retryProvisioning(tenantKey);
     return ResponseEntity.accepted().body(TenantDtoMapper.toResponse(tenant));
+  }
+
+  @GetMapping("/{tenantKey}/members")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
+  @Operation(summary = "List tenant members",
+             description = "Returns a paginated, sorted, and optionally filtered list of users belonging to the given tenant.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Page of members returned"),
+      @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Tenant not found")
+  })
+  public ResponseEntity<TenantDtos.PagedTenantMemberResponse> listTenantMembers(
+      @PathVariable final String tenantKey,
+      @ModelAttribute @Valid final TenantDtos.TenantMemberListQuery query,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    return ResponseEntity.ok(tenantService.listMembersByTenantKey(tenantKey, query));
+  }
+
+  @GetMapping("/{tenantKey}/members/count")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
+  @Operation(summary = "Count tenant members", description = "Returns the number of active members in the tenant.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Member count returned"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Tenant not found")
+  })
+  public ResponseEntity<TenantDtos.TenantMemberCountResponse> countTenantMembers(
+      @PathVariable final String tenantKey,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
   }
 }
