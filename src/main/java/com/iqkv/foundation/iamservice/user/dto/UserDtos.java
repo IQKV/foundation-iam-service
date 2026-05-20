@@ -152,19 +152,23 @@ public final class UserDtos {
    * @param excludePlatformAdmins if true, omits users who hold the PLATFORM_ADMIN authority
    */
   public record UserListQuery(
-      @Min(0) int page,
-      @Min(1) @Max(100) int size,
+      @Min(0) Integer page,
+      @Min(1) @Max(100) Integer size,
       String sortBy,
       String sortDir,
       String search,
       String status,
       Boolean excludePlatformAdmins) {
 
-    /**
-     * Canonical defaults applied when the controller binds an empty query string.
-     */
-    public UserListQuery() {
-      this(0, 20, "createdAt", "desc", null, null, false);
+    public UserListQuery(final Integer page, final Integer size, final String sortBy, final String sortDir,
+                         final String search, final String status, final Boolean excludePlatformAdmins) {
+      this.page = page != null ? page : 0;
+      this.size = size != null ? size : 20;
+      this.sortBy = sortBy != null ? sortBy : "createdAt";
+      this.sortDir = sortDir != null ? sortDir : "desc";
+      this.search = search;
+      this.status = status;
+      this.excludePlatformAdmins = excludePlatformAdmins != null ? excludePlatformAdmins : false;
     }
   }
 }

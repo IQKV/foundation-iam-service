@@ -146,15 +146,21 @@ public final class TenantDtos {
    * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
    */
   public record TenantMemberListQuery(
-      @Min(0) int page,
-      @Min(1) @Max(100) int size,
+      @Min(0) Integer page,
+      @Min(1) @Max(100) Integer size,
       String sortBy,
       String sortDir,
       String search,
       String status) {
 
-    public TenantMemberListQuery() {
-      this(0, 20, "createdAt", "desc", null, null);
+    public TenantMemberListQuery(final Integer page, final Integer size, final String sortBy, final String sortDir,
+                                 final String search, final String status) {
+      this.page = page != null ? page : 0;
+      this.size = size != null ? size : 20;
+      this.sortBy = sortBy != null ? sortBy : "createdAt";
+      this.sortDir = sortDir != null ? sortDir : "desc";
+      this.search = search;
+      this.status = status;
     }
   }
 
@@ -184,18 +190,21 @@ public final class TenantDtos {
    * @param status  exact status filter: PROVISIONING | ACTIVE | SUSPENDED | DELETED | PROVISIONING_FAILED
    */
   public record TenantListQuery(
-      @Min(0) int page,
-      @Min(1) @Max(100) int size,
+      @Min(0) Integer page,
+      @Min(1) @Max(100) Integer size,
       String sortBy,
       String sortDir,
       String search,
       String status) {
 
-    /**
-     * Canonical defaults applied when the controller binds an empty query string.
-     */
-    public TenantListQuery() {
-      this(0, 20, "createdAt", "desc", null, null);
+    public TenantListQuery(final Integer page, final Integer size, final String sortBy, final String sortDir,
+                           final String search, final String status) {
+      this.page = page != null ? page : 0;
+      this.size = size != null ? size : 20;
+      this.sortBy = sortBy != null ? sortBy : "createdAt";
+      this.sortDir = sortDir != null ? sortDir : "desc";
+      this.search = search;
+      this.status = status;
     }
   }
 }

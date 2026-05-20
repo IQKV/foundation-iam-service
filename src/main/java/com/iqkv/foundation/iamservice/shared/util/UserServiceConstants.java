@@ -38,6 +38,7 @@ public final class UserServiceConstants {
   public static final String AUTHORITY_PLATFORM_ADMIN = "PLATFORM_ADMIN";
 
   public static final String AUTHORITY_TENANT_OWNER = "TENANT_OWNER";
+  public static final String AUTHORITY_BILLING_MANAGER = "BILLING_MANAGER";
   public static final String AUTHORITY_ADMIN = "ADMIN";
   public static final String AUTHORITY_MEMBER = "MEMBER";
 
