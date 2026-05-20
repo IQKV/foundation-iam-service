@@ -37,11 +37,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -99,7 +101,13 @@ public class TenantRestResource {
     if (!Objects.equals(tenantKey, tokenTenantId)) {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
-    return ResponseEntity.ok(TenantDtoMapper.toResponse(tenantService.updateTenant(tenantKey, request)));
+    final var updated = tenantService.updateTenant(tenantKey, request);
+    return ResponseEntity.ok(new TenantDtos.TenantResponse(
+        updated.tenantKey(),
+        updated.name(),
+        updated.status(),
+        updated.createdAt()
+    ));
   }
 
   @PatchMapping("/{tenantKey}/status")
