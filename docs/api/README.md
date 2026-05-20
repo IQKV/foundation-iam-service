@@ -9,17 +9,18 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ### Authentication
 
-| Method | Path                              | Auth          | Description                              |
-| ------ | --------------------------------- | ------------- | ---------------------------------------- |
-| `POST` | `/auth/signup`                    | public        | Register user and create tenant          |
-| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status          |
-| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair              |
-| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in                   |
-| `POST` | `/auth/admin/refresh`             | public        | Refresh platform admin token pair        |
-| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens           |
-| `POST` | `/auth/signout`                   | JWT           | Revoke current session (JTI denylist)    |
-| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally             |
-| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection |
+| Method | Path                              | Auth          | Description                                                       |
+| ------ | --------------------------------- | ------------- | ----------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public        | Register user and create tenant                                   |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status                                   |
+| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair                                       |
+| `POST` | `/auth/exchange`                  | JWT           | Exchange a Bearer access token for a new tenant-scoped token pair |
+| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in                                            |
+| `POST` | `/auth/admin/refresh`             | public        | Refresh platform admin token pair                                 |
+| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens                                    |
+| `POST` | `/auth/signout`                   | JWT           | Revoke current session (JTI denylist)                             |
+| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally                                      |
+| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection                          |
 
 `POST /auth/signup` creates a global user account, a new tenant, and a `TENANT_OWNER` membership in one step.
 Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{tenantKey}` until `ACTIVE`.
@@ -38,13 +39,14 @@ Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{t
 
 ### User Profile
 
-| Method   | Path                 | Auth   | Description                               |
-| -------- | -------------------- | ------ | ----------------------------------------- |
-| `GET`    | `/users/me`          | JWT    | Get own profile                           |
-| `PATCH`  | `/users/me`          | JWT    | Update own profile (firstName, lastName)  |
-| `DELETE` | `/users/me`          | JWT    | Remove own membership from current tenant |
-| `POST`   | `/users/me/password` | JWT    | Change own password                       |
-| `POST`   | `/users/tenants`     | public | Discover tenants by credentials           |
+| Method   | Path                    | Auth   | Description                               |
+| -------- | ----------------------- | ------ | ----------------------------------------- |
+| `GET`    | `/users/me`             | JWT    | Get own profile                           |
+| `PATCH`  | `/users/me`             | JWT    | Update own profile (firstName, lastName)  |
+| `DELETE` | `/users/me`             | JWT    | Remove own membership from current tenant |
+| `POST`   | `/users/me/password`    | JWT    | Change own password                       |
+| `POST`   | `/users/tenants`        | public | Discover tenants by credentials           |
+| `GET`    | `/users/me/memberships` | JWT    | List current user's tenant memberships    |
 
 ---
 

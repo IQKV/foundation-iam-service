@@ -349,6 +349,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
+  public AuthenticationDtos.TokenResponse exchangeTenant(final UUID userId, final String tenantKey) {
+    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
+
+    if (tenant.getStatus() == TenantStatus.SUSPENDED) {
+      throw new TenantSuspendedException("Tenant suspended");
+    }
+    if (tenant.getStatus() != TenantStatus.ACTIVE) {
+      throw new TenantNotAvailableException("Tenant not available");
+    }
+
+    final var user = userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      throw new AccountNotActiveException();
+    }
+
+    final var membership = membershipService.resolveMembership(userId, tenantKey);
+    final var authorities = membershipService.getAuthorities(membership.getId());
+
+    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
+    final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
+    return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
+  }
+
+  @Override
   public void verifyEmail(final String token) {
     final var verificationToken = emailVerificationTokenMapper.findByToken(token)
         .orElseThrow(() -> new InvalidVerificationTokenException("Invalid or expired verification token"));

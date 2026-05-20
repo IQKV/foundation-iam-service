@@ -17,6 +17,7 @@
 package com.iqkv.foundation.iamservice.authentication;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 
@@ -47,6 +48,8 @@ public interface AuthenticationService {
   AuthenticationDtos.ValidateTokenResponse validateToken(String token);
 
   List<AuthenticationDtos.TenantMembershipSummary> listUserTenants(String email, String password);
+
+  AuthenticationDtos.TokenResponse exchangeTenant(UUID userId, String tenantKey);
 
   void verifyEmail(String token);
 

@@ -34,6 +34,7 @@ package com.iqkv.foundation.iamservice.authentication.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
@@ -81,6 +82,12 @@ public final class AuthenticationDtos {
       String tenantName,
       String membershipStatus,
       List<String> authorities) {
+  }
+
+  public record TenantExchangeRequest(
+      @NotBlank
+      @Pattern(regexp = "^[a-zA-Z0-9]{8}$", message = "tenantKey must be 8-char alphanumeric")
+      String tenantKey) {
   }
 
   public record VerifyEmailRequest(

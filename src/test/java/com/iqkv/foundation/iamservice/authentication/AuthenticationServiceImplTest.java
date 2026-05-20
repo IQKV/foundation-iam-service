@@ -293,6 +293,31 @@ class AuthenticationServiceImplTest {
   }
 
   @Test
+  @DisplayName("Should exchange tenant tokens successfully")
+  void shouldExchangeTenantTokensSuccessfully() {
+    // Arrange
+    var authorities = List.of("MEMBER");
+
+    when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
+    when(userMapper.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+    when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
+    when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
+    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities))
+        .thenReturn("exchanged-access-token");
+    when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
+        .thenReturn("exchanged-refresh-token");
+
+    // Act
+    var result = authenticationService.exchangeTenant(testUser.getId(), "test-tenant");
+
+    // Assert
+    assertThat(result).isNotNull();
+    assertThat(result.accessToken()).isEqualTo("exchanged-access-token");
+    assertThat(result.refreshToken()).isEqualTo("exchanged-refresh-token");
+    assertThat(result.tenantKey()).isEqualTo("test-tenant");
+  }
+
+  @Test
   @DisplayName("Should verify email successfully")
   void shouldVerifyEmailSuccessfully() {
     // Arrange

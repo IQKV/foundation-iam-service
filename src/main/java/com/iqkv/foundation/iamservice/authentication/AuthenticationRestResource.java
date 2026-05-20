@@ -20,9 +20,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
+import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException;
 import com.iqkv.foundation.iamservice.user.UserService;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,6 +100,34 @@ public class AuthenticationRestResource {
   public ResponseEntity<AuthenticationDtos.TokenResponse> signIn(
       @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {
     return ResponseEntity.ok(authenticationService.signIn(request));
+  }
+
+  @PostMapping("/exchange")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "Exchange tokens for a different tenant",
+             description = "Issues a new access/refresh token pair for the requested tenantKey. "
+                           + "Requires a valid Bearer access token and an ACTIVE membership in the target tenant.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Tokens issued"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "403", description = "No membership or tenant not available"),
+      @ApiResponse(responseCode = "400", description = "Validation error")
+  })
+  public ResponseEntity<AuthenticationDtos.TokenResponse> exchangeTenant(
+      @AuthenticationPrincipal final Jwt jwt,
+      @Valid @RequestBody final AuthenticationDtos.TenantExchangeRequest request) {
+    final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
+    if (!JwtClaimNames.TYPE_ACCESS.equals(type)) {
+      throw new InvalidTokenTypeException();
+    }
+
+    final String userIdClaim = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    if (userIdClaim == null || userIdClaim.isBlank()) {
+      throw new InvalidTokenTypeException();
+    }
+    final UUID userId = UUID.fromString(userIdClaim);
+    return ResponseEntity.ok(authenticationService.exchangeTenant(userId, request.tenantKey()));
   }
 
   @PostMapping("/admin/signin")

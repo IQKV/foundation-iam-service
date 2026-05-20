@@ -46,6 +46,7 @@ Base path: `/api/v1/iam`
 | `POST` | `/auth/signup`                    | public                 | Register user + create tenant (multi-tenant) or join default tenant (single-tenant) |
 | `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status after signup                                        |
 | `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair                                  |
+| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair                   |
 | `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in; returns platform-scoped token pair (null `tenant_id`)       |
 | `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                                  |
 | `POST` | `/auth/refresh`                   | public                 | Exchange refresh token for a new token pair                                         |
@@ -70,6 +71,7 @@ Base path: `/api/v1/iam`
 | `DELETE` | `/users/me`                        | JWT + `X-Tenant-ID`       | Remove current user's membership from tenant                              |
 | `POST`   | `/users/me/password`               | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
 | `POST`   | `/users/tenants`                   | public (credential-gated) | Discover tenants for a user                                               |
+| `GET`    | `/users/me/memberships`            | JWT                       | List current user's tenant memberships (for org/tenant picker UIs)        |
 | `POST`   | `/users/email/verify`              | public                    | Verify email address via one-time token                                   |
 | `POST`   | `/users/email/resend-verification` | public                    | Resend email verification (rate-limited)                                  |
 | `POST`   | `/users/password/forgot`           | public                    | Initiate password reset (rate-limited)                                    |

@@ -30,17 +30,18 @@ Base path: `/api/v1/iam`
 
 ### Authentication
 
-| Method | Path                              | Auth          | Description                                                      |
-| ------ | --------------------------------- | ------------- | ---------------------------------------------------------------- |
-| `POST` | `/auth/signup`                    | public        | Register user and create tenant                                  |
-| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status after signup                     |
-| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair                                      |
-| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in (platform-scoped token, null `tenant_id`) |
-| `POST` | `/auth/admin/refresh`             | public        | Refresh platform-scoped token pair                               |
-| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens                                   |
-| `POST` | `/auth/signout`                   | JWT           | Revoke current session                                           |
-| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally                                     |
-| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection                         |
+| Method | Path                              | Auth          | Description                                                       |
+| ------ | --------------------------------- | ------------- | ----------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public        | Register user and create tenant                                   |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status after signup                      |
+| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair                                       |
+| `POST` | `/auth/exchange`                  | JWT           | Exchange a Bearer access token for a new tenant-scoped token pair |
+| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in (platform-scoped token, null `tenant_id`)  |
+| `POST` | `/auth/admin/refresh`             | public        | Refresh platform-scoped token pair                                |
+| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens                                    |
+| `POST` | `/auth/signout`                   | JWT           | Revoke current session                                            |
+| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally                                      |
+| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection                          |
 
 ### Platform Admin Account
 
@@ -52,13 +53,14 @@ Base path: `/api/v1/iam`
 
 ### User Profile
 
-| Method   | Path                 | Auth                      | Description                                                               |
-| -------- | -------------------- | ------------------------- | ------------------------------------------------------------------------- |
-| `GET`    | `/users/me`          | JWT + `X-Tenant-ID`       | Get own profile                                                           |
-| `PATCH`  | `/users/me`          | JWT + `X-Tenant-ID`       | Update own profile                                                        |
-| `DELETE` | `/users/me`          | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
-| `POST`   | `/users/me/password` | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
-| `POST`   | `/users/tenants`     | public (credential-gated) | Discover tenants by credentials                                           |
+| Method   | Path                    | Auth                      | Description                                                               |
+| -------- | ----------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| `GET`    | `/users/me`             | JWT + `X-Tenant-ID`       | Get own profile                                                           |
+| `PATCH`  | `/users/me`             | JWT + `X-Tenant-ID`       | Update own profile                                                        |
+| `DELETE` | `/users/me`             | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
+| `POST`   | `/users/me/password`    | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/tenants`        | public (credential-gated) | Discover tenants by credentials                                           |
+| `GET`    | `/users/me/memberships` | JWT                       | List current user's tenant memberships                                    |
 
 ### Password Reset
 

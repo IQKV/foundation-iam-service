@@ -22,8 +22,8 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.AuthenticationService;
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
+import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
-import com.iqkv.foundation.iamservice.user.UserService;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,11 +51,14 @@ public class UserRestResource {
 
   private final UserService userService;
   private final AuthenticationService authenticationService;
+  private final MembershipService membershipService;
 
   public UserRestResource(final UserService userService,
-                          final AuthenticationService authenticationService) {
+                          final AuthenticationService authenticationService,
+                          final MembershipService membershipService) {
     this.userService = userService;
     this.authenticationService = authenticationService;
+    this.membershipService = membershipService;
   }
 
   @GetMapping("/me")
@@ -122,6 +125,20 @@ public class UserRestResource {
       @Valid @RequestBody final AuthenticationDtos.TenantDiscoveryRequest request) {
     return ResponseEntity.ok(
         authenticationService.listUserTenants(request.email(), request.password()));
+  }
+
+  @GetMapping("/me/memberships")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "List current user's tenant memberships")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Membership list returned"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
+  public ResponseEntity<List<UserDtos.UserMembershipResponse>> listMyMemberships(
+      @AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(membershipService.getUserMemberships(userId));
   }
 
   @PostMapping("/me/password")
