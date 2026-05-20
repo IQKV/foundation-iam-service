@@ -18,11 +18,14 @@ package com.iqkv.foundation.iamservice.tenant;
 
 import jakarta.validation.Valid;
 import java.util.Objects;
+import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
+import com.iqkv.foundation.iamservice.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -50,9 +53,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TenantRestResource {
 
   private final TenantService tenantService;
+  private final UserService userService;
+  private final MembershipService membershipService;
 
-  public TenantRestResource(final TenantService tenantService) {
+  public TenantRestResource(final TenantService tenantService,
+                            final UserService userService,
+                            final MembershipService membershipService) {
     this.tenantService = tenantService;
+    this.userService = userService;
+    this.membershipService = membershipService;
   }
 
   @GetMapping("/{tenantKey}")
@@ -68,6 +77,29 @@ public class TenantRestResource {
   public ResponseEntity<TenantDtos.TenantResponse> getTenant(@PathVariable final String tenantKey) {
     final Tenant tenant = tenantService.getTenantByKey(tenantKey);
     return ResponseEntity.ok(TenantDtoMapper.toResponse(tenant));
+  }
+
+  @PatchMapping("/{tenantKey}")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(summary = "Rename tenant",
+             description = "Updates the tenant name. Requires TENANT_OWNER authority.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Tenant updated"),
+      @ApiResponse(responseCode = "400", description = "Validation error"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Tenant not found")
+  })
+  public ResponseEntity<TenantDtos.TenantResponse> updateTenant(
+      @PathVariable final String tenantKey,
+      @Valid @RequestBody final TenantDtos.UpdateTenantRequest request,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    return ResponseEntity.ok(TenantDtoMapper.toResponse(tenantService.updateTenant(tenantKey, request)));
   }
 
   @PatchMapping("/{tenantKey}/status")
@@ -149,5 +181,53 @@ public class TenantRestResource {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
     return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
+  }
+
+  @PutMapping("/{tenantKey}/members/{userId}/authorities")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(summary = "Update tenant member authorities", description = "Full replacement of authorities for the tenant member.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities updated"),
+      @ApiResponse(responseCode = "400", description = "Validation error"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Tenant or member not found")
+  })
+  public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> updateMemberAuthorities(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @Valid @RequestBody final TenantDtos.AdminUpdateMemberAuthoritiesRequest request,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    membershipService.updateMemberAuthorities(userId, tenantKey, request.authorities());
+    var membership = membershipService.resolveMembership(userId, tenantKey);
+    var authorities = membershipService.getAuthorities(membership.getId());
+    return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
+  }
+
+  @DeleteMapping("/{tenantKey}/members/{userId}")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(summary = "Remove member from tenant", description = "Deletes the membership of the user in this tenant.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Member removed"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Membership not found")
+  })
+  public ResponseEntity<Void> removeMember(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    userService.deleteUser(userId, tenantKey);
+    return ResponseEntity.noContent().build();
   }
 }
