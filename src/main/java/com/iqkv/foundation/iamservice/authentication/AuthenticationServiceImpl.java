@@ -56,6 +56,7 @@ import com.iqkv.foundation.iamservice.tenant.TenantService;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -90,6 +91,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformAuthorityMapper platformAuthorityMapper;
   private final TenantService tenantService;
+  private final IamServiceMetrics metrics;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -105,7 +107,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final MessagingService messagingService,
       final NotificationConfigurationProperties notificationProps,
       final PlatformAuthorityMapper platformAuthorityMapper,
-      final TenantService tenantService) {
+      final TenantService tenantService,
+      final IamServiceMetrics metrics) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -120,163 +123,220 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.notificationProps = notificationProps;
     this.platformAuthorityMapper = platformAuthorityMapper;
     this.tenantService = tenantService;
+    this.metrics = metrics;
   }
 
   @Override
   public AuthenticationDtos.TokenResponse signIn(final AuthenticationDtos.SignInRequest request) {
     final String tenantKey = TenantContext.getCurrentTenant();
+    return metrics.authDurationTimer(tenantKey, "login").record(() -> {
+      try {
+        final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
+            .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
 
-    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
-        .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
+        if (tenant.getStatus() == TenantStatus.SUSPENDED) {
+          throw new TenantSuspendedException("Tenant suspended");
+        }
+        if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
+          throw new TenantNotAvailableException("Tenant not available");
+        }
 
-    if (tenant.getStatus() == TenantStatus.SUSPENDED) {
-      throw new TenantSuspendedException("Tenant suspended");
+        final var user = userMapper.findByEmail(request.email())
+            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+        if (user.getStatus() != AccountStatus.ACTIVE) {
+          throw new AccountNotActiveException();
+        }
+
+        if (accountLockoutManager.isLocked(request.email())) {
+          throw new AccountLockedException();
+        }
+
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+          accountLockoutManager.recordFailedAttempt(request.email());
+          throw new BadCredentialsException("Invalid credentials");
+        }
+
+        final var membership = membershipService.resolveMembership(user.getId(), tenantKey);
+        final var authorities = membershipService.getAuthorities(membership.getId());
+
+        accountLockoutManager.reset(request.email());
+
+        final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
+        final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
+
+        metrics.recordAuthOutcome(tenantKey, "login", "success", null);
+        return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
+      } catch (final Exception e) {
+        metrics.recordAuthOutcome(tenantKey, "login", "failure", getAuthFailureReason(e));
+        throw e;
+      }
+    });
+  }
+
+  private String getAuthFailureReason(final Exception e) {
+    if (e instanceof BadCredentialsException) {
+      return "bad_credentials";
+    } else if (e instanceof AccountLockedException) {
+      return "account_locked";
+    } else if (e instanceof AccountNotActiveException) {
+      return "user_inactive";
+    } else if (e instanceof TenantSuspendedException) {
+      return "tenant_suspended";
+    } else if (e instanceof TenantNotAvailableException) {
+      return "tenant_not_available";
+    } else if (e instanceof NoPlatformAuthorityException) {
+      return "no_platform_authority";
+    } else if (e instanceof TokenRevokedException) {
+      return "token_revoked";
+    } else if (e instanceof com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException) {
+      return "invalid_token_type";
+    } else if (e instanceof TenantContextMismatchException) {
+      return "tenant_mismatch";
     }
-    if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
-      throw new TenantNotAvailableException("Tenant not available");
-    }
-
-    final var user = userMapper.findByEmail(request.email())
-        .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
-
-    if (user.getStatus() != AccountStatus.ACTIVE) {
-      throw new AccountNotActiveException();
-    }
-
-    if (accountLockoutManager.isLocked(request.email())) {
-      throw new AccountLockedException();
-    }
-
-    if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-      accountLockoutManager.recordFailedAttempt(request.email());
-      throw new BadCredentialsException("Invalid credentials");
-    }
-
-    final var membership = membershipService.resolveMembership(user.getId(), tenantKey);
-    final var authorities = membershipService.getAuthorities(membership.getId());
-
-    accountLockoutManager.reset(request.email());
-
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
-    final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
-
-    return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
+    return "unknown";
   }
 
   @Override
   public AuthenticationDtos.TokenResponse adminSignIn(final AuthenticationDtos.SignInRequest request) {
-    final var user = userMapper.findByEmail(request.email())
-        .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+    return metrics.authDurationTimer(null, "admin_login").record(() -> {
+      try {
+        final var user = userMapper.findByEmail(request.email())
+            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-    if (user.getStatus() != AccountStatus.ACTIVE) {
-      throw new AccountNotActiveException();
-    }
+        if (user.getStatus() != AccountStatus.ACTIVE) {
+          throw new AccountNotActiveException();
+        }
 
-    if (accountLockoutManager.isLocked(request.email())) {
-      throw new AccountLockedException();
-    }
+        if (accountLockoutManager.isLocked(request.email())) {
+          throw new AccountLockedException();
+        }
 
-    if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-      accountLockoutManager.recordFailedAttempt(request.email());
-      throw new BadCredentialsException("Invalid credentials");
-    }
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+          accountLockoutManager.recordFailedAttempt(request.email());
+          throw new BadCredentialsException("Invalid credentials");
+        }
 
-    final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
-    if (platformAuthorities.isEmpty()) {
-      // Record the failed attempt to prevent user enumeration via timing differences,
-      // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
-      accountLockoutManager.reset(request.email());
-      throw new NoPlatformAuthorityException();
-    }
+        final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
+        if (platformAuthorities.isEmpty()) {
+          // Record the failed attempt to prevent user enumeration via timing differences,
+          // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
+          accountLockoutManager.reset(request.email());
+          throw new NoPlatformAuthorityException();
+        }
 
-    accountLockoutManager.reset(request.email());
+        accountLockoutManager.reset(request.email());
 
-    // tenant_id is null for platform-scoped tokens — no tenant context applies.
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
-    final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
+        // tenant_id is null for platform-scoped tokens — no tenant context applies.
+        final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
+        final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
 
-    return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);
+        metrics.recordAuthOutcome(null, "admin_login", "success", null);
+        return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);
+      } catch (final Exception e) {
+        metrics.recordAuthOutcome(null, "admin_login", "failure", getAuthFailureReason(e));
+        throw e;
+      }
+    });
   }
 
   @Override
   public AuthenticationDtos.TokenResponse refresh(final AuthenticationDtos.RefreshTokenRequest request) {
-    final Jwt jwt;
-    try {
-      jwt = jwtDecoder.decode(request.refreshToken());
-    } catch (final JwtException e) {
-      throw new BadCredentialsException("Invalid token signature", e);
-    }
-
-    final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
-    if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
-      throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
-    }
-
-    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
     final String currentTenant = TenantContext.getCurrentTenant();
-    if (!currentTenant.equals(tokenTenantId)) {
-      throw new TenantContextMismatchException("Tenant context mismatch");
-    }
+    return metrics.authDurationTimer(currentTenant, "refresh").record(() -> {
+      try {
+        final Jwt jwt;
+        try {
+          jwt = jwtDecoder.decode(request.refreshToken());
+        } catch (final JwtException e) {
+          throw new BadCredentialsException("Invalid token signature", e);
+        }
 
-    final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
-    final var user = userMapper.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
+        final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
+        if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
+          throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
+        }
 
-    if (user.getStatus() != AccountStatus.ACTIVE) {
-      throw new AccountNotActiveException();
-    }
+        final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+        if (!currentTenant.equals(tokenTenantId)) {
+          throw new TenantContextMismatchException("Tenant context mismatch");
+        }
 
-    final var membership = membershipService.resolveMembership(user.getId(), currentTenant);
-    final var authorities = membershipService.getAuthorities(membership.getId());
+        final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
+        final var user = userMapper.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, currentTenant, authorities);
-    final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, currentTenant);
+        if (user.getStatus() != AccountStatus.ACTIVE) {
+          throw new AccountNotActiveException();
+        }
 
-    return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, currentTenant);
+        final var membership = membershipService.resolveMembership(user.getId(), currentTenant);
+        final var authorities = membershipService.getAuthorities(membership.getId());
+
+        final String accessToken = jwtTokenGenerator.generateAccessToken(user, currentTenant, authorities);
+        final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, currentTenant);
+
+        metrics.recordAuthOutcome(currentTenant, "refresh", "success", null);
+        return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, currentTenant);
+      } catch (final Exception e) {
+        metrics.recordAuthOutcome(currentTenant, "refresh", "failure", getAuthFailureReason(e));
+        throw e;
+      }
+    });
   }
 
   @Override
   public AuthenticationDtos.TokenResponse adminRefresh(final AuthenticationDtos.RefreshTokenRequest request) {
-    final Jwt jwt;
-    try {
-      jwt = jwtDecoder.decode(request.refreshToken());
-    } catch (final JwtException e) {
-      throw new BadCredentialsException("Invalid token signature", e);
-    }
+    return metrics.authDurationTimer(null, "admin_refresh").record(() -> {
+      try {
+        final Jwt jwt;
+        try {
+          jwt = jwtDecoder.decode(request.refreshToken());
+        } catch (final JwtException e) {
+          throw new BadCredentialsException("Invalid token signature", e);
+        }
 
-    final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
-    if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
-      throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
-    }
+        final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
+        if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
+          throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
+        }
 
-    final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
-    final var user = userMapper.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
+        final String email = jwt.getClaimAsString(JwtClaimNames.SUB);
+        final var user = userMapper.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    if (user.getStatus() != AccountStatus.ACTIVE) {
-      throw new AccountNotActiveException();
-    }
+        if (user.getStatus() != AccountStatus.ACTIVE) {
+          throw new AccountNotActiveException();
+        }
 
-    final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
-    if (platformAuthorities.isEmpty()) {
-      throw new NoPlatformAuthorityException();
-    }
+        final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
+        if (platformAuthorities.isEmpty()) {
+          throw new NoPlatformAuthorityException();
+        }
 
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
-    final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
+        final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
+        final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
 
-    return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, null);
+        metrics.recordAuthOutcome(null, "admin_refresh", "success", null);
+        return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, null);
+      } catch (final Exception e) {
+        metrics.recordAuthOutcome(null, "admin_refresh", "failure", getAuthFailureReason(e));
+        throw e;
+      }
+    });
   }
 
   @Override
   public void signOut(final String jti, final String userId, final String expiresAt) {
     tokenDenylistService.denyToken(jti, UUID.fromString(userId), Instant.parse(expiresAt));
+    metrics.recordSecurityEvent(null, "token_revoked");
   }
 
   @Override
   public void signOutAll(final String userId, final String jti, final String expiresAt) {
     userMapper.updateLastGlobalSignoutAt(UUID.fromString(userId), Instant.now());
     tokenDenylistService.denyToken(jti, UUID.fromString(userId), Instant.parse(expiresAt));
+    metrics.recordSecurityEvent(null, "token_revoked_all");
   }
 
   @Override
@@ -286,11 +346,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     try {
       jwt = jwtDecoder.decode(token);
     } catch (final JwtException e) {
+      metrics.recordSecurityEvent(null, "token_validation_failure");
       throw new BadCredentialsException("Invalid token", e);
     }
 
     final String jti = jwt.getClaimAsString(JwtClaimNames.JTI);
     if (jti != null && tokenDenylistService.isRevoked(jti)) {
+      metrics.recordSecurityEvent(null, "token_revoked_check_failure");
       throw new TokenRevokedException();
     }
 

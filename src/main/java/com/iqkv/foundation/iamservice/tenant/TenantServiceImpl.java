@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
@@ -58,15 +59,18 @@ public class TenantServiceImpl implements TenantService {
   private final TenantMembershipMapper membershipMapper;
   private final MessagingService messagingService;
   private final UserMapper userMapper;
+  private final IamServiceMetrics metrics;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
                            final TenantMembershipMapper membershipMapper,
                            final MessagingService messagingService,
-                           final UserMapper userMapper) {
+                           final UserMapper userMapper,
+                           final IamServiceMetrics metrics) {
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;
+    this.metrics = metrics;
   }
 
   // ─── Self-service ──────────────────────────────────────────────────────────
@@ -99,6 +103,7 @@ public class TenantServiceImpl implements TenantService {
     tenant.setUpdatedBy(ownerUserId.toString());
 
     tenantMapper.insertIfAbsent(tenant);
+    metrics.recordTenantProvisioning("initiated");
 
     // Resolve owner fields for the tenant.created event so Billing can bootstrap correctly.
     final var owner = userMapper.findById(ownerUserId).orElse(null);
@@ -106,7 +111,7 @@ public class TenantServiceImpl implements TenantService {
     final String ownerFirstName = owner != null ? owner.getFirstName() : null;
     messagingService.publishTenantCreated(tenantKey, tenantName, ownerEmail, ownerFirstName);
 
-    log.info("Tenant created: tenantKey={}, name={}", tenantKey, tenantName);
+    log.info("Tenant created (provisioning initiated): tenantKey={}, ownerUserId={}", tenantKey, ownerUserId);
     return tenant;
   }
 

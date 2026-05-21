@@ -66,6 +66,8 @@ class UserServiceImplTest {
   private SignupStrategy signupStrategy;
   @Mock
   private PasswordEncoder passwordEncoder;
+  @Mock
+  private com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics metrics;
 
   private UserServiceImpl userService;
 
@@ -82,7 +84,8 @@ class UserServiceImplTest {
         userEventPublisher,
         notificationProps,
         signupStrategy,
-        passwordEncoder
+        passwordEncoder,
+        metrics
     );
 
     testUser = new User();

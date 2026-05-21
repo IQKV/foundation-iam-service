@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
@@ -56,6 +57,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
   private final AuthConfigurationProperties authProps;
   private final NotificationConfigurationProperties notificationProps;
   private final MessageSource messageSource;
+  private final IamServiceMetrics metrics;
 
   public PasswordResetServiceImpl(
       final UserMapper userMapper,
@@ -64,7 +66,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
       final MessagingService messagingService,
       final AuthConfigurationProperties authProps,
       final NotificationConfigurationProperties notificationProps,
-      final MessageSource messageSource) {
+      final MessageSource messageSource,
+      final IamServiceMetrics metrics) {
     this.userMapper = userMapper;
     this.passwordResetTokenMapper = passwordResetTokenMapper;
     this.passwordEncoder = passwordEncoder;
@@ -72,6 +75,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     this.authProps = authProps;
     this.notificationProps = notificationProps;
     this.messageSource = messageSource;
+    this.metrics = metrics;
   }
 
   @Override
@@ -101,6 +105,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     prt.setExpiresAt(Instant.now().plus(authProps.passwordReset().tokenTtl()));
     prt.setCreatedAt(Instant.now());
     passwordResetTokenMapper.insert(prt);
+    metrics.recordUserLifecycleEvent("password_reset_initiated");
 
     final String resetUrl = notificationProps.baseUrl() + "/reset-password?token=" + tokenValue;
     final var event = new NotificationEvent(
@@ -135,6 +140,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     userMapper.updatePassword(prt.getUserId(), hash, Instant.now());
     passwordResetTokenMapper.deleteByToken(token);
     userMapper.updateLastGlobalSignoutAt(prt.getUserId(), Instant.now());
+    metrics.recordUserLifecycleEvent("password_reset_completed");
 
     final var user = userMapper.findById(prt.getUserId()).orElse(null);
     if (user != null) {

@@ -19,6 +19,7 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 import java.time.Instant;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
@@ -33,10 +34,12 @@ public class MessagingService {
 
   private final RabbitTemplate rabbitTemplate;
   private final JsonMapper jsonMapper;
+  private final IamServiceMetrics metrics;
 
-  public MessagingService(final RabbitTemplate rabbitTemplate, final JsonMapper jsonMapper) {
+  public MessagingService(final RabbitTemplate rabbitTemplate, final JsonMapper jsonMapper, final IamServiceMetrics metrics) {
     this.rabbitTemplate = rabbitTemplate;
     this.jsonMapper = jsonMapper;
+    this.metrics = metrics;
   }
 
   public void publishTenantCreated(final String tenantKey, final String tenantName,
@@ -100,7 +103,9 @@ public class MessagingService {
     try {
       rabbitTemplate.convertAndSend(exchange, routingKey, payload);
       log.debug("Published event to exchange={} routingKey={}", exchange, routingKey);
+      metrics.recordMessagingOutcome(routingKey, "success");
     } catch (final AmqpException e) {
+      metrics.recordMessagingOutcome(routingKey, "failure");
       throw new MessagingException(
           "Failed to publish message to exchange=" + exchange + " routingKey=" + routingKey, e);
     }

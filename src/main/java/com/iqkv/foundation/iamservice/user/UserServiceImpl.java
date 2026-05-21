@@ -41,6 +41,7 @@ import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.signup.SignupStrategy;
 import com.iqkv.foundation.iamservice.user.dto.UserDtoMapper;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,6 +66,7 @@ public class UserServiceImpl implements UserService {
   private final NotificationConfigurationProperties notificationProps;
   private final SignupStrategy signupStrategy;
   private final PasswordEncoder passwordEncoder;
+  private final IamServiceMetrics metrics;
 
   public UserServiceImpl(final UserMapper userMapper,
                          final TenantMembershipMapper membershipMapper,
@@ -73,7 +75,8 @@ public class UserServiceImpl implements UserService {
                          final UserEventPublisher userEventPublisher,
                          final NotificationConfigurationProperties notificationProps,
                          final SignupStrategy signupStrategy,
-                         final PasswordEncoder passwordEncoder) {
+                         final PasswordEncoder passwordEncoder,
+                         final IamServiceMetrics metrics) {
     this.userMapper = userMapper;
     this.membershipMapper = membershipMapper;
     this.emailVerificationTokenMapper = emailVerificationTokenMapper;
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService {
     this.notificationProps = notificationProps;
     this.signupStrategy = signupStrategy;
     this.passwordEncoder = passwordEncoder;
+    this.metrics = metrics;
   }
 
   @Override
@@ -145,6 +149,7 @@ public class UserServiceImpl implements UserService {
     }
 
     log.info("User registered: userId={}, tenantKey={}", canonicalUser.getId(), result.tenant().getTenantKey());
+    metrics.recordUserLifecycleEvent("registered");
     return UserDtoMapper.toSignupResponse(canonicalUser, result.tenant());
   }
 

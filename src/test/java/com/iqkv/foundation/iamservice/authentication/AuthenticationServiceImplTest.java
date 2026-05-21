@@ -58,6 +58,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthenticationService Unit Tests")
@@ -91,6 +95,8 @@ class AuthenticationServiceImplTest {
   private com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper platformAuthorityMapper;
   @Mock
   private com.iqkv.foundation.iamservice.tenant.TenantService tenantService;
+  @Mock
+  private com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics metrics;
 
   private AuthenticationServiceImpl authenticationService;
 
@@ -114,8 +120,12 @@ class AuthenticationServiceImplTest {
         messagingService,
         notificationProps,
         platformAuthorityMapper,
-        tenantService
+        tenantService,
+        metrics
     );
+
+    lenient().when(metrics.authDurationTimer(any(), any()))
+        .thenReturn(Timer.builder("test").register(new SimpleMeterRegistry()));
 
     testUser = new User();
     testUser.setId(UUID.randomUUID());

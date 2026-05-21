@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
+import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.TenantEvent;
 import com.iqkv.foundation.iamservice.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
@@ -37,13 +38,16 @@ public class TenantProvisioningConsumer {
   private final TenantLiquibaseRunner tenantLiquibaseRunner;
   private final TenantMapper tenantMapper;
   private final MessagingService messagingService;
+  private final IamServiceMetrics metrics;
 
   public TenantProvisioningConsumer(final TenantLiquibaseRunner tenantLiquibaseRunner,
                                     final TenantMapper tenantMapper,
-                                    final MessagingService messagingService) {
+                                    final MessagingService messagingService,
+                                    final IamServiceMetrics metrics) {
     this.tenantLiquibaseRunner = tenantLiquibaseRunner;
     this.tenantMapper = tenantMapper;
     this.messagingService = messagingService;
+    this.metrics = metrics;
   }
 
   @RabbitListener(queues = RabbitMQConfig.TENANT_PROVISIONING_QUEUE)
@@ -51,16 +55,20 @@ public class TenantProvisioningConsumer {
     final String tenantKey = event.getTenantKey();
     log.info("Received tenant provisioning event: tenantKey={}", tenantKey);
 
-    try {
-      tenantLiquibaseRunner.runMigrationsForTenant(tenantKey);
-      tenantMapper.updateStatus(tenantKey, TenantStatus.ACTIVE.name(), LocalDateTime.now());
-      messagingService.publishTenantProvisioned(tenantKey);
-      log.info("Tenant provisioning succeeded: tenantKey={}", tenantKey);
-    } catch (final Exception e) {
-      log.error("Tenant provisioning failed: tenantKey={}", tenantKey, e);
-      tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
-      messagingService.publishTenantProvisioningFailed(tenantKey);
-      // Do NOT rethrow — message is not requeued; failed state is observable via status endpoint
-    }
+    metrics.tenantProvisioningTimer().record(() -> {
+      try {
+        tenantLiquibaseRunner.runMigrationsForTenant(tenantKey);
+        tenantMapper.updateStatus(tenantKey, TenantStatus.ACTIVE.name(), LocalDateTime.now());
+        messagingService.publishTenantProvisioned(tenantKey);
+        metrics.recordTenantProvisioning("success");
+        log.info("Tenant provisioning succeeded: tenantKey={}", tenantKey);
+      } catch (final Exception e) {
+        log.error("Tenant provisioning failed: tenantKey={}", tenantKey, e);
+        tenantMapper.updateStatus(tenantKey, TenantStatus.PROVISIONING_FAILED.name(), LocalDateTime.now());
+        messagingService.publishTenantProvisioningFailed(tenantKey);
+        metrics.recordTenantProvisioning("failure");
+        // Do NOT rethrow — message is not requeued; failed state is observable via status endpoint
+      }
+    });
   }
 }
