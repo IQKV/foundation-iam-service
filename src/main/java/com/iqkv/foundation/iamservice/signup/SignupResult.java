@@ -25,8 +25,6 @@ import com.iqkv.foundation.iamservice.user.User;
 /**
  * Encapsulates the result of a signup operation, containing the created/resolved
  * user, tenant, membership, and granted authorities.
- *
- * <p>Requirements: 5.1
  */
 public record SignupResult(
     User user,

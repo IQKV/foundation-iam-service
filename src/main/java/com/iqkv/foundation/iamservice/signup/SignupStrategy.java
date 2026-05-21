@@ -27,8 +27,6 @@ import com.iqkv.foundation.iamservice.user.dto.UserDtos;
  *   <li>{@link MultiTenantSignupStrategy} — creates a new tenant per signup for {@code MULTI_TENANT} mode</li>
  *   <li>{@link SingleTenantSignupStrategy} — joins the default tenant for {@code SINGLE_TENANT} mode</li>
  * </ul>
- *
- * <p>Requirements: 5.1
  */
 public interface SignupStrategy {
 

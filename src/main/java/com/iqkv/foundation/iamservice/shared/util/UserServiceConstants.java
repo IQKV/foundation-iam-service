@@ -32,13 +32,10 @@ public final class UserServiceConstants {
    *
    * <p>Grants access to platfrom admin-only operations such as plan catalog management
    * (create, update, delete entries in the plan catalog).
-   *
-   * <p>Requirements: 13.1, 13.4
    */
   public static final String AUTHORITY_PLATFORM_ADMIN = "PLATFORM_ADMIN";
 
   public static final String AUTHORITY_TENANT_OWNER = "TENANT_OWNER";
-  public static final String AUTHORITY_BILLING_MANAGER = "BILLING_MANAGER";
   public static final String AUTHORITY_ADMIN = "ADMIN";
   public static final String AUTHORITY_MEMBER = "MEMBER";
 

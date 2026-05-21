@@ -50,8 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
  * for the registering user. Does NOT create a new tenant row and does NOT publish a
  * {@code tenant.created} event (already published at bootstrap). Grants {@code MEMBER}
  * authority (not {@code TENANT_OWNER}).
- *
- * <p>Requirements: 4.1, 4.2, 4.3, 4.4, 4.7, 4.8, 5.3, 13.2
  */
 @Service
 @ConditionalOnProperty(name = "iqkv.platform.rollout-mode", havingValue = "SINGLE_TENANT")

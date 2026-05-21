@@ -49,8 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>Creates a new tenant per signup, grants {@code TENANT_OWNER} authority,
  * and publishes a {@code tenant.created} event with owner fields.
- *
- * <p>Requirements: 4.5, 4.6, 5.2
  */
 @Service
 @ConditionalOnProperty(name = "iqkv.platform.rollout-mode", havingValue = "MULTI_TENANT")
