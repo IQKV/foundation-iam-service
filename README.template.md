@@ -171,10 +171,10 @@ pnpm install
 cp .env.example .env.local
 # Edit .env.local — defaults work for local Docker setup
 
-# Start dependencies (PostgreSQL on :5432, RabbitMQ on :5672/:15672, MailHog on :1025/:8025)
+# Start infrastructure dependencies (PostgreSQL, RabbitMQ, MailHog)
 docker compose up -d
 
-# Run the service (load .env.local first to activate the local Spring profile)
+# Run the service from your IDE or CLI (load .env.local first to activate the local Spring profile)
 export $(grep -v '^#' .env.local | xargs)
 ./mvnw spring-boot:run -Pdev
 # → API:      http://localhost:8080
@@ -230,11 +230,25 @@ Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in pro
 
 ## Docker
 
+The project provides two Docker Compose configurations for different workflows:
+
+### 1. Infrastructure-only (Local IDE Development)
+
+Starts only the database, message broker, and mail server. The IAM service is expected to be run from your IDE or CLI.
+
+```bash
+docker compose up -d
+```
+
+### 2. Full Stack (Containerized Development)
+
+Starts the entire stack including the IAM service container.
+
 ```bash
 # Build image
 docker build -t iqkv/foundation-iam-service:latest .
 
-# Run full stack (service + dependencies)
+# Run everything
 docker compose -f compose.container.yaml up -d
 ```
 

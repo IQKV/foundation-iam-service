@@ -13,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_iam_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-iam.sql:/docker-entrypoint-initdb.d/init-iam.sql:ro
     networks:
       - iam-service-network
     healthcheck:
