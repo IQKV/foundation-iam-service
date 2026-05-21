@@ -34,6 +34,10 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
 springdoc:
   api-docs:
     path: /api-docs
