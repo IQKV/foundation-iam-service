@@ -152,6 +152,21 @@ JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
 - Micrometer + Prometheus
 - springdoc-openapi (Swagger UI)
 
+## Observability
+
+The service provides comprehensive monitoring via Micrometer and Prometheus:
+
+- **Custom Metrics**:
+    - `iam.auth.outcome`: Authentication success/failure rates by reason and tenant.
+    - `iam.auth.duration`: Latency percentiles for login and refresh operations.
+    - `iam.security.event`: Security-sensitive triggers (lockouts, validation failures).
+    - `iam.user.lifecycle`: Velocity of registrations and password resets.
+    - `iam.tenant.provisioning`: Success rate and duration of tenant database migrations.
+    - `iam.messaging.publish`: Health of RabbitMQ event publication.
+- **Grafana Dashboards**: Pre-configured dashboards are available in `docker/grafana/provisioning/dashboards`:
+    - **JVM**: Core JVM and Spring Boot health.
+    - **IAM Service**: Custom business and security metrics.
+
 ## Prerequisites
 
 - JDK 25 (Eclipse Temurin)
