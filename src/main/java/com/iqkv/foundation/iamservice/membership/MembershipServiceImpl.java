@@ -65,7 +65,7 @@ public class MembershipServiceImpl implements MembershipService {
   public void updateMemberAuthorities(final UUID userId, final String tenantKey, final List<String> authorities) {
     final TenantMembership membership = resolveMembership(userId, tenantKey);
     authorityMapper.deleteByMembershipId(membership.getId());
-    
+
     for (final String auth : authorities) {
       final TenantMemberAuthority newAuth = new TenantMemberAuthority();
       newAuth.setId(UUID.randomUUID());

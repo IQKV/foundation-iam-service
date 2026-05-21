@@ -41,8 +41,8 @@ public interface PlatformAdminAccountService {
    * @param userId          UUID of the authenticated platform operator
    * @param currentPassword the operator's current plaintext password (for re-authentication)
    * @param newPassword     the desired new password (must satisfy the platform password policy)
-   * @throws org.springframework.security.authentication.BadCredentialsException if {@code currentPassword} is wrong
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if the user does not exist
+   * @throws org.springframework.security.authentication.BadCredentialsException          if {@code currentPassword} is wrong
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException        if the user does not exist
    * @throws com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException if the user is not a platform operator
    */
   void changePassword(UUID userId, String currentPassword, String newPassword);

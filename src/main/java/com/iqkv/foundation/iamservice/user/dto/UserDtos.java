@@ -143,12 +143,12 @@ public final class UserDtos {
    * All filter/sort fields are optional — absent values fall back to safe defaults
    * in the service layer.
    *
-   * @param page    zero-based page index (default 0)
-   * @param size    page size 1–100 (default 20)
-   * @param sortBy  sort field: email | firstName | lastName | updatedAt | createdAt
-   * @param sortDir sort direction: asc | desc
-   * @param search  free-text search on email, first name, last name (case-insensitive)
-   * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
+   * @param page                  zero-based page index (default 0)
+   * @param size                  page size 1–100 (default 20)
+   * @param sortBy                sort field: email | firstName | lastName | updatedAt | createdAt
+   * @param sortDir               sort direction: asc | desc
+   * @param search                free-text search on email, first name, last name (case-insensitive)
+   * @param status                exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
    * @param excludePlatformAdmins if true, omits users who hold the PLATFORM_ADMIN authority
    */
   public record UserListQuery(

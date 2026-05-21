@@ -173,7 +173,7 @@ public class TenantServiceImpl implements TenantService {
   @Override
   @Transactional(readOnly = true)
   public TenantDtos.PagedTenantMemberResponse listMembersByTenantKey(final String tenantKey,
-                                                                      final TenantDtos.TenantMemberListQuery query) {
+                                                                     final TenantDtos.TenantMemberListQuery query) {
     tenantMapper.findByTenantKey(tenantKey)
         .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
 

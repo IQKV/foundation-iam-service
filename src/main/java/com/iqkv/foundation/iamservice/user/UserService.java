@@ -180,7 +180,7 @@ public interface UserService {
    * @param userId      UUID of the user whose password is being changed
    * @param newPassword the new plaintext password (must satisfy the password policy)
    * @param actorId     identifier of the admin performing the operation (for audit)
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException    if no user exists with the given ID
    * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
    */
   void setUserPassword(UUID userId, String newPassword, String actorId);
@@ -195,8 +195,8 @@ public interface UserService {
    * @param userId          UUID of the authenticated user
    * @param currentPassword the user's current plaintext password (for re-authentication)
    * @param newPassword     the desired new password (must satisfy the platform password policy)
-   * @throws org.springframework.security.authentication.BadCredentialsException if {@code currentPassword} is wrong
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   * @throws org.springframework.security.authentication.BadCredentialsException      if {@code currentPassword} is wrong
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException    if no user exists with the given ID
    * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
    */
   void changePassword(UUID userId, String currentPassword, String newPassword);
