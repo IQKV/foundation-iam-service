@@ -28,6 +28,48 @@ The IAM service is the identity backbone of the platform:
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 
+### Tenant Admin — `/api/v1/iam/admin/tenants`
+
+| Method  | Path                       | Auth                 | Description                        |
+| ------- | -------------------------- | -------------------- | ---------------------------------- |
+| `GET`   | `/admin/tenants`           | JWT `PLATFORM_ADMIN` | List all tenants (platform scope)  |
+| `GET`   | `/admin/tenants/{key}`      | JWT `PLATFORM_ADMIN` | Get tenant by key                  |
+| `PATCH` | `/admin/tenants/{key}`      | JWT `PLATFORM_ADMIN` | Update tenant (suspend, etc.)      |
+| `DELETE`| `/admin/tenants/{key}`      | JWT `PLATFORM_ADMIN` | Delete tenant                      |
+
+## Events & Messaging
+
+The IAM service publishes lifecycle events to RabbitMQ for platform-wide integration.
+
+**Exchange**: `iqkv.events` (Topic)
+
+### Tenant Lifecycle (`tenant.*`)
+
+| Routing Key | Event Type | Description |
+| :--- | :--- | :--- |
+| `tenant.created` | `TENANT_CREATED` | New tenant account created via signup. |
+| `tenant.provisioned` | `TENANT_PROVISIONED` | Infrastructure setup (billing, DB) complete. |
+| `tenant.provisioning_failed` | `TENANT_PROVISIONING_FAILED` | Infrastructure setup failed. |
+| `tenant.updated` | `TENANT_UPDATED` | Tenant metadata or status updated. |
+| `tenant.suspended` | `TENANT_SUSPENDED` | Tenant access disabled by platform admin. |
+| `tenant.deleted` | `TENANT_DELETED` | Tenant and all associated data removed. |
+
+### User Lifecycle (`user.*`)
+
+| Routing Key | Event Type | Description |
+| :--- | :--- | :--- |
+| `user.created` | `USER_CREATED` | New global identity created. |
+| `user.updated` | `USER_UPDATED` | User profile or password changed. |
+| `user.deleted` | `USER_DELETED` | Global user account deleted. |
+| `user.removed` | `USER_REMOVED` | User membership removed from a specific tenant. |
+| `user.invited` | `USER_INVITED` | Invitation sent to join a tenant. |
+
+### Notifications (`notification.iam.*`)
+
+| Routing Key | Description |
+| :--- | :--- |
+| `notification.iam.email` | Transactional emails (Welcome, Reset Password, Verification). |
+
 ## Quick Links
 
 - [API Documentation](./docs/api/README.md)
