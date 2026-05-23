@@ -19,7 +19,10 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 import java.time.Instant;
 import java.util.UUID;
 
-public class UserEvent {
+import com.iqkv.foundation.audit.model.event.AuditActor;
+import com.iqkv.foundation.audit.model.event.AuditableEvent;
+
+public class UserEvent implements AuditableEvent {
 
   public enum EventType {
     USER_CREATED, USER_UPDATED, USER_DELETED,
@@ -32,6 +35,7 @@ public class UserEvent {
   private String email;
   private EventType eventType;
   private Instant occurredAt;
+  private AuditActor actor;
 
   public UserEvent() {
   }
@@ -43,6 +47,16 @@ public class UserEvent {
     this.email = email;
     this.eventType = eventType;
     this.occurredAt = occurredAt;
+  }
+
+  @Override
+  public AuditActor getActor() {
+    return actor;
+  }
+
+  @Override
+  public void setActor(final AuditActor actor) {
+    this.actor = actor;
   }
 
   public UUID getUserId() {

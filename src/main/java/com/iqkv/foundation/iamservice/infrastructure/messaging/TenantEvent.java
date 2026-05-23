@@ -18,7 +18,10 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
 import java.time.Instant;
 
-public class TenantEvent {
+import com.iqkv.foundation.audit.model.event.AuditActor;
+import com.iqkv.foundation.audit.model.event.AuditableEvent;
+
+public class TenantEvent implements AuditableEvent {
 
   public enum EventType {
     TENANT_CREATED,
@@ -35,6 +38,7 @@ public class TenantEvent {
   private String ownerFirstName;
   private EventType eventType;
   private Instant occurredAt;
+  private AuditActor actor;
 
   public TenantEvent() {
   }
@@ -48,6 +52,16 @@ public class TenantEvent {
     this.ownerFirstName = ownerFirstName;
     this.eventType = eventType;
     this.occurredAt = occurredAt;
+  }
+
+  @Override
+  public AuditActor getActor() {
+    return actor;
+  }
+
+  @Override
+  public void setActor(final AuditActor actor) {
+    this.actor = actor;
   }
 
   public String getTenantKey() {

@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.iqkv</groupId>
         <artifactId>boot-parent-pom</artifactId>
-        <version>0.24.9</version>
+        <version>0.24.10</version>
     </parent>
 
     <groupId>com.iqkv</groupId>
@@ -93,6 +93,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- Auditing -->
+        <dependency>
+            <groupId>com.iqkv</groupId>
+            <artifactId>foundation-audit-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iqkv</groupId>
+            <artifactId>foundation-audit-spi</artifactId>
         </dependency>
 
         <!-- Scheduling: ShedLock -->
