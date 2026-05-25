@@ -39,6 +39,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
         "com.iqkv.foundation.iamservice.denylist",
         "com.iqkv.foundation.iamservice.email",
         "com.iqkv.foundation.iamservice.invitation",
+        "com.iqkv.foundation.iamservice.locale",
         "com.iqkv.foundation.iamservice.lockout",
         "com.iqkv.foundation.iamservice.membership",
         "com.iqkv.foundation.iamservice.passwordreset",
