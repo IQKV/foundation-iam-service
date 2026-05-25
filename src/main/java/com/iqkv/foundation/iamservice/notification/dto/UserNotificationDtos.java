@@ -44,4 +44,13 @@ public final class UserNotificationDtos {
       long totalElements,
       long unreadCount) {
   }
+
+  public record AnnouncementBroadcastResponse(
+      UUID announcementId,
+      String type,
+      String severity,
+      String title,
+      String message,
+      LocalDateTime createdAt) {
+  }
 }

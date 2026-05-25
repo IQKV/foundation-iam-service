@@ -30,7 +30,7 @@ import com.iqkv.foundation.iamservice.announcement.SiteAnnouncementStatus;
 import com.iqkv.foundation.iamservice.announcement.SiteAnnouncementTranslation;
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
-import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtoMapper;
+import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtos;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.apache.ibatis.cursor.Cursor;
@@ -124,17 +124,18 @@ public class AnnouncementConsumer {
 
       // Final Step: Real-time Broadcast via WebSockets
       try {
-        final UserNotification sampleNotification = new UserNotification();
-        sampleNotification.setType("ANNOUNCEMENT");
-        sampleNotification.setSeverity("INFO");
-        sampleNotification.setTitle(defaultTranslation.getTitle());
-        sampleNotification.setMessage(defaultTranslation.getMessage());
-        sampleNotification.setCreatedAt(LocalDateTime.now());
+        final var broadcast = new UserNotificationDtos.AnnouncementBroadcastResponse(
+            announcement.getId(),
+            "ANNOUNCEMENT",
+            "INFO",
+            defaultTranslation.getTitle(),
+            defaultTranslation.getMessage(),
+            LocalDateTime.now()
+        );
 
-        messagingTemplate.convertAndSend("/topic/announcements",
-            UserNotificationDtoMapper.toResponse(sampleNotification));
+        messagingTemplate.convertAndSend("/topic/announcements", broadcast);
       } catch (final Exception e) {
-        log.warn("Failed to push global announcement WebSocket broadcast", e);
+        log.warn("Failed to push global announcement WebSocket broadcast for announcement {}", announcement.getId(), e);
       }
 
       // Transition to PUBLISHED
