@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.announcement.SiteAnnouncementMapper">
+
+    <resultMap id="siteAnnouncementResultMap" type="com.iqkv.foundation.iamservice.announcement.SiteAnnouncement">
+        <id     property="id"           column="id"/>
+        <result property="type"         column="type"/>
+        <result property="status"       column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt"    column="created_at"/>
+        <collection property="translations" ofType="com.iqkv.foundation.iamservice.announcement.SiteAnnouncementTranslation">
+            <result property="announcementId" column="announcement_id"/>
+            <result property="locale"         column="locale"/>
+            <result property="title"          column="title"/>
+            <result property="message"        column="message"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.announcement.SiteAnnouncement">
+        INSERT INTO public.site_announcement (id, type, status, created_at)
+        VALUES (#{id}, #{type}, #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler}, #{createdAt})
+    </insert>
+
+    <insert id="insertTranslation" parameterType="com.iqkv.foundation.iamservice.announcement.SiteAnnouncementTranslation">
+        INSERT INTO public.site_announcement_translations (announcement_id, locale, title, message)
+        VALUES (#{announcementId}, #{locale}, #{title}, #{message})
+    </insert>
+
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.announcement.SiteAnnouncement">
+        UPDATE public.site_announcement
+        SET type = #{type},
+            status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTranslations">
+        DELETE FROM public.site_announcement_translations
+        WHERE announcement_id = #{announcementId}
+    </delete>
+
+    <delete id="delete">
+        DELETE FROM public.site_announcement
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="siteAnnouncementResultMap">
+        SELECT a.id, a.type, a.status, a.created_at,
+               t.announcement_id, t.locale, t.title, t.message
+        FROM public.site_announcement a
+        LEFT JOIN public.site_announcement_translations t ON a.id = t.announcement_id
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="siteAnnouncementResultMap">
+        SELECT a.id, a.type, a.status, a.created_at,
+               t.announcement_id, t.locale, t.title, t.message
+        FROM (
+            SELECT id, type, status, created_at
+            FROM public.site_announcement
+            ORDER BY created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+        ) a
+        LEFT JOIN public.site_announcement_translations t ON a.id = t.announcement_id
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM public.site_announcement
+    </select>
+
+    <select id="findActiveByLocale" resultMap="siteAnnouncementResultMap">
+        SELECT a.id, a.type, a.status, a.created_at,
+               t.announcement_id, t.locale, t.title, t.message
+        FROM public.site_announcement a
+        INNER JOIN public.site_announcement_translations t ON a.id = t.announcement_id
+        WHERE a.status = 'PUBLISHED'
+          AND t.locale = #{locale}
+        ORDER BY a.created_at DESC
+    </select>
+
+</mapper>

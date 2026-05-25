@@ -40,6 +40,7 @@ import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityExcept
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
+import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantManagementException;
@@ -348,6 +349,19 @@ public class GlobalExceptionHandler {
         msg("error.detail.account-not-active", locale),
         request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(SiteAnnouncementNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleSiteAnnouncementNotFound(final SiteAnnouncementNotFoundException ex,
+                                                                      final HttpServletRequest request,
+                                                                      final Locale locale) {
+    log.warn("Site announcement not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.not-found", locale),
+        404,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
 
   @ExceptionHandler(UserNotFoundException.class)

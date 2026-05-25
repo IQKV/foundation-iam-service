@@ -87,6 +87,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/forgot").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/reset").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/locales").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/announcements").permitAll()
             .requestMatchers("/api/v1/iam/admin/**").hasAuthority("PLATFORM_ADMIN")
             // Invitation accept flow — public (no JWT required)
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/invitations/*").permitAll()
