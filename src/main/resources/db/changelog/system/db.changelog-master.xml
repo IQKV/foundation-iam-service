@@ -17,6 +17,9 @@
     <include file="db/changelog/system/20260125140000-add-default-tenant-marker.xml"/>
     <include file="db/changelog/system/20260424130000-create-tenant-invitations-table.xml"/>
     <include file="db/changelog/system/20260510000000-create-platform-authorities-table.xml"/>
+    <include file="db/changelog/system/20260525000000-create-locales-table.xml"/>
+    <include file="db/changelog/system/20260525000001-add-locale-to-users.xml"/>
+    <include file="db/changelog/system/20260525000002-create-notifications-tables.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>

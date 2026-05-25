@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260525000002-create-user-notifications-table" author="iqkv">
+        <createTable tableName="user_notifications" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="target_user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_notifications_target_user" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="locale" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="severity" type="VARCHAR(20)"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="TEXT"/>
+            <column name="payload" type="JSONB"/>
+            <column name="is_read" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="read_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <createIndex indexName="idx_user_notifications_target_user_read" tableName="user_notifications" schemaName="public">
+            <column name="target_user_id"/>
+            <column name="is_read"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260525000003-create-site-announcement-table" author="iqkv">
+        <createTable tableName="site_announcement" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260525000004-create-site-announcement-translations-table" author="iqkv">
+        <createTable tableName="site_announcement_translations" schemaName="public">
+            <column name="announcement_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_site_announcement_translations_announcement" referencedTableName="site_announcement" referencedColumnNames="id"/>
+            </column>
+            <column name="locale" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="site_announcement_translations" columnNames="announcement_id, locale" constraintName="pk_site_announcement_translations" schemaName="public"/>
+    </changeSet>
+
+</databaseChangeLog>
