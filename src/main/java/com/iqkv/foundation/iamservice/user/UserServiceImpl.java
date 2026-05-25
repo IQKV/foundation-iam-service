@@ -229,6 +229,7 @@ public class UserServiceImpl implements UserService {
     user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
     user.setFirstName(request.firstName());
     user.setLastName(request.lastName());
+    user.setLocale(request.locale());
     user.setStatus(AccountStatus.ACTIVE);
     user.setEmailVerified(false);
     user.setCreatedAt(LocalDateTime.now());
@@ -249,6 +250,9 @@ public class UserServiceImpl implements UserService {
     }
     if (request.lastName() != null) {
       user.setLastName(request.lastName());
+    }
+    if (request.locale() != null) {
+      user.setLocale(request.locale());
     }
     if (request.status() != null) {
       try {
@@ -356,11 +360,15 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDtos.UserResponse updateUser(final UUID userId, final String firstName,
-                                          final String lastName, final String updatedBy) {
+                                          final String lastName, final String locale,
+                                          final String updatedBy) {
     final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     user.setFirstName(firstName);
     user.setLastName(lastName);
+    if (locale != null) {
+      user.setLocale(locale);
+    }
     user.setUpdatedAt(LocalDateTime.now());
     user.setUpdatedBy(updatedBy);
     userMapper.update(user);

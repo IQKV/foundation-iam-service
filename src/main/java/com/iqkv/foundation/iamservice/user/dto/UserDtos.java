@@ -45,7 +45,9 @@ public final class UserDtos {
 
   public record UpdateUserRequest(
       @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {
+      @NotBlank @Size(max = 100) String lastName,
+      /** BCP 47 locale tag (e.g. {@code en-US}, {@code de-DE}). Optional — omit to leave unchanged. */
+      @Size(max = 20) String locale) {
   }
 
   public record UserResponse(
@@ -55,6 +57,8 @@ public final class UserDtos {
       String lastName,
       String status,
       boolean emailVerified,
+      /** BCP 47 locale tag (e.g. {@code en-US}). Null when not yet set. */
+      String locale,
       List<String> organizations,
       List<String> membershipAuthorities,
       LocalDateTime createdAt,
@@ -71,13 +75,17 @@ public final class UserDtos {
   public record AdminCreateUserRequest(
       @Email @NotBlank String email,
       @NotBlank @Size(max = 100) String firstName,
-      @NotBlank @Size(max = 100) String lastName) {
+      @NotBlank @Size(max = 100) String lastName,
+      /** BCP 47 locale tag (e.g. {@code en-US}). Optional — defaults to platform default when absent. */
+      @Size(max = 20) String locale) {
   }
 
   public record AdminUpdateUserRequest(
       @Size(max = 100) String firstName,
       @Size(max = 100) String lastName,
-      String status) {
+      String status,
+      /** BCP 47 locale tag (e.g. {@code en-US}). Optional — omit to leave unchanged. */
+      @Size(max = 20) String locale) {
   }
 
   public record AdminUpdateUserAuthoritiesRequest(

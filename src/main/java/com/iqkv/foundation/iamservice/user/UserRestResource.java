@@ -93,7 +93,7 @@ public class UserRestResource {
       @Valid @RequestBody final UserDtos.UpdateUserRequest request) {
     final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
     return ResponseEntity.ok(
-        userService.updateUser(userId, request.firstName(), request.lastName(), userId.toString()));
+        userService.updateUser(userId, request.firstName(), request.lastName(), request.locale(), userId.toString()));
   }
 
   @DeleteMapping("/me")

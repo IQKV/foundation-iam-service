@@ -339,6 +339,7 @@
         UPDATE public.users
         SET first_name = #{firstName},
         last_name = #{lastName},
+        locale = #{locale},
         status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
         updated_at = #{updatedAt},
         updated_by = #{updatedBy}

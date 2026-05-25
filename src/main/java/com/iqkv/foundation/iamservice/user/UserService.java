@@ -114,12 +114,13 @@ public interface UserService {
    * @param userId    UUID of the user to update
    * @param firstName new first name (must not be blank)
    * @param lastName  new last name (must not be blank)
+   * @param locale    locale id
    * @param updatedBy identifier of the actor performing the update (user ID or
    *                  {@code "system"} for admin operations)
    * @return the updated user as a {@link UserDtos.UserResponse}
    * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
-  UserDtos.UserResponse updateUser(UUID userId, String firstName, String lastName, String updatedBy);
+  UserDtos.UserResponse updateUser(UUID userId, String firstName, String lastName, String locale, String updatedBy);
 
   /**
    * Partially updates a user's profile (PATCH semantics).
