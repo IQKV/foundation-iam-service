@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.notification.UserNotificationMapper">
+
+    <resultMap id="userNotificationResultMap" type="com.iqkv.foundation.iamservice.notification.UserNotification">
+        <id     property="id"             column="id"/>
+        <result property="targetUserId"   column="target_user_id"/>
+        <result property="locale"         column="locale"/>
+        <result property="type"           column="type"/>
+        <result property="severity"       column="severity"/>
+        <result property="title"          column="title"/>
+        <result property="message"        column="message"/>
+        <result property="payload"        column="payload"/>
+        <result property="isRead"         column="is_read"/>
+        <result property="createdAt"      column="created_at"/>
+        <result property="readAt"         column="read_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.notification.UserNotification">
+        INSERT INTO public.user_notifications
+            (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
+        VALUES
+            (#{id}, #{targetUserId}, #{locale}, #{type}, #{severity}, #{title}, #{message},
+             #{payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+             #{isRead}, #{createdAt}, #{readAt})
+    </insert>
+
+    <select id="findById" resultMap="userNotificationResultMap">
+        SELECT id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at
+        FROM public.user_notifications
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAllByTargetUserId" resultMap="userNotificationResultMap">
+        SELECT id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at
+        FROM public.user_notifications
+        WHERE target_user_id = #{targetUserId}
+        <if test="isRead != null">
+            AND is_read = #{isRead}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByTargetUserId" resultType="long">
+        SELECT COUNT(*)
+        FROM public.user_notifications
+        WHERE target_user_id = #{targetUserId}
+        <if test="isRead != null">
+            AND is_read = #{isRead}
+        </if>
+    </select>
+
+    <update id="markAsRead">
+        UPDATE public.user_notifications
+        SET is_read = true,
+            read_at = #{readAt}
+        WHERE id = #{id}
+          AND is_read = false
+    </update>
+
+    <update id="markAllAsRead">
+        UPDATE public.user_notifications
+        SET is_read = true,
+            read_at = #{readAt}
+        WHERE target_user_id = #{targetUserId}
+          AND is_read = false
+    </update>
+
+</mapper>

@@ -29,6 +29,7 @@ public class User {
   private String lastName;
   private AccountStatus status;
   private boolean emailVerified = false;
+  private String locale;
   private Instant lastGlobalSignoutAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -89,6 +90,14 @@ public class User {
 
   public void setEmailVerified(final boolean emailVerified) {
     this.emailVerified = emailVerified;
+  }
+
+  public String getLocale() {
+    return locale;
+  }
+
+  public void setLocale(final String locale) {
+    this.locale = locale;
   }
 
   public Instant getLastGlobalSignoutAt() {

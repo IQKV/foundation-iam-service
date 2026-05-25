@@ -12,6 +12,7 @@
         <result property="status"               column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
         <result property="emailVerified"        column="email_verified"/>
+        <result property="locale"               column="locale"/>
         <result property="lastGlobalSignoutAt"  column="last_global_signout_at"/>
         <result property="createdAt"            column="created_at"/>
         <result property="updatedAt"            column="updated_at"/>
@@ -22,20 +23,29 @@
     <insert id="upsertByEmail" parameterType="com.iqkv.foundation.iamservice.user.User">
         INSERT INTO public.users
             (id, email, password_hash, first_name, last_name, status,
-             email_verified, created_at, updated_at, created_by, updated_by)
+             email_verified, locale, created_at, updated_at, created_by, updated_by)
         VALUES
             (#{id}, #{email}, #{passwordHash}, #{firstName}, #{lastName},
              #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{emailVerified}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+             #{emailVerified}, #{locale}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
         ON CONFLICT (email) DO NOTHING
     </insert>
 
     <select id="findById" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, last_global_signout_at,
+               email_verified, locale, last_global_signout_at,
                created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE id = #{id}
+    </select>
+
+    <select id="findAllSimple" resultMap="userResultMap">
+        SELECT id, email, password_hash, first_name, last_name, status,
+               email_verified, locale, last_global_signout_at,
+               created_at, updated_at, created_by, updated_by
+        FROM public.users
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="findByIdWithAuthorities" resultMap="userWithOrganizationsResultMap">
@@ -45,6 +55,7 @@
                u.last_name,
                u.status,
                u.email_verified,
+               u.locale,
                u.created_at,
                u.updated_at,
                array_agg(DISTINCT t.name ORDER BY t.name)
@@ -60,12 +71,12 @@
                ON a.membership_id = m.id
         WHERE u.id = #{id}
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.created_at, u.updated_at
+                 u.email_verified, u.locale, u.created_at, u.updated_at
     </select>
 
     <select id="findByEmail" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, last_global_signout_at,
+               email_verified, locale, last_global_signout_at,
                created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE email = #{email}
@@ -84,6 +95,7 @@
         <result property="status"               column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
         <result property="emailVerified"        column="email_verified"/>
+        <result property="locale"               column="locale"/>
         <result property="createdAt"            column="created_at"/>
         <result property="updatedAt"            column="updated_at"/>
         <result property="organizations"        column="organizations"
@@ -99,6 +111,7 @@
                u.last_name,
                u.status,
                u.email_verified,
+               u.locale,
                u.created_at,
                u.updated_at,
                array_agg(DISTINCT t.name ORDER BY t.name)
@@ -131,7 +144,7 @@
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.created_at, u.updated_at
+                 u.email_verified, u.locale, u.created_at, u.updated_at
         ORDER BY
             <choose>
                 <when test="sortBy == 'email'">u.email</when>
@@ -184,6 +197,7 @@
                u.last_name,
                u.status,
                u.email_verified,
+               u.locale,
                u.created_at,
                u.updated_at,
                array_agg(DISTINCT t.name ORDER BY t.name)
@@ -212,7 +226,7 @@
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.created_at, u.updated_at
+                 u.email_verified, u.locale, u.created_at, u.updated_at
         ORDER BY
             <choose>
                 <when test="sortBy == 'email'">u.email</when>
