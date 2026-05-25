@@ -234,16 +234,18 @@ public class InvitationServiceImpl implements InvitationService {
     try {
       final Tenant tenant = tenantMapper.findByTenantKey(tenantKey).orElse(null);
       final String tenantName = tenant != null ? tenant.getName() : tenantKey;
-      final String dashboardUrl = notificationProps.baseUrl() + "/dashboard";
+      final String dashboardUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/dashboard";
+      final var payload = new java.util.HashMap<String, Object>();
+      payload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+      payload.put("tenantName", tenantName);
+      payload.put("authority", invitation.getAuthority());
+      payload.put("dashboardUrl", dashboardUrl);
+
       final var acceptedEvent = new NotificationEvent(
           user.getEmail(),
           notificationProps.defaultLocale(),
           NotificationEventType.INVITATION_ACCEPTED,
-          Map.of(
-              "firstName", user.getFirstName(),
-              "tenantName", tenantName,
-              "authority", invitation.getAuthority(),
-              "dashboardUrl", dashboardUrl),
+          payload,
           Instant.now());
       messagingService.publishNotification(acceptedEvent);
     } catch (final Exception e) {

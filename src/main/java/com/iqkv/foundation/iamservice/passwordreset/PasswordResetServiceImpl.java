@@ -107,12 +107,17 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     passwordResetTokenMapper.insert(prt);
     metrics.recordUserLifecycleEvent("password_reset_initiated");
 
-    final String resetUrl = notificationProps.baseUrl() + "/reset-password?token=" + tokenValue;
+    final String resetUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/reset-password?token=" + tokenValue;
+    final var payload = new java.util.HashMap<String, Object>();
+    payload.put("resetUrl", resetUrl);
+    payload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+    payload.put("token", tokenValue);
+
     final var event = new NotificationEvent(
         email,
         notificationProps.defaultLocale(),
         NotificationEventType.PASSWORD_RESET_INITIATE,
-        Map.of("resetUrl", resetUrl, "firstName", user.getFirstName(), "token", tokenValue),
+        payload,
         Instant.now());
     try {
       messagingService.publishNotification(event);
@@ -144,11 +149,14 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     final var user = userMapper.findById(prt.getUserId()).orElse(null);
     if (user != null) {
+      final var confirmedPayload = new java.util.HashMap<String, Object>();
+      confirmedPayload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+
       final var event = new NotificationEvent(
           user.getEmail(),
           notificationProps.defaultLocale(),
           NotificationEventType.PASSWORD_RESET_CONFIRMED,
-          Map.of("firstName", user.getFirstName()),
+          confirmedPayload,
           Instant.now());
       try {
         messagingService.publishNotification(event);

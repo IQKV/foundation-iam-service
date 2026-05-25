@@ -44,6 +44,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
   @Override
   @Transactional
   public SiteAnnouncementDtos.SiteAnnouncementResponse create(final SiteAnnouncementDtos.CreateSiteAnnouncementRequest request) {
+    validateEnUsTranslation(request.translations());
     final SiteAnnouncement announcement = SiteAnnouncementDtoMapper.toEntity(request);
     announcement.setId(UUID.randomUUID());
     announcement.setCreatedAt(LocalDateTime.now());
@@ -63,6 +64,14 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
   public SiteAnnouncementDtos.SiteAnnouncementResponse update(final UUID id, final SiteAnnouncementDtos.UpdateSiteAnnouncementRequest request) {
     final SiteAnnouncement announcement = announcementMapper.findById(id)
         .orElseThrow(() -> new SiteAnnouncementNotFoundException(id));
+
+    if (announcement.getStatus() == SiteAnnouncementStatus.PUBLISHED
+        || announcement.getStatus() == SiteAnnouncementStatus.PUBLISHING
+        || announcement.getStatus() == SiteAnnouncementStatus.PENDING) {
+      throw new IllegalStateException("Cannot modify a published or in-progress announcement");
+    }
+
+    validateEnUsTranslation(request.translations());
 
     announcement.setType(request.type());
     announcement.setStatus(request.status());
@@ -84,8 +93,25 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
   @Override
   @Transactional
   public void delete(final UUID id) {
+    final SiteAnnouncement announcement = announcementMapper.findById(id)
+        .orElseThrow(() -> new SiteAnnouncementNotFoundException(id));
+
+    if (announcement.getStatus() == SiteAnnouncementStatus.PUBLISHED
+        || announcement.getStatus() == SiteAnnouncementStatus.PUBLISHING
+        || announcement.getStatus() == SiteAnnouncementStatus.PENDING) {
+      throw new IllegalStateException("Cannot delete a published or in-progress announcement");
+    }
+
     announcementMapper.deleteTranslations(id);
     announcementMapper.delete(id);
+  }
+
+  private void validateEnUsTranslation(final List<? extends SiteAnnouncementDtos.SiteAnnouncementTranslationRequest> translations) {
+    final boolean hasEnUs = translations.stream()
+        .anyMatch(t -> "en-US".equalsIgnoreCase(t.locale()));
+    if (!hasEnUs) {
+      throw new IllegalArgumentException("English (en-US) translation is mandatory");
+    }
   }
 
   @Override

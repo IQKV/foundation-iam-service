@@ -116,14 +116,16 @@ public class UserServiceImpl implements UserService {
     // Publish verification email notification (mode-independent, requirement 4.7)
     final String verificationUrl = notificationProps.baseUrl()
                                    + "/api/v1/iam/users/email/verify?token=" + tokenHex;
+    final var verificationPayload = new java.util.HashMap<String, Object>();
+    verificationPayload.put("verificationUrl", verificationUrl);
+    verificationPayload.put("firstName", canonicalUser.getFirstName() != null ? canonicalUser.getFirstName() : "");
+    verificationPayload.put("expiresInHours", 24);
+
     final var notificationEvent = new NotificationEvent(
         canonicalUser.getEmail(),
         notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
         NotificationEventType.VERIFY_EMAIL,
-        Map.of(
-            "verificationUrl", verificationUrl,
-            "firstName", canonicalUser.getFirstName(),
-            "expiresInHours", 24),
+        verificationPayload,
         Instant.now());
     messagingService.publishNotification(notificationEvent);
 
@@ -131,16 +133,18 @@ public class UserServiceImpl implements UserService {
     // The email is fire-and-forget — a failure must never roll back the registration transaction.
     if (result.authorities().contains(com.iqkv.foundation.iamservice.shared.util.UserServiceConstants.AUTHORITY_TENANT_OWNER)) {
       try {
-        final String dashboardUrl = notificationProps.baseUrl() + "/dashboard";
+        final String dashboardUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/dashboard";
+        final var welcomePayload = new java.util.HashMap<String, Object>();
+        welcomePayload.put("firstName", canonicalUser.getFirstName() != null ? canonicalUser.getFirstName() : "");
+        welcomePayload.put("tenantName", result.tenant().getName() != null ? result.tenant().getName() : "");
+        welcomePayload.put("tenantKey", result.tenant().getTenantKey());
+        welcomePayload.put("dashboardUrl", dashboardUrl);
+
         final var welcomeEvent = new NotificationEvent(
             canonicalUser.getEmail(),
             notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
             NotificationEventType.TENANT_OWNER_WELCOME,
-            Map.of(
-                "firstName", canonicalUser.getFirstName(),
-                "tenantName", result.tenant().getName(),
-                "tenantKey", result.tenant().getTenantKey(),
-                "dashboardUrl", dashboardUrl),
+            welcomePayload,
             Instant.now());
         messagingService.publishNotification(welcomeEvent);
       } catch (final Exception e) {

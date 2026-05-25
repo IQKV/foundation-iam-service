@@ -44,6 +44,7 @@
                email_verified, locale, last_global_signout_at,
                created_at, updated_at, created_by, updated_by
         FROM public.users
+        WHERE status = 'ACTIVE'
     </select>
 
     <select id="findAllSimple" resultMap="userResultMap">

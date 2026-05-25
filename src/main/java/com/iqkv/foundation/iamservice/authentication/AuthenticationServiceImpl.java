@@ -451,12 +451,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     userMapper.setEmailVerified(verificationToken.getUserId());
     emailVerificationTokenMapper.deleteByUserId(verificationToken.getUserId());
 
-    final String signinUrl = notificationProps.baseUrl() + "/signin";
+    final String signinUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/signin";
+    final var payload = new java.util.HashMap<String, Object>();
+    payload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+    payload.put("signinUrl", signinUrl);
+
     final var event = new NotificationEvent(
         user.getEmail(),
         notificationProps.defaultLocale(),
         NotificationEventType.EMAIL_VERIFIED,
-        Map.of("firstName", user.getFirstName(), "signinUrl", signinUrl),
+        payload,
         Instant.now());
     try {
       messagingService.publishNotification(event);
@@ -493,12 +497,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     newToken.setCreatedAt(Instant.now());
     emailVerificationTokenMapper.insert(newToken);
 
-    final String verificationUrl = notificationProps.baseUrl() + "/verify-email?token=" + tokenValue;
+    final String verificationUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/verify-email?token=" + tokenValue;
+    final var resendPayload = new java.util.HashMap<String, Object>();
+    resendPayload.put("verificationUrl", verificationUrl);
+    resendPayload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+    resendPayload.put("expiresInHours", 24);
+
     final var event = new NotificationEvent(
         user.getEmail(),
         notificationProps.defaultLocale(),
         NotificationEventType.VERIFY_EMAIL,
-        Map.of("verificationUrl", verificationUrl, "firstName", user.getFirstName(), "expiresInHours", 24),
+        resendPayload,
         Instant.now());
     try {
       messagingService.publishNotification(event);

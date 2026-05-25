@@ -17,7 +17,10 @@
 package com.iqkv.foundation.iamservice.announcement;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +30,7 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtos;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
+import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +68,25 @@ class SiteAnnouncementServiceImplTest {
     assertThat(result.id()).isNotNull();
     assertThat(result.type()).isEqualTo("INFO");
     verify(announcementMapper).insert(any(SiteAnnouncement.class));
-    verify(announcementMapper).insertTranslation(any(SiteAnnouncementTranslation.class));
+    verify(announcementMapper, times(1)).insertTranslation(any(SiteAnnouncementTranslation.class));
+  }
+
+  @Test
+  @DisplayName("Should throw error when creating announcement without en-US translation")
+  void shouldThrowErrorOnCreateWithoutEnUs() {
+    // Arrange
+    final SiteAnnouncementDtos.CreateSiteAnnouncementRequest request = new SiteAnnouncementDtos.CreateSiteAnnouncementRequest(
+        "INFO",
+        SiteAnnouncementStatus.DRAFT,
+        List.of(new SiteAnnouncementDtos.SiteAnnouncementTranslationRequest("ru-RU", "Title", "Message"))
+    );
+
+    // Act & Assert
+    assertThatThrownBy(() -> announcementService.create(request))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("English (en-US) translation is mandatory");
+
+    verify(announcementMapper, never()).insert(any());
   }
 
   @Test
@@ -80,7 +102,7 @@ class SiteAnnouncementServiceImplTest {
 
     final SiteAnnouncementDtos.UpdateSiteAnnouncementRequest request = new SiteAnnouncementDtos.UpdateSiteAnnouncementRequest(
         "WARNING",
-        SiteAnnouncementStatus.PUBLISHED,
+        SiteAnnouncementStatus.DRAFT,
         List.of(new SiteAnnouncementDtos.SiteAnnouncementTranslationRequest("en-US", "New Title", "New Message"))
     );
 
@@ -91,6 +113,69 @@ class SiteAnnouncementServiceImplTest {
     verify(announcementMapper).update(any(SiteAnnouncement.class));
     verify(announcementMapper).deleteTranslations(id);
     verify(announcementMapper).insertTranslation(any(SiteAnnouncementTranslation.class));
+  }
+
+  @Test
+  @DisplayName("Should throw error when updating published announcement")
+  void shouldThrowErrorOnUpdatePublished() {
+    // Arrange
+    final UUID id = UUID.randomUUID();
+    final SiteAnnouncement existing = new SiteAnnouncement();
+    existing.setId(id);
+    existing.setStatus(SiteAnnouncementStatus.PUBLISHED);
+
+    when(announcementMapper.findById(id)).thenReturn(Optional.of(existing));
+
+    final SiteAnnouncementDtos.UpdateSiteAnnouncementRequest request = new SiteAnnouncementDtos.UpdateSiteAnnouncementRequest(
+        "WARNING",
+        SiteAnnouncementStatus.PUBLISHED,
+        List.of(new SiteAnnouncementDtos.SiteAnnouncementTranslationRequest("en-US", "New Title", "New Message"))
+    );
+
+    // Act & Assert
+    assertThatThrownBy(() -> announcementService.update(id, request))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Cannot modify a published or in-progress announcement");
+
+    verify(announcementMapper, never()).update(any());
+  }
+
+  @Test
+  @DisplayName("Should delete announcement")
+  void shouldDeleteAnnouncement() {
+    // Arrange
+    final UUID id = UUID.randomUUID();
+    final SiteAnnouncement existing = new SiteAnnouncement();
+    existing.setId(id);
+    existing.setStatus(SiteAnnouncementStatus.DRAFT);
+
+    when(announcementMapper.findById(id)).thenReturn(Optional.of(existing));
+
+    // Act
+    announcementService.delete(id);
+
+    // Assert
+    verify(announcementMapper).deleteTranslations(id);
+    verify(announcementMapper).delete(id);
+  }
+
+  @Test
+  @DisplayName("Should throw error when deleting publishing announcement")
+  void shouldThrowErrorOnDeletePublishing() {
+    // Arrange
+    final UUID id = UUID.randomUUID();
+    final SiteAnnouncement existing = new SiteAnnouncement();
+    existing.setId(id);
+    existing.setStatus(SiteAnnouncementStatus.PUBLISHING);
+
+    when(announcementMapper.findById(id)).thenReturn(Optional.of(existing));
+
+    // Act & Assert
+    assertThatThrownBy(() -> announcementService.delete(id))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Cannot delete a published or in-progress announcement");
+
+    verify(announcementMapper, never()).delete(any());
   }
 
   @Test
