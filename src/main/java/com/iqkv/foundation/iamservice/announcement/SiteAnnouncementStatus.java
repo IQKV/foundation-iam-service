@@ -18,6 +18,9 @@ package com.iqkv.foundation.iamservice.announcement;
 
 public enum SiteAnnouncementStatus {
   DRAFT,
+  PENDING,
+  PUBLISHING,
   PUBLISHED,
+  FAILED,
   ARCHIVED
 }

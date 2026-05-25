@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtos;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,9 @@ class SiteAnnouncementServiceImplTest {
 
   @Mock
   private SiteAnnouncementMapper announcementMapper;
+
+  @Mock
+  private MessagingService messagingService;
 
   @InjectMocks
   private SiteAnnouncementServiceImpl announcementService;
@@ -87,5 +91,25 @@ class SiteAnnouncementServiceImplTest {
     verify(announcementMapper).update(any(SiteAnnouncement.class));
     verify(announcementMapper).deleteTranslations(id);
     verify(announcementMapper).insertTranslation(any(SiteAnnouncementTranslation.class));
+  }
+
+  @Test
+  @DisplayName("Should publish announcement")
+  void shouldPublishAnnouncement() {
+    // Arrange
+    final UUID id = UUID.randomUUID();
+    final SiteAnnouncement announcement = new SiteAnnouncement();
+    announcement.setId(id);
+    announcement.setStatus(SiteAnnouncementStatus.DRAFT);
+
+    when(announcementMapper.findById(id)).thenReturn(Optional.of(announcement));
+
+    // Act
+    announcementService.publish(id);
+
+    // Assert
+    assertThat(announcement.getStatus()).isEqualTo(SiteAnnouncementStatus.PENDING);
+    verify(announcementMapper).update(announcement);
+    verify(messagingService).publishAnnouncementPublish(any());
   }
 }

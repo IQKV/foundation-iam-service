@@ -106,8 +106,8 @@ public class MessagingService {
 
   private void publish(final String exchange, final String routingKey, final Object event) {
     try {
-      AuditEventEnricher.enrich(payload);
-      rabbitTemplate.convertAndSend(exchange, routingKey, payload);
+      AuditEventEnricher.enrich(event);
+      rabbitTemplate.convertAndSend(exchange, routingKey, event);
       log.debug("Published event to exchange={} routingKey={}", exchange, routingKey);
       metrics.recordMessagingOutcome(routingKey, "success");
     } catch (final AmqpException e) {

@@ -37,6 +37,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NotificationConsumer Unit Tests")
@@ -56,6 +57,9 @@ class NotificationConsumerTest {
 
   @Mock
   private ObjectMapper objectMapper;
+
+  @Mock
+  private SimpMessagingTemplate messagingTemplate;
 
   @InjectMocks
   private NotificationConsumer notificationConsumer;

@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.iqkv.foundation.iamservice.announcement.FanOutService;
 import com.iqkv.foundation.iamservice.announcement.SiteAnnouncement;
 import com.iqkv.foundation.iamservice.announcement.SiteAnnouncementMapper;
 import com.iqkv.foundation.iamservice.announcement.SiteAnnouncementStatus;
 import com.iqkv.foundation.iamservice.announcement.SiteAnnouncementTranslation;
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
-import com.iqkv.foundation.iamservice.notification.UserNotificationMapper;
 import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtoMapper;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AnnouncementConsumer {
@@ -49,31 +48,33 @@ public class AnnouncementConsumer {
 
   private final SiteAnnouncementMapper announcementMapper;
   private final UserMapper userMapper;
-  private final UserNotificationMapper notificationMapper;
+  private final FanOutService fanOutService;
   private final SimpMessagingTemplate messagingTemplate;
 
   public AnnouncementConsumer(final SiteAnnouncementMapper announcementMapper,
                               final UserMapper userMapper,
-                              final UserNotificationMapper notificationMapper,
+                              final FanOutService fanOutService,
                               final SimpMessagingTemplate messagingTemplate) {
     this.announcementMapper = announcementMapper;
     this.userMapper = userMapper;
-    this.notificationMapper = notificationMapper;
+    this.fanOutService = fanOutService;
     this.messagingTemplate = messagingTemplate;
   }
 
   @RabbitListener(queues = RabbitMQConfig.ANNOUNCEMENTS_QUEUE)
-  @Transactional
   public void handleAnnouncementPublish(final AnnouncementPublishEvent event) {
     log.info("Starting fan-out for announcement: {}", event.announcementId());
 
     final SiteAnnouncement announcement = announcementMapper.findById(event.announcementId())
         .orElseThrow(() -> new RuntimeException("Announcement not found: " + event.announcementId()));
 
-    if (announcement.getStatus() != SiteAnnouncementStatus.PUBLISHED) {
-      log.warn("Announcement {} is not in PUBLISHED status, skipping fan-out", event.announcementId());
+    if (announcement.getStatus() != SiteAnnouncementStatus.PENDING) {
+      log.warn("Announcement {} is in status {}, skipping fan-out", event.announcementId(), announcement.getStatus());
       return;
     }
+
+    // Transition to PUBLISHING
+    fanOutService.updateStatus(event.announcementId(), SiteAnnouncementStatus.PUBLISHING);
 
     final Map<String, SiteAnnouncementTranslation> translationsByLocale = announcement.getTranslations()
         .stream()
@@ -84,6 +85,7 @@ public class AnnouncementConsumer {
 
     if (defaultTranslation == null) {
       log.error("No translations found for announcement: {}", announcement.getId());
+      fanOutService.updateStatus(event.announcementId(), SiteAnnouncementStatus.FAILED);
       return;
     }
 
@@ -108,7 +110,7 @@ public class AnnouncementConsumer {
         batch.add(notification);
 
         if (batch.size() >= BATCH_SIZE) {
-          notificationMapper.insertBatch(batch);
+          fanOutService.saveBatch(batch);
           totalProcessed += batch.size();
           batch.clear();
           log.debug("Processed batch of {} notifications for announcement {}", totalProcessed, announcement.getId());
@@ -116,7 +118,7 @@ public class AnnouncementConsumer {
       }
 
       if (!batch.isEmpty()) {
-        notificationMapper.insertBatch(batch);
+        fanOutService.saveBatch(batch);
         totalProcessed += batch.size();
       }
 
@@ -135,9 +137,13 @@ public class AnnouncementConsumer {
         log.warn("Failed to push global announcement WebSocket broadcast", e);
       }
 
+      // Transition to PUBLISHED
+      fanOutService.updateStatus(event.announcementId(), SiteAnnouncementStatus.PUBLISHED);
       log.info("Finished fan-out for announcement {}: {} notifications created", announcement.getId(), totalProcessed);
+
     } catch (final Exception e) {
       log.error("Failed to process fan-out for announcement: {}", announcement.getId(), e);
+      fanOutService.updateStatus(event.announcementId(), SiteAnnouncementStatus.FAILED);
       throw new RuntimeException("Fan-out failed", e);
     }
   }

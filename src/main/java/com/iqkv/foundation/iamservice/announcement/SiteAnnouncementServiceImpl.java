@@ -106,7 +106,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
       throw new IllegalStateException("Only draft announcements can be published");
     }
 
-    announcement.setStatus(SiteAnnouncementStatus.PUBLISHED);
+    announcement.setStatus(SiteAnnouncementStatus.PENDING);
     announcementMapper.update(announcement);
 
     messagingService.publishAnnouncementPublish(new AnnouncementPublishEvent(id, Instant.now()));

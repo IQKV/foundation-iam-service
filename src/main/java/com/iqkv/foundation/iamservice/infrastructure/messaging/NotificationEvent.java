@@ -32,6 +32,12 @@ public class NotificationEvent {
   public NotificationEvent() {
   }
 
+  public NotificationEvent(final String recipientEmail, final String locale,
+                           final NotificationEventType type, final Map<String, Object> payload,
+                           final Instant occurredAt) {
+    this(null, recipientEmail, locale, type, payload, occurredAt);
+  }
+
   public NotificationEvent(final UUID targetUserId, final String recipientEmail, final String locale,
                            final NotificationEventType type, final Map<String, Object> payload,
                            final Instant occurredAt) {
