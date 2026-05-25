@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.denylist.TokenDenylistMapper">
 
     <resultMap id="tokenDenylistResultMap" type="com.iqkv.foundation.iamservice.denylist.TokenDenylist">
-        <id     property="id"        column="id"/>
-        <result property="jti"       column="jti"/>
-        <result property="userId"    column="user_id"/>
+        <id property="id" column="id"/>
+        <result property="jti" column="jti"/>
+        <result property="userId" column="user_id"/>
         <result property="expiresAt" column="expires_at"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.denylist.TokenDenylist">
         INSERT INTO public.token_denylist
-            (id, jti, user_id, expires_at, created_at)
+        (id, jti, user_id, expires_at, created_at)
         VALUES
-            (#{id}, #{jti}, #{userId}, #{expiresAt}, #{createdAt})
+        (#{id}, #{jti}, #{userId}, #{expiresAt}, #{createdAt})
     </insert>
 
     <select id="existsByJti" resultType="boolean">

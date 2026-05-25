@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper">
 
     <resultMap id="platformRoleResultMap" type="com.iqkv.foundation.iamservice.platformauthority.PlatformAuthority">
-        <id     property="id"        column="id"/>
-        <result property="userId"    column="user_id"/>
-        <result property="authority"      column="authority"/>
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="authority" column="authority"/>
         <result property="grantedAt" column="granted_at"/>
         <result property="grantedBy" column="granted_by"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.platformauthority.PlatformAuthority">
         INSERT INTO public.platform_authorities
-            (id, user_id, authority, granted_at, granted_by)
+        (id, user_id, authority, granted_at, granted_by)
         VALUES
-            (#{id}, #{userId}, #{authority}, #{grantedAt}, #{grantedBy})
+        (#{id}, #{userId}, #{authority}, #{grantedAt}, #{grantedBy})
     </insert>
 
     <select id="findAuthorityValuesByUserId" resultType="java.lang.String">
@@ -26,17 +26,17 @@
 
     <select id="existsByUserIdAndRole" resultType="boolean">
         SELECT EXISTS (
-            SELECT 1
-            FROM public.platform_authorities
-            WHERE user_id = #{userId}
-              AND authority    = #{authority}
+        SELECT 1
+        FROM public.platform_authorities
+        WHERE user_id = #{userId}
+        AND authority = #{authority}
         )
     </select>
 
     <delete id="deleteByUserIdAndRole">
         DELETE FROM public.platform_authorities
         WHERE user_id = #{userId}
-          AND authority    = #{authority}
+        AND authority = #{authority}
     </delete>
 
 </mapper>

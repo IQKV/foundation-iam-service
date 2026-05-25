@@ -70,8 +70,7 @@
         -->
         <sql>
             CREATE UNIQUE INDEX idx_tenant_invitations_pending_email
-                ON public.tenant_invitations (tenant_key, invited_email)
-                WHERE status = 'PENDING';
+                ON public.tenant_invitations (tenant_key, invited_email) WHERE status = 'PENDING';
         </sql>
     </changeSet>
 

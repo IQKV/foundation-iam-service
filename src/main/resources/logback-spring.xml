@@ -9,7 +9,7 @@
     <property name="LOG_LEVEL_MESSAGING" value="${LOG_LEVEL_MESSAGING:-WARN}"/>
     <property name="SERVICE_NAME" value="${spring.application.name:-foundation-iam-service}"/>
     <property name="ENVIRONMENT" value="${SPRING_PROFILES_ACTIVE:-unknown}"/>
-    
+
     <!-- Console Appender - Text Format (default) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -17,7 +17,7 @@
         </encoder>
     </appender>
 
-    
+
     <!-- Async wrapper for JSON appender -->
     <appender name="ASYNC_CONSOLE_JSON" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="CONSOLE_JSON"/>
@@ -25,7 +25,7 @@
         <discardingThreshold>0</discardingThreshold>
         <includeCallerData>false</includeCallerData>
     </appender>
-    
+
     <!-- Application Loggers - controlled by environment variables -->
     <logger name="com.iqkv" level="${LOG_LEVEL_APP}"/>
     <logger name="org.springframework.security" level="${LOG_LEVEL_SECURITY}"/>
@@ -78,12 +78,12 @@
             <appender-ref ref="ASYNC_CONSOLE_JSON"/>
         </root>
     </springProfile>
-    
+
     <!-- Default: Text format for local/dev -->
     <root level="${LOG_LEVEL_ROOT}">
         <appender-ref ref="CONSOLE"/>
     </root>
-    
+
     <!-- Override for uat/prd: Use JSON format -->
     <springProfile name="uat,prd">
         <root level="${LOG_LEVEL_ROOT}">

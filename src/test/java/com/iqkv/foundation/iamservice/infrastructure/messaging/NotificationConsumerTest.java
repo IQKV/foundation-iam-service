@@ -27,7 +27,6 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.notification.UserNotification;
 import com.iqkv.foundation.iamservice.notification.UserNotificationService;
-import tools.jackson.databind.json.JsonMapper;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NotificationConsumer Unit Tests")

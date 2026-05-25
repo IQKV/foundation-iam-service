@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.invitation.InvitationMapper">
 
     <resultMap id="invitationResultMap" type="com.iqkv.foundation.iamservice.invitation.TenantInvitation">
-        <id     property="id"           column="id"/>
-        <result property="tenantKey"    column="tenant_key"/>
+        <id property="id" column="id"/>
+        <result property="tenantKey" column="tenant_key"/>
         <result property="invitedEmail" column="invited_email"/>
-        <result property="invitedBy"    column="invited_by"/>
-        <result property="authority"    column="authority"/>
-        <result property="token"        column="token"/>
-        <result property="status"       column="status"
+        <result property="invitedBy" column="invited_by"/>
+        <result property="authority" column="authority"/>
+        <result property="token" column="token"/>
+        <result property="status" column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="expiresAt"    column="expires_at"/>
-        <result property="acceptedAt"   column="accepted_at"/>
-        <result property="createdAt"    column="created_at"/>
-        <result property="updatedAt"    column="updated_at"/>
-        <result property="createdBy"    column="created_by"/>
-        <result property="updatedBy"    column="updated_by"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="acceptedAt" column="accepted_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.invitation.TenantInvitation">
         INSERT INTO public.tenant_invitations
-            (id, tenant_key, invited_email, invited_by, authority, token, status,
-             expires_at, accepted_at, created_at, updated_at, created_by, updated_by)
+        (id, tenant_key, invited_email, invited_by, authority, token, status,
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by)
         VALUES
-            (#{id}, #{tenantKey}, #{invitedEmail}, #{invitedBy}, #{authority}, #{token},
-             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{expiresAt}, #{acceptedAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        (#{id}, #{tenantKey}, #{invitedEmail}, #{invitedBy}, #{authority}, #{token},
+        #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{expiresAt}, #{acceptedAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
     </insert>
 
     <select id="findByToken" resultMap="invitationResultMap">
         SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
-               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by
         FROM public.tenant_invitations
         WHERE token = #{token}
         LIMIT 1
@@ -40,7 +40,7 @@
 
     <select id="findById" resultMap="invitationResultMap">
         SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
-               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by
         FROM public.tenant_invitations
         WHERE id = #{id}
         LIMIT 1
@@ -48,16 +48,16 @@
 
     <select id="findPendingByTenantKey" resultMap="invitationResultMap">
         SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
-               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by
         FROM public.tenant_invitations
         WHERE tenant_key = #{tenantKey}
-          AND status = 'PENDING'
+        AND status = 'PENDING'
         ORDER BY created_at DESC
     </select>
 
     <select id="findByTenantKey" resultMap="invitationResultMap">
         SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
-               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by
         FROM public.tenant_invitations
         WHERE tenant_key = #{tenantKey}
         ORDER BY created_at DESC
@@ -65,39 +65,39 @@
 
     <select id="existsPendingForTenantAndEmail" resultType="boolean">
         SELECT EXISTS (
-            SELECT 1 FROM public.tenant_invitations
-            WHERE tenant_key   = #{tenantKey}
-              AND invited_email = #{invitedEmail}
-              AND status        = 'PENDING'
+        SELECT 1 FROM public.tenant_invitations
+        WHERE tenant_key = #{tenantKey}
+        AND invited_email = #{invitedEmail}
+        AND status = 'PENDING'
         )
     </select>
 
     <update id="updateStatus">
         UPDATE public.tenant_invitations
-        SET status     = #{status},
-            updated_at = #{updatedAt}
+        SET status = #{status},
+        updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
 
     <update id="markAccepted">
         UPDATE public.tenant_invitations
-        SET status      = 'ACCEPTED',
-            accepted_at = #{acceptedAt},
-            updated_at  = #{updatedAt}
+        SET status = 'ACCEPTED',
+        accepted_at = #{acceptedAt},
+        updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
 
     <update id="expireStale">
         UPDATE public.tenant_invitations
-        SET status     = 'EXPIRED',
-            updated_at = #{updatedAt}
-        WHERE status    = 'PENDING'
-          AND expires_at &lt; #{now}
+        SET status = 'EXPIRED',
+        updated_at = #{updatedAt}
+        WHERE status = 'PENDING'
+        AND expires_at &lt; #{now}
     </update>
 
     <select id="findAll" resultMap="invitationResultMap">
         SELECT id, tenant_key, invited_email, invited_by, authority, token, status,
-               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by
         FROM public.tenant_invitations
         <where>
             <if test="search != null and search != ''">
@@ -111,19 +111,19 @@
             </if>
         </where>
         ORDER BY
-            <choose>
-                <when test="sortBy == 'email'">invited_email</when>
-                <when test="sortBy == 'tenantKey'">tenant_key</when>
-                <when test="sortBy == 'status'">status</when>
-                <when test="sortBy == 'expiresAt'">expires_at</when>
-                <when test="sortBy == 'updatedAt'">updated_at</when>
-                <otherwise>created_at</otherwise>
-            </choose>
-            <choose>
-                <when test="sortDir == 'asc'">ASC</when>
-                <otherwise>DESC</otherwise>
-            </choose>
-            , id ASC
+        <choose>
+            <when test="sortBy == 'email'">invited_email</when>
+            <when test="sortBy == 'tenantKey'">tenant_key</when>
+            <when test="sortBy == 'status'">status</when>
+            <when test="sortBy == 'expiresAt'">expires_at</when>
+            <when test="sortBy == 'updatedAt'">updated_at</when>
+            <otherwise>created_at</otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

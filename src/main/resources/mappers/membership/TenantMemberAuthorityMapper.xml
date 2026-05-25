@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper">
 
     <resultMap id="authorityResultMap" type="com.iqkv.foundation.iamservice.membership.TenantMemberAuthority">
-        <id     property="id"           column="id"/>
+        <id property="id" column="id"/>
         <result property="membershipId" column="membership_id"/>
-        <result property="authority"    column="authority"/>
+        <result property="authority" column="authority"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.membership.TenantMemberAuthority">
         INSERT INTO public.tenant_member_authorities
-            (id, membership_id, authority)
+        (id, membership_id, authority)
         VALUES
-            (#{id}, #{membershipId}, #{authority})
+        (#{id}, #{membershipId}, #{authority})
     </insert>
 
     <select id="findByMembershipId" resultMap="authorityResultMap">

@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
-import tools.jackson.databind.json.JsonMapper;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
 import com.iqkv.foundation.iamservice.notification.UserNotificationService;
 import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtoMapper;
@@ -31,6 +30,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class NotificationConsumer {

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.tenant.TenantMapper">
 
     <resultMap id="tenantResultMap" type="com.iqkv.foundation.iamservice.tenant.Tenant">
-        <id     property="id"         column="id"/>
-        <result property="tenantKey"  column="tenant_key"/>
-        <result property="name"       column="name"/>
-        <result property="status"     column="status"
+        <id property="id" column="id"/>
+        <result property="tenantKey" column="tenant_key"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="createdAt"  column="created_at"/>
-        <result property="updatedAt"  column="updated_at"/>
-        <result property="createdBy"  column="created_by"/>
-        <result property="updatedBy"  column="updated_by"/>
-        <result property="isDefault"  column="is_default"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="isDefault" column="is_default"/>
         <result property="tenantModeOrigin" column="tenant_mode_origin"/>
     </resultMap>
 
     <insert id="insertIfAbsent" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
-            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
+        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
         VALUES
-            (#{id}, #{tenantKey}, #{name},
-             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, #{isDefault}, #{tenantModeOrigin})
+        (#{id}, #{tenantKey}, #{name},
+        #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, #{isDefault}, #{tenantModeOrigin})
         ON CONFLICT (name) DO NOTHING
     </insert>
 
@@ -45,8 +45,8 @@
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(name)       LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -54,17 +54,17 @@
             </if>
         </where>
         ORDER BY
-            <choose>
-                <when test="sortBy == 'name'">name</when>
-                <when test="sortBy == 'tenantKey'">tenant_key</when>
-                <when test="sortBy == 'updatedAt'">updated_at</when>
-                <otherwise>created_at</otherwise>
-            </choose>
-            <choose>
-                <when test="sortDir == 'asc'">ASC</when>
-                <otherwise>DESC</otherwise>
-            </choose>
-            , id ASC
+        <choose>
+            <when test="sortBy == 'name'">name</when>
+            <when test="sortBy == 'tenantKey'">tenant_key</when>
+            <when test="sortBy == 'updatedAt'">updated_at</when>
+            <otherwise>created_at</otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -74,8 +74,8 @@
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(name)       LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(tenant_key) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -86,10 +86,10 @@
 
     <update id="update" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         UPDATE public.tenants
-        SET name       = #{name},
-            status     = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            updated_at = #{updatedAt},
-            updated_by = #{updatedBy}
+        SET name = #{name},
+        status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        updated_at = #{updatedAt},
+        updated_by = #{updatedBy}
         WHERE tenant_key = #{tenantKey}
     </update>
 
@@ -109,8 +109,8 @@
 
     <update id="updateStatus">
         UPDATE public.tenants
-        SET status     = #{status},
-            updated_at = #{updatedAt}
+        SET status = #{status},
+        updated_at = #{updatedAt}
         WHERE tenant_key = #{tenantKey}
     </update>
 
@@ -118,24 +118,24 @@
         SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
         FROM public.tenants
         WHERE status = 'PROVISIONING'
-          AND created_at &lt; #{olderThan}
+        AND created_at &lt; #{olderThan}
     </select>
 
     <select id="findOwnerByTenantKey"
             parameterType="string"
             resultType="com.iqkv.foundation.iamservice.tenant.OwnerInfo">
-        SELECT u.email      AS email,
-               u.first_name AS firstName
-        FROM   public.tenants t
-        JOIN   public.tenant_memberships m
-                 ON m.tenant_key = t.tenant_key
-        JOIN   public.tenant_member_authorities a
-                 ON a.membership_id = m.id
-        JOIN   public.users u
-                 ON u.id = m.user_id
-        WHERE  t.tenant_key = #{tenantKey}
-          AND  a.authority  = 'TENANT_OWNER'
-        LIMIT  1
+        SELECT u.email AS email,
+        u.first_name AS firstName
+        FROM public.tenants t
+        JOIN public.tenant_memberships m
+        ON m.tenant_key = t.tenant_key
+        JOIN public.tenant_member_authorities a
+        ON a.membership_id = m.id
+        JOIN public.users u
+        ON u.id = m.user_id
+        WHERE t.tenant_key = #{tenantKey}
+        AND a.authority = 'TENANT_OWNER'
+        LIMIT 1
     </select>
 
     <select id="findDefaultTenant" resultMap="tenantResultMap">
@@ -148,17 +148,17 @@
     <update id="markDefaultTenant">
         UPDATE public.tenants
         SET is_default = true,
-            updated_at = NOW()
+        updated_at = NOW()
         WHERE tenant_key = #{tenantKey}
     </update>
 
     <insert id="insertIfAbsentDefault" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
-            (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
+        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
         VALUES
-            (#{id}, #{tenantKey}, #{name},
-             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, true, #{tenantModeOrigin})
+        (#{id}, #{tenantKey}, #{name},
+        #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, true, #{tenantModeOrigin})
         ON CONFLICT (is_default) WHERE is_default = true DO NOTHING
     </insert>
 

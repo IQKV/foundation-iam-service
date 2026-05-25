@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.user.UserMapper">
 
     <resultMap id="userResultMap" type="com.iqkv.foundation.iamservice.user.User">
-        <id     property="id"                   column="id"/>
-        <result property="email"                column="email"/>
-        <result property="passwordHash"         column="password_hash"/>
-        <result property="firstName"            column="first_name"/>
-        <result property="lastName"             column="last_name"/>
-        <result property="status"               column="status"
+        <id property="id" column="id"/>
+        <result property="email" column="email"/>
+        <result property="passwordHash" column="password_hash"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="status" column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="emailVerified"        column="email_verified"/>
-        <result property="locale"               column="locale"/>
-        <result property="lastGlobalSignoutAt"  column="last_global_signout_at"/>
-        <result property="createdAt"            column="created_at"/>
-        <result property="updatedAt"            column="updated_at"/>
-        <result property="createdBy"            column="created_by"/>
-        <result property="updatedBy"            column="updated_by"/>
+        <result property="emailVerified" column="email_verified"/>
+        <result property="locale" column="locale"/>
+        <result property="lastGlobalSignoutAt" column="last_global_signout_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
     </resultMap>
 
     <insert id="upsertByEmail" parameterType="com.iqkv.foundation.iamservice.user.User">
         INSERT INTO public.users
-            (id, email, password_hash, first_name, last_name, status,
-             email_verified, locale, created_at, updated_at, created_by, updated_by)
+        (id, email, password_hash, first_name, last_name, status,
+        email_verified, locale, created_at, updated_at, created_by, updated_by)
         VALUES
-            (#{id}, #{email}, #{passwordHash}, #{firstName}, #{lastName},
-             #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-             #{emailVerified}, #{locale}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        (#{id}, #{email}, #{passwordHash}, #{firstName}, #{lastName},
+        #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{emailVerified}, #{locale}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
         ON CONFLICT (email) DO NOTHING
     </insert>
 
     <select id="findById" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, locale, last_global_signout_at,
-               created_at, updated_at, created_by, updated_by
+        email_verified, locale, last_global_signout_at,
+        created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE id = #{id}
     </select>
 
     <select id="findAllStreaming" resultMap="userResultMap" fetchSize="1000">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, locale, last_global_signout_at,
-               created_at, updated_at, created_by, updated_by
+        email_verified, locale, last_global_signout_at,
+        created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE status = 'ACTIVE'
     </select>
 
     <select id="findAllSimple" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, locale, last_global_signout_at,
-               created_at, updated_at, created_by, updated_by
+        email_verified, locale, last_global_signout_at,
+        created_at, updated_at, created_by, updated_by
         FROM public.users
         ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -58,34 +58,34 @@
 
     <select id="findByIdWithAuthorities" resultMap="userWithOrganizationsResultMap">
         SELECT u.id,
-               u.email,
-               u.first_name,
-               u.last_name,
-               u.status,
-               u.email_verified,
-               u.locale,
-               u.created_at,
-               u.updated_at,
-               array_agg(DISTINCT t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
-               array_agg(DISTINCT a.authority ORDER BY a.authority)
-                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.status,
+        u.email_verified,
+        u.locale,
+        u.created_at,
+        u.updated_at,
+        array_agg(DISTINCT t.name ORDER BY t.name)
+        FILTER (WHERE t.name IS NOT NULL) AS organizations,
+        array_agg(DISTINCT a.authority ORDER BY a.authority)
+        FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         LEFT JOIN public.tenant_memberships m
-               ON m.user_id = u.id
+        ON m.user_id = u.id
         LEFT JOIN public.tenants t
-               ON t.tenant_key = m.tenant_key
+        ON t.tenant_key = m.tenant_key
         LEFT JOIN public.tenant_member_authorities a
-               ON a.membership_id = m.id
+        ON a.membership_id = m.id
         WHERE u.id = #{id}
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.locale, u.created_at, u.updated_at
+        u.email_verified, u.locale, u.created_at, u.updated_at
     </select>
 
     <select id="findByEmail" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
-               email_verified, locale, last_global_signout_at,
-               created_at, updated_at, created_by, updated_by
+        email_verified, locale, last_global_signout_at,
+        created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE email = #{email}
     </select>
@@ -96,17 +96,17 @@
 
     <resultMap id="userWithOrganizationsResultMap"
                type="com.iqkv.foundation.iamservice.user.UserWithOrganizations">
-        <id     property="id"                   column="id"/>
-        <result property="email"                column="email"/>
-        <result property="firstName"            column="first_name"/>
-        <result property="lastName"             column="last_name"/>
-        <result property="status"               column="status"
+        <id property="id" column="id"/>
+        <result property="email" column="email"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="status" column="status"
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="emailVerified"        column="email_verified"/>
-        <result property="locale"               column="locale"/>
-        <result property="createdAt"            column="created_at"/>
-        <result property="updatedAt"            column="updated_at"/>
-        <result property="organizations"        column="organizations"
+        <result property="emailVerified" column="email_verified"/>
+        <result property="locale" column="locale"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="organizations" column="organizations"
                 typeHandler="com.iqkv.foundation.iamservice.infrastructure.mybatis.StringArrayTypeHandler"/>
         <result property="membershipAuthorities" column="membership_authorities"
                 typeHandler="com.iqkv.foundation.iamservice.infrastructure.mybatis.StringArrayTypeHandler"/>
@@ -114,31 +114,31 @@
 
     <select id="findAll" resultMap="userWithOrganizationsResultMap">
         SELECT u.id,
-               u.email,
-               u.first_name,
-               u.last_name,
-               u.status,
-               u.email_verified,
-               u.locale,
-               u.created_at,
-               u.updated_at,
-               array_agg(DISTINCT t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
-               array_agg(DISTINCT a.authority ORDER BY a.authority)
-                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.status,
+        u.email_verified,
+        u.locale,
+        u.created_at,
+        u.updated_at,
+        array_agg(DISTINCT t.name ORDER BY t.name)
+        FILTER (WHERE t.name IS NOT NULL) AS organizations,
+        array_agg(DISTINCT a.authority ORDER BY a.authority)
+        FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         LEFT JOIN public.tenant_memberships m
-               ON m.user_id = u.id
+        ON m.user_id = u.id
         LEFT JOIN public.tenants t
-               ON t.tenant_key = m.tenant_key
+        ON t.tenant_key = m.tenant_key
         LEFT JOIN public.tenant_member_authorities a
-               ON a.membership_id = m.id
+        ON a.membership_id = m.id
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(u.email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -146,26 +146,26 @@
             </if>
             <if test="excludePlatformAdmins != null and excludePlatformAdmins == true">
                 AND NOT EXISTS (
-                    SELECT 1 FROM public.platform_authorities pa 
-                    WHERE pa.user_id = u.id AND pa.authority = 'PLATFORM_ADMIN'
+                SELECT 1 FROM public.platform_authorities pa
+                WHERE pa.user_id = u.id AND pa.authority = 'PLATFORM_ADMIN'
                 )
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.locale, u.created_at, u.updated_at
+        u.email_verified, u.locale, u.created_at, u.updated_at
         ORDER BY
-            <choose>
-                <when test="sortBy == 'email'">u.email</when>
-                <when test="sortBy == 'firstName'">u.first_name</when>
-                <when test="sortBy == 'lastName'">u.last_name</when>
-                <when test="sortBy == 'updatedAt'">u.updated_at</when>
-                <otherwise>u.created_at</otherwise>
-            </choose>
-            <choose>
-                <when test="sortDir == 'asc'">ASC</when>
-                <otherwise>DESC</otherwise>
-            </choose>
-            , u.id ASC
+        <choose>
+            <when test="sortBy == 'email'">u.email</when>
+            <when test="sortBy == 'firstName'">u.first_name</when>
+            <when test="sortBy == 'lastName'">u.last_name</when>
+            <when test="sortBy == 'updatedAt'">u.updated_at</when>
+            <otherwise>u.created_at</otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , u.id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -175,9 +175,9 @@
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -185,8 +185,8 @@
             </if>
             <if test="excludePlatformAdmins != null and excludePlatformAdmins == true">
                 AND NOT EXISTS (
-                    SELECT 1 FROM public.platform_authorities pa 
-                    WHERE pa.user_id = public.users.id AND pa.authority = 'PLATFORM_ADMIN'
+                SELECT 1 FROM public.platform_authorities pa
+                WHERE pa.user_id = public.users.id AND pa.authority = 'PLATFORM_ADMIN'
                 )
             </if>
         </where>
@@ -200,33 +200,33 @@
     -->
     <select id="findMembersByTenantKey" resultMap="userWithOrganizationsResultMap">
         SELECT u.id,
-               u.email,
-               u.first_name,
-               u.last_name,
-               u.status,
-               u.email_verified,
-               u.locale,
-               u.created_at,
-               u.updated_at,
-               array_agg(DISTINCT t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
-               array_agg(DISTINCT a.authority ORDER BY a.authority)
-                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.status,
+        u.email_verified,
+        u.locale,
+        u.created_at,
+        u.updated_at,
+        array_agg(DISTINCT t.name ORDER BY t.name)
+        FILTER (WHERE t.name IS NOT NULL) AS organizations,
+        array_agg(DISTINCT a.authority ORDER BY a.authority)
+        FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         INNER JOIN public.tenant_memberships m
-                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
         LEFT JOIN public.tenant_member_authorities a
-               ON a.membership_id = m.id
+        ON a.membership_id = m.id
         LEFT JOIN public.tenant_memberships m2
-               ON m2.user_id = u.id
+        ON m2.user_id = u.id
         LEFT JOIN public.tenants t
-               ON t.tenant_key = m2.tenant_key
+        ON t.tenant_key = m2.tenant_key
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(u.email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -234,20 +234,20 @@
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.locale, u.created_at, u.updated_at
+        u.email_verified, u.locale, u.created_at, u.updated_at
         ORDER BY
-            <choose>
-                <when test="sortBy == 'email'">u.email</when>
-                <when test="sortBy == 'firstName'">u.first_name</when>
-                <when test="sortBy == 'lastName'">u.last_name</when>
-                <when test="sortBy == 'updatedAt'">u.updated_at</when>
-                <otherwise>u.created_at</otherwise>
-            </choose>
-            <choose>
-                <when test="sortDir == 'asc'">ASC</when>
-                <otherwise>DESC</otherwise>
-            </choose>
-            , u.id ASC
+        <choose>
+            <when test="sortBy == 'email'">u.email</when>
+            <when test="sortBy == 'firstName'">u.first_name</when>
+            <when test="sortBy == 'lastName'">u.last_name</when>
+            <when test="sortBy == 'updatedAt'">u.updated_at</when>
+            <otherwise>u.created_at</otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , u.id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -262,32 +262,32 @@
     -->
     <select id="findMembersByTenantKeyScoped" resultMap="userWithOrganizationsResultMap">
         SELECT u.id,
-               u.email,
-               u.first_name,
-               u.last_name,
-               u.status,
-               u.email_verified,
-               u.created_at,
-               u.updated_at,
-               array_agg(DISTINCT t.name ORDER BY t.name)
-                   FILTER (WHERE t.name IS NOT NULL) AS organizations,
-               array_agg(DISTINCT a.authority ORDER BY a.authority)
-                   FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.status,
+        u.email_verified,
+        u.created_at,
+        u.updated_at,
+        array_agg(DISTINCT t.name ORDER BY t.name)
+        FILTER (WHERE t.name IS NOT NULL) AS organizations,
+        array_agg(DISTINCT a.authority ORDER BY a.authority)
+        FILTER (WHERE a.authority IS NOT NULL) AS membership_authorities
         FROM public.users u
         INNER JOIN public.tenant_memberships m
-                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
         LEFT JOIN public.tenant_member_authorities a
-               ON a.membership_id = m.id
+        ON a.membership_id = m.id
         LEFT JOIN public.tenant_memberships m2
-               ON m2.user_id = u.id
+        ON m2.user_id = u.id
         LEFT JOIN public.tenants t
-               ON t.tenant_key = m2.tenant_key
+        ON t.tenant_key = m2.tenant_key
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(u.email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -295,20 +295,20 @@
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-                 u.email_verified, u.created_at, u.updated_at
+        u.email_verified, u.created_at, u.updated_at
         ORDER BY
-            <choose>
-                <when test="sortBy == 'email'">u.email</when>
-                <when test="sortBy == 'firstName'">u.first_name</when>
-                <when test="sortBy == 'lastName'">u.last_name</when>
-                <when test="sortBy == 'updatedAt'">u.updated_at</when>
-                <otherwise>u.created_at</otherwise>
-            </choose>
-            <choose>
-                <when test="sortDir == 'asc'">ASC</when>
-                <otherwise>DESC</otherwise>
-            </choose>
-            , u.id ASC
+        <choose>
+            <when test="sortBy == 'email'">u.email</when>
+            <when test="sortBy == 'firstName'">u.first_name</when>
+            <when test="sortBy == 'lastName'">u.last_name</when>
+            <when test="sortBy == 'updatedAt'">u.updated_at</when>
+            <otherwise>u.created_at</otherwise>
+        </choose>
+        <choose>
+            <when test="sortDir == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , u.id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -316,13 +316,13 @@
         SELECT COUNT(DISTINCT u.id)
         FROM public.users u
         INNER JOIN public.tenant_memberships m
-                ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
         <where>
             <if test="search != null and search != ''">
                 (
-                    LOWER(u.email)      LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
-                 OR LOWER(u.last_name)  LIKE LOWER(CONCAT('%', #{search}, '%'))
+                LOWER(u.email) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(u.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
                 )
             </if>
             <if test="status != null and status != ''">
@@ -338,10 +338,10 @@
     <update id="update" parameterType="com.iqkv.foundation.iamservice.user.User">
         UPDATE public.users
         SET first_name = #{firstName},
-            last_name  = #{lastName},
-            status     = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            updated_at = #{updatedAt},
-            updated_by = #{updatedBy}
+        last_name = #{lastName},
+        status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        updated_at = #{updatedAt},
+        updated_by = #{updatedBy}
         WHERE id = #{id}
     </update>
 
@@ -366,7 +366,7 @@
     <update id="updatePassword">
         UPDATE public.users
         SET password_hash = #{passwordHash},
-            updated_at    = #{updatedAt}
+        updated_at = #{updatedAt}
         WHERE id = #{userId}
     </update>
 

@@ -17,22 +17,22 @@
     -->
     <changeSet id="20260301000001-demo-platform-admin" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0001-000000000001"/>
-            <column name="email"          value="platform.admin@iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Platform"/>
-            <column name="last_name"      value="Admin"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="email" value="platform.admin@iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Platform"/>
+            <column name="last_name" value="Admin"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-03-01T00:00:00"/>
-            <column name="updated_at"     valueDate="2026-03-01T00:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-03-01T00:00:00"/>
+            <column name="updated_at" valueDate="2026-03-01T00:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="platform_authorities" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0004-000000000001"/>
-            <column name="user_id"    value="00000000-0000-0000-0001-000000000001"/>
-            <column name="authority"       value="PLATFORM_ADMIN"/>
+            <column name="id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="authority" value="PLATFORM_ADMIN"/>
             <column name="granted_at" valueDate="2026-03-01T00:00:00"/>
             <column name="granted_by" value="system"/>
         </insert>
@@ -88,10 +88,10 @@
 
     <changeSet id="20260331000000-demo-tenant" author="iqkv" context="demo">
         <insert tableName="tenants" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0000-000000000001"/>
+            <column name="id" value="00000000-0000-0000-0000-000000000001"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="name"       value="Demo Tenant"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="name" value="Demo Tenant"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
@@ -106,381 +106,381 @@
 
     <changeSet id="20260331000000-demo-users" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000002"/>
-            <column name="email"          value="alice.johnson@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Alice"/>
-            <column name="last_name"      value="Johnson"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000002"/>
+            <column name="email" value="alice.johnson@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Alice"/>
+            <column name="last_name" value="Johnson"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-29T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-29T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-29T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-29T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000003"/>
-            <column name="email"          value="bob.smith@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Bob"/>
-            <column name="last_name"      value="Smith"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000003"/>
+            <column name="email" value="bob.smith@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Bob"/>
+            <column name="last_name" value="Smith"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-28T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-28T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-28T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-28T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000004"/>
-            <column name="email"          value="carol.white@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Carol"/>
-            <column name="last_name"      value="White"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000004"/>
+            <column name="email" value="carol.white@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Carol"/>
+            <column name="last_name" value="White"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-27T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-27T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-27T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-27T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000005"/>
-            <column name="email"          value="david.brown@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="David"/>
-            <column name="last_name"      value="Brown"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000005"/>
+            <column name="email" value="david.brown@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="David"/>
+            <column name="last_name" value="Brown"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-26T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-26T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-26T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-26T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000006"/>
-            <column name="email"          value="emma.davis@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Emma"/>
-            <column name="last_name"      value="Davis"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000006"/>
+            <column name="email" value="emma.davis@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Emma"/>
+            <column name="last_name" value="Davis"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-25T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-25T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-25T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-25T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000007"/>
-            <column name="email"          value="frank.miller@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Frank"/>
-            <column name="last_name"      value="Miller"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000007"/>
+            <column name="email" value="frank.miller@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Frank"/>
+            <column name="last_name" value="Miller"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-24T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-24T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-24T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-24T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000008"/>
-            <column name="email"          value="grace.wilson@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Grace"/>
-            <column name="last_name"      value="Wilson"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000008"/>
+            <column name="email" value="grace.wilson@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Grace"/>
+            <column name="last_name" value="Wilson"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-23T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-23T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-23T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-23T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000009"/>
-            <column name="email"          value="henry.moore@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Henry"/>
-            <column name="last_name"      value="Moore"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000009"/>
+            <column name="email" value="henry.moore@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Henry"/>
+            <column name="last_name" value="Moore"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-22T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-22T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-22T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-22T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000010"/>
-            <column name="email"          value="isabella.taylor@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Isabella"/>
-            <column name="last_name"      value="Taylor"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000010"/>
+            <column name="email" value="isabella.taylor@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Isabella"/>
+            <column name="last_name" value="Taylor"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-21T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-21T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-21T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-21T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000011"/>
-            <column name="email"          value="james.anderson@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="James"/>
-            <column name="last_name"      value="Anderson"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000011"/>
+            <column name="email" value="james.anderson@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="James"/>
+            <column name="last_name" value="Anderson"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-20T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-20T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-20T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-20T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000012"/>
-            <column name="email"          value="kate.thomas@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Kate"/>
-            <column name="last_name"      value="Thomas"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000012"/>
+            <column name="email" value="kate.thomas@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Kate"/>
+            <column name="last_name" value="Thomas"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-19T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-19T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-19T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-19T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000013"/>
-            <column name="email"          value="liam.jackson@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Liam"/>
-            <column name="last_name"      value="Jackson"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000013"/>
+            <column name="email" value="liam.jackson@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Liam"/>
+            <column name="last_name" value="Jackson"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-18T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-18T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-18T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-18T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000014"/>
-            <column name="email"          value="mia.harris@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Mia"/>
-            <column name="last_name"      value="Harris"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000014"/>
+            <column name="email" value="mia.harris@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Mia"/>
+            <column name="last_name" value="Harris"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-17T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-17T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-17T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-17T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000015"/>
-            <column name="email"          value="noah.martin@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Noah"/>
-            <column name="last_name"      value="Martin"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000015"/>
+            <column name="email" value="noah.martin@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Noah"/>
+            <column name="last_name" value="Martin"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-16T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-16T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-16T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-16T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000016"/>
-            <column name="email"          value="olivia.garcia@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Olivia"/>
-            <column name="last_name"      value="Garcia"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000016"/>
+            <column name="email" value="olivia.garcia@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Olivia"/>
+            <column name="last_name" value="Garcia"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-15T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-15T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000017"/>
-            <column name="email"          value="peter.martinez@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Peter"/>
-            <column name="last_name"      value="Martinez"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000017"/>
+            <column name="email" value="peter.martinez@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Peter"/>
+            <column name="last_name" value="Martinez"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-14T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-14T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-14T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-14T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000018"/>
-            <column name="email"          value="quinn.robinson@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Quinn"/>
-            <column name="last_name"      value="Robinson"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000018"/>
+            <column name="email" value="quinn.robinson@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Quinn"/>
+            <column name="last_name" value="Robinson"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-13T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-13T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-13T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-13T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000019"/>
-            <column name="email"          value="rachel.clark@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Rachel"/>
-            <column name="last_name"      value="Clark"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000019"/>
+            <column name="email" value="rachel.clark@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Rachel"/>
+            <column name="last_name" value="Clark"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-12T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-12T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-12T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-12T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000020"/>
-            <column name="email"          value="samuel.rodriguez@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Samuel"/>
-            <column name="last_name"      value="Rodriguez"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000020"/>
+            <column name="email" value="samuel.rodriguez@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Samuel"/>
+            <column name="last_name" value="Rodriguez"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-11T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-11T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-11T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-11T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000021"/>
-            <column name="email"          value="tina.lewis@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Tina"/>
-            <column name="last_name"      value="Lewis"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000021"/>
+            <column name="email" value="tina.lewis@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Tina"/>
+            <column name="last_name" value="Lewis"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-10T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-10T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-10T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-10T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000022"/>
-            <column name="email"          value="uma.lee@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Uma"/>
-            <column name="last_name"      value="Lee"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000022"/>
+            <column name="email" value="uma.lee@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Uma"/>
+            <column name="last_name" value="Lee"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-09T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-09T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-09T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-09T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000023"/>
-            <column name="email"          value="victor.walker@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Victor"/>
-            <column name="last_name"      value="Walker"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000023"/>
+            <column name="email" value="victor.walker@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Victor"/>
+            <column name="last_name" value="Walker"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-08T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-08T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-08T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-08T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000024"/>
-            <column name="email"          value="wendy.hall@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Wendy"/>
-            <column name="last_name"      value="Hall"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000024"/>
+            <column name="email" value="wendy.hall@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Wendy"/>
+            <column name="last_name" value="Hall"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-07T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-07T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-07T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-07T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000025"/>
-            <column name="email"          value="xander.allen@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Xander"/>
-            <column name="last_name"      value="Allen"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000025"/>
+            <column name="email" value="xander.allen@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Xander"/>
+            <column name="last_name" value="Allen"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-06T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-06T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-06T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-06T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000026"/>
-            <column name="email"          value="yara.young@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Yara"/>
-            <column name="last_name"      value="Young"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000026"/>
+            <column name="email" value="yara.young@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Yara"/>
+            <column name="last_name" value="Young"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-05T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-05T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-05T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-05T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000027"/>
-            <column name="email"          value="zoe.hernandez@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Zoe"/>
-            <column name="last_name"      value="Hernandez"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000027"/>
+            <column name="email" value="zoe.hernandez@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Zoe"/>
+            <column name="last_name" value="Hernandez"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-04T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-04T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-04T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-04T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000028"/>
-            <column name="email"          value="aaron.king@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Aaron"/>
-            <column name="last_name"      value="King"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000028"/>
+            <column name="email" value="aaron.king@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Aaron"/>
+            <column name="last_name" value="King"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-03T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-03T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-03T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-03T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000029"/>
-            <column name="email"          value="bella.wright@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Bella"/>
-            <column name="last_name"      value="Wright"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000029"/>
+            <column name="email" value="bella.wright@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Bella"/>
+            <column name="last_name" value="Wright"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-02T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-02T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-02T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-02T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000030"/>
-            <column name="email"          value="carlos.scott@demo.iqkv.com"/>
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Carlos"/>
-            <column name="last_name"      value="Scott"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000030"/>
+            <column name="email" value="carlos.scott@demo.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Carlos"/>
+            <column name="last_name" value="Scott"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-01-01T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-01-01T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-01-01T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-01T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <rollback>
             <delete tableName="users" schemaName="public">
@@ -500,297 +500,298 @@
                     '00000000-0000-0000-0101-000000000025','00000000-0000-0000-0101-000000000026',
                     '00000000-0000-0000-0101-000000000027','00000000-0000-0000-0101-000000000028',
                     '00000000-0000-0000-0101-000000000029','00000000-0000-0000-0101-000000000030'
-                )</where>
+                    )
+                </where>
             </delete>
         </rollback>
     </changeSet>
 
     <changeSet id="20260331000000-demo-memberships" author="iqkv" context="demo">
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000002"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000002"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000002"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000002"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000003"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000003"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000003"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000003"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000004"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000004"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000004"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000004"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000005"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000005"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000005"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000005"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000006"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000006"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000006"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000006"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000007"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000007"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000007"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000007"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000008"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000008"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000008"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000008"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000009"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000009"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000009"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000009"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000010"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000010"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000010"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000010"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000011"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000011"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000011"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000011"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000012"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000012"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000012"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000012"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000013"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000013"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000013"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000013"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000014"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000014"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000014"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000014"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000015"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000015"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000015"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000015"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000016"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000016"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000016"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000016"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000017"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000017"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000017"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000017"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000018"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000018"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000018"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000018"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000019"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000019"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000019"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000019"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000020"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000020"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000020"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000020"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000021"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000021"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000021"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000021"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000022"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000022"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000022"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000022"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000023"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000023"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000023"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000023"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000024"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000024"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000024"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000024"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000025"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000025"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000025"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000025"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000026"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000026"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000026"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000026"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000027"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000027"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000027"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000027"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000028"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000028"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000028"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000028"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000029"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000029"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000029"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000029"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
             <column name="updated_by" value="system"/>
         </insert>
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000030"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000030"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000030"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000030"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
             <column name="created_by" value="system"/>
@@ -805,155 +806,156 @@
 
     <changeSet id="20260331000000-demo-authorities" author="iqkv" context="demo">
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000002"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000002"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000002"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000003"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000003"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000003"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000004"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000004"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000004"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000005"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000005"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000005"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000006"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000006"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000006"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000007"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000007"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000007"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000008"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000008"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000008"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000009"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000009"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000009"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000010"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000010"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000010"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000011"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000011"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000011"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000012"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000012"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000012"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000013"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000013"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000013"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000014"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000014"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000014"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000015"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000015"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000015"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000016"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000016"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000016"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000017"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000017"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000017"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000018"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000018"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000018"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000019"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000019"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000019"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000020"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000020"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000020"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000021"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000021"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000021"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000022"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000022"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000022"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000023"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000023"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000023"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000024"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000024"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000024"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000025"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000025"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000025"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000026"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000026"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000026"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000027"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000027"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000027"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000028"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000028"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000028"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000029"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000029"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000029"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000030"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000030"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000030"/>
-            <column name="authority"     value="MEMBER"/>
+            <column name="authority" value="MEMBER"/>
         </insert>
         <rollback>
             <delete tableName="tenant_member_authorities" schemaName="public">
                 <where>membership_id IN (
                     SELECT id FROM public.tenant_memberships WHERE tenant_key = 'demo0001'
-                )</where>
+                    )
+                </where>
             </delete>
         </rollback>
     </changeSet>

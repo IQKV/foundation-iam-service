@@ -19,18 +19,18 @@
 
     <changeSet id="20260511000000-demo-tenant-owner-user" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
-            <column name="id"             value="00000000-0000-0000-0101-000000000032"/>
-            <column name="email"          value="tenant.owner@demo.iqkv.com"/>
+            <column name="id" value="00000000-0000-0000-0101-000000000032"/>
+            <column name="email" value="tenant.owner@demo.iqkv.com"/>
             <!-- ChangeMePass123! — BCrypt cost 12 -->
-            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
-            <column name="first_name"     value="Tenant"/>
-            <column name="last_name"      value="Owner"/>
-            <column name="status"         value="ACTIVE"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Tenant"/>
+            <column name="last_name" value="Owner"/>
+            <column name="status" value="ACTIVE"/>
             <column name="email_verified" valueBoolean="true"/>
-            <column name="created_at"     valueDate="2026-05-11T12:00:00"/>
-            <column name="updated_at"     valueDate="2026-05-11T12:00:00"/>
-            <column name="created_by"     value="system"/>
-            <column name="updated_by"     value="system"/>
+            <column name="created_at" valueDate="2026-05-11T12:00:00"/>
+            <column name="updated_at" valueDate="2026-05-11T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
         </insert>
         <rollback>
             <delete tableName="users" schemaName="public">
@@ -41,10 +41,10 @@
 
     <changeSet id="20260511000000-demo-tenant-owner-membership" author="iqkv" context="demo">
         <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id"         value="00000000-0000-0000-0002-000000000032"/>
-            <column name="user_id"    value="00000000-0000-0000-0101-000000000032"/>
+            <column name="id" value="00000000-0000-0000-0002-000000000032"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000032"/>
             <column name="tenant_key" value="demo0001"/>
-            <column name="status"     value="ACTIVE"/>
+            <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-05-11T12:00:00"/>
             <column name="updated_at" valueDate="2026-05-11T12:00:00"/>
             <column name="created_by" value="system"/>
@@ -59,9 +59,9 @@
 
     <changeSet id="20260511000000-demo-tenant-owner-authority" author="iqkv" context="demo">
         <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id"            value="00000000-0000-0000-0003-000000000032"/>
+            <column name="id" value="00000000-0000-0000-0003-000000000032"/>
             <column name="membership_id" value="00000000-0000-0000-0002-000000000032"/>
-            <column name="authority"     value="TENANT_OWNER"/>
+            <column name="authority" value="TENANT_OWNER"/>
         </insert>
         <rollback>
             <delete tableName="tenant_member_authorities" schemaName="public">

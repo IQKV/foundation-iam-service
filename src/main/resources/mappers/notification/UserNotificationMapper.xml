@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.notification.UserNotificationMapper">
 
     <resultMap id="userNotificationResultMap" type="com.iqkv.foundation.iamservice.notification.UserNotification">
-        <id     property="id"             column="id"/>
-        <result property="targetUserId"   column="target_user_id"/>
-        <result property="locale"         column="locale"/>
-        <result property="type"           column="type"/>
-        <result property="severity"       column="severity"/>
-        <result property="title"          column="title"/>
-        <result property="message"        column="message"/>
-        <result property="payload"        column="payload"/>
-        <result property="isRead"         column="is_read"/>
-        <result property="createdAt"      column="created_at"/>
-        <result property="readAt"         column="read_at"/>
+        <id property="id" column="id"/>
+        <result property="targetUserId" column="target_user_id"/>
+        <result property="locale" column="locale"/>
+        <result property="type" column="type"/>
+        <result property="severity" column="severity"/>
+        <result property="title" column="title"/>
+        <result property="message" column="message"/>
+        <result property="payload" column="payload"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="readAt" column="read_at"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.notification.UserNotification">
         INSERT INTO public.user_notifications
-            (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
+        (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
         VALUES
-            (#{id}, #{targetUserId}, #{locale}, #{type}, #{severity}, #{title}, #{message},
-             #{payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
-             #{isRead}, #{createdAt}, #{readAt})
+        (#{id}, #{targetUserId}, #{locale}, #{type}, #{severity}, #{title}, #{message},
+        #{payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+        #{isRead}, #{createdAt}, #{readAt})
     </insert>
 
     <insert id="insertBatch" parameterType="java.util.List">
         INSERT INTO public.user_notifications
-            (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
+        (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
         VALUES
         <foreach collection="notifications" item="item" separator=",">
             (#{item.id}, #{item.targetUserId}, #{item.locale}, #{item.type}, #{item.severity}, #{item.title}, #{item.message},
-             #{item.payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
-             #{item.isRead}, #{item.createdAt}, #{item.readAt})
+            #{item.payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+            #{item.isRead}, #{item.createdAt}, #{item.readAt})
         </foreach>
     </insert>
 
@@ -66,17 +66,17 @@
     <update id="markAsRead">
         UPDATE public.user_notifications
         SET is_read = true,
-            read_at = #{readAt}
+        read_at = #{readAt}
         WHERE id = #{id}
-          AND is_read = false
+        AND is_read = false
     </update>
 
     <update id="markAllAsRead">
         UPDATE public.user_notifications
         SET is_read = true,
-            read_at = #{readAt}
+        read_at = #{readAt}
         WHERE target_user_id = #{targetUserId}
-          AND is_read = false
+        AND is_read = false
     </update>
 
 </mapper>

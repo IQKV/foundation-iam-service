@@ -21,15 +21,14 @@
         <!-- Add check constraint for tenant_mode_origin values -->
         <sql>
             ALTER TABLE public.tenants
-            ADD CONSTRAINT chk_tenant_mode_origin
-            CHECK (tenant_mode_origin IN ('SINGLE_BOOTSTRAP', 'MULTI_SIGNUP', 'ADMIN_CREATED'));
+                ADD CONSTRAINT chk_tenant_mode_origin
+                    CHECK (tenant_mode_origin IN ('SINGLE_BOOTSTRAP', 'MULTI_SIGNUP', 'ADMIN_CREATED'));
         </sql>
 
         <!-- Create partial unique index ensuring at most one default tenant -->
         <sql>
             CREATE UNIQUE INDEX idx_tenants_default_unique
-            ON public.tenants (is_default)
-            WHERE is_default = true;
+                ON public.tenants (is_default) WHERE is_default = true;
         </sql>
     </changeSet>
 

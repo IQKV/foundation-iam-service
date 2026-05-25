@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iqkv.foundation.iamservice.email.EmailVerificationTokenMapper">
 
     <resultMap id="emailVerificationTokenResultMap" type="com.iqkv.foundation.iamservice.email.EmailVerificationToken">
-        <id     property="id"           column="id"/>
-        <result property="userId"       column="user_id"/>
-        <result property="token"        column="token"/>
-        <result property="expiresAt"    column="expires_at"/>
-        <result property="resendCount"  column="resend_count"/>
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="token" column="token"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="resendCount" column="resend_count"/>
         <result property="lastResendAt" column="last_resend_at"/>
-        <result property="createdAt"    column="created_at"/>
+        <result property="createdAt" column="created_at"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.email.EmailVerificationToken">
         INSERT INTO public.email_verification_tokens
-            (id, user_id, token, expires_at, resend_count, last_resend_at, created_at)
+        (id, user_id, token, expires_at, resend_count, last_resend_at, created_at)
         VALUES
-            (#{id}, #{userId}, #{token}, #{expiresAt}, #{resendCount}, #{lastResendAt}, #{createdAt})
+        (#{id}, #{userId}, #{token}, #{expiresAt}, #{resendCount}, #{lastResendAt}, #{createdAt})
     </insert>
 
     <select id="findByToken" resultMap="emailVerificationTokenResultMap">
@@ -38,8 +38,8 @@
 
     <update id="incrementResendCount">
         UPDATE public.email_verification_tokens
-        SET resend_count  = resend_count + 1,
-            last_resend_at = #{now}
+        SET resend_count = resend_count + 1,
+        last_resend_at = #{now}
         WHERE user_id = #{userId}
     </update>
 
@@ -47,7 +47,7 @@
         SELECT COUNT(*)
         FROM public.email_verification_tokens
         WHERE user_id = #{userId}
-          AND last_resend_at &gt;= #{since}
+        AND last_resend_at &gt;= #{since}
     </select>
 
 </mapper>
