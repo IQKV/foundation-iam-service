@@ -19,8 +19,8 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 import java.util.Locale;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
+import tools.jackson.databind.json.JsonMapper;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
 import com.iqkv.foundation.iamservice.notification.UserNotificationService;
 import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtoMapper;
@@ -41,20 +41,20 @@ public class NotificationConsumer {
   private final UserNotificationService userNotificationService;
   private final UserMapper userMapper;
   private final MessageSource messageSource;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper jsonMapper;
   private final SimpMessagingTemplate messagingTemplate;
 
   public NotificationConsumer(final EmailService emailService,
                               final UserNotificationService userNotificationService,
                               final UserMapper userMapper,
                               final MessageSource messageSource,
-                              final ObjectMapper objectMapper,
+                              final JsonMapper jsonMapper,
                               final SimpMessagingTemplate messagingTemplate) {
     this.emailService = emailService;
     this.userNotificationService = userNotificationService;
     this.userMapper = userMapper;
     this.messageSource = messageSource;
-    this.objectMapper = objectMapper;
+    this.jsonMapper = jsonMapper;
     this.messagingTemplate = messagingTemplate;
   }
 
@@ -117,7 +117,7 @@ public class NotificationConsumer {
 
     if (event.getPayload() != null && !event.getPayload().isEmpty()) {
       try {
-        notification.setPayload(objectMapper.writeValueAsString(event.getPayload()));
+        notification.setPayload(jsonMapper.writeValueAsString(event.getPayload()));
       } catch (final Exception e) {
         log.warn("Failed to serialize notification payload for user={}", user.getId(), e);
       }

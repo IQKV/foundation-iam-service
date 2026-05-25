@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
 import com.iqkv.foundation.iamservice.notification.UserNotificationService;
+import tools.jackson.databind.json.JsonMapper;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +56,7 @@ class NotificationConsumerTest {
   private MessageSource messageSource;
 
   @Mock
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @Mock
   private SimpMessagingTemplate messagingTemplate;
