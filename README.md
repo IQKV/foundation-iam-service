@@ -1,7 +1,7 @@
 > ## 🤔 What is this service all about?
 >
 > - Multi-tenant Identity and Access Management microservice for the IQ Key Value platform.
-> - A single user account can belong to multiple tenants with different authortities in each.
+> - A single user account can belong to multiple tenants with different authorities in each.
 > - Make the project easy to maintain with **8 issue templates**.
 > - Quick-start documentation
 > - Manage issues with **20 issue labels**.
@@ -11,7 +11,7 @@
 
 # 🔐 IQ Key Value IAM Service
 
-Multi-tenant Identity and Access Management microservice. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, and brute-force protection.
+Multi-tenant Identity and Access Management microservice. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, in-app notifications, and brute-force protection.
 
 ## About
 
@@ -21,54 +21,14 @@ The IAM service is the identity backbone of the platform:
 - **Signup by invitation** — existing `TENANT_OWNER` or `ADMIN` sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
 - **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
-- **Tenant lifecycle** — owners can suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
+- **Tenant lifecycle** — owners can rename, suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
+- **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS) to `/user/{userId}/queue/notifications`
+- **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches of 1000 and broadcasts to all connected clients via `/topic/announcements`
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
-
-### Tenant Admin — `/api/v1/iam/admin/tenants`
-
-| Method   | Path                   | Auth                 | Description                       |
-| -------- | ---------------------- | -------------------- | --------------------------------- |
-| `GET`    | `/admin/tenants`       | JWT `PLATFORM_ADMIN` | List all tenants (platform scope) |
-| `GET`    | `/admin/tenants/{key}` | JWT `PLATFORM_ADMIN` | Get tenant by key                 |
-| `PATCH`  | `/admin/tenants/{key}` | JWT `PLATFORM_ADMIN` | Update tenant (suspend, etc.)     |
-| `DELETE` | `/admin/tenants/{key}` | JWT `PLATFORM_ADMIN` | Delete tenant                     |
-
-## Events & Messaging
-
-The IAM service publishes lifecycle events to RabbitMQ for platform-wide integration.
-
-**Exchange**: `iqkv.events` (Topic)
-
-### Tenant Lifecycle (`tenant.*`)
-
-| Routing Key                  | Event Type                   | Description                                  |
-| :--------------------------- | :--------------------------- | :------------------------------------------- |
-| `tenant.created`             | `TENANT_CREATED`             | New tenant account created via signup.       |
-| `tenant.provisioned`         | `TENANT_PROVISIONED`         | Infrastructure setup (billing, DB) complete. |
-| `tenant.provisioning_failed` | `TENANT_PROVISIONING_FAILED` | Infrastructure setup failed.                 |
-| `tenant.updated`             | `TENANT_UPDATED`             | Tenant metadata or status updated.           |
-| `tenant.suspended`           | `TENANT_SUSPENDED`           | Tenant access disabled by platform admin.    |
-| `tenant.deleted`             | `TENANT_DELETED`             | Tenant and all associated data removed.      |
-
-### User Lifecycle (`user.*`)
-
-| Routing Key    | Event Type     | Description                                     |
-| :------------- | :------------- | :---------------------------------------------- |
-| `user.created` | `USER_CREATED` | New global identity created.                    |
-| `user.updated` | `USER_UPDATED` | User profile or password changed.               |
-| `user.deleted` | `USER_DELETED` | Global user account deleted.                    |
-| `user.removed` | `USER_REMOVED` | User membership removed from a specific tenant. |
-| `user.invited` | `USER_INVITED` | Invitation sent to join a tenant.               |
-
-### Notifications (`notification.iam.*`)
-
-| Routing Key              | Description                                                   |
-| :----------------------- | :------------------------------------------------------------ |
-| `notification.iam.email` | Transactional emails (Welcome, Reset Password, Verification). |
 
 ## Quick Links
 
@@ -119,6 +79,54 @@ Base path: `/api/v1/iam`
 | `POST`   | `/users/password/forgot`           | public                    | Initiate password reset (rate-limited)                                    |
 | `POST`   | `/users/password/reset`            | public                    | Complete password reset with token                                        |
 
+### In-App Notifications — `/api/v1/iam/users/notifications`
+
+| Method | Path                             | Auth | Description                                          |
+| ------ | -------------------------------- | ---- | ---------------------------------------------------- |
+| `GET`  | `/users/notifications`           | JWT  | Get paginated notifications (includes `unreadCount`) |
+| `PUT`  | `/users/notifications/{id}/read` | JWT  | Mark a specific notification as read                 |
+| `PUT`  | `/users/notifications/read-all`  | JWT  | Mark all notifications as read                       |
+
+Real-time delivery via WebSocket — connect to `/api/v1/iam/ws` (STOMP/SockJS):
+
+- Subscribe to `/user/{userId}/queue/notifications` for per-user pushes
+- Subscribe to `/topic/announcements` for global announcement broadcasts
+
+### Announcements — `/api/v1/iam/announcements`
+
+| Method | Path             | Auth   | Description                                     |
+| ------ | ---------------- | ------ | ----------------------------------------------- |
+| `GET`  | `/announcements` | public | Get active site-wide announcements for a locale |
+
+### Tenant — `/api/v1/iam/tenants`
+
+| Method   | Path                                                | Auth                                       | Description                         |
+| -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
+| `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
+| `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Update tenant status                |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning`           | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning           |
+| `GET`    | `/tenants/{tenantKey}/members`                      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)     |
+| `GET`    | `/tenants/{tenantKey}/members/count`                | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                |
+| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities |
+| `DELETE` | `/tenants/{tenantKey}/members/{userId}`             | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant           |
+
+### Invitations
+
+| Method   | Path                                    | Auth                                       | Description                                         |
+| -------- | --------------------------------------- | ------------------------------------------ | --------------------------------------------------- |
+| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email                               |
+| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations                            |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation                                   |
+| `GET`    | `/invitations/{token}`                  | public                                     | Preview invitation (tenant name, authority, expiry) |
+| `POST`   | `/invitations/{token}/accept`           | public                                     | Accept invitation; returns token pair               |
+
+### Locales
+
+| Method | Path       | Auth   | Description            |
+| ------ | ---------- | ------ | ---------------------- |
+| `GET`  | `/locales` | public | Get all active locales |
+
 ### User Admin — `/api/v1/iam/admin/users`
 
 | Method   | Path                            | Auth                 | Description                                        |
@@ -135,14 +143,6 @@ Base path: `/api/v1/iam`
 | `GET`    | `/admin/users/{id}/memberships` | JWT `PLATFORM_ADMIN` | Get user tenant memberships                        |
 | `POST`   | `/admin/users/{id}/password`    | JWT `PLATFORM_ADMIN` | Force-set user password (invalidates all sessions) |
 
-### Tenant — `/api/v1/iam/tenants`
-
-| Method  | Path                                      | Auth                               | Description               |
-| ------- | ----------------------------------------- | ---------------------------------- | ------------------------- |
-| `GET`   | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID` | Get tenant details        |
-| `PATCH` | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER` + `X-Tenant-ID` | Update tenant status      |
-| `POST`  | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER` + `X-Tenant-ID` | Retry failed provisioning |
-
 ### Tenant Admin — `/api/v1/iam/admin/tenants`
 
 | Method   | Path                                                      | Auth                 | Description                                 |
@@ -158,16 +158,6 @@ Base path: `/api/v1/iam`
 | `GET`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Get member's tenant authorities             |
 | `PUT`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Replace member's tenant authorities         |
 
-### Invitations
-
-| Method   | Path                                    | Auth                                       | Description                                         |
-| -------- | --------------------------------------- | ------------------------------------------ | --------------------------------------------------- |
-| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email                               |
-| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations                            |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation                                   |
-| `GET`    | `/invitations/{token}`                  | public                                     | Preview invitation (tenant name, authority, expiry) |
-| `POST`   | `/invitations/{token}/accept`           | public                                     | Accept invitation; returns token pair               |
-
 ### Invitation Admin — `/api/v1/iam/admin/invitations`
 
 | Method   | Path                       | Auth                 | Description                                                 |
@@ -178,18 +168,66 @@ Base path: `/api/v1/iam`
 | `POST`   | `/admin/invitations`       | JWT `PLATFORM_ADMIN` | Propose invitation for any active tenant                    |
 | `DELETE` | `/admin/invitations/{id}`  | JWT `PLATFORM_ADMIN` | Revoke invitation                                           |
 
+### Announcement Admin — `/api/v1/iam/admin/announcements`
+
+| Method   | Path                                | Auth                 | Description                                         |
+| -------- | ----------------------------------- | -------------------- | --------------------------------------------------- |
+| `POST`   | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | Create announcement with multi-lingual translations |
+| `PUT`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Update announcement and its translations            |
+| `DELETE` | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Delete announcement                                 |
+| `POST`   | `/admin/announcements/{id}/publish` | JWT `PLATFORM_ADMIN` | Trigger async fan-out to all users                  |
+| `GET`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Get announcement by UUID                            |
+| `GET`    | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | List all announcements (paginated)                  |
+
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
+
+## Events & Messaging
+
+The IAM service publishes lifecycle events to RabbitMQ for platform-wide integration.
+
+**Exchange**: `iqkv.events` (Topic)
+
+### Tenant Lifecycle (`tenant.*`)
+
+| Routing Key                  | Event Type                   | Description                                  |
+| :--------------------------- | :--------------------------- | :------------------------------------------- |
+| `tenant.created`             | `TENANT_CREATED`             | New tenant account created via signup.       |
+| `tenant.provisioned`         | `TENANT_PROVISIONED`         | Infrastructure setup (billing, DB) complete. |
+| `tenant.provisioning_failed` | `TENANT_PROVISIONING_FAILED` | Infrastructure setup failed.                 |
+| `tenant.updated`             | `TENANT_UPDATED`             | Tenant metadata or status updated.           |
+| `tenant.suspended`           | `TENANT_SUSPENDED`           | Tenant access disabled by platform admin.    |
+| `tenant.deleted`             | `TENANT_DELETED`             | Tenant and all associated data removed.      |
+
+### User Lifecycle (`user.*`)
+
+| Routing Key    | Event Type     | Description                                     |
+| :------------- | :------------- | :---------------------------------------------- |
+| `user.created` | `USER_CREATED` | New global identity created.                    |
+| `user.updated` | `USER_UPDATED` | User profile or password changed.               |
+| `user.deleted` | `USER_DELETED` | Global user account deleted.                    |
+| `user.removed` | `USER_REMOVED` | User membership removed from a specific tenant. |
+| `user.invited` | `USER_INVITED` | Invitation sent to join a tenant.               |
+
+### Notifications & Announcements
+
+| Routing Key              | Queue                    | Description                                                                         |
+| :----------------------- | :----------------------- | :---------------------------------------------------------------------------------- |
+| `notification.iam.email` | `iqkv.iam.notifications` | Transactional events — sends email, persists in-app notification, pushes WebSocket. |
+| `announcement.publish`   | `iqkv.iam.announcements` | Fan-out trigger — creates per-user notifications in batches, broadcasts WebSocket.  |
+
+Failed messages are routed to the dead-letter exchange `iqkv.dlx` → `iqkv.dlq`.
 
 ## Tech Stack
 
 - Java 25 / Spring Boot 4.0
 - MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase (system + per-tenant schema migrations)
-- RabbitMQ (async tenant provisioning events)
+- RabbitMQ (async tenant provisioning events, notifications, announcements)
 - JJWT 0.13 RS256 (token issuance and validation)
 - ShedLock 7.x (distributed scheduled cleanup jobs)
+- Spring WebSocket + STOMP/SockJS (real-time in-app notifications)
 - Thymeleaf (transactional email templates)
 - Micrometer + Prometheus
 - springdoc-openapi (Swagger UI)
@@ -326,14 +364,18 @@ docker compose -f compose.container.yaml up -d
 
 ```
 src/main/java/com/iqkv/foundation/iamservice/
+├── announcement/     # Site-wide announcements, fan-out service, admin + public REST resources
 ├── authentication/   # Signin, signup, token refresh, signout, validate
 ├── denylist/         # JTI denylist for token revocation
 ├── email/            # Email verification token + reaper job
 ├── invitation/       # Token-based invite flow + reaper job
+├── locale/           # Supported locales
 ├── lockout/          # Brute-force login lockout per identity
 ├── membership/       # TenantMembership, authorities (TENANT_OWNER, ADMIN, MEMBER)
+├── notification/     # In-app user notifications (DB persistence + WebSocket push)
 ├── passwordreset/    # Forgot/reset password flow + reaper job
 ├── platformadmin/    # Platform operator self-service account
+├── platformauthority/# Platform-level authorities (PLATFORM_ADMIN)
 ├── security/         # JWT authentication filter, claim names, JWKS endpoint
 ├── signup/           # SignupStrategy (multi-tenant / single-tenant)
 ├── tenant/           # Tenant lifecycle, provisioning, bootstrap strategies
@@ -356,9 +398,10 @@ Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of 
 ## 🧩 Boilerplate Architecture
 
 - **Persistence**: MyBatis with XML mappers + PostgreSQL; Liquibase manages both system and per-tenant schema migrations; `is_default` column on `public.tenants` marks the single-mode default tenant with a partial unique index
-- **Messaging**: RabbitMQ for async domain events (tenant provisioning); ShedLock guards scheduled cleanup jobs (expired tokens, stuck tenants)
+- **Messaging**: RabbitMQ for async domain events (tenant provisioning, notifications, announcements); ShedLock guards scheduled cleanup jobs (expired tokens, stuck tenants); dead-letter exchange (`iqkv.dlx`) routes failed messages to `iqkv.dlq`
 - **Security**: Spring Security + JJWT RS256; JTI denylist for token revocation; `last_global_signout_at` for session-wide invalidation; brute-force lockout per identity
 - **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`); tenant-scoped endpoints require a JWT scoped to the target tenant via `X-Tenant-ID` header
+- **In-app notifications**: `NotificationConsumer` listens on `iqkv.iam.notifications` — sends email, persists `UserNotification` to DB, and pushes to `/user/{userId}/queue/notifications` via STOMP; `AnnouncementConsumer` listens on `iqkv.iam.announcements` — streams all users via MyBatis cursor in batches of 1000, bulk-inserts notifications, and broadcasts to `/topic/announcements`
 - **Platform rollout mode**: Controlled via `iqkv.platform.rollout-mode` (`MULTI_TENANT` | `SINGLE_TENANT`); must be identical across IAM, Billing, and Gateway; IAM publishes canonical mode via `/actuator/info` under `platform.rollout-mode`; service fails readiness on invalid/missing mode
 - **Single-tenant mode**: Strategy pattern (`SignupStrategy`, `TenantBootstrapStrategy`) branches behavior at startup and signup; `SingleTenantBootstrapStrategy` idempotently provisions the default tenant on `ApplicationReadyEvent`; `SingleTenantSignupStrategy` joins users to the default tenant with `MEMBER` authority — no tenant creation, no `TENANT_OWNER` grant
 - **Invitations**: Token-based signup-by-invitation flow; token resolves tenant context so accept endpoints are tenant-agnostic; `authority` defaults to `MEMBER`; ShedLock-guarded reaper expires stale tokens

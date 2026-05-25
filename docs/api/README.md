@@ -9,18 +9,18 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ### Authentication
 
-| Method | Path                              | Auth          | Description                                                       |
-| ------ | --------------------------------- | ------------- | ----------------------------------------------------------------- |
-| `POST` | `/auth/signup`                    | public        | Register user and create tenant                                   |
-| `GET`  | `/auth/signup/status/{tenantKey}` | public        | Poll tenant provisioning status                                   |
-| `POST` | `/auth/signin`                    | `X-Tenant-ID` | Sign in, receive token pair                                       |
-| `POST` | `/auth/exchange`                  | JWT           | Exchange a Bearer access token for a new tenant-scoped token pair |
-| `POST` | `/auth/admin/signin`              | public        | Platform admin sign-in                                            |
-| `POST` | `/auth/admin/refresh`             | public        | Refresh platform admin token pair                                 |
-| `POST` | `/auth/refresh`                   | public        | Rotate access + refresh tokens                                    |
-| `POST` | `/auth/signout`                   | JWT           | Revoke current session (JTI denylist)                             |
-| `POST` | `/auth/signout-all`               | JWT           | Revoke all sessions globally                                      |
-| `POST` | `/auth/validate`                  | JWT           | Validate token for gateway introspection                          |
+| Method | Path                              | Auth                   | Description                                                                           |
+| ------ | --------------------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public                 | Register user and create tenant (multi-tenant) or join default tenant (single-tenant) |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status                                                       |
+| `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in, receive RS256 token pair                                                     |
+| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair                     |
+| `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in (platform-scoped token, null `tenant_id`)                      |
+| `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                                    |
+| `POST` | `/auth/refresh`                   | public                 | Rotate access + refresh tokens                                                        |
+| `POST` | `/auth/signout`                   | JWT                    | Revoke current session (JTI denylist)                                                 |
+| `POST` | `/auth/signout-all`               | JWT                    | Revoke all sessions globally                                                          |
+| `POST` | `/auth/validate`                  | JWT                    | Validate token for gateway introspection                                              |
 
 `POST /auth/signup` creates a global user account, a new tenant, and a `TENANT_OWNER` membership in one step.
 Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{tenantKey}` until `ACTIVE`.
@@ -29,24 +29,24 @@ Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{t
 
 ### Platform Admin Account
 
-| Method  | Path                      | Auth | Description                                    |
-| ------- | ------------------------- | ---- | ---------------------------------------------- |
-| `GET`   | `/auth/admin/me`          | JWT  | Get own platform operator profile              |
-| `PATCH` | `/auth/admin/me`          | JWT  | Update own profile (firstName, lastName)       |
-| `POST`  | `/auth/admin/me/password` | JWT  | Change own password (invalidates all sessions) |
+| Method  | Path                      | Auth                 | Description                                    |
+| ------- | ------------------------- | -------------------- | ---------------------------------------------- |
+| `GET`   | `/auth/admin/me`          | JWT `PLATFORM_ADMIN` | Get own platform operator profile              |
+| `PATCH` | `/auth/admin/me`          | JWT `PLATFORM_ADMIN` | Update own profile (firstName, lastName)       |
+| `POST`  | `/auth/admin/me/password` | JWT `PLATFORM_ADMIN` | Change own password (invalidates all sessions) |
 
 ---
 
 ### User Profile
 
-| Method   | Path                    | Auth   | Description                               |
-| -------- | ----------------------- | ------ | ----------------------------------------- |
-| `GET`    | `/users/me`             | JWT    | Get own profile                           |
-| `PATCH`  | `/users/me`             | JWT    | Update own profile (firstName, lastName)  |
-| `DELETE` | `/users/me`             | JWT    | Remove own membership from current tenant |
-| `POST`   | `/users/me/password`    | JWT    | Change own password                       |
-| `POST`   | `/users/tenants`        | public | Discover tenants by credentials           |
-| `GET`    | `/users/me/memberships` | JWT    | List current user's tenant memberships    |
+| Method   | Path                    | Auth                      | Description                                                               |
+| -------- | ----------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| `GET`    | `/users/me`             | JWT + `X-Tenant-ID`       | Get own profile                                                           |
+| `PATCH`  | `/users/me`             | JWT + `X-Tenant-ID`       | Update own profile (firstName, lastName)                                  |
+| `DELETE` | `/users/me`             | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
+| `POST`   | `/users/me/password`    | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/tenants`        | public (credential-gated) | Discover tenants by credentials                                           |
+| `GET`    | `/users/me/memberships` | JWT                       | List current user's tenant memberships                                    |
 
 ---
 
@@ -71,22 +71,59 @@ Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 
 
 ---
 
+### In-App Notifications
+
+| Method | Path                             | Auth | Description                                      |
+| ------ | -------------------------------- | ---- | ------------------------------------------------ |
+| `GET`  | `/users/notifications`           | JWT  | Get paginated notifications for the current user |
+| `PUT`  | `/users/notifications/{id}/read` | JWT  | Mark a specific notification as read             |
+| `PUT`  | `/users/notifications/read-all`  | JWT  | Mark all notifications as read                   |
+
+`GET /users/notifications` supports `limit` (default 10), `offset` (default 0), and optional `isRead` filter.
+The response includes `totalElements` and `unreadCount` for badge rendering.
+
+Real-time delivery is available via WebSocket — see the [WebSocket section](#websocket) below.
+
+---
+
+### Announcements (Public)
+
+| Method | Path             | Auth   | Description                                     |
+| ------ | ---------------- | ------ | ----------------------------------------------- |
+| `GET`  | `/announcements` | public | Get active site-wide announcements for a locale |
+
+Accepts a `locale` query parameter (default `en-US`). Returns only `PUBLISHED` announcements.
+
+---
+
 ### Tenant Management
 
-| Method   | Path                                      | Auth                                          | Description                 |
-| -------- | ----------------------------------------- | --------------------------------------------- | --------------------------- |
-| `GET`    | `/tenants/{tenantKey}`                    | JWT `TENANT_OWNER`                            | Get tenant status           |
-| `PATCH`  | `/tenants/{tenantKey}/status`             | JWT `TENANT_OWNER`                            | Transition tenant status    |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning` | JWT `TENANT_OWNER`                            | Retry failed provisioning   |
-| `POST`   | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Send invitation email       |
-| `GET`    | `/tenants/{tenantKey}/invitations`        | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | List pending invitations    |
-| `DELETE` | `/tenants/{tenantKey}/invitations/{id}`   | JWT `TENANT_OWNER` or `ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
+| Method   | Path                                                | Auth                                       | Description                         |
+| -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
+| `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
+| `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status            |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning`           | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning           |
+| `GET`    | `/tenants/{tenantKey}/members`                      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)     |
+| `GET`    | `/tenants/{tenantKey}/members/count`                | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                |
+| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities |
+| `DELETE` | `/tenants/{tenantKey}/members/{userId}`             | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant           |
 
 `POST /tenants/{tenantKey}/retry-provisioning` is only valid when the tenant is in `PROVISIONING_FAILED` state.
 
 ---
 
-### Invitations (public)
+### Invitations (Tenant-scoped)
+
+| Method   | Path                                    | Auth                                       | Description                 |
+| -------- | --------------------------------------- | ------------------------------------------ | --------------------------- |
+| `POST`   | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Send invitation email       |
+| `GET`    | `/tenants/{tenantKey}/invitations`      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List pending invitations    |
+| `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke a pending invitation |
+
+---
+
+### Invitations (Public)
 
 | Method | Path                          | Auth   | Description                                |
 | ------ | ----------------------------- | ------ | ------------------------------------------ |
@@ -100,50 +137,75 @@ For existing users: only `password` is required (used to verify identity).
 
 ---
 
-### Platform Admin
+### Locales
 
-| Method   | Path                            | Auth | Description                     |
-| -------- | ------------------------------- | ---- | ------------------------------- |
-| `GET`    | `/admin/users`                  | JWT  | List all users (paginated)      |
-| `GET`    | `/admin/users/count`            | JWT  | Count users                     |
-| `GET`    | `/admin/users/{id}`             | JWT  | Get user by ID                  |
-| `POST`   | `/admin/users`                  | JWT  | Create user                     |
-| `PUT`    | `/admin/users/{id}`             | JWT  | Replace user (full update)      |
-| `PATCH`  | `/admin/users/{id}`             | JWT  | Partially update user           |
-| `DELETE` | `/admin/users/{id}`             | JWT  | Delete user and all memberships |
-| `GET`    | `/admin/users/{id}/authorities` | JWT  | Get user platform authorities   |
-| `PUT`    | `/admin/users/{id}/authorities` | JWT  | Replace platform authorities    |
-| `GET`    | `/admin/users/{id}/memberships` | JWT  | Get user tenant memberships     |
-| `POST`   | `/admin/users/{id}/password`    | JWT  | Force-set user password         |
+| Method | Path       | Auth   | Description            |
+| ------ | ---------- | ------ | ---------------------- |
+| `GET`  | `/locales` | public | Get all active locales |
 
 ---
 
-### Tenant Admin
+### Platform Admin — Users
 
-| Method   | Path                                                      | Auth | Description                       |
-| -------- | --------------------------------------------------------- | ---- | --------------------------------- |
-| `GET`    | `/admin/tenants`                                          | JWT  | List all tenants (paginated)      |
-| `GET`    | `/admin/tenants/count`                                    | JWT  | Count tenants                     |
-| `GET`    | `/admin/tenants/{tenantKey}`                              | JWT  | Get tenant by key                 |
-| `PUT`    | `/admin/tenants/{tenantKey}`                              | JWT  | Rename tenant                     |
-| `PATCH`  | `/admin/tenants/{tenantKey}`                              | JWT  | Partially update tenant           |
-| `DELETE` | `/admin/tenants/{tenantKey}`                              | JWT  | Delete tenant and associated data |
-| `GET`    | `/admin/tenants/{tenantKey}/members`                      | JWT  | List tenant members (paginated)   |
-| `GET`    | `/admin/tenants/{tenantKey}/members/count`                | JWT  | Count tenant members              |
-| `GET`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT  | Get member tenant authorities     |
-| `PUT`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT  | Replace member tenant authorities |
+| Method   | Path                            | Auth                 | Description                                        |
+| -------- | ------------------------------- | -------------------- | -------------------------------------------------- |
+| `GET`    | `/admin/users`                  | JWT `PLATFORM_ADMIN` | List all users (paginated, filterable)             |
+| `GET`    | `/admin/users/count`            | JWT `PLATFORM_ADMIN` | Count users                                        |
+| `GET`    | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Get user by UUID                                   |
+| `POST`   | `/admin/users`                  | JWT `PLATFORM_ADMIN` | Create user with temporary password                |
+| `PUT`    | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Replace user (full update)                         |
+| `PATCH`  | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Partially update user                              |
+| `DELETE` | `/admin/users/{id}`             | JWT `PLATFORM_ADMIN` | Delete user and all memberships                    |
+| `GET`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Get user platform authorities                      |
+| `PUT`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Replace user platform authorities                  |
+| `GET`    | `/admin/users/{id}/memberships` | JWT `PLATFORM_ADMIN` | Get user tenant memberships                        |
+| `POST`   | `/admin/users/{id}/password`    | JWT `PLATFORM_ADMIN` | Force-set user password (invalidates all sessions) |
 
 ---
 
-### Invitation Admin
+### Platform Admin — Tenants
 
-| Method   | Path                       | Auth | Description                              |
-| -------- | -------------------------- | ---- | ---------------------------------------- |
-| `GET`    | `/admin/invitations`       | JWT  | List invitations (paginated, filterable) |
-| `GET`    | `/admin/invitations/count` | JWT  | Count invitations                        |
-| `GET`    | `/admin/invitations/{id}`  | JWT  | Get invitation by ID                     |
-| `POST`   | `/admin/invitations`       | JWT  | Propose invitation for a tenant          |
-| `DELETE` | `/admin/invitations/{id}`  | JWT  | Revoke a pending invitation              |
+| Method   | Path                                                      | Auth                 | Description                                 |
+| -------- | --------------------------------------------------------- | -------------------- | ------------------------------------------- |
+| `GET`    | `/admin/tenants`                                          | JWT `PLATFORM_ADMIN` | List all tenants (paginated, filterable)    |
+| `GET`    | `/admin/tenants/count`                                    | JWT `PLATFORM_ADMIN` | Count tenants                               |
+| `GET`    | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Get tenant by key                           |
+| `PUT`    | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Rename tenant                               |
+| `PATCH`  | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Partially update tenant                     |
+| `DELETE` | `/admin/tenants/{tenantKey}`                              | JWT `PLATFORM_ADMIN` | Delete tenant and all associated data       |
+| `GET`    | `/admin/tenants/{tenantKey}/members`                      | JWT `PLATFORM_ADMIN` | List tenant members (paginated, filterable) |
+| `GET`    | `/admin/tenants/{tenantKey}/members/count`                | JWT `PLATFORM_ADMIN` | Count tenant members                        |
+| `GET`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Get member's tenant authorities             |
+| `PUT`    | `/admin/tenants/{tenantKey}/members/{userId}/authorities` | JWT `PLATFORM_ADMIN` | Replace member's tenant authorities         |
+
+---
+
+### Platform Admin — Invitations
+
+| Method   | Path                       | Auth                 | Description                                                 |
+| -------- | -------------------------- | -------------------- | ----------------------------------------------------------- |
+| `GET`    | `/admin/invitations`       | JWT `PLATFORM_ADMIN` | List invitations across all tenants (paginated, filterable) |
+| `GET`    | `/admin/invitations/count` | JWT `PLATFORM_ADMIN` | Count invitations (with optional filters)                   |
+| `GET`    | `/admin/invitations/{id}`  | JWT `PLATFORM_ADMIN` | Get invitation by UUID                                      |
+| `POST`   | `/admin/invitations`       | JWT `PLATFORM_ADMIN` | Propose invitation for any active tenant                    |
+| `DELETE` | `/admin/invitations/{id}`  | JWT `PLATFORM_ADMIN` | Revoke invitation                                           |
+
+---
+
+### Platform Admin — Announcements
+
+| Method   | Path                                | Auth                 | Description                                         |
+| -------- | ----------------------------------- | -------------------- | --------------------------------------------------- |
+| `POST`   | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | Create announcement with multi-lingual translations |
+| `PUT`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Update announcement and its translations            |
+| `DELETE` | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Delete announcement                                 |
+| `POST`   | `/admin/announcements/{id}/publish` | JWT `PLATFORM_ADMIN` | Trigger fan-out to all users                        |
+| `GET`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Get announcement by UUID                            |
+| `GET`    | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | List all announcements (paginated)                  |
+
+Publishing an announcement (`POST /admin/announcements/{id}/publish`) triggers an async fan-out via RabbitMQ:
+the service streams all users in batches of 1000, creates a `UserNotification` record per user, and broadcasts
+a real-time message to the `/topic/announcements` WebSocket topic.
 
 ---
 
@@ -157,6 +219,29 @@ Consumed by the gateway and any downstream service that validates JWTs locally.
 
 ---
 
+### WebSocket
+
+The service exposes a STOMP-over-SockJS endpoint for real-time push notifications.
+
+**Connection endpoint**: `ws://host/api/v1/iam/ws` (SockJS fallback enabled)
+
+**Destinations**:
+
+| Destination                          | Direction          | Description                                                                                         |
+| ------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------- |
+| `/user/{userId}/queue/notifications` | server → client    | Per-user notification pushed after a transactional event (signup, password reset, invitation, etc.) |
+| `/topic/announcements`               | server → broadcast | Global broadcast when a site-wide announcement is published                                         |
+
+Clients must authenticate the WebSocket handshake with a valid Bearer token.
+The user destination prefix is `/user`; the application prefix is `/app`.
+
+---
+
+> Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
+
+---
+
 ### Interactive Documentation
 
 Swagger UI is available at `http://localhost:8080/swagger-ui.html` when the service is running locally.
+OpenAPI spec is served at `http://localhost:8080/api-docs`.
