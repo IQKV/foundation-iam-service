@@ -33,5 +33,11 @@ public enum NotificationEventType {
   /**
    * Sent to the user after a successful self-service or admin-initiated password change.
    */
-  PASSWORD_CHANGED
+  PASSWORD_CHANGED,
+  /**
+   * Sent to a new member right after they join (SINGLE_TENANT signup or invitation-accepted new user).
+   * Distinct from TENANT_OWNER_WELCOME (which targets the workspace creator) and
+   * INVITATION_ACCEPTED (which is a membership-confirmation event).
+   */
+  MEMBER_WELCOME
 }

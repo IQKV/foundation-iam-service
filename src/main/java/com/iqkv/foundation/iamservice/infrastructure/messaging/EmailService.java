@@ -103,6 +103,7 @@ public class EmailService {
       case TENANT_OWNER_WELCOME -> "email/signup/tenant-owner-welcome";
       case INVITATION_ACCEPTED -> "email/invitation/accepted";
       case PASSWORD_CHANGED -> "email/password/changed";
+      case MEMBER_WELCOME -> "email/signup/member-welcome";
     };
   }
 
@@ -116,6 +117,7 @@ public class EmailService {
       case TENANT_OWNER_WELCOME -> "email.tenant-owner-welcome.subject";
       case INVITATION_ACCEPTED -> "email.invitation-accepted.subject";
       case PASSWORD_CHANGED -> "email.password-changed.subject";
+      case MEMBER_WELCOME -> "email.member-welcome.subject";
     };
   }
 }

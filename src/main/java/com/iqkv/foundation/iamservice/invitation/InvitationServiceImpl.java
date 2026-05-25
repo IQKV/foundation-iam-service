@@ -235,6 +235,9 @@ public class InvitationServiceImpl implements InvitationService {
       final Tenant tenant = tenantMapper.findByTenantKey(tenantKey).orElse(null);
       final String tenantName = tenant != null ? tenant.getName() : tenantKey;
       final String dashboardUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/dashboard";
+      final String userLocale = user.getLocale() != null && !user.getLocale().isBlank()
+          ? user.getLocale()
+          : (notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en");
       final var payload = new java.util.HashMap<String, Object>();
       payload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
       payload.put("tenantName", tenantName);
@@ -242,8 +245,9 @@ public class InvitationServiceImpl implements InvitationService {
       payload.put("dashboardUrl", dashboardUrl);
 
       final var acceptedEvent = new NotificationEvent(
+          user.getId(),
           user.getEmail(),
-          notificationProps.defaultLocale(),
+          userLocale,
           NotificationEventType.INVITATION_ACCEPTED,
           payload,
           Instant.now());

@@ -141,6 +141,7 @@ public class UserServiceImpl implements UserService {
         welcomePayload.put("dashboardUrl", dashboardUrl);
 
         final var welcomeEvent = new NotificationEvent(
+            canonicalUser.getId(),
             canonicalUser.getEmail(),
             notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
             NotificationEventType.TENANT_OWNER_WELCOME,
@@ -149,6 +150,33 @@ public class UserServiceImpl implements UserService {
         messagingService.publishNotification(welcomeEvent);
       } catch (final Exception e) {
         log.warn("Failed to publish TENANT_OWNER_WELCOME notification for userId={}", canonicalUser.getId(), e);
+      }
+    }
+
+    // Send member welcome notification when the user joins as a regular MEMBER (SINGLE_TENANT signup).
+    // Uses the user's preferred locale if set, falling back to the platform default.
+    // Fire-and-forget — must not affect the registration transaction.
+    if (result.authorities().contains(com.iqkv.foundation.iamservice.shared.util.UserServiceConstants.AUTHORITY_MEMBER)) {
+      try {
+        final String userLocale = canonicalUser.getLocale() != null && !canonicalUser.getLocale().isBlank()
+            ? canonicalUser.getLocale()
+            : (notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en");
+        final String dashboardUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/dashboard";
+        final var memberWelcomePayload = new java.util.HashMap<String, Object>();
+        memberWelcomePayload.put("firstName", canonicalUser.getFirstName() != null ? canonicalUser.getFirstName() : "");
+        memberWelcomePayload.put("tenantName", result.tenant().getName() != null ? result.tenant().getName() : "");
+        memberWelcomePayload.put("dashboardUrl", dashboardUrl);
+
+        final var memberWelcomeEvent = new NotificationEvent(
+            canonicalUser.getId(),
+            canonicalUser.getEmail(),
+            userLocale,
+            NotificationEventType.MEMBER_WELCOME,
+            memberWelcomePayload,
+            Instant.now());
+        messagingService.publishNotification(memberWelcomeEvent);
+      } catch (final Exception e) {
+        log.warn("Failed to publish MEMBER_WELCOME notification for userId={}", canonicalUser.getId(), e);
       }
     }
 
