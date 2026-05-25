@@ -142,7 +142,7 @@ public class UserAdminRestResource {
   public ResponseEntity<UserDtos.UserResponse> replaceUser(
       @Parameter(description = "User UUID") @PathVariable UUID id,
       @Valid @RequestBody UserDtos.UpdateUserRequest request) {
-    return ResponseEntity.ok(userService.updateUser(id, request.firstName(), request.lastName(), "system"));
+    return ResponseEntity.ok(userService.updateUser(id, request.firstName(), request.lastName(), request.locale(), "system"));
   }
 
   @PatchMapping("/{id}")

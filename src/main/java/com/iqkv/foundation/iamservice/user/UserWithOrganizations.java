@@ -40,6 +40,7 @@ public class UserWithOrganizations {
   private String lastName;
   private AccountStatus status;
   private boolean emailVerified;
+  private String locale;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private List<String> organizations;
@@ -91,6 +92,14 @@ public class UserWithOrganizations {
 
   public void setEmailVerified(final boolean emailVerified) {
     this.emailVerified = emailVerified;
+  }
+
+  public String getLocale() {
+    return locale;
+  }
+
+  public void setLocale(final String locale) {
+    this.locale = locale;
   }
 
   public LocalDateTime getCreatedAt() {
