@@ -21,6 +21,5 @@ public enum SiteAnnouncementStatus {
   PENDING,
   PUBLISHING,
   PUBLISHED,
-  FAILED,
-  ARCHIVED
+  FAILED
 }

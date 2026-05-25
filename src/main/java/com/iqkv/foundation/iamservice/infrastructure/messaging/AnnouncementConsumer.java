@@ -86,7 +86,7 @@ public class AnnouncementConsumer {
     if (defaultTranslation == null) {
       log.error("No translations found for announcement: {}", announcement.getId());
       fanOutService.updateStatus(event.announcementId(), SiteAnnouncementStatus.FAILED);
-      return;
+      throw new RuntimeException("No translations found for announcement: " + announcement.getId());
     }
 
     try (Cursor<User> userCursor = userMapper.findAllStreaming()) {
