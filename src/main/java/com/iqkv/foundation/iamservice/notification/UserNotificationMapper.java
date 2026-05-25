@@ -45,4 +45,8 @@ public interface UserNotificationMapper {
 
   void markAllAsRead(@Param("targetUserId") UUID targetUserId, @Param("readAt") LocalDateTime readAt);
 
+  void deleteById(@Param("id") UUID id, @Param("targetUserId") UUID targetUserId);
+
+  void deleteAllByTargetUserId(@Param("targetUserId") UUID targetUserId);
+
 }

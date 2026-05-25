@@ -73,14 +73,36 @@ Reset tokens expire after 1 hour (configurable). Rate-limited to 3 requests per 
 
 ### In-App Notifications
 
-| Method | Path                             | Auth | Description                                      |
-| ------ | -------------------------------- | ---- | ------------------------------------------------ |
-| `GET`  | `/users/notifications`           | JWT  | Get paginated notifications for the current user |
-| `PUT`  | `/users/notifications/{id}/read` | JWT  | Mark a specific notification as read             |
-| `PUT`  | `/users/notifications/read-all`  | JWT  | Mark all notifications as read                   |
+| Method   | Path                                | Auth | Description                                                         |
+| -------- | ----------------------------------- | ---- | ------------------------------------------------------------------- |
+| `GET`    | `/users/notifications`              | JWT  | Paginated list of notifications for the current user                |
+| `PATCH`  | `/users/notifications`              | JWT  | Bulk partial update — body `{ "isRead": true }` marks all as read   |
+| `DELETE` | `/users/notifications`              | JWT  | Delete all notifications for the current user                       |
+| `GET`    | `/users/notifications/unread/count` | JWT  | Returns `{ "unreadCount": N }` — use for badge rendering            |
+| `PATCH`  | `/users/notifications/{id}`         | JWT  | Partial update on a single notification — body `{ "isRead": true }` |
+| `DELETE` | `/users/notifications/{id}`         | JWT  | Delete a single notification (ownership-enforced)                   |
 
-`GET /users/notifications` supports `limit` (default 10), `offset` (default 0), and optional `isRead` filter.
-The response includes `totalElements` and `unreadCount` for badge rendering.
+`GET /users/notifications` query parameters:
+
+- `limit` — page size, default `10`
+- `offset` — zero-based offset, default `0`
+- `isRead` — optional boolean filter; omit to return all
+
+Response shape:
+
+```json
+{
+    "items": [{ "id": "...", "type": "...", "severity": "INFO", "title": "...", "message": "...", "payload": {}, "isRead": false, "createdAt": "...", "readAt": null }],
+    "totalElements": 42,
+    "unreadCount": 7
+}
+```
+
+`PATCH` body (single or bulk):
+
+```json
+{ "isRead": true }
+```
 
 Real-time delivery is available via WebSocket — see the [WebSocket section](#websocket) below.
 

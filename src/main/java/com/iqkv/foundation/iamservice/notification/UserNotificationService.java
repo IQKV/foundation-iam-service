@@ -30,4 +30,10 @@ public interface UserNotificationService {
 
   void createNotification(UserNotification notification);
 
+  long countUnread(UUID userId);
+
+  void deleteNotification(UUID userId, UUID notificationId);
+
+  void deleteAllNotifications(UUID userId);
+
 }

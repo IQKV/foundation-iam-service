@@ -74,4 +74,22 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     }
     notificationMapper.insert(notification);
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public long countUnread(final UUID userId) {
+    return notificationMapper.countByTargetUserId(userId, false);
+  }
+
+  @Override
+  @Transactional
+  public void deleteNotification(final UUID userId, final UUID notificationId) {
+    notificationMapper.deleteById(notificationId, userId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllNotifications(final UUID userId) {
+    notificationMapper.deleteAllByTargetUserId(userId);
+  }
 }

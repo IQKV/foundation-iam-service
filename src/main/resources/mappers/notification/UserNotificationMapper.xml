@@ -79,4 +79,15 @@
         AND is_read = false
     </update>
 
+    <delete id="deleteById">
+        DELETE FROM public.user_notifications
+        WHERE id = #{id}
+        AND target_user_id = #{targetUserId}
+    </delete>
+
+    <delete id="deleteAllByTargetUserId">
+        DELETE FROM public.user_notifications
+        WHERE target_user_id = #{targetUserId}
+    </delete>
+
 </mapper>

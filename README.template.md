@@ -80,11 +80,14 @@ Base path: `/api/v1/iam`
 
 ### In-App Notifications
 
-| Method | Path                             | Auth | Description                                     |
-| ------ | -------------------------------- | ---- | ----------------------------------------------- |
-| `GET`  | `/users/notifications`           | JWT  | Get paginated notifications (with unread count) |
-| `PUT`  | `/users/notifications/{id}/read` | JWT  | Mark a specific notification as read            |
-| `PUT`  | `/users/notifications/read-all`  | JWT  | Mark all notifications as read                  |
+| Method   | Path                                | Auth | Description                                                               |
+| -------- | ----------------------------------- | ---- | ------------------------------------------------------------------------- |
+| `GET`    | `/users/notifications`              | JWT  | Paginated list; optional `isRead` filter; response includes `unreadCount` |
+| `PATCH`  | `/users/notifications`              | JWT  | Bulk partial update — e.g. mark all as read (`{ "isRead": true }`)        |
+| `DELETE` | `/users/notifications`              | JWT  | Delete all notifications for the current user                             |
+| `GET`    | `/users/notifications/unread/count` | JWT  | Unread notification count (badge)                                         |
+| `PATCH`  | `/users/notifications/{id}`         | JWT  | Partial update on a single notification (`{ "isRead": true }`)            |
+| `DELETE` | `/users/notifications/{id}`         | JWT  | Delete a single notification                                              |
 
 Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and subscribe to
 `/user/{userId}/queue/notifications` for per-user pushes or `/topic/announcements` for global broadcasts.

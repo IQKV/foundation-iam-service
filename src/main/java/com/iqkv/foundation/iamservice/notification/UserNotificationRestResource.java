@@ -29,9 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,11 +50,18 @@ public class UserNotificationRestResource {
     this.notificationService = notificationService;
   }
 
+  // ---------------------------------------------------------------------------
+  // Collection
+  // ---------------------------------------------------------------------------
+
   @GetMapping
   @PreAuthorize("isAuthenticated()")
-  @Operation(summary = "Get user notifications", description = "Retrieves a paginated list of notifications for the current user.")
+  @Operation(
+      summary = "List notifications",
+      description = "Returns a paginated list of notifications for the current user. "
+                    + "Filter by read state with the optional `isRead` parameter.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Notifications retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "401", description = "Unauthorized")
   })
   public ResponseEntity<UserNotificationDtos.UserNotificationListResponse> getNotifications(
@@ -64,31 +73,103 @@ public class UserNotificationRestResource {
     return ResponseEntity.ok(notificationService.getNotifications(userId, limit, offset, isRead));
   }
 
-  @PutMapping("/{id}/read")
+  @PatchMapping
   @PreAuthorize("isAuthenticated()")
-  @Operation(summary = "Mark notification as read", description = "Marks a specific notification as read for the current user.")
+  @Operation(
+      summary = "Bulk-update notifications",
+      description = "Applies a partial update to all notifications of the current user. "
+                    + "Currently supports marking all as read (`isRead: true`).")
   @ApiResponses({
-      @ApiResponse(responseCode = "204", description = "Notification marked as read"),
+      @ApiResponse(responseCode = "204", description = "Update applied"),
+      @ApiResponse(responseCode = "400", description = "Invalid patch body"),
       @ApiResponse(responseCode = "401", description = "Unauthorized")
   })
-  public ResponseEntity<Void> markAsRead(
+  public ResponseEntity<Void> patchAll(
       @AuthenticationPrincipal final Jwt jwt,
-      @PathVariable final UUID id) {
+      @RequestBody final UserNotificationDtos.NotificationPatchRequest patch) {
     final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
-    notificationService.markAsRead(userId, id);
+    if (Boolean.TRUE.equals(patch.isRead())) {
+      notificationService.markAllAsRead(userId);
+    }
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/read-all")
+  @DeleteMapping
   @PreAuthorize("isAuthenticated()")
-  @Operation(summary = "Mark all notifications as read", description = "Marks all unread notifications as read for the current user.")
+  @Operation(
+      summary = "Delete all notifications",
+      description = "Permanently removes all notifications for the current user.")
   @ApiResponses({
-      @ApiResponse(responseCode = "204", description = "All notifications marked as read"),
+      @ApiResponse(responseCode = "204", description = "Deleted"),
       @ApiResponse(responseCode = "401", description = "Unauthorized")
   })
-  public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal final Jwt jwt) {
+  public ResponseEntity<Void> deleteAll(@AuthenticationPrincipal final Jwt jwt) {
     final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
-    notificationService.markAllAsRead(userId);
+    notificationService.deleteAllNotifications(userId);
+    return ResponseEntity.noContent().build();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Unread sub-resource  GET /unread/count
+  // ---------------------------------------------------------------------------
+
+  @GetMapping("/unread/count")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Get unread count",
+      description = "Returns the number of unread notifications for the current user.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
+  public ResponseEntity<UserNotificationDtos.UnreadCountResponse> getUnreadCount(
+      @AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(new UserNotificationDtos.UnreadCountResponse(notificationService.countUnread(userId)));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Single item
+  // ---------------------------------------------------------------------------
+
+  @PatchMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Partially update a notification",
+      description = "Applies a partial update to a single notification. "
+                    + "Currently supports marking it as read (`isRead: true`).")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Update applied"),
+      @ApiResponse(responseCode = "400", description = "Invalid patch body"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "Notification not found")
+  })
+  public ResponseEntity<Void> patchOne(
+      @AuthenticationPrincipal final Jwt jwt,
+      @PathVariable final UUID id,
+      @RequestBody final UserNotificationDtos.NotificationPatchRequest patch) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    if (Boolean.TRUE.equals(patch.isRead())) {
+      notificationService.markAsRead(userId, id);
+    }
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Delete a notification",
+      description = "Permanently removes a single notification belonging to the current user.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Deleted"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "Notification not found")
+  })
+  public ResponseEntity<Void> deleteOne(
+      @AuthenticationPrincipal final Jwt jwt,
+      @PathVariable final UUID id) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    notificationService.deleteNotification(userId, id);
     return ResponseEntity.noContent().build();
   }
 }

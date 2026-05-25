@@ -45,6 +45,16 @@ public final class UserNotificationDtos {
       long unreadCount) {
   }
 
+  public record UnreadCountResponse(long unreadCount) {
+  }
+
+  /**
+   * Patch body for partial notification updates.
+   * All fields are nullable — only non-null fields are applied.
+   */
+  public record NotificationPatchRequest(Boolean isRead) {
+  }
+
   public record AnnouncementBroadcastResponse(
       UUID announcementId,
       String type,
