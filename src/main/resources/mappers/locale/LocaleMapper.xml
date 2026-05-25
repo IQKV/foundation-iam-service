@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.locale.LocaleMapper">
+
+    <resultMap id="localeResultMap" type="com.iqkv.foundation.iamservice.locale.Locale">
+        <id     property="code"         column="code"/>
+        <result property="name"         column="name"/>
+        <result property="nativeName"   column="native_name"/>
+        <result property="isActive"     column="is_active"/>
+        <result property="isDefault"     column="is_default"/>
+        <result property="createdAt"    column="created_at"/>
+    </resultMap>
+
+    <select id="findAllActive" resultMap="localeResultMap">
+        SELECT code, name, native_name, is_active, is_default, created_at
+        FROM public.locales
+        WHERE is_active = true
+        ORDER BY is_default DESC, name ASC
+    </select>
+
+</mapper>
