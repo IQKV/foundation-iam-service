@@ -23,11 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.notification.UserNotification;
 import com.iqkv.foundation.iamservice.notification.UserNotificationService;
+import com.iqkv.foundation.iamservice.notification.dto.UserNotificationDtoMapper;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.MessageSource;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,17 +42,20 @@ public class NotificationConsumer {
   private final UserMapper userMapper;
   private final MessageSource messageSource;
   private final ObjectMapper objectMapper;
+  private final SimpMessagingTemplate messagingTemplate;
 
   public NotificationConsumer(final EmailService emailService,
                               final UserNotificationService userNotificationService,
                               final UserMapper userMapper,
                               final MessageSource messageSource,
-                              final ObjectMapper objectMapper) {
+                              final ObjectMapper objectMapper,
+                              final SimpMessagingTemplate messagingTemplate) {
     this.emailService = emailService;
     this.userNotificationService = userNotificationService;
     this.userMapper = userMapper;
     this.messageSource = messageSource;
     this.objectMapper = objectMapper;
+    this.messagingTemplate = messagingTemplate;
   }
 
   @RabbitListener(queues = RabbitMQConfig.NOTIFICATIONS_QUEUE)
@@ -69,46 +74,68 @@ public class NotificationConsumer {
   }
 
   private void persistInAppNotification(final NotificationEvent event) {
-    userMapper.findByEmail(event.getRecipientEmail()).ifPresentOrElse(user -> {
-      final String localeTag = event.getLocale() != null ? event.getLocale() : user.getLocale();
-      final Locale locale = Locale.forLanguageTag(localeTag != null ? localeTag : "en-US");
-
-      final String title = messageSource.getMessage(
-          "notification." + event.getType() + ".title",
-          null,
-          event.getType().name(),
-          locale
+    if (event.getTargetUserId() != null) {
+      userMapper.findById(event.getTargetUserId()).ifPresentOrElse(
+          user -> doPersist(event, user),
+          () -> log.warn("Target user not found for in-app notification: id={}", event.getTargetUserId())
       );
-
-      final String message = messageSource.getMessage(
-          "notification." + event.getType() + ".message",
-          null,
-          null,
-          locale
+    } else {
+      userMapper.findByEmail(event.getRecipientEmail()).ifPresentOrElse(
+          user -> doPersist(event, user),
+          () -> log.warn("Target user not found for in-app notification: email={}", event.getRecipientEmail())
       );
+    }
+  }
 
-      final UserNotification notification = new UserNotification();
-      notification.setId(UUID.randomUUID());
-      notification.setTargetUserId(user.getId());
-      notification.setLocale(locale.toLanguageTag());
-      notification.setType(event.getType().name());
-      notification.setSeverity("INFO");
-      notification.setTitle(title);
-      notification.setMessage(message);
-      notification.setRead(false);
+  private void doPersist(final NotificationEvent event, final com.iqkv.foundation.iamservice.user.User user) {
+    final String localeTag = event.getLocale() != null ? event.getLocale() : user.getLocale();
+    final Locale locale = Locale.forLanguageTag(localeTag != null ? localeTag : "en-US");
 
-      if (event.getPayload() != null && !event.getPayload().isEmpty()) {
-        try {
-          notification.setPayload(objectMapper.writeValueAsString(event.getPayload()));
-        } catch (final Exception e) {
-          log.warn("Failed to serialize notification payload for user={}", user.getId(), e);
-        }
+    final String title = messageSource.getMessage(
+        "notification." + event.getType() + ".title",
+        null,
+        event.getType().name(),
+        locale
+    );
+
+    final String message = messageSource.getMessage(
+        "notification." + event.getType() + ".message",
+        null,
+        null,
+        locale
+    );
+
+    final UserNotification notification = new UserNotification();
+    notification.setId(UUID.randomUUID());
+    notification.setTargetUserId(user.getId());
+    notification.setLocale(locale.toLanguageTag());
+    notification.setType(event.getType().name());
+    notification.setSeverity("INFO");
+    notification.setTitle(title);
+    notification.setMessage(message);
+    notification.setRead(false);
+
+    if (event.getPayload() != null && !event.getPayload().isEmpty()) {
+      try {
+        notification.setPayload(objectMapper.writeValueAsString(event.getPayload()));
+      } catch (final Exception e) {
+        log.warn("Failed to serialize notification payload for user={}", user.getId(), e);
       }
+    }
 
-      userNotificationService.createNotification(notification);
-      log.debug("Persisted in-app notification: id={} type={} user={}",
-          notification.getId(), notification.getType(), user.getId());
+    userNotificationService.createNotification(notification);
+    log.debug("Persisted in-app notification: id={} type={} user={}",
+        notification.getId(), notification.getType(), user.getId());
 
-    }, () -> log.warn("Target user not found for in-app notification: email={}", event.getRecipientEmail()));
+    // 3. Push to WebSocket
+    try {
+      messagingTemplate.convertAndSendToUser(
+          user.getId().toString(),
+          "/queue/notifications",
+          UserNotificationDtoMapper.toResponse(notification)
+      );
+    } catch (final Exception e) {
+      log.warn("Failed to push WebSocket notification for user={}", user.getId(), e);
+    }
   }
 }

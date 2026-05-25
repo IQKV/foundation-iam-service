@@ -16,12 +16,15 @@
 
 package com.iqkv.foundation.iamservice.announcement;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtoMapper;
 import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtos;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.AnnouncementPublishEvent;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
 
   private final SiteAnnouncementMapper announcementMapper;
+  private final MessagingService messagingService;
 
-  public SiteAnnouncementServiceImpl(final SiteAnnouncementMapper announcementMapper) {
+  public SiteAnnouncementServiceImpl(final SiteAnnouncementMapper announcementMapper,
+                                     final MessagingService messagingService) {
     this.announcementMapper = announcementMapper;
+    this.messagingService = messagingService;
   }
 
   @Override
@@ -88,6 +94,22 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
     return announcementMapper.findById(id)
         .map(SiteAnnouncementDtoMapper::toResponse)
         .orElseThrow(() -> new SiteAnnouncementNotFoundException(id));
+  }
+
+  @Override
+  @Transactional
+  public void publish(final UUID id) {
+    final SiteAnnouncement announcement = announcementMapper.findById(id)
+        .orElseThrow(() -> new SiteAnnouncementNotFoundException(id));
+
+    if (announcement.getStatus() != SiteAnnouncementStatus.DRAFT) {
+      throw new IllegalStateException("Only draft announcements can be published");
+    }
+
+    announcement.setStatus(SiteAnnouncementStatus.PUBLISHED);
+    announcementMapper.update(announcement);
+
+    messagingService.publishAnnouncementPublish(new AnnouncementPublishEvent(id, Instant.now()));
   }
 
   @Override

@@ -18,9 +18,11 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 public class NotificationEvent {
 
+  private UUID targetUserId;
   private String recipientEmail;
   private String locale;
   private NotificationEventType type;
@@ -30,14 +32,23 @@ public class NotificationEvent {
   public NotificationEvent() {
   }
 
-  public NotificationEvent(final String recipientEmail, final String locale,
+  public NotificationEvent(final UUID targetUserId, final String recipientEmail, final String locale,
                            final NotificationEventType type, final Map<String, Object> payload,
                            final Instant occurredAt) {
+    this.targetUserId = targetUserId;
     this.recipientEmail = recipientEmail;
     this.locale = locale;
     this.type = type;
     this.payload = payload;
     this.occurredAt = occurredAt;
+  }
+
+  public UUID getTargetUserId() {
+    return targetUserId;
+  }
+
+  public void setTargetUserId(final UUID targetUserId) {
+    this.targetUserId = targetUserId;
   }
 
   public String getRecipientEmail() {

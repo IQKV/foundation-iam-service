@@ -86,6 +86,18 @@ public class AdminSiteAnnouncementRestResource {
     return ResponseEntity.noContent().build();
   }
 
+  @PostMapping("/{id}/publish")
+  @PreAuthorize("hasAuthority('PLATFORM_ADMIN')")
+  @Operation(summary = "Publish announcement", description = "Triggers the background fan-out process for a draft announcement.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "202", description = "Announcement publication started"),
+      @ApiResponse(responseCode = "404", description = "Announcement not found")
+  })
+  public ResponseEntity<Void> publish(@PathVariable final UUID id) {
+    announcementService.publish(id);
+    return ResponseEntity.accepted().build();
+  }
+
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('PLATFORM_ADMIN')")
   @Operation(summary = "Get announcement by ID", description = "Retrieves detailed information about a specific announcement.")

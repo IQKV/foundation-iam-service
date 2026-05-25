@@ -100,7 +100,11 @@ public class MessagingService {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_NOTIFICATION_IAM_EMAIL, event);
   }
 
-  private void publish(final String exchange, final String routingKey, final Object payload) {
+  public void publishAnnouncementPublish(final AnnouncementPublishEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_ANNOUNCEMENT_PUBLISH, event);
+  }
+
+  private void publish(final String exchange, final String routingKey, final Object event) {
     try {
       AuditEventEnricher.enrich(payload);
       rabbitTemplate.convertAndSend(exchange, routingKey, payload);

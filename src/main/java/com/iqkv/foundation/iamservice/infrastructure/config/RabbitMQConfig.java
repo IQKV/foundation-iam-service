@@ -43,6 +43,7 @@ public class RabbitMQConfig {
   // -------------------------------------------------------------------------
   public static final String USER_EVENTS_QUEUE = "iqkv.iam.user.events";
   public static final String NOTIFICATIONS_QUEUE = "iqkv.iam.notifications";
+  public static final String ANNOUNCEMENTS_QUEUE = "iqkv.iam.announcements";
   public static final String TENANT_PROVISIONING_QUEUE = "iqkv.iam.tenant.provisioning";
   public static final String SUBSCRIPTION_EVENTS_QUEUE = "iqkv.iam.subscription.events";
 
@@ -66,6 +67,7 @@ public class RabbitMQConfig {
   // Routing keys — IAM notification emails (scoped to avoid conflicts)
   // -------------------------------------------------------------------------
   public static final String ROUTING_NOTIFICATION_IAM_EMAIL = "notification.iam.email";
+  public static final String ROUTING_ANNOUNCEMENT_PUBLISH = "announcement.publish";
 
   private static final long TTL_24H_MS = 86_400_000L;
 
@@ -102,6 +104,19 @@ public class RabbitMQConfig {
         .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
         .withArgument("x-message-ttl", TTL_24H_MS)
         .build();
+  }
+
+  @Bean
+  public Queue announcementsQueue() {
+    return QueueBuilder.durable(ANNOUNCEMENTS_QUEUE)
+        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+        .withArgument("x-message-ttl", TTL_24H_MS)
+        .build();
+  }
+
+  @Bean
+  public Binding announcementsBinding(final Queue announcementsQueue, final TopicExchange eventsExchange) {
+    return BindingBuilder.bind(announcementsQueue).to(eventsExchange).with(ROUTING_ANNOUNCEMENT_PUBLISH);
   }
 
   @Bean

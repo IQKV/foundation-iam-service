@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.cursor.Cursor;
 
 @Mapper
 public interface UserMapper {
@@ -30,6 +31,8 @@ public interface UserMapper {
   void upsertByEmail(User user);
 
   Optional<User> findById(UUID id);
+
+  Cursor<User> findAllStreaming();
 
   Optional<UserWithOrganizations> findByIdWithAuthorities(UUID id);
 

@@ -29,6 +29,8 @@ public interface UserNotificationMapper {
 
   void insert(UserNotification notification);
 
+  void insertBatch(@Param("notifications") List<UserNotification> notifications);
+
   Optional<UserNotification> findById(@Param("id") UUID id);
 
   List<UserNotification> findAllByTargetUserId(@Param("targetUserId") UUID targetUserId,

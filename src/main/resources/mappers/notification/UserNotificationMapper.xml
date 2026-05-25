@@ -26,6 +26,17 @@
              #{isRead}, #{createdAt}, #{readAt})
     </insert>
 
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO public.user_notifications
+            (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
+        VALUES
+        <foreach collection="notifications" item="item" separator=",">
+            (#{item.id}, #{item.targetUserId}, #{item.locale}, #{item.type}, #{item.severity}, #{item.title}, #{item.message},
+             #{item.payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+             #{item.isRead}, #{item.createdAt}, #{item.readAt})
+        </foreach>
+    </insert>
+
     <select id="findById" resultMap="userNotificationResultMap">
         SELECT id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at
         FROM public.user_notifications

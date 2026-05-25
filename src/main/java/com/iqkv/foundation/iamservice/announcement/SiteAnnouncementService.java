@@ -31,6 +31,8 @@ public interface SiteAnnouncementService {
 
   SiteAnnouncementDtos.SiteAnnouncementResponse getById(UUID id);
 
+  void publish(UUID id);
+
   SiteAnnouncementDtos.SiteAnnouncementListResponse getAll(int limit, int offset);
 
   List<SiteAnnouncementDtos.SiteAnnouncementResponse> getActiveByLocale(String locale);
