@@ -167,7 +167,8 @@ class UserServiceImplTest {
     var request = new UserDtos.AdminCreateUserRequest(
         "newuser@example.com",
         "New",
-        "User"
+        "User",
+        null
     );
 
     when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$encodedPassword");
@@ -214,7 +215,7 @@ class UserServiceImplTest {
     when(userMapper.findById(userId)).thenReturn(Optional.of(testUser));
 
     // Act
-    var result = userService.updateUser(userId, firstName, lastName, updatedBy);
+    var result = userService.updateUser(userId, firstName, lastName, null, updatedBy);
 
     // Assert
     assertThat(result).isNotNull();
@@ -228,7 +229,7 @@ class UserServiceImplTest {
   void shouldPatchUserSuccessfully() {
     // Arrange
     var userId = testUser.getId();
-    var request = new UserDtos.AdminUpdateUserRequest("Jane", "Smith", "ACTIVE");
+    var request = new UserDtos.AdminUpdateUserRequest("Jane", "Smith", "ACTIVE", null);
 
     when(userMapper.findById(userId)).thenReturn(Optional.of(testUser));
 

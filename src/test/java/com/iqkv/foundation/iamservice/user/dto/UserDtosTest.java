@@ -49,7 +49,7 @@ class UserDtosTest {
   @Test
   @DisplayName("Should create UpdateUserRequest")
   void shouldCreateUpdateUserRequest() {
-    var request = new UserDtos.UpdateUserRequest("Jane", "Smith");
+    var request = new UserDtos.UpdateUserRequest("Jane", "Smith", null);
 
     assertThat(request.firstName()).isEqualTo("Jane");
     assertThat(request.lastName()).isEqualTo("Smith");
@@ -68,6 +68,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        "en-US",
         List.of("Acme Corp"),
         List.of("MEMBER"),
         createdAt,
@@ -109,7 +110,8 @@ class UserDtosTest {
     var request = new UserDtos.AdminCreateUserRequest(
         "admin@example.com",
         "Admin",
-        "User"
+        "User",
+        null
     );
 
     assertThat(request.email()).isEqualTo("admin@example.com");
@@ -123,7 +125,8 @@ class UserDtosTest {
     var request = new UserDtos.AdminUpdateUserRequest(
         "Updated",
         "Name",
-        "SUSPENDED"
+        "SUSPENDED",
+        null
     );
 
     assertThat(request.firstName()).isEqualTo("Updated");
@@ -142,6 +145,7 @@ class UserDtosTest {
         "Doe",
         "ACTIVE",
         true,
+        null,
         List.of(),
         List.of(),
         LocalDateTime.now(),
