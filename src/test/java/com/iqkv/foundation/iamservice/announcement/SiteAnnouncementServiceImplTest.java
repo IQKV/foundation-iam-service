@@ -30,7 +30,6 @@ import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtos;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
-import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
