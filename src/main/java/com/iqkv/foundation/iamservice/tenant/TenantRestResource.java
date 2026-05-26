@@ -67,7 +67,7 @@ public class TenantRestResource {
   }
 
   @GetMapping("/{tenantKey}")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN', 'MEMBER')")
   @Operation(summary = "Get tenant by key", description = "Retrieves tenant details by tenantKey")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
@@ -76,7 +76,12 @@ public class TenantRestResource {
       @ApiResponse(responseCode = "403", description = "Access denied"),
       @ApiResponse(responseCode = "404", description = "Tenant not found")
   })
-  public ResponseEntity<TenantDtos.TenantResponse> getTenant(@PathVariable final String tenantKey) {
+  public ResponseEntity<TenantDtos.TenantResponse> getTenant(@PathVariable final String tenantKey,
+                                                             @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
     final Tenant tenant = tenantService.getTenantByKey(tenantKey);
     return ResponseEntity.ok(TenantDtoMapper.toResponse(tenant));
   }
@@ -147,7 +152,7 @@ public class TenantRestResource {
   }
 
   @GetMapping("/{tenantKey}/members")
-  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN', 'MEMBER')")
   @Operation(summary = "List tenant members",
              description = "Returns a paginated, sorted, and optionally filtered list of users belonging to the given tenant.")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
@@ -171,7 +176,7 @@ public class TenantRestResource {
   }
 
   @GetMapping("/{tenantKey}/members/count")
-  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN', 'MEMBER')")
   @Operation(summary = "Count tenant members", description = "Returns the number of active members in the tenant.")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
