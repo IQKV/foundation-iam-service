@@ -2,19 +2,21 @@
 -- This script runs when the PostgreSQL container starts for the first time
 
 -- Create additional schemas
-CREATE SCHEMA IF NOT EXISTS auth;
+CREATE SCHEMA IF NOT EXISTS iamservice;
+CREATE SCHEMA IF NOT EXISTS t_platform;
 
 -- Set default search path
-ALTER DATABASE iam SET search_path TO public, auth;
+ALTER DATABASE iamservice SET search_path TO t_platform, public, iamservice;
 
 -- Create extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 
 -- Grant permissions
-GRANT ALL PRIVILEGES ON DATABASE iam TO svc_iam_dba;
+GRANT ALL PRIVILEGES ON DATABASE iamservice TO svc_iam_dba;
 GRANT ALL PRIVILEGES ON SCHEMA public TO svc_iam_dba;
-GRANT ALL PRIVILEGES ON SCHEMA auth TO svc_iam_dba;
+GRANT ALL PRIVILEGES ON SCHEMA iamservice TO svc_iam_dba;
+GRANT ALL PRIVILEGES ON SCHEMA t_platform TO svc_iam_dba;
 
 -- Audit trigger function for tracking row updates
 CREATE OR REPLACE FUNCTION update_updated_at_column()

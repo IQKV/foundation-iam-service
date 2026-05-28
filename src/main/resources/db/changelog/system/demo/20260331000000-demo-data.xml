@@ -88,7 +88,7 @@
 
     <changeSet id="20260331000000-demo-tenant" author="iqkv" context="demo">
         <insert tableName="tenants" schemaName="public">
-            <column name="id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="id" value="f3c2b8f1-7e4a-4d9b-9c0a-8e2d4a6f91bd"/>
             <column name="tenant_key" value="demo0001"/>
             <column name="name" value="Demo Tenant"/>
             <column name="status" value="ACTIVE"/>
