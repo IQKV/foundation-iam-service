@@ -55,5 +55,22 @@
             </delete>
         </rollback>
     </changeSet>
+    <changeSet id="20260115120000-acme-tenant-record" author="iqkv">
+        <insert tableName="tenants" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0000-000000000002"/>
+            <column name="tenant_key" value="acme0001"/>
+            <column name="name" value="Acme Corp. Tenant"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenants" schemaName="public">
+                <where>tenant_key = 'acme0001'</where>
+            </delete>
+        </rollback>
+    </changeSet>
 
 </databaseChangeLog>
