@@ -24,4 +24,19 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="20260525000000-default-locale-en-us" author="iqkv">
+        <insert tableName="locales" schemaName="public">
+            <column name="code" value="en-US"/>
+            <column name="name" value="English (US)"/>
+            <column name="native_name" value="English (US)"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_default" valueBoolean="true"/>
+        </insert>
+        <rollback>
+            <delete tableName="locales" schemaName="public">
+                <where>code IN ('en-US')</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

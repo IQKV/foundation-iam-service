@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Platform E2E test fixture users — context: demo.
+        Assigned to tenant key 'platform'.
+
+        Designed for Playwright end-to-end tests targeting the platform tenant.
+
+        Password : ChangeMePass123!  (BCrypt 12, same hash used across all demo users)
+        Hash     : $2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku
+
+        ── Tenant scope — platform ─────────────────────────────────────────────────
+          TENANT_OWNER
+            00000000-0000-0000-0101-000000000190  alice.freeman@platform.iqkv.com
+            00000000-0000-0000-0101-000000000191  bob.carpenter@platform.iqkv.com
+          ADMIN
+            00000000-0000-0000-0101-000000000192  charlie.baker@platform.iqkv.com
+            00000000-0000-0000-0101-000000000193  david.miller@platform.iqkv.com
+          MEMBER
+            00000000-0000-0000-0101-000000000194  eve.taylor@platform.iqkv.com
+            00000000-0000-0000-0101-000000000195  frank.wilson@platform.iqkv.com
+            00000000-0000-0000-0101-000000000196  grace.davies@platform.iqkv.com
+            00000000-0000-0000-0101-000000000197  henry.clark@platform.iqkv.com
+            00000000-0000-0000-0101-000000000198  ivy.roberts@platform.iqkv.com
+
+          Sign-in: POST /api/v1/iam/auth/signin  Header: X-Tenant-ID: platform
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         1. TENANT OWNER users  (platform)
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <changeSet id="20260528000000-e2e-platform-tenant-owner-users" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000190"/>
+            <column name="email" value="alice.freeman@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Alice"/>
+            <column name="last_name" value="Freeman"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:01:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:01:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000191"/>
+            <column name="email" value="bob.carpenter@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Bob"/>
+            <column name="last_name" value="Carpenter"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:02:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:02:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="users" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0101-000000000190',
+                    '00000000-0000-0000-0101-000000000191'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-tenant-owner-memberships" author="iqkv" context="demo">
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000190"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000190"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:01:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:01:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000191"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000191"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:02:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:02:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_memberships" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0002-000000000190',
+                    '00000000-0000-0000-0002-000000000191'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-tenant-owner-authorities" author="iqkv" context="demo">
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000190"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000190"/>
+            <column name="authority" value="TENANT_OWNER"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000191"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000191"/>
+            <column name="authority" value="TENANT_OWNER"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_member_authorities" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0003-000000000190',
+                    '00000000-0000-0000-0003-000000000191'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         2. ADMIN users  (platform)
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <changeSet id="20260528000000-e2e-platform-admin-users" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000192"/>
+            <column name="email" value="charlie.baker@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Charlie"/>
+            <column name="last_name" value="Baker"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:03:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:03:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000193"/>
+            <column name="email" value="david.miller@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="David"/>
+            <column name="last_name" value="Miller"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:04:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:04:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="users" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0101-000000000192',
+                    '00000000-0000-0000-0101-000000000193'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-admin-memberships" author="iqkv" context="demo">
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000192"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000192"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:03:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:03:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000193"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000193"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:04:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:04:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_memberships" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0002-000000000192',
+                    '00000000-0000-0000-0002-000000000193'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-admin-authorities" author="iqkv" context="demo">
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000192"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000192"/>
+            <column name="authority" value="ADMIN"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000193"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000193"/>
+            <column name="authority" value="ADMIN"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_member_authorities" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0003-000000000192',
+                    '00000000-0000-0000-0003-000000000193'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         3. MEMBER users  (platform)
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <changeSet id="20260528000000-e2e-platform-member-users" author="iqkv" context="demo">
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000194"/>
+            <column name="email" value="eve.taylor@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Eve"/>
+            <column name="last_name" value="Taylor"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:05:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:05:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000195"/>
+            <column name="email" value="frank.wilson@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Frank"/>
+            <column name="last_name" value="Wilson"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:06:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:06:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000196"/>
+            <column name="email" value="grace.davies@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Grace"/>
+            <column name="last_name" value="Davies"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:07:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:07:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000197"/>
+            <column name="email" value="henry.clark@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Henry"/>
+            <column name="last_name" value="Clark"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:08:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:08:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="users" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0101-000000000198"/>
+            <column name="email" value="ivy.roberts@platform.iqkv.com"/>
+            <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name" value="Ivy"/>
+            <column name="last_name" value="Roberts"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email_verified" valueBoolean="true"/>
+            <column name="created_at" valueDate="2026-05-28T09:09:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:09:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="users" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0101-000000000194',
+                    '00000000-0000-0000-0101-000000000195',
+                    '00000000-0000-0000-0101-000000000196',
+                    '00000000-0000-0000-0101-000000000197',
+                    '00000000-0000-0000-0101-000000000198'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-member-memberships" author="iqkv" context="demo">
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000194"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000194"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:05:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:05:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000195"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000195"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:06:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:06:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000196"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000196"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:07:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:07:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000197"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000197"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:08:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:08:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0002-000000000198"/>
+            <column name="user_id" value="00000000-0000-0000-0101-000000000198"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T09:09:00"/>
+            <column name="updated_at" valueDate="2026-05-28T09:09:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_memberships" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0002-000000000194',
+                    '00000000-0000-0000-0002-000000000195',
+                    '00000000-0000-0000-0002-000000000196',
+                    '00000000-0000-0000-0002-000000000197',
+                    '00000000-0000-0000-0002-000000000198'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260528000000-e2e-platform-member-authorities" author="iqkv" context="demo">
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000194"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000194"/>
+            <column name="authority" value="MEMBER"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000195"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000195"/>
+            <column name="authority" value="MEMBER"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000196"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000196"/>
+            <column name="authority" value="MEMBER"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000197"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000197"/>
+            <column name="authority" value="MEMBER"/>
+        </insert>
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" value="00000000-0000-0000-0003-000000000198"/>
+            <column name="membership_id" value="00000000-0000-0000-0002-000000000198"/>
+            <column name="authority" value="MEMBER"/>
+        </insert>
+        <rollback>
+            <delete tableName="tenant_member_authorities" schemaName="public">
+                <where>id IN (
+                    '00000000-0000-0000-0003-000000000194',
+                    '00000000-0000-0000-0003-000000000195',
+                    '00000000-0000-0000-0003-000000000196',
+                    '00000000-0000-0000-0003-000000000197',
+                    '00000000-0000-0000-0003-000000000198'
+                    )
+                </where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

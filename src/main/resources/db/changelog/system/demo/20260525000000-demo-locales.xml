@@ -7,29 +7,22 @@
 
     <changeSet id="20260525000000-demo-locales" author="iqkv" context="demo">
         <insert tableName="locales" schemaName="public">
-            <column name="code" value="en-US"/>
-            <column name="name" value="English (US)"/>
-            <column name="native_name" value="English (US)"/>
-            <column name="is_active" valueBoolean="true"/>
-            <column name="is_default" valueBoolean="true"/>
-        </insert>
-        <insert tableName="locales" schemaName="public">
-            <column name="code" value="ru-RU"/>
-            <column name="name" value="Russian"/>
-            <column name="native_name" value="Русский"/>
+            <column name="code" value="gn-PY"/>
+            <column name="name" value="Guarani"/>
+            <column name="native_name" value="Guarani"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="is_default" valueBoolean="false"/>
         </insert>
         <insert tableName="locales" schemaName="public">
-            <column name="code" value="it-IT"/>
-            <column name="name" value="Italian"/>
-            <column name="native_name" value="Italiano"/>
+            <column name="code" value="qu-PE"/>
+            <column name="name" value="Quechua"/>
+            <column name="native_name" value="Quechua"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="is_default" valueBoolean="false"/>
         </insert>
         <rollback>
             <delete tableName="locales" schemaName="public">
-                <where>code IN ('en-US', 'ru-RU', 'it-IT')</where>
+                <where>code IN ('gn-PY', 'qu-PE')</where>
             </delete>
         </rollback>
     </changeSet>
