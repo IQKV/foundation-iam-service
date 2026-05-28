@@ -17,7 +17,7 @@ Multi-tenant Identity and Access Management microservice. Handles the full ident
 
 The IAM service is the identity backbone of the platform:
 
-- **Self-service onboarding** — a single signup call creates the user account and provisions a new tenant in one step; the caller receives a `tenantKey` and polls for `ACTIVE` status
+- **Self-service onboarding** — signup creates the user account and adds them as a `MEMBER` to the hidden platform tenant; tenants are created separately via a dedicated endpoint after signup
 - **Signup by invitation** — existing `TENANT_OWNER` or `ADMIN` sends a time-limited invite (72 h, default authority `MEMBER`); new users are created on accept with email pre-verified; existing users verify identity by password
 - **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
@@ -43,18 +43,18 @@ Base path: `/api/v1/iam`
 
 ### Authentication — `/api/v1/iam/auth`
 
-| Method | Path                              | Auth                   | Description                                                                         |
-| ------ | --------------------------------- | ---------------------- | ----------------------------------------------------------------------------------- |
-| `POST` | `/auth/signup`                    | public                 | Register user + create tenant (multi-tenant) or join default tenant (single-tenant) |
-| `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status after signup                                        |
-| `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair                                  |
-| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair                   |
-| `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in; returns platform-scoped token pair (null `tenant_id`)       |
-| `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                                  |
-| `POST` | `/auth/refresh`                   | public                 | Exchange refresh token for a new token pair                                         |
-| `POST` | `/auth/signout`                   | JWT                    | Revoke current token (JTI denylist)                                                 |
-| `POST` | `/auth/signout-all`               | JWT                    | Invalidate all sessions via `last_global_signout_at`                                |
-| `POST` | `/auth/validate`                  | JWT                    | Validate token and return user context (gateway introspection)                      |
+| Method | Path                              | Auth                   | Description                                                                   |
+| ------ | --------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public                 | Register user and add as MEMBER to platform tenant                            |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status after signup                                  |
+| `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in; returns RS256 access + refresh token pair                            |
+| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair             |
+| `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in; returns platform-scoped token pair (null `tenant_id`) |
+| `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                            |
+| `POST` | `/auth/refresh`                   | public                 | Exchange refresh token for a new token pair                                   |
+| `POST` | `/auth/signout`                   | JWT                    | Revoke current token (JTI denylist)                                           |
+| `POST` | `/auth/signout-all`               | JWT                    | Invalidate all sessions via `last_global_signout_at`                          |
+| `POST` | `/auth/validate`                  | JWT                    | Validate token and return user context (gateway introspection)                |
 
 ### Platform Admin Account — `/api/v1/iam/auth/admin/me`
 
@@ -105,6 +105,7 @@ Real-time delivery via WebSocket — connect to `/api/v1/iam/ws` (STOMP/SockJS):
 
 | Method   | Path                                                | Auth                                       | Description                         |
 | -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| `POST`   | `/tenants`                                          | JWT                                        | Create new tenant (owner is caller) |
 | `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
 | `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
 | `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Update tenant status                |
@@ -407,6 +408,7 @@ Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of 
 - **In-app notifications**: `NotificationConsumer` listens on `iqkv.iam.notifications` — sends email, persists `UserNotification` to DB, and pushes to `/user/{userId}/queue/notifications` via STOMP; `AnnouncementConsumer` listens on `iqkv.iam.announcements` — streams all users via MyBatis cursor in batches of 1000, bulk-inserts notifications, and broadcasts to `/topic/announcements`
 - **Platform rollout mode**: Controlled via `iqkv.platform.rollout-mode` (`MULTI_TENANT` | `SINGLE_TENANT`); must be identical across IAM, Billing, and Gateway; IAM publishes canonical mode via `/actuator/info` under `platform.rollout-mode`; service fails readiness on invalid/missing mode
 - **Single-tenant mode**: Strategy pattern (`SignupStrategy`, `TenantBootstrapStrategy`) branches behavior at startup and signup; `SingleTenantBootstrapStrategy` idempotently provisions the default tenant on `ApplicationReadyEvent`; `SingleTenantSignupStrategy` joins users to the default tenant with `MEMBER` authority — no tenant creation, no `TENANT_OWNER` grant
+- **Platform tenant**: Every user is automatically added to the hidden platform tenant (tenantKey = "platform") as a `MEMBER` — used for single-tenant mode and as a default workspace in multi-tenant mode; enables seamless single-to-multi tenant switching
 - **Invitations**: Token-based signup-by-invitation flow; token resolves tenant context so accept endpoints are tenant-agnostic; `authority` defaults to `MEMBER`; ShedLock-guarded reaper expires stale tokens
 - **Email**: Thymeleaf-rendered transactional emails via Spring Mail; MailHog for local testing
 - **Observability**: Micrometer + Prometheus; structured JSON logging with Logstash encoder; health probes for Kubernetes; `PlatformModeHealthIndicator` exposes rollout mode in `/actuator/health`; `PlatformModeInfoContributor` publishes canonical `platform.rollout-mode` in `/actuator/info`

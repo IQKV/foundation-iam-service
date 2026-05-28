@@ -9,21 +9,21 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ### Authentication
 
-| Method | Path                              | Auth                   | Description                                                                           |
-| ------ | --------------------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
-| `POST` | `/auth/signup`                    | public                 | Register user and create tenant (multi-tenant) or join default tenant (single-tenant) |
-| `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status                                                       |
-| `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in, receive RS256 token pair                                                     |
-| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair                     |
-| `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in (platform-scoped token, null `tenant_id`)                      |
-| `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                                    |
-| `POST` | `/auth/refresh`                   | public                 | Rotate access + refresh tokens                                                        |
-| `POST` | `/auth/signout`                   | JWT                    | Revoke current session (JTI denylist)                                                 |
-| `POST` | `/auth/signout-all`               | JWT                    | Revoke all sessions globally                                                          |
-| `POST` | `/auth/validate`                  | JWT                    | Validate token for gateway introspection                                              |
+| Method | Path                              | Auth                   | Description                                                       |
+| ------ | --------------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| `POST` | `/auth/signup`                    | public                 | Register user and add as MEMBER to platform tenant                |
+| `GET`  | `/auth/signup/status/{tenantKey}` | public                 | Poll tenant provisioning status                                   |
+| `POST` | `/auth/signin`                    | public + `X-Tenant-ID` | Sign in, receive RS256 token pair                                 |
+| `POST` | `/auth/exchange`                  | JWT                    | Exchange a Bearer access token for a new tenant-scoped token pair |
+| `POST` | `/auth/admin/signin`              | public                 | Platform admin sign-in (platform-scoped token, null `tenant_id`)  |
+| `POST` | `/auth/admin/refresh`             | public                 | Refresh platform-scoped token pair                                |
+| `POST` | `/auth/refresh`                   | public                 | Rotate access + refresh tokens                                    |
+| `POST` | `/auth/signout`                   | JWT                    | Revoke current session (JTI denylist)                             |
+| `POST` | `/auth/signout-all`               | JWT                    | Revoke all sessions globally                                      |
+| `POST` | `/auth/validate`                  | JWT                    | Validate token for gateway introspection                          |
 
-`POST /auth/signup` creates a global user account, a new tenant, and a `TENANT_OWNER` membership in one step.
-Returns `201` with `tenantStatus=PROVISIONING`; poll `GET /auth/signup/status/{tenantKey}` until `ACTIVE`.
+`POST /auth/signup` creates a global user account and adds them as a `MEMBER` to the platform tenant.
+Tenants are created afterwards via `POST /tenants`, which provisions the tenant and grants the caller `TENANT_OWNER`.
 
 ---
 
@@ -122,6 +122,7 @@ Accepts a `locale` query parameter (default `en-US`). Returns only `PUBLISHED` a
 
 | Method   | Path                                                | Auth                                       | Description                         |
 | -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| `POST`   | `/tenants`                                          | JWT                                        | Create new tenant (owner is caller) |
 | `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
 | `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
 | `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status            |
