@@ -44,6 +44,7 @@ import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundExcepti
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
+import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -63,6 +64,7 @@ public class InvitationServiceImpl implements InvitationService {
 
   private static final Logger log = LoggerFactory.getLogger(InvitationServiceImpl.class);
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+  private static final String PLATFORM_TENANT_KEY = "platform";
 
   private final InvitationMapper invitationMapper;
   private final TenantMapper tenantMapper;
@@ -218,6 +220,9 @@ public class InvitationServiceImpl implements InvitationService {
     authority.setMembershipId(membership.getId());
     authority.setAuthority(invitation.getAuthority());
     authorityMapper.insert(authority);
+
+    // Add user to platform tenant with MEMBER authority if not already a member
+    ensurePlatformMembership(user);
 
     // Consume the invitation
     invitationMapper.markAccepted(invitation.getId(), Instant.now(), LocalDateTime.now());
@@ -552,5 +557,32 @@ public class InvitationServiceImpl implements InvitationService {
       throw new InvitationNotFoundException();
     }
     return invitation;
+  }
+
+  /**
+   * Ensures the user has an active membership in the platform tenant with MEMBER authority.
+   * Idempotent - skips creation if membership already exists.
+   */
+  private void ensurePlatformMembership(final com.iqkv.foundation.iamservice.user.User user) {
+    if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
+      log.info("Adding user {} to platform tenant", user.getId());
+      
+      final var platformMembership = new TenantMembership();
+      platformMembership.setId(UUID.randomUUID());
+      platformMembership.setUserId(user.getId());
+      platformMembership.setTenantKey(PLATFORM_TENANT_KEY);
+      platformMembership.setStatus(MembershipStatus.ACTIVE);
+      platformMembership.setCreatedAt(LocalDateTime.now());
+      platformMembership.setUpdatedAt(LocalDateTime.now());
+      platformMembership.setCreatedBy(user.getId().toString());
+      platformMembership.setUpdatedBy(user.getId().toString());
+      membershipMapper.insert(platformMembership);
+
+      final var platformAuthority = new TenantMemberAuthority();
+      platformAuthority.setId(UUID.randomUUID());
+      platformAuthority.setMembershipId(platformMembership.getId());
+      platformAuthority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
+      authorityMapper.insert(platformAuthority);
+    }
   }
 }
