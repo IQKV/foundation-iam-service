@@ -78,6 +78,8 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     this.passwordEncoder = passwordEncoder;
   }
 
+  private static final String PLATFORM_TENANT_KEY = "platform";
+
   @Override
   @Transactional
   public SignupResult execute(final UserDtos.RegisterUserRequest request) {
@@ -127,14 +129,17 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     membership.setUpdatedBy(canonicalUser.getId().toString());
     membershipMapper.insert(membership);
 
-    // Step 6: Grant MEMBER authority (not TENANT_OWNER per requirement 4.2, 13.2)
+    // Step 6: Grant MEMBER authority
     final var authority = new TenantMemberAuthority();
     authority.setId(UUID.randomUUID());
     authority.setMembershipId(membership.getId());
     authority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
     authorityMapper.insert(authority);
 
-    // NOTE: Do NOT publish tenant.created event — already published at bootstrap (requirement 4.7)
+    // Step 7: Add user to platform tenant with MEMBER authority if not already a member
+    ensurePlatformMembership(canonicalUser);
+
+    // NOTE: Do NOT publish tenant.created event — already published at bootstrap
 
     log.info("Single-tenant signup: userId={}, defaultTenantKey={}", canonicalUser.getId(), defaultTenantKey);
 
@@ -143,5 +148,32 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
         defaultTenant,
         membership,
         List.of(UserServiceConstants.AUTHORITY_MEMBER));
+  }
+
+  /**
+   * Ensures the user has an active membership in the platform tenant with MEMBER authority.
+   * Idempotent - skips creation if membership already exists.
+   */
+  private void ensurePlatformMembership(final User user) {
+    if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
+      log.info("Adding user {} to platform tenant", user.getId());
+      
+      final var platformMembership = new TenantMembership();
+      platformMembership.setId(UUID.randomUUID());
+      platformMembership.setUserId(user.getId());
+      platformMembership.setTenantKey(PLATFORM_TENANT_KEY);
+      platformMembership.setStatus(MembershipStatus.ACTIVE);
+      platformMembership.setCreatedAt(LocalDateTime.now());
+      platformMembership.setUpdatedAt(LocalDateTime.now());
+      platformMembership.setCreatedBy(user.getId().toString());
+      platformMembership.setUpdatedBy(user.getId().toString());
+      membershipMapper.insert(platformMembership);
+
+      final var platformAuthority = new TenantMemberAuthority();
+      platformAuthority.setId(UUID.randomUUID());
+      platformAuthority.setMembershipId(platformMembership.getId());
+      platformAuthority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
+      authorityMapper.insert(platformAuthority);
+    }
   }
 }
