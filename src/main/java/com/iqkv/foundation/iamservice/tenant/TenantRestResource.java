@@ -66,6 +66,21 @@ public class TenantRestResource {
     this.membershipService = membershipService;
   }
 
+  @PostMapping
+  @PreAuthorize("isAuthenticated()")
+  @Operation(summary = "Create new tenant/organization", description = "Creates a new tenant and adds the caller as TENANT_OWNER")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "Tenant created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid tenant name"),
+      @ApiResponse(responseCode = "409", description = "Tenant name already exists")
+  })
+  public ResponseEntity<TenantDtos.TenantResponse> createTenant(@Valid @RequestBody final TenantDtos.CreateTenantRequest request,
+                                                               @AuthenticationPrincipal final Jwt jwt) {
+    final UUID ownerUserId = UUID.fromString(jwt.getSubject());
+    final Tenant tenant = tenantService.createTenant(request.name(), ownerUserId);
+    return ResponseEntity.status(201).body(TenantDtoMapper.toResponse(tenant));
+  }
+
   @GetMapping("/{tenantKey}")
   @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN', 'MEMBER')")
   @Operation(summary = "Get tenant by key", description = "Retrieves tenant details by tenantKey")

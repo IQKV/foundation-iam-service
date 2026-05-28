@@ -34,6 +34,11 @@ public final class TenantDtos {
 
   // ─── Self-service DTOs (used by TenantRestResource) ───────────────────────
 
+  public record CreateTenantRequest(
+      @NotBlank @Size(max = 100) String name
+  ) {
+  }
+
   public record UpdateTenantStatusRequest(@NotNull TenantStatus status) {
   }
 
@@ -44,7 +49,8 @@ public final class TenantDtos {
       String tenantKey,
       String name,
       TenantStatus status,
-      LocalDateTime createdAt) {
+      LocalDateTime createdAt
+  ) {
   }
 
   // ─── Admin DTOs (used by TenantAdminRestResource) ─────────────────────────

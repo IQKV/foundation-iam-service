@@ -18,19 +18,27 @@ package com.iqkv.foundation.iamservice.tenant;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
+import com.iqkv.foundation.iamservice.membership.MembershipStatus;
+import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
+import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
+import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
+import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
+import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,17 +65,20 @@ public class TenantServiceImpl implements TenantService {
 
   private final TenantMapper tenantMapper;
   private final TenantMembershipMapper membershipMapper;
+  private final TenantMemberAuthorityMapper authorityMapper;
   private final MessagingService messagingService;
   private final UserMapper userMapper;
   private final IamServiceMetrics metrics;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
                            final TenantMembershipMapper membershipMapper,
+                           final TenantMemberAuthorityMapper authorityMapper,
                            final MessagingService messagingService,
                            final UserMapper userMapper,
                            final IamServiceMetrics metrics) {
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
+    this.authorityMapper = authorityMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;
     this.metrics = metrics;
@@ -90,8 +101,13 @@ public class TenantServiceImpl implements TenantService {
       throw new TenantAlreadyExistsException("Tenant name already taken");
     }
 
+    // Step 1: Validate owner user exists
+    final User owner = userMapper.findById(ownerUserId)
+        .orElseThrow(() -> new UserNotFoundException("Owner user not found"));
+
     final String tenantKey = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NANOID_ALPHABET, NANOID_SIZE);
 
+    // Step 2: Create tenant
     final var tenant = new Tenant();
     tenant.setId(UUID.randomUUID());
     tenant.setTenantKey(tenantKey);
@@ -105,11 +121,26 @@ public class TenantServiceImpl implements TenantService {
     tenantMapper.insertIfAbsent(tenant);
     metrics.recordTenantProvisioning("initiated");
 
-    // Resolve owner fields for the tenant.created event so Billing can bootstrap correctly.
-    final var owner = userMapper.findById(ownerUserId).orElse(null);
-    final String ownerEmail = owner != null ? owner.getEmail() : null;
-    final String ownerFirstName = owner != null ? owner.getFirstName() : null;
-    messagingService.publishTenantCreated(tenantKey, tenantName, ownerEmail, ownerFirstName);
+    // Step 3: Create owner membership with TENANT_OWNER authority
+    final var membership = new TenantMembership();
+    membership.setId(UUID.randomUUID());
+    membership.setUserId(ownerUserId);
+    membership.setTenantKey(tenantKey);
+    membership.setStatus(MembershipStatus.ACTIVE);
+    membership.setCreatedAt(LocalDateTime.now());
+    membership.setUpdatedAt(LocalDateTime.now());
+    membership.setCreatedBy(ownerUserId.toString());
+    membership.setUpdatedBy(ownerUserId.toString());
+    membershipMapper.insert(membership);
+
+    final var authority = new TenantMemberAuthority();
+    authority.setId(UUID.randomUUID());
+    authority.setMembershipId(membership.getId());
+    authority.setAuthority(UserServiceConstants.AUTHORITY_TENANT_OWNER);
+    authorityMapper.insert(authority);
+
+    // Step 4: Publish tenant created event
+    messagingService.publishTenantCreated(tenantKey, tenantName, owner.getEmail(), owner.getFirstName());
 
     log.info("Tenant created (provisioning initiated): tenantKey={}, ownerUserId={}", tenantKey, ownerUserId);
     return tenant;
