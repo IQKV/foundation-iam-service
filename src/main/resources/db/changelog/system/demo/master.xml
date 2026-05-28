@@ -14,4 +14,5 @@
     <include file="db/changelog/system/demo/20260517000004-demo-e2e-users.xml"/>
     <include file="db/changelog/system/demo/20260525000000-demo-locales.xml"/>
     <include file="db/changelog/system/demo/20260528000000-demo-platform-e2e-users.xml"/>
+    <include file="db/changelog/system/demo/20260528100000-demo-platform-memberships.xml"/>
 </databaseChangeLog>

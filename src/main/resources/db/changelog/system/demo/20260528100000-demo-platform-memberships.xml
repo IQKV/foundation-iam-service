@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Add all demo users as MEMBERs of the 'platform' tenant.
+        Uses bulk inserts with select to avoid explicit listing.
+    -->
+
+    <changeSet id="20260528100000-demo-platform-memberships" author="iqkv" context="demo">
+        <!-- Insert tenant memberships for all users into platform tenant (skip existing memberships) -->
+        <insert tableName="tenant_memberships" schemaName="public">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="user_id" valueComputed="u.id"/>
+            <column name="tenant_key" value="platform"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueDate="2026-05-28T10:00:00"/>
+            <column name="updated_at" valueDate="2026-05-28T10:00:00"/>
+            <column name="created_by" value="system"/>
+            <column name="updated_by" value="system"/>
+            <select>
+                SELECT u.id
+                FROM public.users u
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM public.tenant_memberships tm
+                    WHERE tm.user_id = u.id
+                    AND tm.tenant_key = 'platform'
+                )
+            </select>
+        </insert>
+
+        <!-- Insert MEMBER authorities for newly created platform memberships -->
+        <insert tableName="tenant_member_authorities" schemaName="public">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="membership_id" valueComputed="tm.id"/>
+            <column name="authority" value="MEMBER"/>
+            <select>
+                SELECT tm.id
+                FROM public.tenant_memberships tm
+                WHERE tm.tenant_key = 'platform'
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM public.tenant_member_authorities tma
+                    WHERE tma.membership_id = tm.id
+                )
+            </select>
+        </insert>
+
+        <rollback>
+            <delete tableName="tenant_member_authorities" schemaName="public">
+                <where>membership_id IN (
+                    SELECT id FROM public.tenant_memberships WHERE tenant_key = 'platform'
+                )</where>
+            </delete>
+            <delete tableName="tenant_memberships" schemaName="public">
+                <where>tenant_key = 'platform'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
