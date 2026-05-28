@@ -214,6 +214,8 @@ class InvitationServiceImplTest {
     when(accountLockoutManager.isLocked("invitee@example.com")).thenReturn(false);
     when(passwordEncoder.matches("password123", existingUser.getPasswordHash())).thenReturn(true);
     when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "test-tenant")).thenReturn(false);
+    // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
+    when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "platform")).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
@@ -257,6 +259,8 @@ class InvitationServiceImplTest {
         .thenReturn(Optional.of(newUser));
     when(passwordEncoder.encode("password123")).thenReturn("$2a$10$encodedPassword");
     when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("test-tenant"))).thenReturn(false);
+    // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
+    when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("platform"))).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
