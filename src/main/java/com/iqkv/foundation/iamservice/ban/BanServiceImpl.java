@@ -205,8 +205,9 @@ public class BanServiceImpl implements BanService {
       }
 
       NotificationEvent event = new NotificationEvent(
+          user.getId(),
           user.getEmail(),
-          notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en",
+          user.getLocale() != null ? user.getLocale() : (notificationProps.defaultLocale() != null ? notificationProps.defaultLocale() : "en"),
           NotificationEventType.USER_BANNED,
           payload,
           Instant.now());
