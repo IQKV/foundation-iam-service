@@ -45,8 +45,84 @@ Tenants are created afterwards via `POST /tenants`, which provisions the tenant 
 | `PATCH`  | `/users/me`             | JWT + `X-Tenant-ID`       | Update own profile (firstName, lastName)                                  |
 | `DELETE` | `/users/me`             | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
 | `POST`   | `/users/me/password`    | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/me/avatar`      | JWT + `X-Tenant-ID`       | Initiate avatar upload (returns presigned S3 URL)                        |
+| `POST`   | `/users/me/avatar/confirm` | JWT + `X-Tenant-ID`    | Confirm avatar upload (persists avatar URL after S3 upload)              |
+| `DELETE` | `/users/me/avatar`      | JWT + `X-Tenant-ID`       | Delete current user's avatar                                              |
 | `POST`   | `/users/tenants`        | public (credential-gated) | Discover tenants by credentials                                           |
 | `GET`    | `/users/me/memberships` | JWT                       | List current user's tenant memberships                                    |
+
+---
+
+### Avatar Upload
+
+The avatar upload feature uses a two-phase flow for secure, direct-to-S3 uploads:
+
+1. **Initiate**: `POST /users/me/avatar` returns a presigned S3 PUT URL (valid for 15 minutes)
+2. **Upload**: Client uploads the image file directly to the presigned URL
+3. **Confirm**: `POST /users/me/avatar/confirm` persists the avatar URL in the user profile
+
+**Initiate Upload**
+
+```http
+POST /api/v1/iam/users/me/avatar
+Authorization: Bearer <jwt>
+X-Tenant-ID: <tenant-key>
+```
+
+Response:
+```json
+{
+  "presignedUploadUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg?...",
+  "objectKey": "avatars/user-id/timestamp.jpg",
+  "expiresInMinutes": 15
+}
+```
+
+**Upload to S3**
+
+```http
+PUT <presignedUploadUrl>
+Content-Type: image/jpeg
+Content-Length: <file-size>
+
+<binary-image-data>
+```
+
+**Confirm Upload**
+
+```http
+POST /api/v1/iam/users/me/avatar/confirm
+Authorization: Bearer <jwt>
+X-Tenant-ID: <tenant-key>
+Content-Type: application/json
+
+{
+  "objectKey": "avatars/user-id/timestamp.jpg"
+}
+```
+
+Response:
+```json
+{
+  "avatarUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg"
+}
+```
+
+**Delete Avatar**
+
+```http
+DELETE /api/v1/iam/users/me/avatar
+Authorization: Bearer <jwt>
+X-Tenant-ID: <tenant-key>
+```
+
+Returns `204 No Content`. Removes the avatar from both S3 and the user profile.
+
+**Notes:**
+- Presigned URLs expire after 15 minutes
+- Object keys follow the pattern: `avatars/{userId}/{timestamp}.jpg`
+- Old avatars are automatically deleted when a new one is uploaded
+- The `avatarUrl` field is included in all user profile responses (`GET /users/me`)
 
 ---
 
