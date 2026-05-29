@@ -72,6 +72,18 @@
             "name": "iqkv.liquibase",
             "type": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
             "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
+        },
+        {
+            "name": "iqkv.objectstorage",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.ObjectStorageConfigurationProperties",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.ObjectStorageConfigurationProperties",
+            "description": "S3-compatible object storage configuration. Supports MinIO (SIT/UAT) and AWS S3 (production)."
+        },
+        {
+            "name": "iqkv.objectstorage.upload",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.ObjectStorageConfigurationProperties$Upload",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.ObjectStorageConfigurationProperties",
+            "description": "Upload policy constraints applied before an object is sent to storage."
         }
     ],
     "properties": [
@@ -332,6 +344,59 @@
             "name": "iqkv.liquibase.contexts",
             "type": "java.lang.String",
             "description": "Active Liquibase contexts (e.g. demo to include seed data, or omit for clean schema only)."
+        },
+        {
+            "name": "iqkv.objectstorage.endpoint",
+            "type": "java.lang.String",
+            "description": "S3-compatible endpoint URL. Use the MinIO in-cluster service URL for SIT/UAT, or https://s3.amazonaws.com for AWS S3 in production.",
+            "defaultValue": "http://localhost:9000"
+        },
+        {
+            "name": "iqkv.objectstorage.access-key",
+            "type": "java.lang.String",
+            "description": "S3 / MinIO access key (username). Injected from a Kubernetes Secret in cluster environments.",
+            "defaultValue": "iqkv"
+        },
+        {
+            "name": "iqkv.objectstorage.secret-key",
+            "type": "java.lang.String",
+            "description": "S3 / MinIO secret key (password). Injected from a Kubernetes Secret in cluster environments."
+        },
+        {
+            "name": "iqkv.objectstorage.bucket-name",
+            "type": "java.lang.String",
+            "description": "Name of the S3 bucket used to store IAM assets (e.g. user avatars).",
+            "defaultValue": "iam-assets"
+        },
+        {
+            "name": "iqkv.objectstorage.region",
+            "type": "java.lang.String",
+            "description": "AWS region identifier. Required by the S3 client even when connecting to MinIO.",
+            "defaultValue": "us-east-1"
+        },
+        {
+            "name": "iqkv.objectstorage.ssl",
+            "type": "java.lang.Boolean",
+            "description": "Whether to use HTTPS when connecting to the object storage endpoint. Must be true in production.",
+            "defaultValue": false
+        },
+        {
+            "name": "iqkv.objectstorage.upload.max-file-size-bytes",
+            "type": "java.lang.Long",
+            "description": "Maximum allowed upload file size in bytes. Requests exceeding this limit are rejected before reaching storage.",
+            "defaultValue": 5242880
+        },
+        {
+            "name": "iqkv.objectstorage.upload.presigned-url-expiration-minutes",
+            "type": "java.lang.Integer",
+            "description": "Lifetime of a pre-signed PUT or GET URL in minutes.",
+            "defaultValue": 60
+        },
+        {
+            "name": "iqkv.objectstorage.upload.allowed-mime-types",
+            "type": "java.util.List<java.lang.String>",
+            "description": "Comma-separated list of accepted MIME types. Uploads with a Content-Type not in this list are rejected.",
+            "defaultValue": "image/jpeg,image/png,image/webp,image/gif"
         }
     ],
     "hints": [
@@ -408,6 +473,57 @@
                 {
                     "value": false,
                     "description": "Disable RabbitMQ — used in test profile."
+                }
+            ]
+        },
+        {
+            "name": "iqkv.objectstorage.ssl",
+            "values": [
+                {
+                    "value": true,
+                    "description": "Use HTTPS — required for production and AWS S3."
+                },
+                {
+                    "value": false,
+                    "description": "Use HTTP — acceptable for in-cluster MinIO in SIT/UAT."
+                }
+            ]
+        },
+        {
+            "name": "iqkv.objectstorage.endpoint",
+            "values": [
+                {
+                    "value": "http://foundation-infra-minio.iqkv-sit-env.svc.cluster.local:9000",
+                    "description": "In-cluster MinIO endpoint for SIT environment."
+                },
+                {
+                    "value": "http://foundation-infra-minio.iqkv-uat-env.svc.cluster.local:9000",
+                    "description": "In-cluster MinIO endpoint for UAT environment."
+                },
+                {
+                    "value": "https://s3.amazonaws.com",
+                    "description": "AWS S3 endpoint for production."
+                },
+                {
+                    "value": "http://localhost:9000",
+                    "description": "Local MinIO instance for development."
+                }
+            ]
+        },
+        {
+            "name": "iqkv.objectstorage.region",
+            "values": [
+                {
+                    "value": "us-east-1"
+                },
+                {
+                    "value": "us-west-2"
+                },
+                {
+                    "value": "eu-central-1"
+                },
+                {
+                    "value": "eu-west-1"
                 }
             ]
         }

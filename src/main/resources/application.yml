@@ -100,6 +100,17 @@ iqkv:
       token-ttl: PT1H
       rate-limit-window: PT15M
       rate-limit-max-requests: 3
+  objectstorage:
+    endpoint: ${OBJECTSTORAGE_ENDPOINT:http://localhost:9000}
+    access-key: ${OBJECTSTORAGE_ACCESS_KEY:iqkv}
+    secret-key: ${OBJECTSTORAGE_SECRET_KEY:iqkv_password}
+    bucket-name: ${OBJECTSTORAGE_BUCKET_NAME:iam-assets}
+    region: ${OBJECTSTORAGE_REGION:us-east-1}
+    ssl: ${OBJECTSTORAGE_SSL:false}
+    upload:
+      max-file-size-bytes: ${OBJECTSTORAGE_UPLOAD_MAX_FILE_SIZE_BYTES:5242880}
+      presigned-url-expiration-minutes: ${OBJECTSTORAGE_UPLOAD_PRESIGNED_URL_EXPIRATION_MINUTES:60}
+      allowed-mime-types: ${OBJECTSTORAGE_UPLOAD_ALLOWED_MIME_TYPES:image/jpeg,image/png,image/webp,image/gif}
   invitation:
     token-ttl: ${INVITATION_TOKEN_TTL:PT72H}
     reaper-interval: ${INVITATION_REAPER_INTERVAL:PT1H}

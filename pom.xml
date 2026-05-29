@@ -108,6 +108,12 @@
             <artifactId>foundation-audit-spi</artifactId>
         </dependency>
 
+        <!-- Object Storage: MinIO S3-compatible client -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+
         <!-- Scheduling: ShedLock -->
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>

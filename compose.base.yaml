@@ -75,6 +75,29 @@ services:
       - iam-service-network
     restart: unless-stopped
 
+  # MinIO S3-compatible object storage - Local Development
+  minio:
+    image: minio/minio:latest
+    container_name: foundation-iam-minio-dev
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: iqkv
+      MINIO_ROOT_PASSWORD: iqkv_password
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console UI
+    volumes:
+      - minio_iam_data:/data
+    networks:
+      - iam-service-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
   # IAM Service - Local Development
   iam-service:
     build:
@@ -109,6 +132,14 @@ services:
       MAIL_FROM: noreply@iqkv.dev
       MAIL_REPLY_TO: ""
 
+      # Object Storage Configuration (MinIO)
+      OBJECTSTORAGE_ENDPOINT: http://minio:9000
+      OBJECTSTORAGE_ACCESS_KEY: iqkv
+      OBJECTSTORAGE_SECRET_KEY: iqkv_password
+      OBJECTSTORAGE_BUCKET_NAME: iam-assets
+      OBJECTSTORAGE_REGION: us-east-1
+      OBJECTSTORAGE_SSL: "false"
+
       # JWT RS256 Key Configuration
       JWT_PRIVATE_KEY_PATH: classpath:keys/private.pem
       JWT_PUBLIC_KEY_PATH: classpath:keys/public.pem
@@ -135,6 +166,8 @@ services:
       postgres-iam:
         condition: service_healthy
       rabbitmq-iam:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     networks:
       - iam-service-network
@@ -171,6 +204,9 @@ volumes:
     driver: local
   rabbitmq_iam_data:
     name: iqkv_iam_rabbitmq_data_dev
+    driver: local
+  minio_iam_data:
+    name: iqkv_iam_minio_data_dev
     driver: local
   iam_logs:
     name: iqkv_iam_logs_dev

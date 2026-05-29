@@ -41,6 +41,17 @@ iqkv:
     jwt:
       private-key-path: ${JWT_PRIVATE_KEY_PATH}
       public-key-path: ${JWT_PUBLIC_KEY_PATH}
+  objectstorage:
+    endpoint: ${OBJECTSTORAGE_ENDPOINT}
+    access-key: ${OBJECTSTORAGE_ACCESS_KEY}
+    secret-key: ${OBJECTSTORAGE_SECRET_KEY}
+    bucket-name: ${OBJECTSTORAGE_BUCKET_NAME}
+    region: ${OBJECTSTORAGE_REGION}
+    ssl: ${OBJECTSTORAGE_SSL}
+    upload:
+      max-file-size-bytes: ${OBJECTSTORAGE_UPLOAD_MAX_FILE_SIZE_BYTES}
+      presigned-url-expiration-minutes: ${OBJECTSTORAGE_UPLOAD_PRESIGNED_URL_EXPIRATION_MINUTES}
+      allowed-mime-types: ${OBJECTSTORAGE_UPLOAD_ALLOWED_MIME_TYPES}
   messaging:
     rabbitmq:
       enabled: true

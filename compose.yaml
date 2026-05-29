@@ -17,6 +17,12 @@ services:
       file: compose.base.yaml
       service: mailhog
 
+  # MinIO S3-compatible object storage
+  minio:
+    extends:
+      file: compose.base.yaml
+      service: minio
+
 networks:
   iam-service-network:
     name: foundation-iam-network-dev
@@ -27,3 +33,5 @@ volumes:
     name: iqkv_iam_postgres_data_dev
   rabbitmq_iam_data:
     name: iqkv_iam_rabbitmq_data_dev
+  minio_iam_data:
+    name: iqkv_iam_minio_data_dev

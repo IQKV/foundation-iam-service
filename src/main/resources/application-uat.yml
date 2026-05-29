@@ -35,6 +35,13 @@ iqkv:
     jwt:
       private-key-path: ${JWT_PRIVATE_KEY_PATH}
       public-key-path: ${JWT_PUBLIC_KEY_PATH}
+  objectstorage:
+    endpoint: ${OBJECTSTORAGE_ENDPOINT}
+    access-key: ${OBJECTSTORAGE_ACCESS_KEY}
+    secret-key: ${OBJECTSTORAGE_SECRET_KEY}
+    bucket-name: ${OBJECTSTORAGE_BUCKET_NAME}
+    region: ${OBJECTSTORAGE_REGION}
+    ssl: ${OBJECTSTORAGE_SSL}
   messaging:
     rabbitmq:
       enabled: true

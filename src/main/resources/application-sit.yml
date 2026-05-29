@@ -26,6 +26,11 @@ iqkv:
   mail:
     host: ${MAIL_HOST:mailhog}
     port: ${MAIL_PORT:1025}
+  objectstorage:
+    endpoint: ${OBJECTSTORAGE_ENDPOINT:http://foundation-infra-minio.iqkv-sit-env.svc.cluster.local:9000}
+    access-key: ${OBJECTSTORAGE_ACCESS_KEY:iqkv}
+    secret-key: ${OBJECTSTORAGE_SECRET_KEY:iqkv_password}
+    bucket-name: ${OBJECTSTORAGE_BUCKET_NAME:iam-assets}
   messaging:
     rabbitmq:
       enabled: true
