@@ -31,9 +31,9 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
+import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
-import com.iqkv.foundation.iamservice.user.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
