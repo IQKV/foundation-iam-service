@@ -39,17 +39,17 @@ Tenants are created afterwards via `POST /tenants`, which provisions the tenant 
 
 ### User Profile
 
-| Method   | Path                    | Auth                      | Description                                                               |
-| -------- | ----------------------- | ------------------------- | ------------------------------------------------------------------------- |
-| `GET`    | `/users/me`             | JWT + `X-Tenant-ID`       | Get own profile                                                           |
-| `PATCH`  | `/users/me`             | JWT + `X-Tenant-ID`       | Update own profile (firstName, lastName)                                  |
-| `DELETE` | `/users/me`             | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
-| `POST`   | `/users/me/password`    | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
-| `POST`   | `/users/me/avatar`      | JWT + `X-Tenant-ID`       | Initiate avatar upload (returns presigned S3 URL)                        |
-| `POST`   | `/users/me/avatar/confirm` | JWT + `X-Tenant-ID`    | Confirm avatar upload (persists avatar URL after S3 upload)              |
-| `DELETE` | `/users/me/avatar`      | JWT + `X-Tenant-ID`       | Delete current user's avatar                                              |
-| `POST`   | `/users/tenants`        | public (credential-gated) | Discover tenants by credentials                                           |
-| `GET`    | `/users/me/memberships` | JWT                       | List current user's tenant memberships                                    |
+| Method   | Path                       | Auth                      | Description                                                               |
+| -------- | -------------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| `GET`    | `/users/me`                | JWT + `X-Tenant-ID`       | Get own profile                                                           |
+| `PATCH`  | `/users/me`                | JWT + `X-Tenant-ID`       | Update own profile (firstName, lastName)                                  |
+| `DELETE` | `/users/me`                | JWT + `X-Tenant-ID`       | Remove own membership from current tenant                                 |
+| `POST`   | `/users/me/password`       | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/me/avatar`         | JWT + `X-Tenant-ID`       | Initiate avatar upload (returns presigned S3 URL)                         |
+| `POST`   | `/users/me/avatar/confirm` | JWT + `X-Tenant-ID`       | Confirm avatar upload (persists avatar URL after S3 upload)               |
+| `DELETE` | `/users/me/avatar`         | JWT + `X-Tenant-ID`       | Delete current user's avatar                                              |
+| `POST`   | `/users/tenants`           | public (credential-gated) | Discover tenants by credentials                                           |
+| `GET`    | `/users/me/memberships`    | JWT                       | List current user's tenant memberships                                    |
 
 ---
 
@@ -70,11 +70,12 @@ X-Tenant-ID: <tenant-key>
 ```
 
 Response:
+
 ```json
 {
-  "presignedUploadUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg?...",
-  "objectKey": "avatars/user-id/timestamp.jpg",
-  "expiresInMinutes": 15
+    "presignedUploadUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg?...",
+    "objectKey": "avatars/user-id/timestamp.jpg",
+    "expiresInMinutes": 15
 }
 ```
 
@@ -102,9 +103,10 @@ Content-Type: application/json
 ```
 
 Response:
+
 ```json
 {
-  "avatarUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg"
+    "avatarUrl": "https://s3.amazonaws.com/bucket/avatars/user-id/timestamp.jpg"
 }
 ```
 
@@ -119,6 +121,7 @@ X-Tenant-ID: <tenant-key>
 Returns `204 No Content`. Removes the avatar from both S3 and the user profile.
 
 **Notes:**
+
 - Presigned URLs expire after 15 minutes
 - Object keys follow the pattern: `avatars/{userId}/{timestamp}.jpg`
 - Old avatars are automatically deleted when a new one is uploaded
