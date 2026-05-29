@@ -294,8 +294,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);
       } catch (final Exception e) {
         // Only publish if we haven't already published in the specific catch blocks above
-        if (!(e instanceof AccountNotActiveException || e instanceof AccountLockedException ||
-              e instanceof BadCredentialsException || e instanceof NoPlatformAuthorityException)) {
+        if (!(e instanceof AccountNotActiveException
+            || e instanceof AccountLockedException
+            || e instanceof BadCredentialsException
+            || e instanceof NoPlatformAuthorityException)) {
           publishSigninAttemptEvent(request.email(), userIdForAudit, null, 
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.UNKNOWN);
         }
