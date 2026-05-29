@@ -32,6 +32,7 @@ import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigur
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.SigninAttemptEvent;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
@@ -129,30 +130,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public AuthenticationDtos.TokenResponse signIn(final AuthenticationDtos.SignInRequest request) {
     final String tenantKey = TenantContext.getCurrentTenant();
     return metrics.authDurationTimer(tenantKey, "login").record(() -> {
+      UUID userId = null;
+      SigninAttemptEvent.FailureReason failureReason = null;
+      
       try {
         final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
             .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
 
         if (tenant.getStatus() == TenantStatus.SUSPENDED) {
+          failureReason = SigninAttemptEvent.FailureReason.TENANT_SUSPENDED;
           throw new TenantSuspendedException("Tenant suspended");
         }
         if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
+          failureReason = SigninAttemptEvent.FailureReason.TENANT_NOT_AVAILABLE;
           throw new TenantNotAvailableException("Tenant not available");
         }
 
         final var user = userMapper.findByEmail(request.email())
-            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+            .orElseThrow(() -> {
+              failureReason = SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS;
+              return new BadCredentialsException("Invalid credentials");
+            });
+
+        userId = user.getId();
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          failureReason = SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE;
           throw new AccountNotActiveException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
+          failureReason = SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED;
           throw new AccountLockedException();
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
           accountLockoutManager.recordFailedAttempt(request.email());
+          failureReason = SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS;
           throw new BadCredentialsException("Invalid credentials");
         }
 
@@ -164,9 +178,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
         final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
+        // Publish successful signin attempt event
+        publishSigninAttemptEvent(request.email(), userId, tenantKey, 
+            SigninAttemptEvent.AttemptResult.SUCCESS, null);
+
         metrics.recordAuthOutcome(tenantKey, "login", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
       } catch (final Exception e) {
+        // Publish failed signin attempt event
+        publishSigninAttemptEvent(request.email(), userId, tenantKey, 
+            SigninAttemptEvent.AttemptResult.FAILURE, failureReason);
+            
         metrics.recordAuthOutcome(tenantKey, "login", "failure", getAuthFailureReason(e));
         throw e;
       }
@@ -199,20 +221,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   public AuthenticationDtos.TokenResponse adminSignIn(final AuthenticationDtos.SignInRequest request) {
     return metrics.authDurationTimer(null, "admin_login").record(() -> {
+      UUID userId = null;
+      SigninAttemptEvent.FailureReason failureReason = null;
+      
       try {
         final var user = userMapper.findByEmail(request.email())
-            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+            .orElseThrow(() -> {
+              failureReason = SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS;
+              return new BadCredentialsException("Invalid credentials");
+            });
+
+        userId = user.getId();
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          failureReason = SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE;
           throw new AccountNotActiveException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
+          failureReason = SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED;
           throw new AccountLockedException();
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
           accountLockoutManager.recordFailedAttempt(request.email());
+          failureReason = SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS;
           throw new BadCredentialsException("Invalid credentials");
         }
 
@@ -221,6 +254,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
           // Record the failed attempt to prevent user enumeration via timing differences,
           // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
           accountLockoutManager.reset(request.email());
+          failureReason = SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS; // Don't expose platform authority info
           throw new NoPlatformAuthorityException();
         }
 
@@ -230,9 +264,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
         final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
 
+        // Publish successful admin signin attempt event
+        publishSigninAttemptEvent(request.email(), userId, null, 
+            SigninAttemptEvent.AttemptResult.SUCCESS, null);
+
         metrics.recordAuthOutcome(null, "admin_login", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);
       } catch (final Exception e) {
+        // Publish failed admin signin attempt event
+        publishSigninAttemptEvent(request.email(), userId, null, 
+            SigninAttemptEvent.AttemptResult.FAILURE, failureReason);
+            
         metrics.recordAuthOutcome(null, "admin_login", "failure", getAuthFailureReason(e));
         throw e;
       }
@@ -519,5 +561,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Transactional(readOnly = true)
   public String getProvisioningStatus(final String tenantKey) {
     return tenantService.getProvisioningStatus(tenantKey);
+  }
+
+  /**
+   * Publishes a signin attempt event for audit logging.
+   * IP address and user agent will be automatically enriched by AuditEventEnricher.
+   */
+  private void publishSigninAttemptEvent(final String email, final UUID userId, final String tenantKey,
+                                        final SigninAttemptEvent.AttemptResult result, 
+                                        final SigninAttemptEvent.FailureReason failureReason) {
+    try {
+      final var event = new SigninAttemptEvent(
+          email,
+          userId,
+          tenantKey,
+          result,
+          failureReason,
+          null, // IP address will be enriched by AuditEventEnricher
+          null, // User agent will be enriched by AuditEventEnricher
+          Instant.now()
+      );
+      messagingService.publishSigninAttempt(event);
+    } catch (final Exception e) {
+      log.warn("Failed to publish signin attempt event for email={}, result={}", email, result, e);
+      // Don't fail the signin process if audit event publishing fails
+    }
   }
 }

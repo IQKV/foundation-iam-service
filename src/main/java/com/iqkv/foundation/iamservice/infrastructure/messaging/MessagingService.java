@@ -104,6 +104,10 @@ public class MessagingService {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_ANNOUNCEMENT_PUBLISH, event);
   }
 
+  public void publishSigninAttempt(final SigninAttemptEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_SIGNIN_ATTEMPT, event);
+  }
+
   private void publish(final String exchange, final String routingKey, final Object event) {
     try {
       AuditEventEnricher.enrich(event);

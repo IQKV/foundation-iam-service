@@ -62,6 +62,7 @@ public class RabbitMQConfig {
   public static final String ROUTING_USER_REMOVED = "user.removed";
   public static final String ROUTING_USER_INVITED = "user.invited";
   public static final String ROUTING_SUBSCRIPTION_CANCELLED = "subscription.cancelled";
+  public static final String ROUTING_SIGNIN_ATTEMPT = "auth.signin.attempt";
 
   // -------------------------------------------------------------------------
   // Routing keys — IAM notification emails (scoped to avoid conflicts)
