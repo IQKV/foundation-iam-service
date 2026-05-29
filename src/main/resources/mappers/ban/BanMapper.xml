@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.ban.BanMapper">
+
+    <resultMap id="banResultMap" type="com.iqkv.foundation.iamservice.ban.Ban">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="initiatorId" column="initiator_id"/>
+        <result property="type" column="type"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="tenantKey" column="tenant_key"/>
+        <result property="reason" column="reason"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.ban.Ban">
+        INSERT INTO public.bans
+        (id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by)
+        VALUES
+        (#{id}, #{userId}, #{initiatorId},
+        #{type, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{tenantKey}, #{reason}, #{expiresAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.ban.Ban">
+        UPDATE public.bans
+        SET user_id = #{userId},
+            initiator_id = #{initiatorId},
+            type = #{type, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            tenant_key = #{tenantKey},
+            reason = #{reason},
+            expires_at = #{expiresAt},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE id = #{id}
+    </select>
+
+    <select id="findActiveBan" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE user_id = #{userId}
+        AND (tenant_key = #{tenantKey} OR tenant_key IS NULL)
+        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+        ORDER BY type DESC
+        LIMIT 1
+    </select>
+
+    <select id="findActivePlatformBan" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE user_id = #{userId}
+        AND type = 'PLATFORM'
+        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+        LIMIT 1
+    </select>
+
+    <select id="findActiveTenantBan" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE user_id = #{userId}
+        AND type = 'TENANT'
+        AND tenant_key = #{tenantKey}
+        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+        LIMIT 1
+    </select>
+
+    <select id="findAllByUserId" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findAllByTenantKey" resultMap="banResultMap">
+        SELECT id, user_id, initiator_id, type, tenant_key, reason, expires_at, created_at, updated_at, created_by, updated_by
+        FROM public.bans
+        WHERE tenant_key = #{tenantKey}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM public.bans
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByUserIdAndTypeAndTenantKey">
+        DELETE FROM public.bans
+        WHERE user_id = #{userId}
+        AND type = #{type, typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+        <choose>
+            <when test="tenantKey != null">
+                AND tenant_key = #{tenantKey}
+            </when>
+            <otherwise>
+                AND tenant_key IS NULL
+            </otherwise>
+        </choose>
+    </delete>
+
+</mapper>

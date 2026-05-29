@@ -21,6 +21,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.ban.BanService;
+import com.iqkv.foundation.iamservice.ban.dto.BanDtos;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityService;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
@@ -62,13 +64,16 @@ public class UserAdminRestResource {
   private final UserService userService;
   private final PlatformAuthorityService platformAuthorityService;
   private final MembershipService membershipService;
+  private final BanService banService;
 
   public UserAdminRestResource(final UserService userService,
                                final PlatformAuthorityService platformAuthorityService,
-                               final MembershipService membershipService) {
+                               final MembershipService membershipService,
+                               final BanService banService) {
     this.userService = userService;
     this.platformAuthorityService = platformAuthorityService;
     this.membershipService = membershipService;
+    this.banService = banService;
   }
 
   @GetMapping
@@ -239,6 +244,43 @@ public class UserAdminRestResource {
       @AuthenticationPrincipal Jwt jwt) {
     final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
     userService.setUserPassword(id, request.newPassword(), actorId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{id}/ban")
+  @Operation(
+      summary = "Ban user globally",
+      description = "Bans a user from the entire platform. The user will be logged out immediately and cannot log in again until unbanned.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "User banned successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<BanDtos.BanResponse> banUser(
+      @Parameter(description = "User UUID") @PathVariable UUID id,
+      @RequestBody(required = false) BanDtos.CreateBanRequest request,
+      @AuthenticationPrincipal Jwt jwt) {
+    final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    final BanDtos.BanResponse ban = banService.banUserPlatform(id, UUID.fromString(actorId), request != null ? request : new BanDtos.CreateBanRequest(null, null));
+    return ResponseEntity.ok(ban);
+  }
+
+  @PostMapping("/{id}/unban")
+  @Operation(
+      summary = "Unban user globally",
+      description = "Unbans a user from the entire platform, allowing them to log in again.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "User unbanned successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<Void> unbanUser(
+      @Parameter(description = "User UUID") @PathVariable UUID id,
+      @AuthenticationPrincipal Jwt jwt) {
+    final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    banService.unbanUserPlatform(id, UUID.fromString(actorId));
     return ResponseEntity.noContent().build();
   }
 }

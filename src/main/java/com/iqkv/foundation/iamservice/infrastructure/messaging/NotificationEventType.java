@@ -39,5 +39,13 @@ public enum NotificationEventType {
    * Distinct from TENANT_OWNER_WELCOME (which targets the workspace creator) and
    * INVITATION_ACCEPTED (which is a membership-confirmation event).
    */
-  MEMBER_WELCOME
+  MEMBER_WELCOME,
+  /**
+   * Sent to a user when they are banned (either globally or from a tenant).
+   */
+  USER_BANNED,
+  /**
+   * Sent to a user when they are unbanned (either globally or from a tenant).
+   */
+  USER_UNBANNED
 }

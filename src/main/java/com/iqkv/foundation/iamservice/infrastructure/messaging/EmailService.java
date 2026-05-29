@@ -104,6 +104,8 @@ public class EmailService {
       case INVITATION_ACCEPTED -> "email/invitation/accepted";
       case PASSWORD_CHANGED -> "email/password/changed";
       case MEMBER_WELCOME -> "email/signup/member-welcome";
+      case USER_BANNED -> "email/account/banned";
+      case USER_UNBANNED -> "email/account/unbanned"; // Reserved, not implemented
     };
   }
 
@@ -118,6 +120,8 @@ public class EmailService {
       case INVITATION_ACCEPTED -> "email.invitation-accepted.subject";
       case PASSWORD_CHANGED -> "email.password-changed.subject";
       case MEMBER_WELCOME -> "email.member-welcome.subject";
+      case USER_BANNED -> "email.account-banned.subject";
+      case USER_UNBANNED -> "email.account-unbanned.subject"; // Reserved, not implemented
     };
   }
 }

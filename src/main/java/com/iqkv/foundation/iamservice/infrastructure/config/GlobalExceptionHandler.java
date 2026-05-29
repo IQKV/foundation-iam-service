@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
+import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
@@ -361,6 +362,19 @@ public class GlobalExceptionHandler {
         msg("error.title.account-not-active", locale),
         403,
         msg("error.detail.account-not-active", locale),
+        request);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(AccountBannedException.class)
+  public ResponseEntity<ProblemDetail> handleAccountBanned(final AccountBannedException ex,
+                                                           final HttpServletRequest request,
+                                                           final Locale locale) {
+    log.warn("Account banned: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.account-banned", locale),
+        403,
+        msg("error.detail.account-banned", locale),
         request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }

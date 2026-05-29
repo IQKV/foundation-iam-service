@@ -21,6 +21,7 @@
     <include file="db/changelog/system/20260525000001-add-locale-to-users.xml"/>
     <include file="db/changelog/system/20260525000002-create-notifications-tables.xml"/>
     <include file="db/changelog/system/20260529000001-add-avatar-url-to-users.xml"/>
+    <include file="db/changelog/system/20260529100000-create-bans-table.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>

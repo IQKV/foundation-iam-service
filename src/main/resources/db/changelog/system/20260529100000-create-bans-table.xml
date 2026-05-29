@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260529100000" author="iqkv">
+        <createTable tableName="bans" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_bans_user_id"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="initiator_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_bans_initiator_id"
+                             references="public.users(id)"
+                             deleteCascade="false"/>
+            </column>
+            <column name="type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tenant_key" type="VARCHAR(12)"/>
+            <column name="reason" type="TEXT"/>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="updated_by" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uq_bans_user_tenant_type"
+                tableName="bans"
+                schemaName="public"
+                columnNames="user_id, tenant_key, type"/>
+
+        <createIndex indexName="idx_bans_user_id" tableName="bans" schemaName="public">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_bans_tenant_key" tableName="bans" schemaName="public">
+            <column name="tenant_key"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

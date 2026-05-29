@@ -40,6 +40,8 @@ import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.ban.BanService;
+import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
@@ -92,6 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final PlatformAuthorityMapper platformAuthorityMapper;
   private final TenantService tenantService;
   private final IamServiceMetrics metrics;
+  private final BanService banService;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -108,7 +111,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final NotificationConfigurationProperties notificationProps,
       final PlatformAuthorityMapper platformAuthorityMapper,
       final TenantService tenantService,
-      final IamServiceMetrics metrics) {
+      final IamServiceMetrics metrics,
+      final BanService banService) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -124,6 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.platformAuthorityMapper = platformAuthorityMapper;
     this.tenantService = tenantService;
     this.metrics = metrics;
+    this.banService = banService;
   }
 
   @Override
@@ -165,6 +170,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey, 
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE);
           throw new AccountNotActiveException();
+        }
+
+        if (banService.isUserBanned(user.getId(), tenantKey)) {
+          publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey, 
+              SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
+          throw new AccountBannedException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
@@ -230,6 +241,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return "invalid_token_type";
     } else if (e instanceof TenantContextMismatchException) {
       return "tenant_mismatch";
+    } else if (e instanceof AccountBannedException) {
+      return "account_banned";
     }
     return "unknown";
   }
@@ -255,6 +268,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
           publishSigninAttemptEvent(request.email(), userIdForAudit, null, 
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE);
           throw new AccountNotActiveException();
+        }
+
+        if (banService.isUserBanned(user.getId(), null)) {
+          publishSigninAttemptEvent(request.email(), userIdForAudit, null, 
+              SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
+          throw new AccountBannedException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
@@ -338,6 +357,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
           throw new AccountNotActiveException();
         }
 
+        if (banService.isUserBanned(user.getId(), currentTenant)) {
+          throw new AccountBannedException();
+        }
+
         final var membership = membershipService.resolveMembership(user.getId(), currentTenant);
         final var authorities = membershipService.getAuthorities(membership.getId());
 
@@ -375,6 +398,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
           throw new AccountNotActiveException();
+        }
+
+        if (banService.isUserBanned(user.getId(), null)) {
+          throw new AccountBannedException();
         }
 
         final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());

@@ -20,6 +20,8 @@ import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.ban.BanService;
+import com.iqkv.foundation.iamservice.ban.dto.BanDtos;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
@@ -29,6 +31,7 @@ import com.iqkv.foundation.iamservice.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -57,13 +60,16 @@ public class TenantRestResource {
   private final TenantService tenantService;
   private final UserService userService;
   private final MembershipService membershipService;
+  private final BanService banService;
 
   public TenantRestResource(final TenantService tenantService,
                             final UserService userService,
-                            final MembershipService membershipService) {
+                            final MembershipService membershipService,
+                            final BanService banService) {
     this.tenantService = tenantService;
     this.userService = userService;
     this.membershipService = membershipService;
+    this.banService = banService;
   }
 
   @PostMapping
@@ -256,6 +262,59 @@ public class TenantRestResource {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
     userService.deleteUser(userId, tenantKey);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{tenantKey}/members/{userId}/ban")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(
+      summary = "Ban user from tenant",
+      description = "Bans a user from the current tenant. The user will be logged out immediately and cannot log in to this tenant again until unbanned.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "User banned successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User or tenant not found", content = @Content)
+  })
+  public ResponseEntity<BanDtos.BanResponse> banTenantMember(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @RequestBody(required = false) BanDtos.CreateBanRequest request,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    final BanDtos.BanResponse ban = banService.banUserTenant(userId, tenantKey, UUID.fromString(actorId), request != null ? request : new BanDtos.CreateBanRequest(null, null));
+    return ResponseEntity.ok(ban);
+  }
+
+  @PostMapping("/{tenantKey}/members/{userId}/unban")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(
+      summary = "Unban user from tenant",
+      description = "Unbans a user from the current tenant, allowing them to log in to this tenant again.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "User unbanned successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User or tenant not found", content = @Content)
+  })
+  public ResponseEntity<Void> unbanTenantMember(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
+    banService.unbanUserTenant(userId, tenantKey, UUID.fromString(actorId));
     return ResponseEntity.noContent().build();
   }
 }
