@@ -96,6 +96,8 @@ class AuthenticationServiceImplTest {
   private com.iqkv.foundation.iamservice.tenant.TenantService tenantService;
   @Mock
   private com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics metrics;
+  @Mock
+  private com.iqkv.foundation.iamservice.ban.BanService banService;
 
   private AuthenticationServiceImpl authenticationService;
 
@@ -120,7 +122,8 @@ class AuthenticationServiceImplTest {
         notificationProps,
         platformAuthorityMapper,
         tenantService,
-        metrics
+        metrics,
+        banService
     );
 
     lenient().when(metrics.authDurationTimer(any(), any()))
