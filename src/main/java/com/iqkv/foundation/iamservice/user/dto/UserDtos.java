@@ -59,6 +59,8 @@ public final class UserDtos {
       boolean emailVerified,
       // BCP 47 locale tag (e.g. "en-US"). Null when not yet set.
       String locale,
+      // Public URL of the user's avatar image. Null when no avatar has been uploaded.
+      String avatarUrl,
       List<String> organizations,
       List<String> membershipAuthorities,
       LocalDateTime createdAt,
@@ -134,6 +136,37 @@ public final class UserDtos {
   }
 
   public record UserCountResponse(long total) {
+  }
+
+  /**
+   * Returned by {@code POST /users/me/avatar}.
+   *
+   * <p>The client must PUT the file directly to {@code presignedUploadUrl} within
+   * {@code expiresInMinutes} minutes, then call {@code POST /users/me/avatar/confirm}
+   * with the resulting {@code objectKey} to persist the avatar URL on the profile.
+   */
+  public record AvatarUploadInitResponse(
+      // Pre-signed S3/MinIO PUT URL — valid for expiresInMinutes minutes.
+      String presignedUploadUrl,
+      // Object key to pass back in the confirm call.
+      String objectKey,
+      int expiresInMinutes) {
+  }
+
+  /**
+   * Body for {@code POST /users/me/avatar/confirm}.
+   *
+   * <p>After the client has successfully PUT the file to the pre-signed URL,
+   * it calls this endpoint with the object key to persist the avatar URL.
+   */
+  public record AvatarConfirmRequest(
+      @NotBlank String objectKey) {
+  }
+
+  /**
+   * Returned after a successful avatar confirm — contains the public avatar URL.
+   */
+  public record AvatarResponse(String avatarUrl) {
   }
 
   public record PagedUserResponse(

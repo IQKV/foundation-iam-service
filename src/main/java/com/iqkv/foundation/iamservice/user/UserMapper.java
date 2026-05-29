@@ -93,4 +93,6 @@ public interface UserMapper {
 
   void updatePassword(@Param("userId") UUID userId, @Param("passwordHash") String passwordHash,
                       @Param("updatedAt") Instant updatedAt);
+
+  void updateAvatarUrl(@Param("userId") UUID userId, @Param("avatarUrl") String avatarUrl);
 }

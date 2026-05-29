@@ -52,13 +52,16 @@ public class UserRestResource {
   private final UserService userService;
   private final AuthenticationService authenticationService;
   private final MembershipService membershipService;
+  private final AvatarService avatarService;
 
   public UserRestResource(final UserService userService,
                           final AuthenticationService authenticationService,
-                          final MembershipService membershipService) {
+                          final MembershipService membershipService,
+                          final AvatarService avatarService) {
     this.userService = userService;
     this.authenticationService = authenticationService;
     this.membershipService = membershipService;
+    this.avatarService = avatarService;
   }
 
   @GetMapping("/me")
@@ -162,6 +165,68 @@ public class UserRestResource {
       @Valid @RequestBody final UserDtos.ChangePasswordRequest request) {
     final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
     userService.changePassword(userId, request.currentPassword(), request.newPassword());
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/me/avatar")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Initiate avatar upload",
+      description = "Generates a presigned S3 PUT URL for direct client upload. "
+                    + "The client must upload the file to the returned URL within 15 minutes, "
+                    + "then call POST /me/avatar/confirm with the objectKey to persist the avatar.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Presigned URL generated"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<UserDtos.AvatarUploadInitResponse> initiateAvatarUpload(
+      @AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(avatarService.initiateUpload(userId));
+  }
+
+  @PostMapping("/me/avatar/confirm")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Confirm avatar upload",
+      description = "Persists the avatar URL after successful S3 upload. "
+                    + "The objectKey must match the one returned from POST /me/avatar.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Avatar URL persisted"),
+      @ApiResponse(responseCode = "400", description = "Invalid object key"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<UserDtos.AvatarResponse> confirmAvatarUpload(
+      @AuthenticationPrincipal final Jwt jwt,
+      @Valid @RequestBody final UserDtos.AvatarConfirmRequest request) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    return ResponseEntity.ok(avatarService.confirmUpload(userId, request.objectKey()));
+  }
+
+  @DeleteMapping("/me/avatar")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Delete avatar",
+      description = "Removes the user's avatar from S3 and sets avatar_url to null.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Avatar deleted"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<Void> deleteAvatar(@AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    avatarService.deleteAvatar(userId);
     return ResponseEntity.noContent().build();
   }
 }

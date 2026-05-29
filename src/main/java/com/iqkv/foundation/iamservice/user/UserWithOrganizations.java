@@ -41,6 +41,7 @@ public class UserWithOrganizations {
   private AccountStatus status;
   private boolean emailVerified;
   private String locale;
+  private String avatarUrl;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private List<String> organizations;
@@ -100,6 +101,14 @@ public class UserWithOrganizations {
 
   public void setLocale(final String locale) {
     this.locale = locale;
+  }
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(final String avatarUrl) {
+    this.avatarUrl = avatarUrl;
   }
 
   public LocalDateTime getCreatedAt() {

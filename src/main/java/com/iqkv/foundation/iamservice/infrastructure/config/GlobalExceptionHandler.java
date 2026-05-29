@@ -28,6 +28,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingExceptio
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
+import com.iqkv.foundation.iamservice.shared.exception.InvalidObjectKeyException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenSignatureException;
@@ -176,6 +177,19 @@ public class GlobalExceptionHandler {
     log.warn("Invalid password: {}", ex.getMessage());
     final ProblemDetail pd = problem("about:blank",
         msg("error.title.invalid-password", locale),
+        400,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(InvalidObjectKeyException.class)
+  public ResponseEntity<ProblemDetail> handleInvalidObjectKey(final InvalidObjectKeyException ex,
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
+    log.warn("Invalid object key: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.validation-failed", locale),
         400,
         ex.getMessage(),
         request);

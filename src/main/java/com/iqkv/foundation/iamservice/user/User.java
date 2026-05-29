@@ -30,6 +30,7 @@ public class User {
   private AccountStatus status;
   private boolean emailVerified = false;
   private String locale;
+  private String avatarUrl;
   private Instant lastGlobalSignoutAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -98,6 +99,14 @@ public class User {
 
   public void setLocale(final String locale) {
     this.locale = locale;
+  }
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(final String avatarUrl) {
+    this.avatarUrl = avatarUrl;
   }
 
   public Instant getLastGlobalSignoutAt() {

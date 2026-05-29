@@ -69,6 +69,7 @@ class UserDtosTest {
         "ACTIVE",
         true,
         "en-US",
+        null, // avatarUrl
         List.of("Acme Corp"),
         List.of("MEMBER"),
         createdAt,
@@ -146,6 +147,7 @@ class UserDtosTest {
         "ACTIVE",
         true,
         null,
+        null, // avatarUrl
         List.of(),
         List.of(),
         LocalDateTime.now(),
