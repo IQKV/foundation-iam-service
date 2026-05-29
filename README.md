@@ -25,6 +25,7 @@ The IAM service is the identity backbone of the platform:
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
+- **Avatar uploads** — two-phase S3 upload flow: initiate generates presigned PUT URL, client uploads directly to S3, confirm persists avatar URL; old avatars automatically deleted
 - **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS) to `/user/{userId}/queue/notifications`
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches of 1000 and broadcasts to all connected clients via `/topic/announcements`
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
@@ -72,6 +73,9 @@ Base path: `/api/v1/iam`
 | `PATCH`  | `/users/me`                        | JWT + `X-Tenant-ID`       | Update current user profile                                               |
 | `DELETE` | `/users/me`                        | JWT + `X-Tenant-ID`       | Remove current user's membership from tenant                              |
 | `POST`   | `/users/me/password`               | JWT + `X-Tenant-ID`       | Change own password (requires current password; invalidates all sessions) |
+| `POST`   | `/users/me/avatar`                 | JWT + `X-Tenant-ID`       | Initiate avatar upload (returns presigned S3 URL)                         |
+| `POST`   | `/users/me/avatar/confirm`         | JWT + `X-Tenant-ID`       | Confirm avatar upload (persists avatar URL after S3 upload)               |
+| `DELETE` | `/users/me/avatar`                 | JWT + `X-Tenant-ID`       | Delete current user's avatar                                              |
 | `POST`   | `/users/tenants`                   | public (credential-gated) | Discover tenants for a user                                               |
 | `GET`    | `/users/me/memberships`            | JWT                       | List current user's tenant memberships (for org/tenant picker UIs)        |
 | `POST`   | `/users/email/verify`              | public                    | Verify email address via one-time token                                   |
@@ -229,6 +233,7 @@ Failed messages are routed to the dead-letter exchange `iqkv.dlx` → `iqkv.dlq`
 - MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase (system + per-tenant schema migrations)
 - RabbitMQ (async tenant provisioning events, notifications, announcements)
+- MinIO 9.x S3-compatible client (avatar uploads, presigned URLs)
 - JJWT 0.13 RS256 (token issuance and validation)
 - ShedLock 7.x (distributed scheduled cleanup jobs)
 - Spring WebSocket + STOMP/SockJS (real-time in-app notifications)
@@ -272,7 +277,7 @@ pnpm install
 cp .env.example .env.local
 # Edit .env.local — defaults work for local Docker setup
 
-# Start infrastructure dependencies (PostgreSQL, RabbitMQ, MailHog)
+# Start infrastructure dependencies (PostgreSQL, RabbitMQ, MailHog, MinIO)
 docker compose up -d
 
 # Run the service from your IDE or CLI
@@ -282,31 +287,38 @@ export $(grep -v '^#' .env.local | xargs)
 # → Actuator: http://localhost:8081/actuator/health
 # → Swagger:  http://localhost:8080/swagger-ui.html
 # → MailHog:  http://localhost:8025
+# → MinIO:    http://localhost:9001 (admin: minioadmin/minioadmin)
 ```
 
 ## Environment Variables
 
-| Variable               | Default                      | Description                                      |
-| ---------------------- | ---------------------------- | ------------------------------------------------ |
-| `ROLLOUT_MODE`         | `MULTI_TENANT`               | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
-| `DB_HOST`              | `localhost`                  | PostgreSQL host                                  |
-| `DB_PORT`              | `5432`                       | PostgreSQL port                                  |
-| `DB_NAME`              | `iam`                        | Database name                                    |
-| `DB_USERNAME`          | `svc_iam_dba`                | Database user                                    |
-| `DB_PASSWORD`          | `svc_iam_dba`                | Database password                                |
-| `RABBITMQ_HOST`        | `localhost`                  | RabbitMQ host                                    |
-| `RABBITMQ_PORT`        | `5672`                       | RabbitMQ AMQP port                               |
-| `RABBITMQ_USERNAME`    | `svc_iam_rmq`                | RabbitMQ user                                    |
-| `RABBITMQ_PASSWORD`    | `svc_iam_rmq`                | RabbitMQ password                                |
-| `MAIL_HOST`            | `localhost`                  | SMTP host                                        |
-| `MAIL_PORT`            | `587`                        | SMTP port                                        |
-| `MAIL_FROM`            | `noreply@iqkv.com`           | Sender address                                   |
-| `JWT_PRIVATE_KEY_PATH` | `classpath:keys/private.pem` | RS256 private key                                |
-| `JWT_PUBLIC_KEY_PATH`  | `classpath:keys/public.pem`  | RS256 public key                                 |
-| `APP_BASE_URL`         | `http://localhost:3000`      | Frontend base URL (used in email links)          |
-| `DEFAULT_TENANT_KEY`   | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
-| `DEFAULT_TENANT_NAME`  | `Acme Corp.`                 | Default tenant display name                      |
-| `INVITATION_TOKEN_TTL` | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
+| Variable                    | Default                      | Description                                      |
+| --------------------------- | ---------------------------- | ------------------------------------------------ |
+| `ROLLOUT_MODE`              | `MULTI_TENANT`               | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
+| `DB_HOST`                   | `localhost`                  | PostgreSQL host                                  |
+| `DB_PORT`                   | `5432`                       | PostgreSQL port                                  |
+| `DB_NAME`                   | `iam`                        | Database name                                    |
+| `DB_USERNAME`               | `svc_iam_dba`                | Database user                                    |
+| `DB_PASSWORD`               | `svc_iam_dba`                | Database password                                |
+| `RABBITMQ_HOST`             | `localhost`                  | RabbitMQ host                                    |
+| `RABBITMQ_PORT`             | `5672`                       | RabbitMQ AMQP port                               |
+| `RABBITMQ_USERNAME`         | `svc_iam_rmq`                | RabbitMQ user                                    |
+| `RABBITMQ_PASSWORD`         | `svc_iam_rmq`                | RabbitMQ password                                |
+| `MAIL_HOST`                 | `localhost`                  | SMTP host                                        |
+| `MAIL_PORT`                 | `587`                        | SMTP port                                        |
+| `MAIL_FROM`                 | `noreply@iqkv.com`           | Sender address                                   |
+| `OBJECTSTORAGE_ENDPOINT`    | `http://localhost:9000`      | S3-compatible storage endpoint (MinIO/AWS S3)    |
+| `OBJECTSTORAGE_ACCESS_KEY`  | `minioadmin`                 | S3 access key                                    |
+| `OBJECTSTORAGE_SECRET_KEY`  | `minioadmin`                 | S3 secret key                                    |
+| `OBJECTSTORAGE_BUCKET_NAME` | `iam-avatars`                | S3 bucket name for avatar uploads                |
+| `OBJECTSTORAGE_REGION`      | `us-east-1`                  | S3 region                                        |
+| `OBJECTSTORAGE_SSL`         | `false`                      | Use SSL for S3 connections                       |
+| `JWT_PRIVATE_KEY_PATH`      | `classpath:keys/private.pem` | RS256 private key                                |
+| `JWT_PUBLIC_KEY_PATH`       | `classpath:keys/public.pem`  | RS256 public key                                 |
+| `APP_BASE_URL`              | `http://localhost:3000`      | Frontend base URL (used in email links)          |
+| `DEFAULT_TENANT_KEY`        | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
+| `DEFAULT_TENANT_NAME`       | `Acme Corp.`                 | Default tenant display name                      |
+| `INVITATION_TOKEN_TTL`      | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
 
@@ -335,7 +347,7 @@ The project provides two Docker Compose configurations for different workflows:
 
 ### 1. Infrastructure-only (Local IDE Development)
 
-Starts only the database, message broker, and mail server. The IAM service is expected to be run from your IDE or CLI.
+Starts only the database, message broker, mail server, and object storage. The IAM service is expected to be run from your IDE or CLI.
 
 ```bash
 docker compose up -d
