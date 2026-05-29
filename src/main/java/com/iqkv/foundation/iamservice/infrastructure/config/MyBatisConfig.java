@@ -38,6 +38,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
     basePackages = {
         "com.iqkv.foundation.iamservice.announcement",
         "com.iqkv.foundation.iamservice.authentication",
+        "com.iqkv.foundation.iamservice.ban",
         "com.iqkv.foundation.iamservice.denylist",
         "com.iqkv.foundation.iamservice.email",
         "com.iqkv.foundation.iamservice.invitation",
