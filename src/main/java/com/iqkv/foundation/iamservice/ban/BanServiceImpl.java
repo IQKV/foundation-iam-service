@@ -110,7 +110,7 @@ public class BanServiceImpl implements BanService {
 
   @Override
   public void unbanUserPlatform(UUID userId, UUID initiatorId) {
-    User user = userMapper.findById(userId)
+    userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     banMapper.deleteByUserIdAndTypeAndTenantKey(userId, BanType.PLATFORM, null);
     log.info("User {} unbanned globally by {}", userId, initiatorId);
@@ -163,7 +163,7 @@ public class BanServiceImpl implements BanService {
 
   @Override
   public void unbanUserTenant(UUID userId, String tenantKey, UUID initiatorId) {
-    User user = userMapper.findById(userId)
+    userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     banMapper.deleteByUserIdAndTypeAndTenantKey(userId, BanType.TENANT, tenantKey);
     log.info("User {} unbanned from tenant {} by {}", userId, tenantKey, initiatorId);
