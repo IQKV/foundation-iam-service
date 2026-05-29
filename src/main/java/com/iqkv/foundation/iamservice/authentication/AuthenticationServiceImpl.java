@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
+import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.denylist.TokenDenylistService;
 import com.iqkv.foundation.iamservice.email.EmailVerificationToken;
 import com.iqkv.foundation.iamservice.email.EmailVerificationTokenMapper;
@@ -38,7 +39,6 @@ import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
