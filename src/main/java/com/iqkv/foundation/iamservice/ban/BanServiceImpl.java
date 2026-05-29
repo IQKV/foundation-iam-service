@@ -52,11 +52,11 @@ public class BanServiceImpl implements BanService {
   private final MessagingService messagingService;
   private final NotificationConfigurationProperties notificationProps;
 
-  public BanServiceImpl(BanMapper banMapper,
-                       UserMapper userMapper,
-                       PlatformAuthorityMapper platformAuthorityMapper,
-                       MessagingService messagingService,
-                       NotificationConfigurationProperties notificationProps) {
+  public BanServiceImpl(final BanMapper banMapper,
+                       final UserMapper userMapper,
+                       final PlatformAuthorityMapper platformAuthorityMapper,
+                       final MessagingService messagingService,
+                       final NotificationConfigurationProperties notificationProps) {
     this.banMapper = banMapper;
     this.userMapper = userMapper;
     this.platformAuthorityMapper = platformAuthorityMapper;
@@ -212,7 +212,7 @@ public class BanServiceImpl implements BanService {
           payload,
           Instant.now());
       messagingService.publishNotification(event);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.warn("Failed to publish USER_BANNED notification for user {}", user.getId(), e);
     }
   }

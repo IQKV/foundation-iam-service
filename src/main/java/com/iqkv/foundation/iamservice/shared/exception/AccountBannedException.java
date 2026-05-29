@@ -26,7 +26,7 @@ public class AccountBannedException extends RuntimeException {
     super("Account is banned");
   }
 
-  public AccountBannedException(String message) {
+  public AccountBannedException(final String message) {
     super(message);
   }
 }
