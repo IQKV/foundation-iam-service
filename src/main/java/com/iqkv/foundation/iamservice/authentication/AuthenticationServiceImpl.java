@@ -196,9 +196,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
       } catch (final Exception e) {
         // Only publish if we haven't already published in the specific catch blocks above
-        if (!(e instanceof TenantSuspendedException || e instanceof TenantNotAvailableException ||
-              e instanceof AccountNotActiveException || e instanceof AccountLockedException ||
-              e instanceof BadCredentialsException)) {
+        if (!(e instanceof TenantSuspendedException
+              || e instanceof TenantNotAvailableException
+              || e instanceof AccountNotActiveException
+              || e instanceof AccountLockedException
+              || e instanceof BadCredentialsException)) {
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey, 
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.UNKNOWN);
         }
