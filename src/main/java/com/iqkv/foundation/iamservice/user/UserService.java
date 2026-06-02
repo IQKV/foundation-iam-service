@@ -201,4 +201,16 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException if the new password does not meet policy requirements
    */
   void changePassword(UUID userId, String currentPassword, String newPassword);
+
+  /**
+   * Unlocks a user's account by resetting their failed login attempts.
+   *
+   * <p>This is a platform admin operation. It clears all failed login attempts for the user,
+   * allowing them to log in again even if they were previously locked out due to too many
+   * failed attempts.
+   *
+   * @param userId UUID of the user to unlock
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
+   */
+  void unlockUser(UUID userId);
 }

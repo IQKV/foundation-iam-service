@@ -33,6 +33,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
+import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidAccountStatusException;
@@ -67,6 +68,7 @@ public class UserServiceImpl implements UserService {
   private final SignupStrategy signupStrategy;
   private final PasswordEncoder passwordEncoder;
   private final IamServiceMetrics metrics;
+  private final AccountLockoutManager accountLockoutManager;
 
   public UserServiceImpl(final UserMapper userMapper,
                          final TenantMembershipMapper membershipMapper,
@@ -76,7 +78,8 @@ public class UserServiceImpl implements UserService {
                          final NotificationConfigurationProperties notificationProps,
                          final SignupStrategy signupStrategy,
                          final PasswordEncoder passwordEncoder,
-                         final IamServiceMetrics metrics) {
+                         final IamServiceMetrics metrics,
+                         final AccountLockoutManager accountLockoutManager) {
     this.userMapper = userMapper;
     this.membershipMapper = membershipMapper;
     this.emailVerificationTokenMapper = emailVerificationTokenMapper;
@@ -86,6 +89,7 @@ public class UserServiceImpl implements UserService {
     this.signupStrategy = signupStrategy;
     this.passwordEncoder = passwordEncoder;
     this.metrics = metrics;
+    this.accountLockoutManager = accountLockoutManager;
   }
 
   @Override
@@ -383,5 +387,13 @@ public class UserServiceImpl implements UserService {
 
     userMapper.findById(userId).ifPresent(user -> userEventPublisher.publishUserRemoved(user, tenantKey));
     log.info("User membership removed: userId={}, tenantKey={}", userId, tenantKey);
+  }
+
+  @Override
+  public void unlockUser(final UUID userId) {
+    final User user = userMapper.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+    accountLockoutManager.reset(user.getEmail());
+    log.info("User unlocked: userId={}", userId);
   }
 }

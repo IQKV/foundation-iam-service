@@ -283,4 +283,20 @@ public class UserAdminRestResource {
     banService.unbanUserPlatform(id, UUID.fromString(actorId));
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/{id}/unlock")
+  @Operation(
+      summary = "Unlock user",
+      description = "Unlocks a user's account by resetting failed login attempts, allowing them to log in again.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "User unlocked successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
+  public ResponseEntity<Void> unlockUser(
+      @Parameter(description = "User UUID") @PathVariable UUID id) {
+    userService.unlockUser(id);
+    return ResponseEntity.noContent().build();
+  }
 }
