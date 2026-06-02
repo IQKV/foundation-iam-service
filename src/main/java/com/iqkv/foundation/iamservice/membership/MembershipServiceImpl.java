@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.TenantManagementException;
+import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import org.springframework.stereotype.Service;
@@ -79,7 +79,7 @@ public class MembershipServiceImpl implements MembershipService {
     if (actingUserId.equals(targetUserId) && currentTargetAuthorities.contains("TENANT_OWNER") && !authorities.contains("TENANT_OWNER")) {
       final long currentOwnerCount = countTenantOwners(tenantKey);
       if (currentOwnerCount <= 1) {
-        throw new TenantManagementException("Cannot remove your own TENANT_OWNER authority as you are the last owner");
+        throw new UserManagementException("Cannot remove your own TENANT_OWNER authority as you are the last owner");
       }
     }
 
@@ -87,7 +87,7 @@ public class MembershipServiceImpl implements MembershipService {
     if (currentTargetAuthorities.contains("TENANT_OWNER") && !authorities.contains("TENANT_OWNER")) {
       final long currentOwnerCount = countTenantOwners(tenantKey);
       if (currentOwnerCount <= 1) {
-        throw new TenantManagementException("Cannot remove the last TENANT_OWNER from the tenant");
+        throw new UserManagementException("Cannot remove the last TENANT_OWNER from the tenant");
       }
     }
 
@@ -108,7 +108,7 @@ public class MembershipServiceImpl implements MembershipService {
   public void transferOwnership(final UUID fromUserId, final UUID toUserId, final String tenantKey) {
     // Validate: can't transfer to self
     if (fromUserId.equals(toUserId)) {
-      throw new TenantManagementException("Cannot transfer ownership to yourself");
+      throw new UserManagementException("Cannot transfer ownership to yourself");
     }
 
     // Validate: resolve both memberships
@@ -118,7 +118,7 @@ public class MembershipServiceImpl implements MembershipService {
     // Validate: from user must be TENANT_OWNER
     final List<String> fromAuthorities = getAuthorities(fromMembership.getId());
     if (!fromAuthorities.contains("TENANT_OWNER")) {
-      throw new TenantManagementException("Current user is not the tenant owner");
+      throw new UserManagementException("Current user is not the tenant owner");
     }
 
     // Update from user's authorities: remove TENANT_OWNER, leave MEMBER only

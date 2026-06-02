@@ -22,13 +22,15 @@ The IAM service is the identity backbone of the platform:
 - **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can rename, suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
-- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
+- **Member management** — tenant owners can change member authority (`TENANT_OWNER` ↔ `MEMBER`), ban/unban members, and transfer ownership with guardrails (can't remove last owner, can't ban yourself)
+- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes; platform admins can unlock users manually
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
 - **Avatar uploads** — two-phase S3 upload flow: initiate generates presigned PUT URL, client uploads directly to S3, confirm persists avatar URL; old avatars automatically deleted
 - **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS) to `/user/{userId}/queue/notifications`
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches of 1000 and broadcasts to all connected clients via `/topic/announcements`
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
+- **Platform admin actions** — platform admins can ban/unban/unlock users, manage platform authorities, and more
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 
 ## Quick Links

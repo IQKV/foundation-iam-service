@@ -11,13 +11,15 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 - **Multi-tenancy** — users are global identities; isolation is enforced through `TenantMembership` records that carry per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`)
 - **JWT RS256 authentication** — 15-minute access tokens and 7-day refresh tokens, both carrying `tenant_id`; every request is validated against a JTI denylist and a global signout timestamp
 - **Tenant lifecycle** — owners can rename, suspend, delete, or retry failed provisioning; a ShedLock-guarded reaper job cleans up stuck `PROVISIONING` tenants automatically
-- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes
+- **Member management** — tenant owners can change member authority (`TENANT_OWNER` ↔ `MEMBER`), ban/unban members, and transfer ownership with guardrails (can't remove last owner, can't ban yourself)
+- **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes; platform admins can unlock users manually
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
 - **Avatar uploads** — two-phase S3 upload flow: initiate generates presigned PUT URL, client uploads directly to S3, confirm persists avatar URL; old avatars automatically deleted
 - **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS)
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches and broadcasts to all connected clients via WebSocket
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
+- **Platform admin actions** — platform admins can ban/unban/unlock users, manage platform authorities, and more
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 
 ## Quick Links
@@ -104,17 +106,20 @@ Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and
 
 ### Tenant Management
 
-| Method   | Path                                                | Auth                                       | Description                         |
-| -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| `POST`   | `/tenants`                                          | JWT                                        | Create new tenant (owner is caller) |
-| `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
-| `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
-| `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status            |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning`           | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning           |
-| `GET`    | `/tenants/{tenantKey}/members`                      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)     |
-| `GET`    | `/tenants/{tenantKey}/members/count`                | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                |
-| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities |
-| `DELETE` | `/tenants/{tenantKey}/members/{userId}`             | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant           |
+| Method   | Path                                                       | Auth                                       | Description                                                           |
+| -------- | ---------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
+| `POST`   | `/tenants`                                                 | JWT                                        | Create new tenant (owner is caller)                                   |
+| `GET`    | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                                                    |
+| `PATCH`  | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                                                         |
+| `PATCH`  | `/tenants/{tenantKey}/status`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status                                              |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning`                  | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning                                             |
+| `GET`    | `/tenants/{tenantKey}/members`                             | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)                                       |
+| `GET`    | `/tenants/{tenantKey}/members/count`                       | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                                                  |
+| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities`        | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities                                   |
+| `DELETE` | `/tenants/{tenantKey}/members/{userId}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant                                             |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/ban`                | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Ban member from tenant; invalidates all sessions for this tenant      |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/unban`              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Unban member from tenant                                              |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/transfer-ownership` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transfer tenant ownership to another member; old owner becomes MEMBER |
 
 ### Invitations
 
@@ -147,6 +152,9 @@ Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and
 | `PUT`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Replace user platform authorities                  |
 | `GET`    | `/admin/users/{id}/memberships` | JWT `PLATFORM_ADMIN` | Get user tenant memberships                        |
 | `POST`   | `/admin/users/{id}/password`    | JWT `PLATFORM_ADMIN` | Force-set user password (invalidates all sessions) |
+| `POST`   | `/admin/users/{id}/ban`         | JWT `PLATFORM_ADMIN` | Ban user globally                                  |
+| `POST`   | `/admin/users/{id}/unban`       | JWT `PLATFORM_ADMIN` | Unban user globally                                |
+| `POST`   | `/admin/users/{id}/unlock`      | JWT `PLATFORM_ADMIN` | Unlock user by resetting failed login attempts     |
 
 ### Platform Admin — Tenants
 

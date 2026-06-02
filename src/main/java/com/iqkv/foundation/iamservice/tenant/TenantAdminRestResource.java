@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.membership.MembershipService;
+import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -145,8 +148,10 @@ public class TenantAdminRestResource {
   public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> updateMemberAuthorities(
       @Parameter(description = "8-char tenant key") @PathVariable String tenantKey,
       @Parameter(description = "User UUID") @PathVariable UUID userId,
-      @Valid @RequestBody TenantDtos.AdminUpdateMemberAuthoritiesRequest request) {
-    membershipService.updateMemberAuthorities(userId, tenantKey, request.authorities());
+      @Valid @RequestBody TenantDtos.AdminUpdateMemberAuthoritiesRequest request,
+      @AuthenticationPrincipal Jwt jwt) {
+    final UUID actorId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    membershipService.updateMemberAuthorities(actorId, tenantKey, userId, request.authorities());
     var membership = membershipService.resolveMembership(userId, tenantKey);
     var authorities = membershipService.getAuthorities(membership.getId());
     return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));

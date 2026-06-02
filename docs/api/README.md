@@ -199,17 +199,20 @@ Accepts a `locale` query parameter (default `en-US`). Returns only `PUBLISHED` a
 
 ### Tenant Management
 
-| Method   | Path                                                | Auth                                       | Description                         |
-| -------- | --------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| `POST`   | `/tenants`                                          | JWT                                        | Create new tenant (owner is caller) |
-| `GET`    | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                  |
-| `PATCH`  | `/tenants/{tenantKey}`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                       |
-| `PATCH`  | `/tenants/{tenantKey}/status`                       | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status            |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning`           | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning           |
-| `GET`    | `/tenants/{tenantKey}/members`                      | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)     |
-| `GET`    | `/tenants/{tenantKey}/members/count`                | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                |
-| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities |
-| `DELETE` | `/tenants/{tenantKey}/members/{userId}`             | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant           |
+| Method   | Path                                                       | Auth                                       | Description                                                           |
+| -------- | ---------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
+| `POST`   | `/tenants`                                                 | JWT                                        | Create new tenant (owner is caller)                                   |
+| `GET`    | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                                                    |
+| `PATCH`  | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                                                         |
+| `PATCH`  | `/tenants/{tenantKey}/status`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status                                              |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning`                  | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning                                             |
+| `GET`    | `/tenants/{tenantKey}/members`                             | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)                                       |
+| `GET`    | `/tenants/{tenantKey}/members/count`                       | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                                                  |
+| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities`        | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities                                   |
+| `DELETE` | `/tenants/{tenantKey}/members/{userId}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant                                             |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/ban`                | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Ban member from tenant; invalidates all sessions for this tenant      |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/unban`              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Unban member from tenant                                              |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/transfer-ownership` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transfer tenant ownership to another member; old owner becomes MEMBER |
 
 `POST /tenants/{tenantKey}/retry-provisioning` is only valid when the tenant is in `PROVISIONING_FAILED` state.
 
@@ -262,6 +265,9 @@ For existing users: only `password` is required (used to verify identity).
 | `PUT`    | `/admin/users/{id}/authorities` | JWT `PLATFORM_ADMIN` | Replace user platform authorities                  |
 | `GET`    | `/admin/users/{id}/memberships` | JWT `PLATFORM_ADMIN` | Get user tenant memberships                        |
 | `POST`   | `/admin/users/{id}/password`    | JWT `PLATFORM_ADMIN` | Force-set user password (invalidates all sessions) |
+| `POST`   | `/admin/users/{id}/ban`         | JWT `PLATFORM_ADMIN` | Ban user globally                                  |
+| `POST`   | `/admin/users/{id}/unban`       | JWT `PLATFORM_ADMIN` | Unban user globally                                |
+| `POST`   | `/admin/users/{id}/unlock`      | JWT `PLATFORM_ADMIN` | Unlock user by resetting failed login attempts     |
 
 ---
 

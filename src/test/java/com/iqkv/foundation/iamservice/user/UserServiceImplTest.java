@@ -32,6 +32,7 @@ import com.iqkv.foundation.iamservice.email.EmailVerificationTokenMapper;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
+import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.signup.SignupResult;
@@ -69,6 +70,8 @@ class UserServiceImplTest {
   private PasswordEncoder passwordEncoder;
   @Mock
   private com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics metrics;
+  @Mock
+  private AccountLockoutManager accountLockoutManager;
 
   private UserServiceImpl userService;
 
@@ -86,7 +89,8 @@ class UserServiceImplTest {
         notificationProps,
         signupStrategy,
         passwordEncoder,
-        metrics
+        metrics,
+        accountLockoutManager
     );
 
     testUser = new User();
