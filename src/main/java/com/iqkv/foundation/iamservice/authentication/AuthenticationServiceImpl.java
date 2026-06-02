@@ -523,6 +523,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       throw new AccountNotActiveException();
     }
 
+    if (banService.isUserBanned(userId, tenantKey)) {
+      throw new AccountBannedException();
+    }
+
     final var membership = membershipService.resolveMembership(userId, tenantKey);
     final var authorities = membershipService.getAuthorities(membership.getId());
 
