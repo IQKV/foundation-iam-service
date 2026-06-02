@@ -25,7 +25,9 @@ public interface MembershipService {
 
   List<String> getAuthorities(UUID membershipId);
 
-  void updateMemberAuthorities(UUID userId, String tenantKey, List<String> authorities);
+  void updateMemberAuthorities(UUID actingUserId, String tenantKey, UUID targetUserId, List<String> authorities);
+
+  void transferOwnership(UUID fromUserId, UUID toUserId, String tenantKey);
 
   List<com.iqkv.foundation.iamservice.user.dto.UserDtos.UserMembershipResponse> getUserMemberships(UUID userId);
 }

@@ -237,7 +237,8 @@ public class TenantRestResource {
     if (!Objects.equals(tenantKey, tokenTenantId)) {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
-    membershipService.updateMemberAuthorities(userId, tenantKey, request.authorities());
+    final UUID actorId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    membershipService.updateMemberAuthorities(actorId, tenantKey, userId, request.authorities());
     var membership = membershipService.resolveMembership(userId, tenantKey);
     var authorities = membershipService.getAuthorities(membership.getId());
     return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
@@ -316,5 +317,33 @@ public class TenantRestResource {
     final String actorId = jwt.getClaimAsString(JwtClaimNames.USER_ID);
     banService.unbanUserTenant(userId, tenantKey, UUID.fromString(actorId));
     return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{tenantKey}/members/{userId}/transfer-ownership")
+  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @Operation(
+      summary = "Transfer tenant ownership to another member",
+      description = "Transfers ownership of the tenant to another member. The current owner will be downgraded to ADMIN.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Ownership transferred successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User or tenant not found", content = @Content)
+  })
+  public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> transferTenantOwnership(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    final UUID actorId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    membershipService.transferOwnership(actorId, userId, tenantKey);
+    final var membership = membershipService.resolveMembership(userId, tenantKey);
+    final var authorities = membershipService.getAuthorities(membership.getId());
+    return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
   }
 }
