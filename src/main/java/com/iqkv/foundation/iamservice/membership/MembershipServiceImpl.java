@@ -113,7 +113,7 @@ public class MembershipServiceImpl implements MembershipService {
 
     // Validate: resolve both memberships
     final TenantMembership fromMembership = resolveMembership(fromUserId, tenantKey);
-    final TenantMembership toMembership = resolveMembership(toUserId, tenantKey);
+    resolveMembership(toUserId, tenantKey);
 
     // Validate: from user must be TENANT_OWNER
     final List<String> fromAuthorities = getAuthorities(fromMembership.getId());
