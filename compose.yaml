@@ -23,6 +23,12 @@ services:
       file: compose.base.yaml
       service: minio
 
+  # DbGate - Database Administration Tool
+  dbgate:
+    extends:
+      file: compose.base.yaml
+      service: dbgate
+
 networks:
   iam-service-network:
     name: foundation-iam-network-dev
@@ -35,3 +41,5 @@ volumes:
     name: iqkv_iam_rabbitmq_data_dev
   minio_iam_data:
     name: iqkv_iam_minio_data_dev
+  dbgate_iam_data:
+    name: iqkv_iam_dbgate_data_dev

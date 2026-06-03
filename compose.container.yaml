@@ -23,6 +23,12 @@ services:
       file: compose.base.yaml
       service: minio
 
+  # DbGate - Database Administration Tool
+  dbgate:
+    extends:
+      file: compose.base.yaml
+      service: dbgate
+
   # IAM Service - Full platform run including build phase
   iam-service:
     extends:
@@ -41,6 +47,8 @@ volumes:
     name: iqkv_iam_rabbitmq_data_dev
   minio_iam_data:
     name: iqkv_iam_minio_data_dev
+  dbgate_iam_data:
+    name: iqkv_iam_dbgate_data_dev
   iam_logs:
     name: iqkv_iam_logs_dev
   iam_tmp:
