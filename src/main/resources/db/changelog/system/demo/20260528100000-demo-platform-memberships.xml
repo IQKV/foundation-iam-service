@@ -12,53 +12,52 @@
 
     <changeSet id="20260528100000-demo-platform-memberships" author="iqkv" context="demo">
         <!-- Insert tenant memberships for all users into platform tenant (skip existing memberships) -->
-        <insert tableName="tenant_memberships" schemaName="public">
-            <column name="id" valueComputed="gen_random_uuid()"/>
-            <column name="user_id" valueComputed="u.id"/>
-            <column name="tenant_key" value="platform"/>
-            <column name="status" value="ACTIVE"/>
-            <column name="created_at" valueDate="2026-05-28T10:00:00"/>
-            <column name="updated_at" valueDate="2026-05-28T10:00:00"/>
-            <column name="created_by" value="system"/>
-            <column name="updated_by" value="system"/>
-            <select>
-                SELECT u.id
-                FROM public.users u
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.tenant_memberships tm
-                    WHERE tm.user_id = u.id
-                    AND tm.tenant_key = 'platform'
-                )
-            </select>
-        </insert>
+        <sql>
+            INSERT INTO public.tenant_memberships (id, user_id, tenant_key, status, created_at, updated_at, created_by, updated_by)
+            SELECT 
+                gen_random_uuid(),
+                u.id,
+                'platform',
+                'ACTIVE',
+                TIMESTAMP '2026-05-28 10:00:00',
+                TIMESTAMP '2026-05-28 10:00:00',
+                'system',
+                'system'
+            FROM public.users u
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM public.tenant_memberships tm
+                WHERE tm.user_id = u.id
+                AND tm.tenant_key = 'platform'
+            );
+        </sql>
 
         <!-- Insert MEMBER authorities for newly created platform memberships -->
-        <insert tableName="tenant_member_authorities" schemaName="public">
-            <column name="id" valueComputed="gen_random_uuid()"/>
-            <column name="membership_id" valueComputed="tm.id"/>
-            <column name="authority" value="MEMBER"/>
-            <select>
-                SELECT tm.id
-                FROM public.tenant_memberships tm
-                WHERE tm.tenant_key = 'platform'
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM public.tenant_member_authorities tma
-                    WHERE tma.membership_id = tm.id
-                )
-            </select>
-        </insert>
+        <sql>
+            INSERT INTO public.tenant_member_authorities (id, membership_id, authority)
+            SELECT 
+                gen_random_uuid(),
+                tm.id,
+                'MEMBER'
+            FROM public.tenant_memberships tm
+            WHERE tm.tenant_key = 'platform'
+            AND NOT EXISTS (
+                SELECT 1
+                FROM public.tenant_member_authorities tma
+                WHERE tma.membership_id = tm.id
+            );
+        </sql>
 
         <rollback>
-            <delete tableName="tenant_member_authorities" schemaName="public">
-                <where>membership_id IN (
+            <sql>
+                DELETE FROM public.tenant_member_authorities
+                WHERE membership_id IN (
                     SELECT id FROM public.tenant_memberships WHERE tenant_key = 'platform'
-                )</where>
-            </delete>
-            <delete tableName="tenant_memberships" schemaName="public">
-                <where>tenant_key = 'platform'</where>
-            </delete>
+                );
+                
+                DELETE FROM public.tenant_memberships
+                WHERE tenant_key = 'platform';
+            </sql>
         </rollback>
     </changeSet>
 
