@@ -25,6 +25,7 @@ import java.util.UUID;
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException;
+import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.user.UserService;
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -98,8 +100,14 @@ public class AuthenticationRestResource {
       @ApiResponse(responseCode = "403", description = "Account not active (suspended/locked/deleted), account locked by brute-force policy, tenant suspended, or no membership")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> signIn(
-      @Valid @RequestBody final AuthenticationDtos.SignInRequest request) {
-    return ResponseEntity.ok(authenticationService.signIn(request));
+      @Valid @RequestBody final AuthenticationDtos.SignInRequest request,
+      @RequestHeader("X-Tenant-ID") final String tenantKey) {
+    try {
+      TenantContext.setCurrentTenant(tenantKey);
+      return ResponseEntity.ok(authenticationService.signIn(request));
+    } finally {
+      TenantContext.clear();
+    }
   }
 
   @PostMapping("/exchange")
@@ -171,8 +179,14 @@ public class AuthenticationRestResource {
       @ApiResponse(responseCode = "403", description = "Tenant context mismatch or tenant suspended")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> refresh(
-      @Valid @RequestBody final AuthenticationDtos.RefreshTokenRequest request) {
-    return ResponseEntity.ok(authenticationService.refresh(request));
+      @Valid @RequestBody final AuthenticationDtos.RefreshTokenRequest request,
+      @RequestHeader("X-Tenant-ID") final String tenantKey) {
+    try {
+      TenantContext.setCurrentTenant(tenantKey);
+      return ResponseEntity.ok(authenticationService.refresh(request));
+    } finally {
+      TenantContext.clear();
+    }
   }
 
   @PostMapping("/signout")

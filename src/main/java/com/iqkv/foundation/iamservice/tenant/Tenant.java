@@ -31,6 +31,7 @@ public class Tenant {
   private String updatedBy;
   private Boolean isDefault;
   private String tenantModeOrigin;
+  private Boolean isInternal;
 
   public UUID getId() {
     return id;
@@ -110,5 +111,13 @@ public class Tenant {
 
   public void setTenantModeOrigin(final String tenantModeOrigin) {
     this.tenantModeOrigin = tenantModeOrigin;
+  }
+
+  public Boolean getIsInternal() {
+    return isInternal;
+  }
+
+  public void setIsInternal(final Boolean isInternal) {
+    this.isInternal = isInternal;
   }
 }

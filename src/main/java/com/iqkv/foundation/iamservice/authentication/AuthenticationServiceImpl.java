@@ -491,7 +491,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         continue;
       }
       final var tenant = tenantMapper.findByTenantKey(membership.getTenantKey()).orElse(null);
-      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE) {
+      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE || Boolean.TRUE.equals(tenant.getIsInternal())) {
         continue;
       }
       final var authorities = membershipService.getAuthorities(membership.getId());

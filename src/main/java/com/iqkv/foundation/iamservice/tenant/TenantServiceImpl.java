@@ -107,7 +107,7 @@ public class TenantServiceImpl implements TenantService {
     final String tenantKey = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NANOID_ALPHABET, NANOID_SIZE);
 
     // Step 2: Create tenant
-    final var tenant = new Tenant();
+    final Tenant tenant = new Tenant();
     tenant.setId(UUID.randomUUID());
     tenant.setTenantKey(tenantKey);
     tenant.setName(tenantName);
@@ -116,6 +116,7 @@ public class TenantServiceImpl implements TenantService {
     tenant.setUpdatedAt(LocalDateTime.now());
     tenant.setCreatedBy(ownerUserId.toString());
     tenant.setUpdatedBy(ownerUserId.toString());
+    tenant.setIsInternal(false);
 
     tenantMapper.insertIfAbsent(tenant);
     metrics.recordTenantProvisioning("initiated");

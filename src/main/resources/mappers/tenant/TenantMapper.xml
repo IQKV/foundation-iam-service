@@ -15,32 +15,33 @@
         <result property="updatedBy" column="updated_by"/>
         <result property="isDefault" column="is_default"/>
         <result property="tenantModeOrigin" column="tenant_mode_origin"/>
+        <result property="isInternal" column="is_internal"/>
     </resultMap>
 
     <insert id="insertIfAbsent" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
-        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
+        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal)
         VALUES
         (#{id}, #{tenantKey}, #{name},
         #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, #{isDefault}, #{tenantModeOrigin})
+        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, #{isDefault}, #{tenantModeOrigin}, #{isInternal})
         ON CONFLICT (name) DO NOTHING
     </insert>
 
     <select id="findByTenantKey" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         WHERE tenant_key = #{tenantKey}
     </select>
 
     <select id="findById" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         WHERE id = #{id}
     </select>
 
     <select id="findAll" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         <where>
             <if test="search != null and search != ''">
@@ -98,7 +99,7 @@
     </delete>
 
     <select id="findByStatus" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         WHERE status = #{status}
     </select>
@@ -115,7 +116,7 @@
     </update>
 
     <select id="findStuckProvisioning" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         WHERE status = 'PROVISIONING'
         AND created_at &lt; #{olderThan}
@@ -139,7 +140,7 @@
     </select>
 
     <select id="findDefaultTenant" resultMap="tenantResultMap">
-        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin
+        SELECT id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal
         FROM public.tenants
         WHERE is_default = true
         LIMIT 1
@@ -154,11 +155,11 @@
 
     <insert id="insertIfAbsentDefault" parameterType="com.iqkv.foundation.iamservice.tenant.Tenant">
         INSERT INTO public.tenants
-        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin)
+        (id, tenant_key, name, status, created_at, updated_at, created_by, updated_by, is_default, tenant_mode_origin, is_internal)
         VALUES
         (#{id}, #{tenantKey}, #{name},
         #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, true, #{tenantModeOrigin})
+        #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}, true, #{tenantModeOrigin}, #{isInternal})
         ON CONFLICT (is_default) WHERE is_default = true DO NOTHING
     </insert>
 

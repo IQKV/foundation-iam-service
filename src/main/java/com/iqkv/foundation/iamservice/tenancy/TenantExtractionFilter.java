@@ -37,19 +37,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p>Returns 400 with a problem+json body when the tenant cannot be resolved.
  * Always clears the tenant context in a {@code finally} block.
- *
- * <p><strong>Temporary:</strong> when no tenant can be resolved the filter falls back to
- * {@value #DEFAULT_PLATFORM_TENANT} to support demo/development environments.
- * Remove this fallback before going to production.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class TenantExtractionFilter extends OncePerRequestFilter {
 
   private static final String TENANT_HEADER = "X-Tenant-ID";
-
-  // TODO: remove demo fallback before production
-  private static final String DEFAULT_PLATFORM_TENANT = "platform";
 
   private final JwtDecoder jwtDecoder;
 
@@ -63,9 +56,13 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
                                   final FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      final String resolved = resolveTenantId(request);
-      // TODO: remove demo fallback before production
-      final String tenantId = (resolved != null) ? resolved : DEFAULT_PLATFORM_TENANT;
+      final String tenantId = resolveTenantId(request);
+      if (tenantId == null || tenantId.isBlank()) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.setContentType("application/problem+json");
+        response.getWriter().write("{\"title\":\"Bad Request\",\"status\":400,\"detail\":\"Missing or invalid tenant context\"}");
+        return;
+      }
       TenantContext.setCurrentTenant(tenantId);
       filterChain.doFilter(request, response);
     } finally {
@@ -89,7 +86,11 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
-           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/signin"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/refresh"));
   }
 
   private String resolveTenantId(final HttpServletRequest request) {
