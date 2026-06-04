@@ -42,7 +42,7 @@
         <insert tableName="tenants" schemaName="public">
             <column name="id" value="00000000-0000-0000-0000-000000000001"/>
             <column name="tenant_key" value="platform"/>
-            <column name="name" value="Platform Tenant"/>
+            <column name="name" value="Personal Workspace"/>
             <column name="status" value="ACTIVE"/>
             <column name="created_at" valueDate="2026-01-15T12:00:00"/>
             <column name="updated_at" valueDate="2026-01-15T12:00:00"/>

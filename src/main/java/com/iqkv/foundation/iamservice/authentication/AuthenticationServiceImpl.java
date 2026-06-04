@@ -19,7 +19,6 @@ package com.iqkv.foundation.iamservice.authentication;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +36,6 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.SigninAttemptEven
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.lockout.AccountLockoutManager;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
-import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
@@ -54,6 +52,7 @@ import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.VerificationRateLimitException;
 import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
+import com.iqkv.foundation.iamservice.tenant.TenantListingService;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantService;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -95,6 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final TenantService tenantService;
   private final IamServiceMetrics metrics;
   private final BanService banService;
+  private final TenantListingService tenantListingService;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -112,7 +112,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final PlatformAuthorityMapper platformAuthorityMapper,
       final TenantService tenantService,
       final IamServiceMetrics metrics,
-      final BanService banService) {
+      final BanService banService,
+      final TenantListingService tenantListingService) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -129,6 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.tenantService = tenantService;
     this.metrics = metrics;
     this.banService = banService;
+    this.tenantListingService = tenantListingService;
   }
 
   @Override
@@ -482,41 +484,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     accountLockoutManager.reset(email);
-
-    final List<TenantMembership> memberships = membershipMapper.findByUserId(user.getId());
-    final List<AuthenticationDtos.TenantMembershipSummary> result = new ArrayList<>();
-    AuthenticationDtos.TenantMembershipSummary personalWorkspace = null;
-
-    for (final TenantMembership membership : memberships) {
-      if (membership.getStatus() != com.iqkv.foundation.iamservice.membership.MembershipStatus.ACTIVE) {
-        continue;
-      }
-      final var tenant = tenantMapper.findByTenantKey(membership.getTenantKey()).orElse(null);
-      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE) {
-        continue;
-      }
-      final var authorities = membershipService.getAuthorities(membership.getId());
-      
-      if ("platform".equals(tenant.getTenantKey())) {
-        personalWorkspace = new AuthenticationDtos.TenantMembershipSummary(
-            tenant.getTenantKey(),
-            "Personal Workspace",
-            membership.getStatus().name(),
-            authorities);
-      } else if (!Boolean.TRUE.equals(tenant.getIsInternal())) {
-        result.add(new AuthenticationDtos.TenantMembershipSummary(
-            tenant.getTenantKey(),
-            tenant.getName(),
-            membership.getStatus().name(),
-            authorities));
-      }
-    }
-
-    if (personalWorkspace != null) {
-      result.add(0, personalWorkspace);
-    }
-
-    return result;
+    return tenantListingService.prepareTenantList(user.getId());
   }
 
   @Override
