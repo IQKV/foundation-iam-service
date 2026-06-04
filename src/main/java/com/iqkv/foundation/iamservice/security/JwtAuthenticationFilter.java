@@ -113,7 +113,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String path = request.getRequestURI();
     final String method = request.getMethod();
 
-    if (path.startsWith("/actuator/") || path.startsWith("/api-docs/") || path.startsWith("/swagger-ui/")) {
+    if (path.startsWith("/actuator/")
+        || path.startsWith("/api-docs/")
+        || path.startsWith("/swagger-ui/")
+        || path.startsWith("/.well-known/")) {
       return true;
     }
 
@@ -122,6 +125,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/refresh"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/validate"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))

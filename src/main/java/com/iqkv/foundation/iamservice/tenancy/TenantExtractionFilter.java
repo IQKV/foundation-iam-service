@@ -37,6 +37,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p>Returns 400 with a problem+json body when the tenant cannot be resolved.
  * Always clears the tenant context in a {@code finally} block.
+ *
+ * <p>Tenant resolution is intentionally skipped for platform-scoped paths that operate
+ * cross-tenant and never require a {@link TenantContext}:
+ * <ul>
+ *   <li>{@code /api/v1/iam/admin/**} — platform operator CRUD (users, tenants, etc.)</li>
+ *   <li>{@code /api/v1/iam/auth/admin/me/**} — platform admin self-service account</li>
+ *   <li>{@code /api/v1/iam/auth/signout} and {@code /api/v1/iam/auth/signout-all} — token revocation</li>
+ *   <li>{@code /.well-known/**} — public JWKS endpoint</li>
+ *   <li>Actuator, API docs, Swagger UI</li>
+ * </ul>
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
@@ -75,10 +85,28 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
     final String path = request.getRequestURI();
     final String method = request.getMethod();
 
-    if (path.startsWith("/actuator/") || path.startsWith("/api-docs/") || path.startsWith("/swagger-ui/") || path.startsWith("/.well-known/")) {
+    // Infrastructure / docs — always skip
+    if (path.startsWith("/actuator/")
+        || path.startsWith("/api-docs/")
+        || path.startsWith("/swagger-ui/")
+        || path.startsWith("/.well-known/")) {
       return true;
     }
 
+    // Platform-admin paths — cross-tenant by design, no tenant context ever required.
+    // Admin JWTs carry a null tenant_id claim intentionally (see adminSignIn).
+    if (path.startsWith("/api/v1/iam/admin/")
+        || path.startsWith("/api/v1/iam/auth/admin/me")) {
+      return true;
+    }
+
+    // Token revocation — operates on the token itself, not a tenant schema
+    if (path.equals("/api/v1/iam/auth/signout") || path.equals("/api/v1/iam/auth/signout-all")) {
+      return true;
+    }
+
+    // Public / tenant-managed endpoints (either tenant context is irrelevant or
+    // the controller sets it manually via X-Tenant-ID header)
     return ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signup"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/tenants"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/exchange"))
