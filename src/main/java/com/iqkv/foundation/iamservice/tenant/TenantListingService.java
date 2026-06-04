@@ -74,7 +74,7 @@ public class TenantListingService {
       final var authorities = membershipService.getAuthorities(membership.getId());
       final var isPersonal = Boolean.TRUE.equals(tenant.getIsInternal());
 
-      if (PLATFORM_TENANT_KEY.equals(tenant.getTenantKey())) {
+      if (isPersonal) {
         personalWorkspace = new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             PERSONAL_WORKSPACE_NAME,
@@ -82,7 +82,7 @@ public class TenantListingService {
             authorities,
             true
         );
-      } else if (!Boolean.TRUE.equals(tenant.getIsInternal())) {
+      } else {
         result.add(new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             tenant.getName(),
