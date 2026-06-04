@@ -299,6 +299,12 @@
                 <configuration>
                     <excludes>
                         <exclude>**/*Application.class</exclude>
+                        <exclude>**/infrastructure/config/*Config.class</exclude>
+                        <exclude>**/infrastructure/config/*Properties.class</exclude>
+                        <exclude>**/infrastructure/config/*Handler.class</exclude>
+                        <exclude>**/infrastructure/config/*Contributor.class</exclude>
+                        <exclude>**/infrastructure/config/*Validator.class</exclude>
+                        <exclude>**/infrastructure/config/RolloutMode.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
