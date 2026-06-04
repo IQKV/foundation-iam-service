@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TenantListingService {
 
-  private static final String PLATFORM_TENANT_KEY = "platform";
   private static final String PERSONAL_WORKSPACE_NAME = "Personal Workspace";
 
   private final TenantMapper tenantMapper;
