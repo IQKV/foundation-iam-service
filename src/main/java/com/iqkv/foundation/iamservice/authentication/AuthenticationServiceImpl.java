@@ -485,21 +485,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     final List<TenantMembership> memberships = membershipMapper.findByUserId(user.getId());
     final List<AuthenticationDtos.TenantMembershipSummary> result = new ArrayList<>();
+    AuthenticationDtos.TenantMembershipSummary personalWorkspace = null;
 
     for (final TenantMembership membership : memberships) {
       if (membership.getStatus() != com.iqkv.foundation.iamservice.membership.MembershipStatus.ACTIVE) {
         continue;
       }
       final var tenant = tenantMapper.findByTenantKey(membership.getTenantKey()).orElse(null);
-      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE || Boolean.TRUE.equals(tenant.getIsInternal())) {
+      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE) {
         continue;
       }
       final var authorities = membershipService.getAuthorities(membership.getId());
-      result.add(new AuthenticationDtos.TenantMembershipSummary(
-          tenant.getTenantKey(),
-          tenant.getName(),
-          membership.getStatus().name(),
-          authorities));
+      
+      if ("platform".equals(tenant.getTenantKey())) {
+        personalWorkspace = new AuthenticationDtos.TenantMembershipSummary(
+            tenant.getTenantKey(),
+            "Personal Workspace",
+            membership.getStatus().name(),
+            authorities);
+      } else if (!Boolean.TRUE.equals(tenant.getIsInternal())) {
+        result.add(new AuthenticationDtos.TenantMembershipSummary(
+            tenant.getTenantKey(),
+            tenant.getName(),
+            membership.getStatus().name(),
+            authorities));
+      }
+    }
+
+    if (personalWorkspace != null) {
+      result.add(0, personalWorkspace);
     }
 
     return result;
