@@ -289,7 +289,7 @@ class AuthenticationServiceImplTest {
     var password = "password123";
     var authorities = List.of("MEMBER");
     var expectedTenantSummary = new AuthenticationDtos.TenantMembershipSummary(
-        "test-tenant", "Test Tenant", "ACTIVE", authorities
+        "test-tenant", "Test Tenant", "ACTIVE", authorities, false
     );
 
     when(userMapper.findByEmail(email)).thenReturn(Optional.of(testUser));

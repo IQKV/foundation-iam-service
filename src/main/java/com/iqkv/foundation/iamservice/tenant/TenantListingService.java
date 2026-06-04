@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TenantListingService {
 
+  private static final String PLATFORM_TENANT_KEY = "platform";
   private static final String PERSONAL_WORKSPACE_NAME = "Personal Workspace";
 
   private final TenantMapper tenantMapper;
@@ -71,20 +72,23 @@ public class TenantListingService {
         continue;
       }
       final var authorities = membershipService.getAuthorities(membership.getId());
+      final var isPersonal = Boolean.TRUE.equals(tenant.getIsInternal());
 
-      if (tenant.getIsInternal()) {
+      if (PLATFORM_TENANT_KEY.equals(tenant.getTenantKey())) {
         personalWorkspace = new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             PERSONAL_WORKSPACE_NAME,
             membership.getStatus().name(),
-            authorities
+            authorities,
+            true
         );
-      } else {
+      } else if (!Boolean.TRUE.equals(tenant.getIsInternal())) {
         result.add(new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             tenant.getName(),
             membership.getStatus().name(),
-            authorities
+            authorities,
+            false
         ));
       }
     }

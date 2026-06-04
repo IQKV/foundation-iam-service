@@ -84,12 +84,14 @@ class AuthenticationDtosTest {
         "tenant-key",
         "Tenant Name",
         "ACTIVE",
-        authorities
+        authorities,
+        false
     );
 
     assertThat(summary.tenantKey()).isEqualTo("tenant-key");
     assertThat(summary.tenantName()).isEqualTo("Tenant Name");
     assertThat(summary.membershipStatus()).isEqualTo("ACTIVE");
     assertThat(summary.authorities()).containsExactly("MEMBER");
+    assertThat(summary.isPersonal()).isFalse();
   }
 }

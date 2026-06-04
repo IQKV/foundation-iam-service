@@ -81,7 +81,8 @@ public final class AuthenticationDtos {
       String tenantKey,
       String tenantName,
       String membershipStatus,
-      List<String> authorities) {
+      List<String> authorities,
+      boolean isPersonal) {
   }
 
   public record TenantExchangeRequest(
