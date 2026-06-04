@@ -44,6 +44,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   <li>{@code /api/v1/iam/admin/**} — platform operator CRUD (users, tenants, etc.)</li>
  *   <li>{@code /api/v1/iam/auth/admin/me/**} — platform admin self-service account</li>
  *   <li>{@code /api/v1/iam/auth/signout} and {@code /api/v1/iam/auth/signout-all} — token revocation</li>
+ *   <li>{@code /api/v1/iam/users/notifications/**} — stored in {@code public} schema with
+ *       fully-qualified SQL; accessible to both tenant users and platform admins whose
+ *       tokens carry a null {@code tenant_id}.</li>
  *   <li>{@code /.well-known/**} — public JWKS endpoint</li>
  *   <li>Actuator, API docs, Swagger UI</li>
  * </ul>
@@ -102,6 +105,13 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
 
     // Token revocation — operates on the token itself, not a tenant schema
     if (path.equals("/api/v1/iam/auth/signout") || path.equals("/api/v1/iam/auth/signout-all")) {
+      return true;
+    }
+
+    // User notifications — stored in public.user_notifications with fully schema-qualified SQL.
+    // No tenant schema routing needed; accessible to both tenant users and platform admins
+    // (whose tokens carry a null tenant_id).
+    if (path.startsWith("/api/v1/iam/users/notifications")) {
       return true;
     }
 
