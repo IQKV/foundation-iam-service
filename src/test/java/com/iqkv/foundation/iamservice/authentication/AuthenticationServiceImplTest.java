@@ -98,6 +98,8 @@ class AuthenticationServiceImplTest {
   private com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics metrics;
   @Mock
   private com.iqkv.foundation.iamservice.ban.BanService banService;
+  @Mock
+  private com.iqkv.foundation.iamservice.tenant.TenantListingService tenantListingService;
 
   private AuthenticationServiceImpl authenticationService;
 
@@ -123,7 +125,8 @@ class AuthenticationServiceImplTest {
         platformAuthorityMapper,
         tenantService,
         metrics,
-        banService
+        banService,
+        tenantListingService
     );
 
     lenient().when(metrics.authDurationTimer(any(), any()))
@@ -285,13 +288,14 @@ class AuthenticationServiceImplTest {
     var email = "user@example.com";
     var password = "password123";
     var authorities = List.of("MEMBER");
+    var expectedTenantSummary = new AuthenticationDtos.TenantMembershipSummary(
+        "test-tenant", "Test Tenant", "ACTIVE", authorities
+    );
 
     when(userMapper.findByEmail(email)).thenReturn(Optional.of(testUser));
     when(accountLockoutManager.isLocked(email)).thenReturn(false);
     when(passwordEncoder.matches(password, testUser.getPasswordHash())).thenReturn(true);
-    when(membershipMapper.findByUserId(testUser.getId())).thenReturn(List.of(testMembership));
-    when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
-    when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
+    when(tenantListingService.prepareTenantList(testUser.getId())).thenReturn(List.of(expectedTenantSummary));
 
     // Act
     var result = authenticationService.listUserTenants(email, password);
