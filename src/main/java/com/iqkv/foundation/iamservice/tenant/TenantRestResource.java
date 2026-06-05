@@ -319,6 +319,30 @@ public class TenantRestResource {
     return ResponseEntity.noContent().build();
   }
 
+  @GetMapping("/{tenantKey}/members/{userId}/authorities")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN', 'MEMBER')")
+  @Operation(summary = "Get tenant member authorities")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorities found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "403", description = "Access denied"),
+      @ApiResponse(responseCode = "404", description = "Tenant or member not found")
+  })
+  public ResponseEntity<TenantDtos.MemberAuthoritiesResponse> getMemberAuthorities(
+      @PathVariable final String tenantKey,
+      @PathVariable final UUID userId,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    final var membership = membershipService.resolveMembership(userId, tenantKey);
+    final var authorities = membershipService.getAuthorities(membership.getId());
+    return ResponseEntity.ok(new TenantDtos.MemberAuthoritiesResponse(userId, tenantKey, authorities));
+  }
+
   @PostMapping("/{tenantKey}/members/{userId}/transfer-ownership")
   @PreAuthorize("hasAuthority('TENANT_OWNER')")
   @Operation(
