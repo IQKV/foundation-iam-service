@@ -106,20 +106,21 @@ Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and
 
 ### Tenant Management
 
-| Method   | Path                                                       | Auth                                       | Description                                                           |
-| -------- | ---------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
-| `POST`   | `/tenants`                                                 | JWT                                        | Create new tenant (owner is caller)                                   |
-| `GET`    | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Get tenant details                                                    |
-| `PATCH`  | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Rename tenant                                                         |
-| `PATCH`  | `/tenants/{tenantKey}/status`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transition tenant status                                              |
-| `POST`   | `/tenants/{tenantKey}/retry-provisioning`                  | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Retry failed provisioning                                             |
-| `GET`    | `/tenants/{tenantKey}/members`                             | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | List tenant members (paginated)                                       |
-| `GET`    | `/tenants/{tenantKey}/members/count`                       | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Count tenant members                                                  |
-| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities`        | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Replace member's tenant authorities                                   |
-| `DELETE` | `/tenants/{tenantKey}/members/{userId}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Remove member from tenant                                             |
-| `POST`   | `/tenants/{tenantKey}/members/{userId}/ban`                | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Ban member from tenant; invalidates all sessions for this tenant      |
-| `POST`   | `/tenants/{tenantKey}/members/{userId}/unban`              | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Unban member from tenant                                              |
-| `POST`   | `/tenants/{tenantKey}/members/{userId}/transfer-ownership` | JWT `TENANT_OWNER` + `X-Tenant-ID`         | Transfer tenant ownership to another member; old owner becomes MEMBER |
+| Method   | Path                                                       | Auth                                                | Description                                                           |
+| -------- | ---------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------- |
+| `POST`   | `/tenants`                                                 | JWT                                                 | Create new tenant (owner is caller)                                   |
+| `GET`    | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Get tenant details                                                    |
+| `PATCH`  | `/tenants/{tenantKey}`                                     | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Rename tenant                                                         |
+| `PATCH`  | `/tenants/{tenantKey}/status`                              | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Transition tenant status                                              |
+| `POST`   | `/tenants/{tenantKey}/retry-provisioning`                  | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Retry failed provisioning                                             |
+| `GET`    | `/tenants/{tenantKey}/members`                             | JWT `TENANT_OWNER`/`ADMIN`/`MEMBER` + `X-Tenant-ID` | List tenant members (paginated)                                       |
+| `GET`    | `/tenants/{tenantKey}/members/count`                       | JWT `TENANT_OWNER`/`ADMIN`/`MEMBER` + `X-Tenant-ID` | Count tenant members                                                  |
+| `GET`    | `/tenants/{tenantKey}/members/{userId}/authorities`        | JWT `TENANT_OWNER`/`ADMIN`/`MEMBER` + `X-Tenant-ID` | Get member's tenant authorities                                       |
+| `PUT`    | `/tenants/{tenantKey}/members/{userId}/authorities`        | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Replace member's tenant authorities                                   |
+| `DELETE` | `/tenants/{tenantKey}/members/{userId}`                    | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Remove member from tenant                                             |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/ban`                | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Ban member from tenant; invalidates all sessions for this tenant      |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/unban`              | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Unban member from tenant                                              |
+| `POST`   | `/tenants/{tenantKey}/members/{userId}/transfer-ownership` | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Transfer tenant ownership to another member; old owner becomes MEMBER |
 
 ### Invitations
 
