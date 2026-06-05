@@ -113,17 +113,37 @@ public class AvatarServiceImpl implements AvatarService {
   private String generatePresignedPutUrl(final String objectKey) {
     try {
       // MinIO 9.x uses io.minio.Http.Method enum
-      return minioClient.getPresignedObjectUrl(
+      final String presignedUrl = minioClient.getPresignedObjectUrl(
           GetPresignedObjectUrlArgs.builder()
               .method(io.minio.Http.Method.PUT)
               .bucket(storageProps.bucketName())
               .object(objectKey)
               .expiry(PRESIGNED_URL_EXPIRY_MINUTES, TimeUnit.MINUTES)
               .build());
+      return rewriteToPublicEndpoint(presignedUrl);
     } catch (final Exception e) {
       log.error("Failed to generate presigned URL for objectKey={}", objectKey, e);
       throw new RuntimeException("Failed to generate presigned URL", e);
     }
+  }
+
+  /**
+   * Rewrites the host:port of a presigned URL from the internal MinIO endpoint
+   * to the public-facing endpoint, so browser clients can reach it.
+   * No-op when {@code publicEndpoint} is blank (local dev or AWS S3).
+   */
+  private String rewriteToPublicEndpoint(final String presignedUrl) {
+    final String publicEndpoint = storageProps.publicEndpoint();
+    if (publicEndpoint == null || publicEndpoint.isBlank()) {
+      return presignedUrl;
+    }
+    final String internalBase = storageProps.endpoint().replaceAll("/$", "");
+    final String publicBase = publicEndpoint.replaceAll("/$", "");
+    if (presignedUrl.startsWith(internalBase)) {
+      return publicBase + presignedUrl.substring(internalBase.length());
+    }
+    log.warn("Presigned URL does not start with internal endpoint '{}', returning as-is", internalBase);
+    return presignedUrl;
   }
 
   private String buildPublicUrl(final String objectKey) {

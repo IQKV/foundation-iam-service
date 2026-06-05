@@ -28,6 +28,7 @@ iqkv:
     port: ${MAIL_PORT:1025}
   objectstorage:
     endpoint: ${OBJECTSTORAGE_ENDPOINT:http://foundation-infra-minio.iqkv-sit-env.svc.cluster.local:9000}
+    public-endpoint: ${OBJECTSTORAGE_PUBLIC_ENDPOINT:}
     access-key: ${OBJECTSTORAGE_ACCESS_KEY:iqkv}
     secret-key: ${OBJECTSTORAGE_SECRET_KEY:iqkv_password}
     bucket-name: ${OBJECTSTORAGE_BUCKET_NAME:iam-assets}

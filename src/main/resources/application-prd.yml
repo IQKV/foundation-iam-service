@@ -43,6 +43,7 @@ iqkv:
       public-key-path: ${JWT_PUBLIC_KEY_PATH}
   objectstorage:
     endpoint: ${OBJECTSTORAGE_ENDPOINT}
+    public-endpoint: ${OBJECTSTORAGE_PUBLIC_ENDPOINT:}
     access-key: ${OBJECTSTORAGE_ACCESS_KEY}
     secret-key: ${OBJECTSTORAGE_SECRET_KEY}
     bucket-name: ${OBJECTSTORAGE_BUCKET_NAME}

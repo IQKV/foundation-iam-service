@@ -33,12 +33,20 @@ import org.springframework.validation.annotation.Validated;
  * <p>Supports both MinIO (SIT/UAT) and AWS S3 (production) via the same S3-compatible API.
  * The {@code endpoint} field is ignored by the AWS SDK when using the default S3 region resolver,
  * so set it to {@code https://s3.amazonaws.com} for AWS or to the MinIO service URL otherwise.
+ *
+ * <p>{@code publicEndpoint} is the URL reachable by external clients (browsers, mobile apps).
+ * When set, presigned URLs have their host rewritten from {@code endpoint} to {@code publicEndpoint}
+ * before being returned to callers — necessary when MinIO runs on an in-cluster hostname that
+ * external clients cannot resolve.  Leave blank to use {@code endpoint} as-is (local dev).
  */
 @Validated
 @ConfigurationProperties(prefix = "iqkv.objectstorage")
 public record ObjectStorageConfigurationProperties(
     // S3-compatible endpoint URL — MinIO in-cluster or https://s3.amazonaws.com for AWS
     @NotBlank @Pattern(regexp = "^https?://.+", message = "endpoint must be a valid http or https URL") String endpoint,
+    // Public-facing URL used to rewrite presigned URLs returned to external clients.
+    // Optional — when blank, presigned URLs are returned unchanged.
+    String publicEndpoint,
     @NotBlank String accessKey,
     @NotBlank String secretKey,
     @NotBlank String bucketName,
