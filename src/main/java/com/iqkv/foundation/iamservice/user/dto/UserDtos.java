@@ -132,7 +132,8 @@ public final class UserDtos {
       String tenantKey,
       String tenantName,
       String status,
-      List<String> authorities) {
+      List<String> authorities,
+      boolean isPersonal) {
   }
 
   public record UserCountResponse(long total) {

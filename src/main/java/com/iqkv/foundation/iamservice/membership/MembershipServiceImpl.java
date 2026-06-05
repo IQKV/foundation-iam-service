@@ -141,15 +141,16 @@ public class MembershipServiceImpl implements MembershipService {
   public List<UserDtos.UserMembershipResponse> getUserMemberships(final UUID userId) {
     final List<TenantMembership> memberships = membershipMapper.findByUserId(userId);
     return memberships.stream().map(membership -> {
-      final String tenantName = tenantMapper.findByTenantKey(membership.getTenantKey())
-          .map(t -> t.getName())
-          .orElse(membership.getTenantKey());
+      final var tenant = tenantMapper.findByTenantKey(membership.getTenantKey()).orElse(null);
+      final String tenantName = tenant != null ? tenant.getName() : membership.getTenantKey();
+      final boolean isPersonal = tenant != null && Boolean.TRUE.equals(tenant.getIsInternal());
       final List<String> authorities = getAuthorities(membership.getId());
       return new UserDtos.UserMembershipResponse(
           membership.getTenantKey(),
           tenantName,
           membership.getStatus().name(),
-          authorities
+          authorities,
+          isPersonal
       );
     }).collect(Collectors.toList());
   }
