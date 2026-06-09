@@ -130,7 +130,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/verify"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/email/resend-verification"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/forgot"))
-           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"));
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/users/password/reset"))
+           || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/locales"))
+           || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/announcements"));
   }
 
   private void writeRevoked(final HttpServletResponse response) throws IOException {

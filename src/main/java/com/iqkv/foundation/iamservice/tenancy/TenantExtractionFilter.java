@@ -47,10 +47,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   <li>{@code /api/v1/iam/users/notifications/**} — stored in {@code public} schema with
  *       fully-qualified SQL; accessible to both tenant users and platform admins whose
  *       tokens carry a null {@code tenant_id}.</li>
+ *   <li>{@code GET /api/v1/iam/locales} — platform-wide locale list, stored in {@code public} schema.</li>
+ *   <li>{@code GET /api/v1/iam/announcements} — platform-wide announcements, stored in {@code public} schema.</li>
  *   <li>{@code /.well-known/**} — public JWKS endpoint</li>
  *   <li>Actuator, API docs, Swagger UI</li>
- * </ul>
- */
+ * </ul> */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class TenantExtractionFilter extends OncePerRequestFilter {
@@ -136,7 +137,9 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
-           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/refresh"));
+           || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/refresh"))
+           || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/locales"))
+           || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/announcements"));
   }
 
   private String resolveTenantId(final HttpServletRequest request) {
