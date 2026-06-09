@@ -88,6 +88,14 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
     final String path = request.getRequestURI();
     final String method = request.getMethod();
 
+    // WebSocket / SockJS — handshake and transport paths.
+    // The SockJS /info probe and upgrade request carry no JWT or tenant header
+    // (browsers cannot set custom headers on WebSocket upgrades).
+    // Tenant context is resolved post-handshake via the STOMP CONNECT frame.
+    if (path.startsWith("/api/v1/iam/ws/") || path.equals("/api/v1/iam/ws")) {
+      return true;
+    }
+
     // Infrastructure / docs — always skip
     if (path.startsWith("/actuator/")
         || path.startsWith("/api-docs/")
