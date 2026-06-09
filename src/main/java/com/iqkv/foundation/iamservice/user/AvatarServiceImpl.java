@@ -29,6 +29,7 @@ import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,13 +42,17 @@ public class AvatarServiceImpl implements AvatarService {
 
   private final UserMapper userMapper;
   private final MinioClient minioClient;
+  private final MinioClient presigningMinioClient;
   private final ObjectStorageConfigurationProperties storageProps;
 
   public AvatarServiceImpl(final UserMapper userMapper,
                            final MinioClient minioClient,
+                           @Qualifier("presigningMinioClient")
+                           final MinioClient presigningMinioClient,
                            final ObjectStorageConfigurationProperties storageProps) {
     this.userMapper = userMapper;
     this.minioClient = minioClient;
+    this.presigningMinioClient = presigningMinioClient;
     this.storageProps = storageProps;
   }
 
@@ -112,73 +117,19 @@ public class AvatarServiceImpl implements AvatarService {
 
   private String generatePresignedPutUrl(final String objectKey) {
     try {
-      // MinIO 9.x uses io.minio.Http.Method enum
-      final String presignedUrl = minioClient.getPresignedObjectUrl(
+      final String presignedUrl = presigningMinioClient.getPresignedObjectUrl(
           GetPresignedObjectUrlArgs.builder()
               .method(io.minio.Http.Method.PUT)
               .bucket(storageProps.bucketName())
               .object(objectKey)
               .expiry(PRESIGNED_URL_EXPIRY_MINUTES, TimeUnit.MINUTES)
               .build());
-      final String rewritten = rewriteToPublicEndpoint(presignedUrl);
-      log.debug("Presigned PUT URL generated: objectKey={}, url={}", objectKey, rewritten);
-      return rewritten;
+      log.debug("Presigned PUT URL generated: objectKey={}, url={}", objectKey, presignedUrl);
+      return presignedUrl;
     } catch (final Exception e) {
       log.error("Failed to generate presigned URL for objectKey={}", objectKey, e);
       throw new RuntimeException("Failed to generate presigned URL", e);
     }
-  }
-
-  /**
-   * Rewrites the host:port of a presigned URL from the internal MinIO endpoint
-   * to the public-facing endpoint, so browser clients can reach it.
-   * No-op when {@code publicEndpoint} is blank (local dev or AWS S3).
-   *
-   * <p>Uses {@link java.net.URI} parsing instead of string prefix matching so that
-   * equivalent URLs with/without explicit default ports (e.g. :80, :443) are handled
-   * correctly — MinIO SDK may append the port even when it is the scheme default.
-   */
-  private String rewriteToPublicEndpoint(final String presignedUrl) {
-    final String publicEndpoint = storageProps.publicEndpoint();
-    if (publicEndpoint == null || publicEndpoint.isBlank()) {
-      return presignedUrl;
-    }
-    try {
-      final java.net.URI presigned = new java.net.URI(presignedUrl);
-      final java.net.URI internal = new java.net.URI(storageProps.endpoint().replaceAll("/$", ""));
-      final java.net.URI pub = new java.net.URI(publicEndpoint.replaceAll("/$", ""));
-
-      // Compare scheme + host + effective port (treat -1 as scheme default)
-      final int presignedPort = effectivePort(presigned);
-      final int internalPort = effectivePort(internal);
-
-      if (presigned.getScheme().equalsIgnoreCase(internal.getScheme())
-          && presigned.getHost().equalsIgnoreCase(internal.getHost())
-          && presignedPort == internalPort) {
-        // Replace scheme+authority with the public base, keep path+query unchanged
-        final String pathAndQuery = presigned.getRawPath()
-            + (presigned.getRawQuery() != null ? "?" + presigned.getRawQuery() : "");
-        return pub.toString() + pathAndQuery;
-      }
-
-      log.warn("Presigned URL host '{}:{}' does not match internal endpoint '{}:{}', returning as-is",
-          presigned.getHost(), presignedPort, internal.getHost(), internalPort);
-      return presignedUrl;
-    } catch (final java.net.URISyntaxException e) {
-      log.warn("Could not parse presigned URL '{}', returning as-is", presignedUrl, e);
-      return presignedUrl;
-    }
-  }
-
-  private static int effectivePort(final java.net.URI uri) {
-    if (uri.getPort() != -1) {
-      return uri.getPort();
-    }
-    return switch (uri.getScheme().toLowerCase()) {
-      case "https" -> 443;
-      case "http" -> 80;
-      default -> -1;
-    };
   }
 
   private String buildPublicUrl(final String objectKey) {
