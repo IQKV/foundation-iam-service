@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260612000000-add-locale-bg-bg" author="iqkv">
+        <insert tableName="locales" schemaName="public">
+            <column name="code" value="bg-BG"/>
+            <column name="name" value="Bulgarian (Bulgaria)"/>
+            <column name="native_name" value="&#1041;&#1098;&#1083;&#1075;&#1072;&#1088;&#1089;&#1082;&#1080; (&#1041;&#1098;&#1083;&#1075;&#1072;&#1088;&#1080;&#1103;)"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_default" valueBoolean="false"/>
+        </insert>
+        <rollback>
+            <delete tableName="locales" schemaName="public">
+                <where>code = 'bg-BG'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -23,6 +23,7 @@
     <include file="db/changelog/system/20260529000001-add-avatar-url-to-users.xml"/>
     <include file="db/changelog/system/20260529100000-create-bans-table.xml"/>
     <include file="db/changelog/system/20260604120000-add-is-internal-column.xml"/>
+    <include file="db/changelog/system/20260612000000-add-locale-bg-bg.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>
