@@ -98,8 +98,10 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
     }
 
     // Infrastructure / docs — always skip
-    if (path.startsWith("/actuator/")
+    if (path.equals("/api-docs")
         || path.startsWith("/api-docs/")
+        || path.equals("/actuator")
+        || path.startsWith("/actuator/")
         || path.startsWith("/swagger-ui/")
         || path.startsWith("/.well-known/")) {
       return true;
