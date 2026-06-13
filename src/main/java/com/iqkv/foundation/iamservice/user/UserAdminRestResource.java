@@ -180,18 +180,24 @@ public class UserAdminRestResource {
   }
 
   @PutMapping("/{id}/authorities")
-  @Operation(summary = "Update user platform authorities", description = "Full replacement of platform authorities for the user.")
+  @Operation(summary = "Update user platform authorities", description = "Full replacement of platform authorities for the user. "
+                                                                         + "A platform admin cannot modify their own platform authorities.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Authorities updated"),
-      @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+      @ApiResponse(responseCode = "400", description = "Validation error or self-modification attempt", content = @Content),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
       @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   public ResponseEntity<UserDtos.UserAuthoritiesResponse> updateUserAuthorities(
       @Parameter(description = "User UUID") @PathVariable UUID id,
-      @Valid @RequestBody UserDtos.AdminUpdateUserAuthoritiesRequest request) {
-    platformAuthorityService.updateUserAuthorities(id, request.authorities(), "system");
+      @Valid @RequestBody UserDtos.AdminUpdateUserAuthoritiesRequest request,
+      @AuthenticationPrincipal Jwt jwt) {
+    final UUID actorId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    if (actorId.equals(id)) {
+      return ResponseEntity.badRequest().build();
+    }
+    platformAuthorityService.updateUserAuthorities(id, request.authorities(), actorId.toString());
     List<String> authorities = platformAuthorityService.getUserAuthorities(id);
     return ResponseEntity.ok(new UserDtos.UserAuthoritiesResponse(id, authorities));
   }
