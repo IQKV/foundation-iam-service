@@ -27,6 +27,22 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/**
+ * Consumes subscription lifecycle events published by the Billing service.
+ *
+ * <p>Handles three event types:
+ * <ul>
+ *   <li>{@code SUBSCRIPTION_CREATED} — caches the active plan code on the tenant so it
+ *       can be stamped into JWT access tokens as the {@code plan_code} claim.</li>
+ *   <li>{@code SUBSCRIPTION_UPDATED} — updates the cached plan code when the tenant
+ *       upgrades or downgrades their subscription.</li>
+ *   <li>{@code SUBSCRIPTION_CANCELLED} — suspends the tenant.</li>
+ * </ul>
+ *
+ * <p>The queue binds to the {@code subscription.#} wildcard, so all three routing keys
+ * ({@code subscription.created}, {@code subscription.updated}, {@code subscription.cancelled})
+ * are delivered here.
+ */
 @Component
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")
 public class SubscriptionEventConsumer {
@@ -40,13 +56,62 @@ public class SubscriptionEventConsumer {
   }
 
   @RabbitListener(queues = RabbitMQConfig.SUBSCRIPTION_EVENTS_QUEUE)
-  public void handleSubscriptionCancelled(final SubscriptionEvent event) {
+  public void handleSubscriptionEvent(final SubscriptionEvent event) {
+    if (event.getEventType() == null) {
+      log.warn("Received subscription event with null eventType for tenantKey={}", event.getTenantKey());
+      return;
+    }
+    switch (event.getEventType()) {
+      case SUBSCRIPTION_CREATED -> handleSubscriptionActivated(event);
+      case SUBSCRIPTION_UPDATED -> handleSubscriptionActivated(event);
+      case SUBSCRIPTION_CANCELLED -> handleSubscriptionCancelled(event);
+      default -> log.debug("Unhandled subscription event type: {}", event.getEventType());
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Handlers
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Caches the active plan code on the tenant when a subscription is created or updated.
+   * The plan code is subsequently stamped into JWT access tokens via {@code JwtTokenGenerator}.
+   */
+  private void handleSubscriptionActivated(final SubscriptionEvent event) {
     final String tenantKey = event.getTenantKey();
-    log.info("Received subscription.cancelled event: tenantKey={}, externalSubscriptionId={}",
+    final String planCode = event.getPlanCode();
+
+    if (tenantKey == null || tenantKey.isBlank()) {
+      log.warn("Received {} event with missing tenantKey, skipping", event.getEventType());
+      return;
+    }
+
+    if (planCode == null || planCode.isBlank()) {
+      log.debug("Received {} event for tenantKey={} with null planCode, skipping plan cache update",
+          event.getEventType(), tenantKey);
+      return;
+    }
+
+    log.info("Received {} event: tenantKey={}, planCode={}, externalSubscriptionId={}",
+        event.getEventType(), tenantKey, planCode, event.getExternalSubscriptionId());
+
+    try {
+      tenantService.updateActivePlanCode(tenantKey, planCode);
+      log.info("Cached active plan code for tenantKey={}: planCode={}", tenantKey, planCode);
+    } catch (final TenantNotFoundException e) {
+      log.error("Tenant not found for {} event: tenantKey={}", event.getEventType(), tenantKey, e);
+      throw e; // → DLQ after retry exhaustion
+    }
+  }
+
+  /**
+   * Suspends the tenant when their subscription is cancelled.
+   */
+  private void handleSubscriptionCancelled(final SubscriptionEvent event) {
+    final String tenantKey = event.getTenantKey();
+    log.info("Received SUBSCRIPTION_CANCELLED event: tenantKey={}, externalSubscriptionId={}",
         tenantKey, event.getExternalSubscriptionId());
 
-    // 1. Look up tenant via tenantService.getTenantByKey(tenantKey)
-    //    If not found, log error and throw (→ DLQ)
     final Tenant tenant;
     try {
       tenant = tenantService.getTenantByKey(tenantKey);
@@ -55,13 +120,11 @@ public class SubscriptionEventConsumer {
       throw e; // → DLQ after retry exhaustion
     }
 
-    // 2. If tenant already SUSPENDED, log warning and return (idempotent ack)
     if (tenant.getStatus() == TenantStatus.SUSPENDED) {
       log.warn("Tenant already SUSPENDED, skipping status update: tenantKey={}", tenantKey);
       return;
     }
 
-    // 3. Otherwise call tenantService.updateTenantStatus(tenantKey, SUSPENDED)
     tenantService.updateTenantStatus(tenantKey, TenantStatus.SUSPENDED);
     log.info("Tenant suspended due to subscription cancellation: tenantKey={}", tenantKey);
   }

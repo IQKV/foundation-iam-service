@@ -217,7 +217,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "platform")).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
-    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any())).thenReturn("access-token");
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
     // Act
@@ -262,7 +262,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("platform"))).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
-    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any())).thenReturn("access-token");
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
     // Act

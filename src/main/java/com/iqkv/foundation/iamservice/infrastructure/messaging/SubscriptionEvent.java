@@ -18,9 +18,18 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
 import java.time.Instant;
 
+/**
+ * Subscription lifecycle event published by the Billing service and consumed by IAM.
+ *
+ * <p>{@code planCode} carries the human-readable plan code (e.g. {@code "pro-monthly"})
+ * so that IAM can cache it on the tenant without needing knowledge of the billing
+ * plan catalog. It is then stamped into JWT access tokens as the {@code plan_code} claim.
+ */
 public class SubscriptionEvent {
 
   public enum EventType {
+    SUBSCRIPTION_CREATED,
+    SUBSCRIPTION_UPDATED,
     SUBSCRIPTION_CANCELLED
   }
 
@@ -28,16 +37,11 @@ public class SubscriptionEvent {
   private String externalSubscriptionId;
   private EventType eventType;
   private Instant occurredAt;
+  private String subjectType;
+  private String subjectKey;
+  private String planCode;
 
   public SubscriptionEvent() {
-  }
-
-  public SubscriptionEvent(final String tenantKey, final String externalSubscriptionId,
-                           final EventType eventType, final Instant occurredAt) {
-    this.tenantKey = tenantKey;
-    this.externalSubscriptionId = externalSubscriptionId;
-    this.eventType = eventType;
-    this.occurredAt = occurredAt;
   }
 
   public String getTenantKey() {
@@ -70,5 +74,29 @@ public class SubscriptionEvent {
 
   public void setOccurredAt(final Instant occurredAt) {
     this.occurredAt = occurredAt;
+  }
+
+  public String getSubjectType() {
+    return subjectType;
+  }
+
+  public void setSubjectType(final String subjectType) {
+    this.subjectType = subjectType;
+  }
+
+  public String getSubjectKey() {
+    return subjectKey;
+  }
+
+  public void setSubjectKey(final String subjectKey) {
+    this.subjectKey = subjectKey;
+  }
+
+  public String getPlanCode() {
+    return planCode;
+  }
+
+  public void setPlanCode(final String planCode) {
+    this.planCode = planCode;
   }
 }

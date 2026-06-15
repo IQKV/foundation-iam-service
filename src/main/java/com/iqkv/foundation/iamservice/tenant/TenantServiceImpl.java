@@ -83,6 +83,14 @@ public class TenantServiceImpl implements TenantService {
     this.metrics = metrics;
   }
 
+  @Override
+  public void updateActivePlanCode(final String tenantKey, final String planCode) {
+    tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
+    tenantMapper.updateActivePlanCode(tenantKey, planCode);
+    log.info("Active plan code updated: tenantKey={}, planCode={}", tenantKey, planCode);
+  }
+
   // ─── Self-service ──────────────────────────────────────────────────────────
 
   @Override

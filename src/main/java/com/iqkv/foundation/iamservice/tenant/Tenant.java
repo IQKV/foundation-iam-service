@@ -32,6 +32,7 @@ public class Tenant {
   private Boolean isDefault;
   private String tenantModeOrigin;
   private Boolean isInternal;
+  private String activePlanCode;
 
   public UUID getId() {
     return id;
@@ -119,5 +120,13 @@ public class Tenant {
 
   public void setIsInternal(final Boolean isInternal) {
     this.isInternal = isInternal;
+  }
+
+  public String getActivePlanCode() {
+    return activePlanCode;
+  }
+
+  public void setActivePlanCode(final String activePlanCode) {
+    this.activePlanCode = activePlanCode;
   }
 }

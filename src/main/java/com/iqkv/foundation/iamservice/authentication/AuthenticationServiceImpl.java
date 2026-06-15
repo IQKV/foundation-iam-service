@@ -198,7 +198,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         accountLockoutManager.reset(request.email());
 
-        final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
+        final String accessToken = jwtTokenGenerator.generateAccessToken(
+            user, tenantKey, authorities, tenant.getActivePlanCode());
         final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
         // Publish successful signin attempt event
@@ -366,7 +367,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final var membership = membershipService.resolveMembership(user.getId(), currentTenant);
         final var authorities = membershipService.getAuthorities(membership.getId());
 
-        final String accessToken = jwtTokenGenerator.generateAccessToken(user, currentTenant, authorities);
+        final String planCode = tenantMapper.findByTenantKey(currentTenant)
+            .map(Tenant::getActivePlanCode).orElse(null);
+        final String accessToken = jwtTokenGenerator.generateAccessToken(
+            user, currentTenant, authorities, planCode);
         final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, currentTenant);
 
         metrics.recordAuthOutcome(currentTenant, "refresh", "success", null);
@@ -512,7 +516,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final var membership = membershipService.resolveMembership(userId, tenantKey);
     final var authorities = membershipService.getAuthorities(membership.getId());
 
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
+    final String accessToken = jwtTokenGenerator.generateAccessToken(
+        user, tenantKey, authorities, tenant.getActivePlanCode());
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
     return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
   }

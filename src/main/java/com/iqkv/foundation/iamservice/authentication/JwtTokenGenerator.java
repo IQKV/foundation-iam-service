@@ -67,11 +67,17 @@ public class JwtTokenGenerator {
     }
   }
 
-  public String generateAccessToken(final User user, final String tenantKey, final List<String> authorities) {
+  public String generateAccessToken(final User user, final String tenantKey,
+                                    final List<String> authorities) {
+    return generateAccessToken(user, tenantKey, authorities, null);
+  }
+
+  public String generateAccessToken(final User user, final String tenantKey,
+                                    final List<String> authorities, final String planCode) {
     final Instant now = Instant.now();
     final Instant expiry = now.plus(authProps.jwt().expiry());
 
-    return Jwts.builder()
+    final var builder = Jwts.builder()
         .claim(JwtClaimNames.SUB, user.getEmail())
         .claim(JwtClaimNames.ISS, JwtClaimNames.ISSUER)
         .claim(JwtClaimNames.IAT, Date.from(now))
@@ -85,9 +91,13 @@ public class JwtTokenGenerator {
         .claim(JwtClaimNames.LAST_NAME, user.getLastName())
         .claim(JwtClaimNames.TENANT_ID, tenantKey)
         .claim(JwtClaimNames.EMAIL_VERIFIED, user.isEmailVerified())
-        .claim(JwtClaimNames.AUTHORITIES, authorities)
-        .signWith(privateKey, Jwts.SIG.RS256)
-        .compact();
+        .claim(JwtClaimNames.AUTHORITIES, authorities);
+
+    if (planCode != null && !planCode.isBlank()) {
+      builder.claim(JwtClaimNames.PLAN_CODE, planCode);
+    }
+
+    return builder.signWith(privateKey, Jwts.SIG.RS256).compact();
   }
 
   public String generateRefreshToken(final User user, final String tenantKey) {

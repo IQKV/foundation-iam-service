@@ -170,7 +170,7 @@ class AuthenticationServiceImplTest {
     when(passwordEncoder.matches("password123", testUser.getPasswordHash())).thenReturn(true);
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities))
+    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
         .thenReturn("access-token-123");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("refresh-token-456");
@@ -204,7 +204,7 @@ class AuthenticationServiceImplTest {
     when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities))
+    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
         .thenReturn("new-access-token");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("new-refresh-token");
@@ -318,7 +318,7 @@ class AuthenticationServiceImplTest {
     when(userMapper.findById(testUser.getId())).thenReturn(Optional.of(testUser));
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities))
+    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
         .thenReturn("exchanged-access-token");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("exchanged-refresh-token");

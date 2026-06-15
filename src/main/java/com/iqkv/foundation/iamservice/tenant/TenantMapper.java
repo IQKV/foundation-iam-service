@@ -43,6 +43,15 @@ public interface TenantMapper {
 
   void update(Tenant tenant);
 
+  /**
+   * Sets {@code active_plan_code} for the given tenant.
+   * Called when a {@code subscription.created} or {@code subscription.updated} event is received.
+   *
+   * @param tenantKey the tenant's unique key
+   * @param planCode  the human-readable plan code (e.g. {@code "pro-monthly"}); may be null to clear
+   */
+  void updateActivePlanCode(@Param("tenantKey") String tenantKey, @Param("planCode") String planCode);
+
   void deleteByTenantKey(@Param("tenantKey") String tenantKey);
 
   List<Tenant> findAll(@Param("limit") int limit, @Param("offset") int offset,

@@ -24,6 +24,7 @@
     <include file="db/changelog/system/20260529100000-create-bans-table.xml"/>
     <include file="db/changelog/system/20260604120000-add-is-internal-column.xml"/>
     <include file="db/changelog/system/20260612000000-add-locale-bg-bg.xml"/>
+    <include file="db/changelog/system/20260615120000-add-active-plan-code-to-tenants.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>

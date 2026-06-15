@@ -62,6 +62,8 @@ public class RabbitMQConfig {
   public static final String ROUTING_USER_REMOVED = "user.removed";
   public static final String ROUTING_USER_INVITED = "user.invited";
   public static final String ROUTING_SUBSCRIPTION_CANCELLED = "subscription.cancelled";
+  public static final String ROUTING_SUBSCRIPTION_CREATED = "subscription.created";
+  public static final String ROUTING_SUBSCRIPTION_UPDATED = "subscription.updated";
   public static final String ROUTING_SIGNIN_ATTEMPT = "auth.signin.attempt";
 
   // -------------------------------------------------------------------------
@@ -156,8 +158,9 @@ public class RabbitMQConfig {
 
   @Bean
   public Binding subscriptionEventsBinding() {
+    // Wildcard — subscription.created, subscription.updated, subscription.cancelled all route here
     return BindingBuilder.bind(subscriptionEventsQueue()).to(eventsExchange())
-        .with(ROUTING_SUBSCRIPTION_CANCELLED);
+        .with("subscription.#");
   }
 
   @Bean

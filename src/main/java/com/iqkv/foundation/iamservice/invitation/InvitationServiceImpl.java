@@ -229,7 +229,9 @@ public class InvitationServiceImpl implements InvitationService {
 
     // Issue token pair scoped to the invited tenant
     final List<String> authorities = membershipService.getAuthorities(membership.getId());
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities);
+    final String planCode = tenantMapper.findByTenantKey(tenantKey)
+        .map(Tenant::getActivePlanCode).orElse(null);
+    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities, planCode);
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
     log.info("Invitation accepted: invitationId={} userId={} tenantKey={}",

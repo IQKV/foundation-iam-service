@@ -34,6 +34,16 @@ import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
  */
 public interface TenantService {
 
+  /**
+   * Updates the cached active plan code for the given tenant.
+   * Called when a subscription is created or updated.
+   *
+   * @param tenantKey the tenant's unique key
+   * @param planCode  the human-readable plan code (e.g. {@code "pro-monthly"})
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
+   */
+  void updateActivePlanCode(String tenantKey, String planCode);
+
   // ─── Self-service ──────────────────────────────────────────────────────────
 
   /**
