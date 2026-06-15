@@ -1,0 +1,31 @@
+/*
+ * Copyright 2026 IQKV Foundation Team.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.iqkv.foundation.iamservice.shared.exception;
+
+/**
+ * Thrown when a member quota enforced by the active subscription plan is exceeded.
+ *
+ * <p>Maps to HTTP {@code 402 Payment Required} — the caller must upgrade their plan
+ * to admit more members.
+ */
+public class PlanMemberQuotaException extends RuntimeException {
+
+  public PlanMemberQuotaException(final long current, final int limit) {
+    super("Member limit reached for your current plan: " + current + "/" + limit
+          + ". Upgrade your plan to add more members.");
+  }
+}

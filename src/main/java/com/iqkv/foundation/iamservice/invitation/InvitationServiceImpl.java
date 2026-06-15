@@ -39,8 +39,10 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
@@ -79,6 +81,7 @@ public class InvitationServiceImpl implements InvitationService {
   private final InvitationConfigurationProperties invitationProps;
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformConfigurationProperties platformConfig;
+  private final PlanCatalogCache planCatalogCache;
 
   public InvitationServiceImpl(
       final InvitationMapper invitationMapper,
@@ -93,7 +96,8 @@ public class InvitationServiceImpl implements InvitationService {
       final MessagingService messagingService,
       final InvitationConfigurationProperties invitationProps,
       final NotificationConfigurationProperties notificationProps,
-      final PlatformConfigurationProperties platformConfig) {
+      final PlatformConfigurationProperties platformConfig,
+      final PlanCatalogCache planCatalogCache) {
     this.invitationMapper = invitationMapper;
     this.tenantMapper = tenantMapper;
     this.userMapper = userMapper;
@@ -107,6 +111,7 @@ public class InvitationServiceImpl implements InvitationService {
     this.invitationProps = invitationProps;
     this.notificationProps = notificationProps;
     this.platformConfig = platformConfig;
+    this.planCatalogCache = planCatalogCache;
   }
 
   // -------------------------------------------------------------------------
@@ -202,6 +207,17 @@ public class InvitationServiceImpl implements InvitationService {
       throw new TenantMembershipAlreadyExistsException();
     }
 
+    // Quota check: enforce maxUsers from the active plan (0 = unlimited)
+    final String planCode = tenantMapper.findByTenantKey(tenantKey)
+        .map(Tenant::getActivePlanCode).orElse(null);
+    final int maxUsers = planCatalogCache.forPlan(planCode).maxUsers();
+    if (maxUsers > 0) {
+      final long current = membershipMapper.countByTenantKey(tenantKey);
+      if (current >= maxUsers) {
+        throw new PlanMemberQuotaException(current, maxUsers);
+      }
+    }
+
     // Create membership
     final var membership = new TenantMembership();
     membership.setId(UUID.randomUUID());
@@ -229,8 +245,6 @@ public class InvitationServiceImpl implements InvitationService {
 
     // Issue token pair scoped to the invited tenant
     final List<String> authorities = membershipService.getAuthorities(membership.getId());
-    final String planCode = tenantMapper.findByTenantKey(tenantKey)
-        .map(Tenant::getActivePlanCode).orElse(null);
     final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities, planCode);
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 

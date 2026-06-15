@@ -41,6 +41,7 @@ import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundExcepti
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
@@ -273,6 +274,19 @@ public class GlobalExceptionHandler {
         ex.getMessage(),
         request);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(PlanMemberQuotaException.class)
+  public ResponseEntity<ProblemDetail> handlePlanMemberQuota(final PlanMemberQuotaException ex,
+                                                             final HttpServletRequest request,
+                                                             final Locale locale) {
+    log.warn("Plan member quota exceeded: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        "Plan upgrade required",
+        402,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(pd);
   }
 
   @ExceptionHandler(MembershipNotFoundException.class)

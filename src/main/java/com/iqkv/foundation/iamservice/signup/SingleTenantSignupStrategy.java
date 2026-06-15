@@ -25,6 +25,8 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
@@ -63,19 +65,22 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
   private final TenantMemberAuthorityMapper authorityMapper;
   private final DefaultTenantResolver defaultTenantResolver;
   private final PasswordEncoder passwordEncoder;
+  private final PlanCatalogCache planCatalogCache;
 
   public SingleTenantSignupStrategy(final UserMapper userMapper,
                                     final TenantMapper tenantMapper,
                                     final TenantMembershipMapper membershipMapper,
                                     final TenantMemberAuthorityMapper authorityMapper,
                                     final DefaultTenantResolver defaultTenantResolver,
-                                    final PasswordEncoder passwordEncoder) {
+                                    final PasswordEncoder passwordEncoder,
+                                    final PlanCatalogCache planCatalogCache) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.defaultTenantResolver = defaultTenantResolver;
     this.passwordEncoder = passwordEncoder;
+    this.planCatalogCache = planCatalogCache;
   }
 
   private static final String PLATFORM_TENANT_KEY = "platform";
@@ -115,6 +120,15 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     // Step 4: Check if membership already exists; throw exception if duplicate
     if (membershipMapper.existsByUserIdAndTenantKey(canonicalUser.getId(), defaultTenantKey)) {
       throw new TenantMembershipAlreadyExistsException();
+    }
+
+    // Step 4a: Quota check — enforce maxUsers from the active plan (0 = unlimited)
+    final int maxUsers = planCatalogCache.forPlan(defaultTenant.getActivePlanCode()).maxUsers();
+    if (maxUsers > 0) {
+      final long current = membershipMapper.countByTenantKey(defaultTenantKey);
+      if (current >= maxUsers) {
+        throw new PlanMemberQuotaException(current, maxUsers);
+      }
     }
 
     // Step 5: Create membership with status=ACTIVE

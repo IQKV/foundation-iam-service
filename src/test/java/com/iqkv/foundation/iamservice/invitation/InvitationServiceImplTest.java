@@ -41,6 +41,7 @@ import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -85,6 +86,8 @@ class InvitationServiceImplTest {
   private NotificationConfigurationProperties notificationProps;
   @Mock
   private PlatformConfigurationProperties platformConfig;
+  @Mock
+  private PlanCatalogCache planCatalogCache;
 
   private InvitationServiceImpl invitationService;
 
@@ -108,7 +111,8 @@ class InvitationServiceImplTest {
         messagingService,
         invitationProps,
         notificationProps,
-        platformConfig
+        platformConfig,
+        planCatalogCache
     );
 
     testUser = new User();
@@ -217,6 +221,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "platform")).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
+    when(planCatalogCache.forPlan(any())).thenReturn(PlanFeatures.NONE);
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
@@ -262,6 +267,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("platform"))).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
+    when(planCatalogCache.forPlan(any())).thenReturn(PlanFeatures.NONE);
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
