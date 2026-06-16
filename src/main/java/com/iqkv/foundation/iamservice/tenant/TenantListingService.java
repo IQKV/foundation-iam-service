@@ -67,13 +67,15 @@ public class TenantListingService {
         continue;
       }
       final var tenant = tenantMapper.findByTenantKey(membership.getTenantKey()).orElse(null);
-      if (tenant == null || tenant.getStatus() != TenantStatus.ACTIVE) {
+      if (tenant == null) {
         continue;
       }
+      
       final var authorities = membershipService.getAuthorities(membership.getId());
       final var isPersonal = Boolean.TRUE.equals(tenant.getIsInternal());
 
       if (isPersonal) {
+        // Always include personal workspace, even if tenant status is not ACTIVE
         personalWorkspace = new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             PERSONAL_WORKSPACE_NAME,
@@ -81,7 +83,8 @@ public class TenantListingService {
             authorities,
             true
         );
-      } else {
+      } else if (tenant.getStatus() == TenantStatus.ACTIVE) {
+        // Only include non-personal tenants if they are ACTIVE
         result.add(new AuthenticationDtos.TenantMembershipSummary(
             tenant.getTenantKey(),
             tenant.getName(),

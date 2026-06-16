@@ -144,7 +144,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
             .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
 
-        if (tenant.getStatus() == TenantStatus.SUSPENDED) {
+        // Allow access to internal (personal) tenants even if status is SUSPENDED
+        final boolean isInternalTenant = Boolean.TRUE.equals(tenant.getIsInternal());
+        
+        if (!isInternalTenant && tenant.getStatus() == TenantStatus.SUSPENDED) {
           failureReasonForAudit = SigninAttemptEvent.FailureReason.TENANT_SUSPENDED;
           publishSigninAttemptEvent(request.email(), null, tenantKey, 
               SigninAttemptEvent.AttemptResult.FAILURE, failureReasonForAudit);
@@ -496,10 +499,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
         .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
 
-    if (tenant.getStatus() == TenantStatus.SUSPENDED) {
+    // Allow access to internal (personal) tenants even if status is SUSPENDED
+    final boolean isInternalTenant = Boolean.TRUE.equals(tenant.getIsInternal());
+    
+    if (!isInternalTenant && tenant.getStatus() == TenantStatus.SUSPENDED) {
       throw new TenantSuspendedException("Tenant suspended");
     }
-    if (tenant.getStatus() != TenantStatus.ACTIVE) {
+    if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
       throw new TenantNotAvailableException("Tenant not available");
     }
 

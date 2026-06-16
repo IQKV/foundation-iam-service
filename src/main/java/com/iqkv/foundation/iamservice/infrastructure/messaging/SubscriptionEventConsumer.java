@@ -105,7 +105,7 @@ public class SubscriptionEventConsumer {
   }
 
   /**
-   * Suspends the tenant when their subscription is cancelled.
+   * Suspends the tenant when their subscription is cancelled, but skips internal (personal) tenants.
    */
   private void handleSubscriptionCancelled(final SubscriptionEvent event) {
     final String tenantKey = event.getTenantKey();
@@ -118,6 +118,12 @@ public class SubscriptionEventConsumer {
     } catch (final TenantNotFoundException e) {
       log.error("Tenant not found for subscription.cancelled event: tenantKey={}", tenantKey, e);
       throw e; // → DLQ after retry exhaustion
+    }
+
+    // Skip suspending internal (personal) tenants
+    if (Boolean.TRUE.equals(tenant.getIsInternal())) {
+      log.info("Skipping suspension of internal/personal tenant: tenantKey={}", tenantKey);
+      return;
     }
 
     if (tenant.getStatus() == TenantStatus.SUSPENDED) {
