@@ -11,14 +11,14 @@
         This user has NO tenant membership. Authentication goes through
         POST /api/v1/iam/auth/admin/signin (no X-Tenant-ID required).
 
-        Email    : platform.admin@iqkv.com
+        Email    : platform.admin@demo.iqkv.com
         Password : ChangeMePass123!  (BCrypt 12)
         Role     : PLATFORM_ADMIN (platform_authorities, not tenant_member_authorities)
     -->
     <changeSet id="20260301000001-demo-platform-admin" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
             <column name="id" value="00000000-0000-0000-0001-000000000001"/>
-            <column name="email" value="platform.admin@iqkv.com"/>
+            <column name="email" value="platform.admin@demo.iqkv.com"/>
             <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name" value="Platform"/>
             <column name="last_name" value="Admin"/>

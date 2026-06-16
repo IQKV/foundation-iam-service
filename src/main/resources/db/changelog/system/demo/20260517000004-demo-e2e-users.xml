@@ -15,7 +15,7 @@
         Hash     : $2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku
 
         ── Platform scope (no tenant membership) ──────────────────────────────────
-          00000000-0000-0000-0001-000000000089  jonathan.pierce@iqkv.com   PLATFORM_ADMIN
+          00000000-0000-0000-0001-000000000089  jonathan.pierce@demo.iqkv.com   PLATFORM_ADMIN
             Sign-in: POST /api/v1/iam/auth/admin/signin  (no X-Tenant-ID)
 
         ── Tenant scope — demo0001 ─────────────────────────────────────────────────
@@ -42,7 +42,7 @@
     <changeSet id="20260517000004-e2e-platform-owner-user" author="iqkv" context="demo">
         <insert tableName="users" schemaName="public">
             <column name="id" value="00000000-0000-0000-0001-000000000089"/>
-            <column name="email" value="jonathan.pierce@iqkv.com"/>
+            <column name="email" value="jonathan.pierce@demo.iqkv.com"/>
             <!-- ChangeMePass123! — BCrypt cost 12 -->
             <column name="password_hash" value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
             <column name="first_name" value="Jonathan"/>
