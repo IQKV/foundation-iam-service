@@ -45,9 +45,6 @@ public class UserEvent implements AuditableEvent {
   private EventType eventType;
   private Instant occurredAt;
   private AuditActor actor;
-  private String banScope;
-  private String banReason;
-  private String newStatus;
 
   public UserEvent() {
   }
