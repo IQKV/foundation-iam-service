@@ -241,8 +241,14 @@ public class UserServiceImpl implements UserService {
     user.setCreatedBy("system");
     user.setUpdatedBy("system");
     userMapper.upsertByEmail(user);
-    return UserDtoMapper.toResponse(userMapper.findByEmail(request.email())
-        .orElseThrow(() -> new UserNotFoundException("User not found after insert: " + request.email())));
+    final User created = userMapper.findByEmail(request.email())
+        .orElseThrow(() -> new UserNotFoundException("User not found after insert: " + request.email()));
+    try {
+      userEventPublisher.publishUserCreated(created);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_CREATED audit event for userId={}", created.getId(), e);
+    }
+    return UserDtoMapper.toResponse(created);
   }
 
   @Override
@@ -258,6 +264,7 @@ public class UserServiceImpl implements UserService {
     if (request.locale() != null) {
       user.setLocale(request.locale());
     }
+    final String previousStatus = user.getStatus() != null ? user.getStatus().name() : null;
     if (request.status() != null) {
       try {
         user.setStatus(AccountStatus.valueOf(request.status()));
@@ -271,15 +278,30 @@ public class UserServiceImpl implements UserService {
     user.setUpdatedAt(LocalDateTime.now());
     user.setUpdatedBy("system");
     userMapper.update(user);
+    // Publish status-change event when the status field was actually mutated
+    try {
+      if (request.status() != null && !request.status().equalsIgnoreCase(previousStatus)) {
+        userEventPublisher.publishUserStatusChanged(user, request.status());
+      } else {
+        userEventPublisher.publishUserUpdated(user);
+      }
+    } catch (final Exception e) {
+      log.warn("Failed to publish user mutation audit event for userId={}", userId, e);
+    }
     return UserDtoMapper.toResponse(user);
   }
 
   @Override
   public void deleteUserById(final UUID userId) {
-    userMapper.findById(userId)
+    final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     userMapper.deleteById(userId);
     log.info("User deleted: userId={}", userId);
+    try {
+      userEventPublisher.publishUserDeleted(user);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_DELETED audit event for userId={}", userId, e);
+    }
   }
 
   @Override
@@ -298,6 +320,18 @@ public class UserServiceImpl implements UserService {
     // Invalidate all existing sessions for the target user
     userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
     log.info("Password changed by admin: userId={}, actorId={}", userId, actorId);
+
+    // Audit event — fire-and-forget
+    try {
+      final UUID actorUuid = actorId != null ? UUID.fromString(actorId) : null;
+      final var pwEvent = new com.iqkv.foundation.iamservice.infrastructure.messaging.PasswordEvent(
+          userId, user.getEmail(), null,
+          com.iqkv.foundation.iamservice.infrastructure.messaging.PasswordEvent.EventType.PASSWORD_CHANGED_BY_ADMIN,
+          actorUuid, Instant.now());
+      messagingService.publishPasswordEvent(pwEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_CHANGED_BY_ADMIN audit event for userId={}", userId, e);
+    }
 
     // Notify the user — fire-and-forget, must not affect the operation outcome
     try {
@@ -338,6 +372,17 @@ public class UserServiceImpl implements UserService {
     userMapper.updateLastGlobalSignoutAt(userId, Instant.now());
     log.info("Password changed by user: userId={}", userId);
 
+    // Audit event — fire-and-forget
+    try {
+      final var pwEvent = new com.iqkv.foundation.iamservice.infrastructure.messaging.PasswordEvent(
+          userId, user.getEmail(), null,
+          com.iqkv.foundation.iamservice.infrastructure.messaging.PasswordEvent.EventType.PASSWORD_CHANGED_SELF,
+          userId, Instant.now());
+      messagingService.publishPasswordEvent(pwEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_CHANGED_SELF audit event for userId={}", userId, e);
+    }
+
     // Notify the user — fire-and-forget, must not affect the operation outcome
     try {
       final var event = new NotificationEvent(
@@ -376,6 +421,11 @@ public class UserServiceImpl implements UserService {
     user.setUpdatedAt(LocalDateTime.now());
     user.setUpdatedBy(updatedBy);
     userMapper.update(user);
+    try {
+      userEventPublisher.publishUserUpdated(user);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_UPDATED audit event for userId={}", userId, e);
+    }
     return UserDtoMapper.toResponse(user);
   }
 
@@ -395,5 +445,10 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     accountLockoutManager.reset(user.getEmail());
     log.info("User unlocked: userId={}", userId);
+    try {
+      userEventPublisher.publishUserUnlocked(user);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_UNLOCKED audit event for userId={}", userId, e);
+    }
   }
 }

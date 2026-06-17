@@ -26,9 +26,18 @@ public class UserEvent implements AuditableEvent {
 
   public enum EventType {
     USER_CREATED, USER_UPDATED, USER_DELETED,
-    USER_REMOVED,   // membership removal
-    USER_INVITED    // invitation sent
+    USER_REMOVED,       // membership removal
+    USER_INVITED,       // invitation sent
+    USER_STATUS_CHANGED, // account status changed (ACTIVE / SUSPENDED / etc.)
+    USER_UNLOCKED,      // lockout cleared by admin
+    USER_BANNED,        // user banned (platform or tenant scope)
+    USER_UNBANNED       // ban lifted
   }
+
+  // Populated for BAN / UNBAN / STATUS_CHANGED events — null otherwise
+  private String banScope;    // "PLATFORM" | "TENANT" | null
+  private String banReason;   // nullable
+  private String newStatus;   // e.g. "ACTIVE", "SUSPENDED" — for USER_STATUS_CHANGED
 
   private UUID userId;
   private String tenantId;
@@ -36,6 +45,9 @@ public class UserEvent implements AuditableEvent {
   private EventType eventType;
   private Instant occurredAt;
   private AuditActor actor;
+  private String banScope;
+  private String banReason;
+  private String newStatus;
 
   public UserEvent() {
   }
@@ -49,6 +61,10 @@ public class UserEvent implements AuditableEvent {
     this.occurredAt = occurredAt;
   }
 
+  // -------------------------------------------------------------------------
+  // AuditableEvent
+  // -------------------------------------------------------------------------
+
   @Override
   public AuditActor getActor() {
     return actor;
@@ -58,6 +74,10 @@ public class UserEvent implements AuditableEvent {
   public void setActor(final AuditActor actor) {
     this.actor = actor;
   }
+
+  // -------------------------------------------------------------------------
+  // Accessors
+  // -------------------------------------------------------------------------
 
   public UUID getUserId() {
     return userId;
@@ -97,5 +117,29 @@ public class UserEvent implements AuditableEvent {
 
   public void setOccurredAt(final Instant occurredAt) {
     this.occurredAt = occurredAt;
+  }
+
+  public String getBanScope() {
+    return banScope;
+  }
+
+  public void setBanScope(final String banScope) {
+    this.banScope = banScope;
+  }
+
+  public String getBanReason() {
+    return banReason;
+  }
+
+  public void setBanReason(final String banReason) {
+    this.banReason = banReason;
+  }
+
+  public String getNewStatus() {
+    return newStatus;
+  }
+
+  public void setNewStatus(final String newStatus) {
+    this.newStatus = newStatus;
   }
 }

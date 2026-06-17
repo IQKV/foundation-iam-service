@@ -108,6 +108,31 @@ public class MessagingService {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_SIGNIN_ATTEMPT, event);
   }
 
+  public void publishPasswordEvent(final PasswordEvent event) {
+    final String routingKey = switch (event.getEventType()) {
+      case PASSWORD_RESET_INITIATED -> RabbitMQConfig.ROUTING_PASSWORD_RESET_INITIATED;
+      case PASSWORD_RESET_COMPLETED -> RabbitMQConfig.ROUTING_PASSWORD_RESET_COMPLETED;
+      case PASSWORD_CHANGED_SELF, PASSWORD_CHANGED_BY_ADMIN -> RabbitMQConfig.ROUTING_PASSWORD_CHANGED;
+    };
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, routingKey, event);
+  }
+
+  public void publishUserBanned(final UserEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_BANNED, event);
+  }
+
+  public void publishUserUnbanned(final UserEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_UNBANNED, event);
+  }
+
+  public void publishUserUnlocked(final UserEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_UNLOCKED, event);
+  }
+
+  public void publishUserStatusChanged(final UserEvent event) {
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_STATUS_CHANGED, event);
+  }
+
   private void publish(final String exchange, final String routingKey, final Object event) {
     try {
       AuditEventEnricher.enrich(event);

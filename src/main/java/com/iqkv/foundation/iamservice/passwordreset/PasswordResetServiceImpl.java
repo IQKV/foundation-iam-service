@@ -28,6 +28,7 @@ import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigur
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.PasswordEvent;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidPasswordException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
@@ -106,6 +107,17 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     passwordResetTokenMapper.insert(prt);
     metrics.recordUserLifecycleEvent("password_reset_initiated");
 
+    // Audit event — fire-and-forget, published before sending the email notification
+    try {
+      final var pwEvent = new PasswordEvent(
+          user.getId(), user.getEmail(), null,
+          PasswordEvent.EventType.PASSWORD_RESET_INITIATED,
+          null, Instant.now());
+      messagingService.publishPasswordEvent(pwEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_RESET_INITIATED audit event for userId={}", user.getId(), e);
+    }
+
     final String resetUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/reset-password?token=" + tokenValue;
     final var payload = new java.util.HashMap<String, Object>();
     payload.put("resetUrl", resetUrl);
@@ -147,6 +159,20 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     metrics.recordUserLifecycleEvent("password_reset_completed");
 
     final var user = userMapper.findById(prt.getUserId()).orElse(null);
+
+    // Audit event — fire-and-forget
+    try {
+      final var pwEvent = new PasswordEvent(
+          prt.getUserId(),
+          user != null ? user.getEmail() : null,
+          null,
+          PasswordEvent.EventType.PASSWORD_RESET_COMPLETED,
+          prt.getUserId(), Instant.now());
+      messagingService.publishPasswordEvent(pwEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish PASSWORD_RESET_COMPLETED audit event for userId={}", prt.getUserId(), e);
+    }
+
     if (user != null) {
       final var confirmedPayload = new java.util.HashMap<String, Object>();
       confirmedPayload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");

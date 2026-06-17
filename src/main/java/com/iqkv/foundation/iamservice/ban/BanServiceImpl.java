@@ -29,6 +29,7 @@ import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigur
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
 import com.iqkv.foundation.iamservice.platformauthority.PlatformAuthorityMapper;
 import com.iqkv.foundation.iamservice.shared.exception.UserManagementException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
@@ -51,17 +52,20 @@ public class BanServiceImpl implements BanService {
   private final PlatformAuthorityMapper platformAuthorityMapper;
   private final MessagingService messagingService;
   private final NotificationConfigurationProperties notificationProps;
+  private final UserEventPublisher userEventPublisher;
 
   public BanServiceImpl(final BanMapper banMapper,
                        final UserMapper userMapper,
                        final PlatformAuthorityMapper platformAuthorityMapper,
                        final MessagingService messagingService,
-                       final NotificationConfigurationProperties notificationProps) {
+                       final NotificationConfigurationProperties notificationProps,
+                       final UserEventPublisher userEventPublisher) {
     this.banMapper = banMapper;
     this.userMapper = userMapper;
     this.platformAuthorityMapper = platformAuthorityMapper;
     this.messagingService = messagingService;
     this.notificationProps = notificationProps;
+    this.userEventPublisher = userEventPublisher;
   }
 
   @Override
@@ -105,16 +109,28 @@ public class BanServiceImpl implements BanService {
     sendBanNotification(user, ban);
 
     log.info("User {} banned globally by {}", userId, initiatorId);
+
+    // Audit event — fire-and-forget
+    try {
+      userEventPublisher.publishUserBanned(user, BanType.PLATFORM.name(), null, ban.getReason());
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_BANNED audit event for userId={}", userId, e);
+    }
+
     return toResponse(ban);
   }
 
   @Override
   public void unbanUserPlatform(UUID userId, UUID initiatorId) {
-    userMapper.findById(userId)
+    final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     banMapper.deleteByUserIdAndTypeAndTenantKey(userId, BanType.PLATFORM, null);
     log.info("User {} unbanned globally by {}", userId, initiatorId);
-    // Unban notification reserved but not implemented
+    try {
+      userEventPublisher.publishUserUnbanned(user, BanType.PLATFORM.name(), null);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_UNBANNED audit event for userId={}", userId, e);
+    }
   }
 
   @Override
@@ -158,16 +174,28 @@ public class BanServiceImpl implements BanService {
     sendBanNotification(user, ban);
 
     log.info("User {} banned from tenant {} by {}", userId, tenantKey, initiatorId);
+
+    // Audit event — fire-and-forget
+    try {
+      userEventPublisher.publishUserBanned(user, BanType.TENANT.name(), tenantKey, ban.getReason());
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_BANNED audit event for userId={}", userId, e);
+    }
+
     return toResponse(ban);
   }
 
   @Override
   public void unbanUserTenant(UUID userId, String tenantKey, UUID initiatorId) {
-    userMapper.findById(userId)
+    final User user = userMapper.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
     banMapper.deleteByUserIdAndTypeAndTenantKey(userId, BanType.TENANT, tenantKey);
     log.info("User {} unbanned from tenant {} by {}", userId, tenantKey, initiatorId);
-    // Unban notification reserved but not implemented
+    try {
+      userEventPublisher.publishUserUnbanned(user, BanType.TENANT.name(), tenantKey);
+    } catch (final Exception e) {
+      log.warn("Failed to publish USER_UNBANNED audit event for userId={}", userId, e);
+    }
   }
 
   @Override

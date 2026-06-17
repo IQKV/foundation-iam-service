@@ -46,6 +46,7 @@ public class RabbitMQConfig {
   public static final String ANNOUNCEMENTS_QUEUE = "iqkv.iam.announcements";
   public static final String TENANT_PROVISIONING_QUEUE = "iqkv.iam.tenant.provisioning";
   public static final String SUBSCRIPTION_EVENTS_QUEUE = "iqkv.iam.subscription.events";
+  public static final String AUTH_EVENTS_QUEUE = "iqkv.iam.auth.events";
 
   // -------------------------------------------------------------------------
   // Routing keys — domain events (shared across services)
@@ -65,6 +66,22 @@ public class RabbitMQConfig {
   public static final String ROUTING_SUBSCRIPTION_CREATED = "subscription.created";
   public static final String ROUTING_SUBSCRIPTION_UPDATED = "subscription.updated";
   public static final String ROUTING_SIGNIN_ATTEMPT = "auth.signin.attempt";
+
+  // -------------------------------------------------------------------------
+  // Routing keys — password mutations
+  // -------------------------------------------------------------------------
+  public static final String ROUTING_PASSWORD_RESET_INITIATED = "auth.password.reset.initiated";
+  public static final String ROUTING_PASSWORD_RESET_COMPLETED = "auth.password.reset.completed";
+  public static final String ROUTING_PASSWORD_CHANGED = "auth.password.changed";
+
+  // -------------------------------------------------------------------------
+  // Routing keys — user admin mutations (ban, unban, unlock, status change)
+  // user.# wildcard in USER_EVENTS_QUEUE already captures these
+  // -------------------------------------------------------------------------
+  public static final String ROUTING_USER_BANNED = "user.banned";
+  public static final String ROUTING_USER_UNBANNED = "user.unbanned";
+  public static final String ROUTING_USER_UNLOCKED = "user.unlocked";
+  public static final String ROUTING_USER_STATUS_CHANGED = "user.status_changed";
 
   // -------------------------------------------------------------------------
   // Routing keys — IAM notification emails (scoped to avoid conflicts)
@@ -139,8 +156,22 @@ public class RabbitMQConfig {
   }
 
   @Bean
+  public Queue authEventsQueue() {
+    return QueueBuilder.durable(AUTH_EVENTS_QUEUE)
+        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+        .withArgument("x-message-ttl", TTL_24H_MS)
+        .build();
+  }
+
+  @Bean
   public Binding userEventsBinding() {
     return BindingBuilder.bind(userEventsQueue()).to(eventsExchange()).with("user.#");
+  }
+
+  @Bean
+  public Binding authEventsBinding() {
+    // Captures signin attempts + all password mutation events
+    return BindingBuilder.bind(authEventsQueue()).to(eventsExchange()).with("auth.#");
   }
 
   @Bean
