@@ -108,9 +108,9 @@ public class TenantRestResource {
   }
 
   @PatchMapping("/{tenantKey}")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(summary = "Rename tenant",
-             description = "Updates the tenant name. Requires TENANT_OWNER authority.")
+             description = "Updates the tenant name. Requires TENANT_OWNER or ADMIN authority.")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
   @ApiResponses({
@@ -137,7 +137,7 @@ public class TenantRestResource {
   }
 
   @PatchMapping("/{tenantKey}/status")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(summary = "Update tenant status", description = "Transitions tenant to a new status")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
@@ -155,7 +155,7 @@ public class TenantRestResource {
   }
 
   @PostMapping("/{tenantKey}/retry-provisioning")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(summary = "Retry tenant provisioning",
              description = "Retries provisioning for a tenant in PROVISIONING_FAILED state")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
@@ -218,7 +218,7 @@ public class TenantRestResource {
   }
 
   @PutMapping("/{tenantKey}/members/{userId}/authorities")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(summary = "Update tenant member authorities", description = "Full replacement of authorities for the tenant member.")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
@@ -245,7 +245,7 @@ public class TenantRestResource {
   }
 
   @DeleteMapping("/{tenantKey}/members/{userId}")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(summary = "Remove member from tenant", description = "Deletes the membership of the user in this tenant.")
   @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
              description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
@@ -267,7 +267,7 @@ public class TenantRestResource {
   }
 
   @PostMapping("/{tenantKey}/members/{userId}/ban")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(
       summary = "Ban user from tenant",
       description = "Bans a user from the current tenant. The user will be logged out immediately and cannot log in to this tenant again until unbanned.")
@@ -276,7 +276,7 @@ public class TenantRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User banned successfully"),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER required", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER or ADMIN required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User or tenant not found", content = @Content)
   })
   public ResponseEntity<BanDtos.BanResponse> banTenantMember(
@@ -294,7 +294,7 @@ public class TenantRestResource {
   }
 
   @PostMapping("/{tenantKey}/members/{userId}/unban")
-  @PreAuthorize("hasAuthority('TENANT_OWNER')")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
   @Operation(
       summary = "Unban user from tenant",
       description = "Unbans a user from the current tenant, allowing them to log in to this tenant again.")
@@ -303,7 +303,7 @@ public class TenantRestResource {
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "User unbanned successfully"),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER required", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER or ADMIN required", content = @Content),
       @ApiResponse(responseCode = "404", description = "User or tenant not found", content = @Content)
   })
   public ResponseEntity<Void> unbanTenantMember(
