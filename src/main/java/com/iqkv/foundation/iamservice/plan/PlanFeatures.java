@@ -16,18 +16,29 @@
 
 package com.iqkv.foundation.iamservice.plan;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
- * Local copy of the plan feature set as returned by the billing service internal plans endpoint.
+ * Local copy of the plan feature set as returned by the billing service
+ * {@code GET /api/v1/billing/internal/plans} endpoint.
  *
  * <p>Intentionally a plain record — no shared library dependency on billing service.
  * Unknown JSON fields are ignored by the Jackson deserializer.
+ *
+ * <p>{@code maxUsers} and {@code maxProjects} are kept as typed {@code int} fields
+ * because IAM enforces them at write time (signup, invitation).
+ * The {@code features} map carries display-oriented flags keyed by feature code;
+ * deserialized generically — no Java change required to add a new feature.
+ *
+ * <p>{@code maxUsers} and {@code maxProjects} use {@code 0} to mean "unlimited".
  */
 public record PlanFeatures(
-    boolean prioritySupport,
     int maxUsers,
-    int maxProjects
+    int maxProjects,
+    Map<String, PlanFeature> features
 ) {
 
   /** Safe fallback used when the plan code is unknown or the cache is empty. */
-  public static final PlanFeatures NONE = new PlanFeatures(false, 1, 1);
+  public static final PlanFeatures NONE = new PlanFeatures(1, 1, Collections.emptyMap());
 }
