@@ -41,6 +41,7 @@ import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundExcepti
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.PlanFeatureNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
@@ -279,6 +280,20 @@ public class GlobalExceptionHandler {
         403,
         ex.getMessage(),
         request);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(PlanFeatureNotAvailableException.class)
+  public ResponseEntity<ProblemDetail> handlePlanFeatureNotAvailable(final PlanFeatureNotAvailableException ex,
+                                                                     final HttpServletRequest request,
+                                                                     final Locale locale) {
+    log.warn("Plan feature not available: featureCode={}, planMessage={}", ex.getFeatureCode(), ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        "Plan upgrade required",
+        403,
+        ex.getMessage(),
+        request);
+    pd.setProperty("featureCode", ex.getFeatureCode());
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 

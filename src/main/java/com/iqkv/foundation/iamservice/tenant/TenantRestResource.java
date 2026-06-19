@@ -23,6 +23,7 @@ import java.util.UUID;
 import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.ban.dto.BanDtos;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
+import com.iqkv.foundation.iamservice.plan.PlanFeatureGuard;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
@@ -63,15 +64,18 @@ public class TenantRestResource {
   private final UserService userService;
   private final MembershipService membershipService;
   private final BanService banService;
+  private final PlanFeatureGuard planFeatureGuard;
 
   public TenantRestResource(final TenantService tenantService,
                             final UserService userService,
                             final MembershipService membershipService,
-                            final BanService banService) {
+                            final BanService banService,
+                            final PlanFeatureGuard planFeatureGuard) {
     this.tenantService = tenantService;
     this.userService = userService;
     this.membershipService = membershipService;
     this.banService = banService;
+    this.planFeatureGuard = planFeatureGuard;
   }
 
   @PostMapping
@@ -252,7 +256,7 @@ public class TenantRestResource {
       @ApiResponse(responseCode = "200", description = "Stats returned",
                    content = @Content(schema = @Schema(implementation = UserDtos.TenantUserStatsResponse.class))),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER or ADMIN required",
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER or ADMIN required, or advanced_analytics feature not available on current plan",
                    content = @Content),
       @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
   })
@@ -264,6 +268,8 @@ public class TenantRestResource {
     if (!Objects.equals(tenantKey, tokenTenantId)) {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
+    final String planCode = jwt.getClaimAsString(JwtClaimNames.PLAN_CODE);
+    planFeatureGuard.require(planCode, PlanFeatureGuard.ADVANCED_ANALYTICS);
     return ResponseEntity.ok(userService.getTenantUserStats(tenantKey, query));
   }
 
