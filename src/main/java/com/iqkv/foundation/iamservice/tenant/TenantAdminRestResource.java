@@ -23,6 +23,8 @@ import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
+import com.iqkv.foundation.iamservice.user.UserService;
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -56,10 +58,14 @@ public class TenantAdminRestResource {
 
   private final TenantService tenantService;
   private final MembershipService membershipService;
+  private final UserService userService;
 
-  public TenantAdminRestResource(final TenantService tenantService, final MembershipService membershipService) {
+  public TenantAdminRestResource(final TenantService tenantService,
+                                  final MembershipService membershipService,
+                                  final UserService userService) {
     this.tenantService = tenantService;
     this.membershipService = membershipService;
+    this.userService = userService;
   }
 
   @GetMapping
@@ -118,6 +124,38 @@ public class TenantAdminRestResource {
   public ResponseEntity<TenantDtos.TenantMemberCountResponse> countTenantMembers(
       @Parameter(description = "8-char tenant key") @PathVariable String tenantKey) {
     return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
+  }
+
+  @GetMapping("/{tenantKey}/members/stats")
+  @Operation(
+      summary = "Get tenant user statistics",
+      description = """
+          Returns aggregated member counts (total, by status, email-verified) and a \
+          time-bucketed signup series — intended for the platform admin dashboard. \
+          No X-Tenant-ID header or tenant-scoped token is required.
+
+          **Query parameters (all optional):**
+          - `from` — inclusive start date, ISO-8601 `yyyy-MM-dd`; defaults to 30 days ago
+          - `to`   — inclusive end date, ISO-8601 `yyyy-MM-dd`; defaults to today (UTC)
+          - `granularity` — `day` (default) or `month`
+          """)
+  @Parameter(name = "from", description = "Inclusive start date, ISO-8601 yyyy-MM-dd (default: 30 days ago)",
+             schema = @Schema(type = "string", format = "date", example = "2026-01-01"))
+  @Parameter(name = "to", description = "Inclusive end date, ISO-8601 yyyy-MM-dd (default: today UTC)",
+             schema = @Schema(type = "string", format = "date", example = "2026-06-19"))
+  @Parameter(name = "granularity", description = "Time bucket size: day (default) or month",
+             schema = @Schema(type = "string", allowableValues = {"day", "month"}, defaultValue = "day"))
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Stats returned",
+                   content = @Content(schema = @Schema(implementation = UserDtos.TenantUserStatsResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — PLATFORM_ADMIN required", content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
+  })
+  public ResponseEntity<UserDtos.TenantUserStatsResponse> getTenantUserStats(
+      @Parameter(description = "8-char tenant key") @PathVariable final String tenantKey,
+      @ModelAttribute final UserDtos.TenantUserStatsQuery query) {
+    return ResponseEntity.ok(userService.getTenantUserStats(tenantKey, query));
   }
 
   @GetMapping("/{tenantKey}/members/{userId}/authorities")
