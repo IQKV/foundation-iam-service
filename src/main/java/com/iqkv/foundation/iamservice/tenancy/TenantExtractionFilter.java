@@ -51,7 +51,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   <li>{@code GET /api/v1/iam/announcements} — platform-wide announcements, stored in {@code public} schema.</li>
  *   <li>{@code /.well-known/**} — public JWKS endpoint</li>
  *   <li>Actuator, API docs, Swagger UI</li>
- * </ul> */
+ * </ul>
+ */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class TenantExtractionFilter extends OncePerRequestFilter {

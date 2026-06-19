@@ -57,8 +57,8 @@ public class SigninAttemptEvent implements AuditableEvent {
   }
 
   public SigninAttemptEvent(final String email, final UUID userId, final String tenantKey,
-                           final AttemptResult result, final FailureReason failureReason,
-                           final String ipAddress, final String userAgent, final Instant occurredAt) {
+                            final AttemptResult result, final FailureReason failureReason,
+                            final String ipAddress, final String userAgent, final Instant occurredAt) {
     this.email = email;
     this.userId = userId;
     this.tenantKey = tenantKey;
@@ -146,14 +146,14 @@ public class SigninAttemptEvent implements AuditableEvent {
   @Override
   public String toString() {
     return "SigninAttemptEvent{" +
-        "email='" + email + '\'' +
-        ", userId=" + userId +
-        ", tenantKey='" + tenantKey + '\'' +
-        ", result=" + result +
-        ", failureReason=" + failureReason +
-        ", ipAddress='" + ipAddress + '\'' +
-        ", userAgent='" + userAgent + '\'' +
-        ", occurredAt=" + occurredAt +
-        '}';
+           "email='" + email + '\'' +
+           ", userId=" + userId +
+           ", tenantKey='" + tenantKey + '\'' +
+           ", result=" + result +
+           ", failureReason=" + failureReason +
+           ", ipAddress='" + ipAddress + '\'' +
+           ", userAgent='" + userAgent + '\'' +
+           ", occurredAt=" + occurredAt +
+           '}';
   }
 }

@@ -70,7 +70,7 @@ public class TenantListingService {
       if (tenant == null) {
         continue;
       }
-      
+
       final var authorities = membershipService.getAuthorities(membership.getId());
       final var isPersonal = Boolean.TRUE.equals(tenant.getIsInternal());
 

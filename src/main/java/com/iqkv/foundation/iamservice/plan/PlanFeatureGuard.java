@@ -45,8 +45,14 @@ public class PlanFeatureGuard {
 
   private static final Logger log = LoggerFactory.getLogger(PlanFeatureGuard.class);
 
-  /** Feature code for the Advanced Analytics dashboard feature. */
+  /**
+   * Feature code for the Advanced Analytics dashboard feature.
+   */
   public static final String ADVANCED_ANALYTICS = "advanced_analytics";
+  /**
+   * Feature code for the Priority Support feature.
+   */
+  public static final String PRIORITY_SUPPORT = "priority_support";
 
   private final PlanCatalogCache planCatalogCache;
 

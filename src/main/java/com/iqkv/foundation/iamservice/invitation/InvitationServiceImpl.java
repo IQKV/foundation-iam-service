@@ -582,7 +582,7 @@ public class InvitationServiceImpl implements InvitationService {
   private void ensurePlatformMembership(final com.iqkv.foundation.iamservice.user.User user) {
     if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
       log.info("Adding user {} to platform tenant", user.getId());
-      
+
       final var platformMembership = new TenantMembership();
       platformMembership.setId(UUID.randomUUID());
       platformMembership.setUserId(user.getId());

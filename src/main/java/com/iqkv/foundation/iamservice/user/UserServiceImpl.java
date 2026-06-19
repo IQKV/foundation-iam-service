@@ -459,7 +459,7 @@ public class UserServiceImpl implements UserService {
     // ── Resolve & validate the date range ────────────────────────────────────
     final java.time.LocalDate today = java.time.LocalDate.now(java.time.ZoneOffset.UTC);
     final java.time.LocalDate from = parseDateOrDefault(query.from(), today.minusDays(29));
-    final java.time.LocalDate to   = parseDateOrDefault(query.to(),   today);
+    final java.time.LocalDate to = parseDateOrDefault(query.to(), today);
 
     // Guard: from must not be after to, and the window is capped at 366 days to
     // prevent accidentally huge time-series result sets.
@@ -467,24 +467,24 @@ public class UserServiceImpl implements UserService {
     final java.time.LocalDate safeTo;
     if (from.isAfter(to)) {
       safeFrom = to.minusDays(29);
-      safeTo   = to;
+      safeTo = to;
     } else if (java.time.temporal.ChronoUnit.DAYS.between(from, to) > 366) {
       safeFrom = to.minusDays(365);
-      safeTo   = to;
+      safeTo = to;
     } else {
       safeFrom = from;
-      safeTo   = to;
+      safeTo = to;
     }
 
     // Granularity: only "month" or "day" (default)
     final String granularity = "month".equalsIgnoreCase(query.granularity()) ? "month" : "day";
 
     // ── Aggregate counts ──────────────────────────────────────────────────────
-    final long totalMembers     = userMapper.countMembersByTenantKey(tenantKey, null, null);
-    final long activeMembers    = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.ACTIVE.name());
-    final long lockedMembers    = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.LOCKED.name());
+    final long totalMembers = userMapper.countMembersByTenantKey(tenantKey, null, null);
+    final long activeMembers = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.ACTIVE.name());
+    final long lockedMembers = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.LOCKED.name());
     final long suspendedMembers = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.SUSPENDED.name());
-    final long emailVerified    = userMapper.countEmailVerifiedMembersByTenantKey(tenantKey);
+    final long emailVerified = userMapper.countEmailVerifiedMembersByTenantKey(tenantKey);
 
     // ── Build signup series with zero-gap fill ────────────────────────────────
     final java.util.List<UserDtos.UserSignupSeriesPoint> rawSeries =
@@ -528,7 +528,7 @@ public class UserServiceImpl implements UserService {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   private static java.time.LocalDate parseDateOrDefault(final String raw,
-                                                         final java.time.LocalDate fallback) {
+                                                        final java.time.LocalDate fallback) {
     if (raw == null || raw.isBlank()) {
       return fallback;
     }

@@ -61,8 +61,8 @@ public class TenantAdminRestResource {
   private final UserService userService;
 
   public TenantAdminRestResource(final TenantService tenantService,
-                                  final MembershipService membershipService,
-                                  final UserService userService) {
+                                 final MembershipService membershipService,
+                                 final UserService userService) {
     this.tenantService = tenantService;
     this.membershipService = membershipService;
     this.userService = userService;
@@ -133,7 +133,7 @@ public class TenantAdminRestResource {
           Returns aggregated member counts (total, by status, email-verified) and a \
           time-bucketed signup series — intended for the platform admin dashboard. \
           No X-Tenant-ID header or tenant-scoped token is required.
-
+          
           **Query parameters (all optional):**
           - `from` — inclusive start date, ISO-8601 `yyyy-MM-dd`; defaults to 30 days ago
           - `to`   — inclusive end date, ISO-8601 `yyyy-MM-dd`; defaults to today (UTC)

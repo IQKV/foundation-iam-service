@@ -120,7 +120,7 @@ public class MultiTenantSignupStrategy implements SignupStrategy {
   private void ensurePlatformMembership(final User user) {
     if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
       log.info("Adding user {} to platform tenant", user.getId());
-      
+
       final var platformMembership = new TenantMembership();
       platformMembership.setId(UUID.randomUUID());
       platformMembership.setUserId(user.getId());

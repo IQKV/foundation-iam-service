@@ -47,8 +47,7 @@ public class AvatarServiceImpl implements AvatarService {
 
   public AvatarServiceImpl(final UserMapper userMapper,
                            final MinioClient minioClient,
-                           @Qualifier("presigningMinioClient")
-                           final MinioClient presigningMinioClient,
+                           @Qualifier("presigningMinioClient") final MinioClient presigningMinioClient,
                            final ObjectStorageConfigurationProperties storageProps) {
     this.userMapper = userMapper;
     this.minioClient = minioClient;

@@ -58,7 +58,7 @@ public interface AvatarService {
    * @param userId    UUID of the user confirming the upload
    * @param objectKey the S3 object key returned from {@link #initiateUpload}
    * @return response containing the public avatar URL
-   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException    if no user exists with the given ID
+   * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException     if no user exists with the given ID
    * @throws com.iqkv.foundation.iamservice.shared.exception.InvalidObjectKeyException if the object key is malformed or does not belong to the user
    */
   UserDtos.AvatarResponse confirmUpload(UUID userId, String objectKey);

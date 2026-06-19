@@ -39,6 +39,8 @@ public record PlanFeatures(
     Map<String, PlanFeature> features
 ) {
 
-  /** Safe fallback used when the plan code is unknown or the cache is empty. */
+  /**
+   * Safe fallback used when the plan code is unknown or the cache is empty.
+   */
   public static final PlanFeatures NONE = new PlanFeatures(1, 1, Collections.emptyMap());
 }

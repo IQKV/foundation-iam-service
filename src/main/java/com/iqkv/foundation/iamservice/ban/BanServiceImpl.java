@@ -55,11 +55,11 @@ public class BanServiceImpl implements BanService {
   private final UserEventPublisher userEventPublisher;
 
   public BanServiceImpl(final BanMapper banMapper,
-                       final UserMapper userMapper,
-                       final PlatformAuthorityMapper platformAuthorityMapper,
-                       final MessagingService messagingService,
-                       final NotificationConfigurationProperties notificationProps,
-                       final UserEventPublisher userEventPublisher) {
+                        final UserMapper userMapper,
+                        final PlatformAuthorityMapper platformAuthorityMapper,
+                        final MessagingService messagingService,
+                        final NotificationConfigurationProperties notificationProps,
+                        final UserEventPublisher userEventPublisher) {
     this.banMapper = banMapper;
     this.userMapper = userMapper;
     this.platformAuthorityMapper = platformAuthorityMapper;

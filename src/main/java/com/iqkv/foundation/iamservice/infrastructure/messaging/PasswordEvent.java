@@ -38,13 +38,21 @@ import com.iqkv.foundation.audit.model.event.AuditableEvent;
 public class PasswordEvent implements AuditableEvent {
 
   public enum EventType {
-    /** User or admin requested a password-reset link. */
+    /**
+     * User or admin requested a password-reset link.
+     */
     PASSWORD_RESET_INITIATED,
-    /** Password-reset token was consumed and new password was set. */
+    /**
+     * Password-reset token was consumed and new password was set.
+     */
     PASSWORD_RESET_COMPLETED,
-    /** User changed their own password while authenticated. */
+    /**
+     * User changed their own password while authenticated.
+     */
     PASSWORD_CHANGED_SELF,
-    /** Platform admin forcibly set a new password for another user. */
+    /**
+     * Platform admin forcibly set a new password for another user.
+     */
     PASSWORD_CHANGED_BY_ADMIN
   }
 
@@ -52,7 +60,9 @@ public class PasswordEvent implements AuditableEvent {
   private String email;
   private String tenantKey;
   private EventType eventType;
-  /** Null for INITIATED (actor unknown at that point) or self-service; admin ID for CHANGED_BY_ADMIN. */
+  /**
+   * Null for INITIATED (actor unknown at that point) or self-service; admin ID for CHANGED_BY_ADMIN.
+   */
   private UUID actorId;
   private Instant occurredAt;
   private AuditActor actor;

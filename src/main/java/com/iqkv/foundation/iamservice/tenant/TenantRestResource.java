@@ -87,7 +87,7 @@ public class TenantRestResource {
       @ApiResponse(responseCode = "409", description = "Tenant name already exists")
   })
   public ResponseEntity<TenantDtos.TenantResponse> createTenant(@Valid @RequestBody final TenantDtos.CreateTenantRequest request,
-                                                               @AuthenticationPrincipal final Jwt jwt) {
+                                                                @AuthenticationPrincipal final Jwt jwt) {
     final UUID ownerUserId = UUID.fromString(jwt.getSubject());
     final Tenant tenant = tenantService.createTenant(request.name(), ownerUserId);
     return ResponseEntity.status(201).body(TenantDtoMapper.toResponse(tenant));
@@ -230,12 +230,12 @@ public class TenantRestResource {
       description = """
           Returns aggregated member counts (total, by status, email-verified) and a \
           time-bucketed signup series for the tenant owner/admin dashboard.
-
+          
           **Query parameters (all optional):**
           - `from` — inclusive start date, ISO-8601 `yyyy-MM-dd`; defaults to 30 days ago
           - `to`   — inclusive end date, ISO-8601 `yyyy-MM-dd`; defaults to today (UTC)
           - `granularity` — `day` (default) or `month`
-
+          
           The `signupSeries` array always contains one entry per calendar bucket within \
           the resolved range — buckets with zero signups are included to guarantee a \
           continuous chart axis. The maximum range is capped at 366 days; requests \

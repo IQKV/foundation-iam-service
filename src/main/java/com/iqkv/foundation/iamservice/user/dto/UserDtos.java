@@ -181,9 +181,9 @@ public final class UserDtos {
   /**
    * A single data point in a time-series signup series.
    *
-   * @param period   ISO-8601 date string representing the start of the bucket
-   *                 (e.g. {@code "2026-06-01"} for a day bucket, {@code "2026-06"} for a month bucket)
-   * @param signups  number of new memberships created within this bucket
+   * @param period  ISO-8601 date string representing the start of the bucket
+   *                (e.g. {@code "2026-06-01"} for a day bucket, {@code "2026-06"} for a month bucket)
+   * @param signups number of new memberships created within this bucket
    */
   public record UserSignupSeriesPoint(String period, long signups) {
   }
@@ -196,16 +196,16 @@ public final class UserDtos {
    * queried range. Buckets with zero signups are included so the chart renders
    * a continuous axis.
    *
-   * @param tenantKey         the 8-character NanoID identifying the tenant
-   * @param totalMembers      total number of memberships ever created (all statuses)
-   * @param activeMembers     members whose account status is {@code ACTIVE}
-   * @param lockedMembers     members whose account status is {@code LOCKED}
-   * @param suspendedMembers  members whose account status is {@code SUSPENDED}
+   * @param tenantKey          the 8-character NanoID identifying the tenant
+   * @param totalMembers       total number of memberships ever created (all statuses)
+   * @param activeMembers      members whose account status is {@code ACTIVE}
+   * @param lockedMembers      members whose account status is {@code LOCKED}
+   * @param suspendedMembers   members whose account status is {@code SUSPENDED}
    * @param emailVerifiedCount members with a verified email address
-   * @param signupSeries      time-bucketed new-signup counts over the requested period
-   * @param periodFrom        inclusive start of the queried period (ISO-8601 date)
-   * @param periodTo          inclusive end of the queried period (ISO-8601 date)
-   * @param granularity       time bucket size used: {@code "day"} or {@code "month"}
+   * @param signupSeries       time-bucketed new-signup counts over the requested period
+   * @param periodFrom         inclusive start of the queried period (ISO-8601 date)
+   * @param periodTo           inclusive end of the queried period (ISO-8601 date)
+   * @param granularity        time bucket size used: {@code "day"} or {@code "month"}
    */
   public record TenantUserStatsResponse(
       String tenantKey,
