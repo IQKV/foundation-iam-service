@@ -32,6 +32,7 @@ The IAM service is the identity backbone of the platform:
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
 - **Platform admin actions** — platform admins can ban/unban/unlock users, manage platform authorities, and more
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
+- **Plan feature enforcement** — `PlanFeatureGuard` resolves the caller's active plan features from a local cache (populated at startup from the billing service) and throws `PlanFeatureNotAvailableException` when a gated endpoint is called by a plan that does not include the required feature; the `plan_code` JWT claim is the only runtime input required
 
 ## Quick Links
 
