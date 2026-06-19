@@ -385,4 +385,72 @@
         WHERE id = #{userId}
     </update>
 
+    <!-- ── Tenant user stats queries ─────────────────────────────────────── -->
+
+    <!--
+        countMembersByTenantKeyAndStatus
+        Counts members of a tenant whose user account status equals the given value.
+    -->
+    <select id="countMembersByTenantKeyAndStatus" resultType="long">
+        SELECT COUNT(DISTINCT u.id)
+        FROM public.users u
+        INNER JOIN public.tenant_memberships m
+            ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        WHERE u.status = #{status}
+    </select>
+
+    <!--
+        countEmailVerifiedMembersByTenantKey
+        Counts members of a tenant with a verified email address.
+    -->
+    <select id="countEmailVerifiedMembersByTenantKey" resultType="long">
+        SELECT COUNT(DISTINCT u.id)
+        FROM public.users u
+        INNER JOIN public.tenant_memberships m
+            ON m.user_id = u.id AND m.tenant_key = #{tenantKey}
+        WHERE u.email_verified = true
+    </select>
+
+    <!--
+        countMemberSignupsByTenantKeyBetween
+        Returns a time-bucketed series of new membership creations for a tenant.
+
+        The granularity parameter controls the truncation function:
+          - "month"  → TO_CHAR(DATE_TRUNC('month', m.created_at), 'YYYY-MM')
+          - "day"    → TO_CHAR(DATE_TRUNC('day',   m.created_at), 'YYYY-MM-DD')
+
+        Only buckets with at least one signup are returned; zero-count gaps are
+        filled in by the service layer to ensure a continuous chart axis.
+
+        The result is mapped to UserDtos.UserSignupSeriesPoint via a dedicated
+        resultMap below.
+    -->
+    <resultMap id="signupSeriesResultMap"
+               type="com.iqkv.foundation.iamservice.user.dto.UserDtos$UserSignupSeriesPoint">
+        <constructor>
+            <arg column="period"  javaType="String"/>
+            <arg column="signups" javaType="long"/>
+        </constructor>
+    </resultMap>
+
+    <select id="countMemberSignupsByTenantKeyBetween" resultMap="signupSeriesResultMap">
+        SELECT
+        <choose>
+            <when test="granularity == 'month'">
+                TO_CHAR(DATE_TRUNC('month', m.created_at), 'YYYY-MM')
+            </when>
+            <otherwise>
+                TO_CHAR(DATE_TRUNC('day', m.created_at), 'YYYY-MM-DD')
+            </otherwise>
+        </choose>
+            AS period,
+            COUNT(*) AS signups
+        FROM public.tenant_memberships m
+        WHERE m.tenant_key = #{tenantKey}
+          AND m.created_at &gt;= #{from}::date
+          AND m.created_at  &lt; #{to}::date + INTERVAL '1 day'
+        GROUP BY period
+        ORDER BY period ASC
+    </select>
+
 </mapper>

@@ -179,6 +179,61 @@ public final class UserDtos {
   }
 
   /**
+   * A single data point in a time-series signup series.
+   *
+   * @param period   ISO-8601 date string representing the start of the bucket
+   *                 (e.g. {@code "2026-06-01"} for a day bucket, {@code "2026-06"} for a month bucket)
+   * @param signups  number of new memberships created within this bucket
+   */
+  public record UserSignupSeriesPoint(String period, long signups) {
+  }
+
+  /**
+   * Aggregated user statistics for a tenant, suitable for the owner/admin dashboard.
+   *
+   * <p>The {@code signupSeries} list contains one entry per calendar bucket
+   * (day or month depending on the requested {@code granularity}) within the
+   * queried range. Buckets with zero signups are included so the chart renders
+   * a continuous axis.
+   *
+   * @param tenantKey         the 8-character NanoID identifying the tenant
+   * @param totalMembers      total number of memberships ever created (all statuses)
+   * @param activeMembers     members whose account status is {@code ACTIVE}
+   * @param lockedMembers     members whose account status is {@code LOCKED}
+   * @param suspendedMembers  members whose account status is {@code SUSPENDED}
+   * @param emailVerifiedCount members with a verified email address
+   * @param signupSeries      time-bucketed new-signup counts over the requested period
+   * @param periodFrom        inclusive start of the queried period (ISO-8601 date)
+   * @param periodTo          inclusive end of the queried period (ISO-8601 date)
+   * @param granularity       time bucket size used: {@code "day"} or {@code "month"}
+   */
+  public record TenantUserStatsResponse(
+      String tenantKey,
+      long totalMembers,
+      long activeMembers,
+      long lockedMembers,
+      long suspendedMembers,
+      long emailVerifiedCount,
+      java.util.List<UserSignupSeriesPoint> signupSeries,
+      String periodFrom,
+      String periodTo,
+      String granularity) {
+  }
+
+  /**
+   * Query parameters for the tenant user-stats endpoint.
+   *
+   * @param from        inclusive start date, ISO-8601 ({@code yyyy-MM-dd}); defaults to 30 days ago
+   * @param to          inclusive end date, ISO-8601 ({@code yyyy-MM-dd}); defaults to today
+   * @param granularity time bucket: {@code "day"} (default) or {@code "month"}
+   */
+  public record TenantUserStatsQuery(
+      String from,
+      String to,
+      String granularity) {
+  }
+
+  /**
    * Query parameters for the admin user list endpoint.
    *
    * <p>Bound from HTTP query string via {@code @ModelAttribute} in the controller.

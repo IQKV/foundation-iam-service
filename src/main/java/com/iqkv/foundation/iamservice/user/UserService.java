@@ -213,4 +213,29 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   void unlockUser(UUID userId);
+
+  /**
+   * Returns aggregated user statistics for a specific tenant, scoped to an optional date range.
+   *
+   * <p>Provides a snapshot of member counts broken down by account status and email-verification
+   * state, plus a time-bucketed signup series suitable for rendering a trend chart on the
+   * tenant owner/admin dashboard.
+   *
+   * <p>The {@code query} parameters are all optional:
+   * <ul>
+   *   <li>{@code from} / {@code to} — ISO-8601 dates ({@code yyyy-MM-dd}); defaults to the
+   *       last 30 days when absent.</li>
+   *   <li>{@code granularity} — {@code "day"} (default) or {@code "month"}; controls the
+   *       time-bucket size used in the signup series.</li>
+   * </ul>
+   *
+   * <p>Zero-count buckets are always included in {@code signupSeries} so that the frontend
+   * chart renders a continuous axis without gaps.
+   *
+   * @param tenantKey the 8-character NanoID identifying the tenant
+   * @param query     optional period and granularity parameters
+   * @return a {@link UserDtos.TenantUserStatsResponse} with counts and the signup series
+   * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
+   */
+  UserDtos.TenantUserStatsResponse getTenantUserStats(String tenantKey, UserDtos.TenantUserStatsQuery query);
 }

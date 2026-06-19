@@ -28,10 +28,12 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchExce
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtos;
 import com.iqkv.foundation.iamservice.user.UserService;
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -215,6 +217,54 @@ public class TenantRestResource {
       throw new TenantContextMismatchException("Tenant context mismatch");
     }
     return ResponseEntity.ok(tenantService.countMembersByTenantKey(tenantKey));
+  }
+
+  @GetMapping("/{tenantKey}/members/stats")
+  @PreAuthorize("hasAnyAuthority('TENANT_OWNER', 'ADMIN')")
+  @Operation(
+      summary = "Get tenant user statistics",
+      description = """
+          Returns aggregated member counts (total, by status, email-verified) and a \
+          time-bucketed signup series for the tenant owner/admin dashboard.
+
+          **Query parameters (all optional):**
+          - `from` — inclusive start date, ISO-8601 `yyyy-MM-dd`; defaults to 30 days ago
+          - `to`   — inclusive end date, ISO-8601 `yyyy-MM-dd`; defaults to today (UTC)
+          - `granularity` — `day` (default) or `month`
+
+          The `signupSeries` array always contains one entry per calendar bucket within \
+          the resolved range — buckets with zero signups are included to guarantee a \
+          continuous chart axis. The maximum range is capped at 366 days; requests \
+          exceeding that are silently trimmed from the `from` side.
+          """)
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @Parameter(name = "from", in = ParameterIn.QUERY, required = false,
+             description = "Inclusive start date, ISO-8601 yyyy-MM-dd (default: 30 days ago)",
+             schema = @Schema(type = "string", format = "date", example = "2026-01-01"))
+  @Parameter(name = "to", in = ParameterIn.QUERY, required = false,
+             description = "Inclusive end date, ISO-8601 yyyy-MM-dd (default: today UTC)",
+             schema = @Schema(type = "string", format = "date", example = "2026-06-19"))
+  @Parameter(name = "granularity", in = ParameterIn.QUERY, required = false,
+             description = "Time bucket size: day (default) or month",
+             schema = @Schema(type = "string", allowableValues = {"day", "month"}, defaultValue = "day"))
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Stats returned",
+                   content = @Content(schema = @Schema(implementation = UserDtos.TenantUserStatsResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+      @ApiResponse(responseCode = "403", description = "Access denied — TENANT_OWNER or ADMIN required",
+                   content = @Content),
+      @ApiResponse(responseCode = "404", description = "Tenant not found", content = @Content)
+  })
+  public ResponseEntity<UserDtos.TenantUserStatsResponse> getTenantUserStats(
+      @PathVariable final String tenantKey,
+      @ModelAttribute final UserDtos.TenantUserStatsQuery query,
+      @AuthenticationPrincipal final Jwt jwt) {
+    final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
+    if (!Objects.equals(tenantKey, tokenTenantId)) {
+      throw new TenantContextMismatchException("Tenant context mismatch");
+    }
+    return ResponseEntity.ok(userService.getTenantUserStats(tenantKey, query));
   }
 
   @PutMapping("/{tenantKey}/members/{userId}/authorities")

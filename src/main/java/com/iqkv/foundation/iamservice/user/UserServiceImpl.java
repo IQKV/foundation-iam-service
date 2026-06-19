@@ -451,4 +451,91 @@ public class UserServiceImpl implements UserService {
       log.warn("Failed to publish USER_UNLOCKED audit event for userId={}", userId, e);
     }
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public UserDtos.TenantUserStatsResponse getTenantUserStats(final String tenantKey,
+                                                             final UserDtos.TenantUserStatsQuery query) {
+    // ── Resolve & validate the date range ────────────────────────────────────
+    final java.time.LocalDate today = java.time.LocalDate.now(java.time.ZoneOffset.UTC);
+    final java.time.LocalDate from = parseDateOrDefault(query.from(), today.minusDays(29));
+    final java.time.LocalDate to   = parseDateOrDefault(query.to(),   today);
+
+    // Guard: from must not be after to, and the window is capped at 366 days to
+    // prevent accidentally huge time-series result sets.
+    final java.time.LocalDate safeFrom;
+    final java.time.LocalDate safeTo;
+    if (from.isAfter(to)) {
+      safeFrom = to.minusDays(29);
+      safeTo   = to;
+    } else if (java.time.temporal.ChronoUnit.DAYS.between(from, to) > 366) {
+      safeFrom = to.minusDays(365);
+      safeTo   = to;
+    } else {
+      safeFrom = from;
+      safeTo   = to;
+    }
+
+    // Granularity: only "month" or "day" (default)
+    final String granularity = "month".equalsIgnoreCase(query.granularity()) ? "month" : "day";
+
+    // ── Aggregate counts ──────────────────────────────────────────────────────
+    final long totalMembers     = userMapper.countMembersByTenantKey(tenantKey, null, null);
+    final long activeMembers    = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.ACTIVE.name());
+    final long lockedMembers    = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.LOCKED.name());
+    final long suspendedMembers = userMapper.countMembersByTenantKeyAndStatus(tenantKey, AccountStatus.SUSPENDED.name());
+    final long emailVerified    = userMapper.countEmailVerifiedMembersByTenantKey(tenantKey);
+
+    // ── Build signup series with zero-gap fill ────────────────────────────────
+    final java.util.List<UserDtos.UserSignupSeriesPoint> rawSeries =
+        userMapper.countMemberSignupsByTenantKeyBetween(tenantKey, safeFrom, safeTo, granularity);
+
+    final java.util.Map<String, Long> seriesMap = new java.util.LinkedHashMap<>();
+    rawSeries.forEach(p -> seriesMap.put(p.period(), p.signups()));
+
+    // Generate every expected bucket label and fill zeros for missing ones
+    final java.util.List<UserDtos.UserSignupSeriesPoint> filledSeries = new java.util.ArrayList<>();
+    if ("month".equals(granularity)) {
+      java.time.YearMonth cursor = java.time.YearMonth.from(safeFrom);
+      final java.time.YearMonth end = java.time.YearMonth.from(safeTo);
+      while (!cursor.isAfter(end)) {
+        final String label = cursor.toString(); // "YYYY-MM"
+        filledSeries.add(new UserDtos.UserSignupSeriesPoint(label, seriesMap.getOrDefault(label, 0L)));
+        cursor = cursor.plusMonths(1);
+      }
+    } else {
+      java.time.LocalDate cursor = safeFrom;
+      while (!cursor.isAfter(safeTo)) {
+        final String label = cursor.toString(); // "YYYY-MM-DD"
+        filledSeries.add(new UserDtos.UserSignupSeriesPoint(label, seriesMap.getOrDefault(label, 0L)));
+        cursor = cursor.plusDays(1);
+      }
+    }
+
+    return new UserDtos.TenantUserStatsResponse(
+        tenantKey,
+        totalMembers,
+        activeMembers,
+        lockedMembers,
+        suspendedMembers,
+        emailVerified,
+        filledSeries,
+        safeFrom.toString(),
+        safeTo.toString(),
+        granularity);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  private static java.time.LocalDate parseDateOrDefault(final String raw,
+                                                         final java.time.LocalDate fallback) {
+    if (raw == null || raw.isBlank()) {
+      return fallback;
+    }
+    try {
+      return java.time.LocalDate.parse(raw.strip());
+    } catch (final java.time.format.DateTimeParseException e) {
+      return fallback;
+    }
+  }
 }

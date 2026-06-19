@@ -17,10 +17,12 @@
 package com.iqkv.foundation.iamservice.user;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.iqkv.foundation.iamservice.user.dto.UserDtos;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.cursor.Cursor;
@@ -95,4 +97,42 @@ public interface UserMapper {
                       @Param("updatedAt") Instant updatedAt);
 
   void updateAvatarUrl(@Param("userId") UUID userId, @Param("avatarUrl") String avatarUrl);
+
+  /**
+   * Counts members of a specific tenant whose account status equals the given value.
+   *
+   * @param tenantKey the 8-character NanoID identifying the tenant
+   * @param status    the {@link com.iqkv.foundation.iamservice.user.AccountStatus} name
+   * @return count of matching members
+   */
+  long countMembersByTenantKeyAndStatus(@Param("tenantKey") String tenantKey,
+                                        @Param("status") String status);
+
+  /**
+   * Counts members of a specific tenant whose account email is verified.
+   *
+   * @param tenantKey the 8-character NanoID identifying the tenant
+   * @return count of email-verified members
+   */
+  long countEmailVerifiedMembersByTenantKey(@Param("tenantKey") String tenantKey);
+
+  /**
+   * Returns a time-bucketed series of new member signups (i.e. membership creations)
+   * for the given tenant within the specified date range.
+   *
+   * <p>Each row contains a {@code period} label (ISO-8601 date formatted according to
+   * {@code granularity}) and a {@code signups} count. Only buckets with at least one
+   * signup are returned — the service layer fills in the zero-count gaps.
+   *
+   * @param tenantKey   the 8-character NanoID identifying the tenant
+   * @param from        inclusive start date
+   * @param to          inclusive end date
+   * @param granularity {@code "day"} or {@code "month"}
+   * @return list of {@link UserDtos.UserSignupSeriesPoint} sorted by period ascending
+   */
+  List<UserDtos.UserSignupSeriesPoint> countMemberSignupsByTenantKeyBetween(
+      @Param("tenantKey") String tenantKey,
+      @Param("from") LocalDate from,
+      @Param("to") LocalDate to,
+      @Param("granularity") String granularity);
 }
