@@ -521,6 +521,9 @@ public class InvitationServiceImpl implements InvitationService {
       if (accountLockoutManager.isLocked(existing.getEmail())) {
         throw new com.iqkv.foundation.iamservice.shared.exception.AccountLockedException();
       }
+      if (existing.getStatus() != AccountStatus.ACTIVE) {
+        throw new com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException();
+      }
       if (!passwordEncoder.matches(request.password(), existing.getPasswordHash())) {
         accountLockoutManager.recordFailedAttempt(existing.getEmail());
         throw new BadCredentialsException("Invalid credentials");
