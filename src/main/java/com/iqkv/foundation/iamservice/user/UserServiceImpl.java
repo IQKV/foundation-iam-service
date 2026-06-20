@@ -525,6 +525,11 @@ public class UserServiceImpl implements UserService {
         granularity);
   }
 
+  @Override
+  public void completeOnboarding(UUID userId) {
+    userMapper.setOnboardingCompleted(userId);
+  }
+
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   private static java.time.LocalDate parseDateOrDefault(final String raw,

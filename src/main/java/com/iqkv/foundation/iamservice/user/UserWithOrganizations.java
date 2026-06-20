@@ -16,6 +16,7 @@
 
 package com.iqkv.foundation.iamservice.user;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,8 @@ public class UserWithOrganizations {
   private boolean emailVerified;
   private String locale;
   private String avatarUrl;
+  private Instant firstSignInAt;
+  private boolean onboardingCompleted;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private List<String> organizations;
@@ -109,6 +112,22 @@ public class UserWithOrganizations {
 
   public void setAvatarUrl(final String avatarUrl) {
     this.avatarUrl = avatarUrl;
+  }
+
+  public Instant getFirstSignInAt() {
+    return firstSignInAt;
+  }
+
+  public void setFirstSignInAt(final Instant firstSignInAt) {
+    this.firstSignInAt = firstSignInAt;
+  }
+
+  public boolean isOnboardingCompleted() {
+    return onboardingCompleted;
+  }
+
+  public void setOnboardingCompleted(final boolean onboardingCompleted) {
+    this.onboardingCompleted = onboardingCompleted;
   }
 
   public LocalDateTime getCreatedAt() {

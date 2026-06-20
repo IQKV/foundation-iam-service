@@ -98,6 +98,10 @@ public interface UserMapper {
 
   void updateAvatarUrl(@Param("userId") UUID userId, @Param("avatarUrl") String avatarUrl);
 
+  void setFirstSignInAt(@Param("userId") UUID userId, @Param("firstSignInAt") Instant firstSignInAt);
+
+  void setOnboardingCompleted(@Param("userId") UUID userId);
+
   /**
    * Counts members of a specific tenant whose account status equals the given value.
    *

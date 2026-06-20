@@ -91,6 +91,7 @@ public class JwtTokenGenerator {
         .claim(JwtClaimNames.LAST_NAME, user.getLastName())
         .claim(JwtClaimNames.TENANT_ID, tenantKey)
         .claim(JwtClaimNames.EMAIL_VERIFIED, user.isEmailVerified())
+        .claim(JwtClaimNames.ONBOARDING_COMPLETED, user.isOnboardingCompleted())
         .claim(JwtClaimNames.AUTHORITIES, authorities);
 
     if (planCode != null && !planCode.isBlank()) {

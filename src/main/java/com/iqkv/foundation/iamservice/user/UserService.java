@@ -238,4 +238,11 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
   UserDtos.TenantUserStatsResponse getTenantUserStats(String tenantKey, UserDtos.TenantUserStatsQuery query);
+
+  /**
+   * Marks the onboarding process as completed for the current user.
+   *
+   * @param userId the UUID of the user
+   */
+  void completeOnboarding(UUID userId);
 }

@@ -201,6 +201,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         accountLockoutManager.reset(request.email());
 
+        // Set first sign in time if not already set
+        userMapper.setFirstSignInAt(user.getId(), Instant.now());
+
         final String accessToken = jwtTokenGenerator.generateAccessToken(
             user, tenantKey, authorities, tenant.getActivePlanCode());
         final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);

@@ -61,6 +61,10 @@ public final class UserDtos {
       String locale,
       // Public URL of the user's avatar image. Null when no avatar has been uploaded.
       String avatarUrl,
+      // First sign-in timestamp. Null if the user hasn't signed in yet.
+      java.time.Instant firstSignInAt,
+      // Whether the user has completed the onboarding process.
+      boolean onboardingCompleted,
       List<String> organizations,
       List<String> membershipAuthorities,
       LocalDateTime createdAt,

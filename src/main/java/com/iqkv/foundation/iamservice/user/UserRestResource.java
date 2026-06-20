@@ -229,4 +229,23 @@ public class UserRestResource {
     avatarService.deleteAvatar(userId);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/me/onboarding/complete")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Complete onboarding",
+      description = "Marks the user's onboarding process as completed.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Onboarding completed"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<Void> completeOnboarding(@AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    userService.completeOnboarding(userId);
+    return ResponseEntity.noContent().build();
+  }
 }
