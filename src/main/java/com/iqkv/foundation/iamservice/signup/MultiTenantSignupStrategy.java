@@ -25,6 +25,8 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
@@ -58,17 +60,20 @@ public class MultiTenantSignupStrategy implements SignupStrategy {
   private final TenantMembershipMapper membershipMapper;
   private final TenantMemberAuthorityMapper authorityMapper;
   private final PasswordEncoder passwordEncoder;
+  private final PlanCatalogCache planCatalogCache;
 
   public MultiTenantSignupStrategy(final UserMapper userMapper,
                                    final TenantMapper tenantMapper,
                                    final TenantMembershipMapper membershipMapper,
                                    final TenantMemberAuthorityMapper authorityMapper,
-                                   final PasswordEncoder passwordEncoder) {
+                                   final PasswordEncoder passwordEncoder,
+                                   final PlanCatalogCache planCatalogCache) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.passwordEncoder = passwordEncoder;
+    this.planCatalogCache = planCatalogCache;
   }
 
   @Override
@@ -119,6 +124,16 @@ public class MultiTenantSignupStrategy implements SignupStrategy {
    */
   private void ensurePlatformMembership(final User user) {
     if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
+      // Quota check: enforce maxUsers from the active plan (0 = unlimited)
+      final Tenant platformTenant = tenantMapper.findByTenantKey(PLATFORM_TENANT_KEY)
+          .orElseThrow(() -> new IllegalStateException("Platform tenant not found"));
+      final int maxUsers = planCatalogCache.forPlan(platformTenant.getActivePlanCode()).maxUsers();
+      if (maxUsers > 0) {
+        final long current = membershipMapper.countByTenantKey(PLATFORM_TENANT_KEY);
+        if (current >= maxUsers) {
+          throw new PlanMemberQuotaException(current, maxUsers);
+        }
+      }
       log.info("Adding user {} to platform tenant", user.getId());
 
       final var platformMembership = new TenantMembership();

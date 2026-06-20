@@ -29,7 +29,9 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.InvalidTenantStateException;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
@@ -68,19 +70,22 @@ public class TenantServiceImpl implements TenantService {
   private final MessagingService messagingService;
   private final UserMapper userMapper;
   private final IamServiceMetrics metrics;
+  private final PlanCatalogCache planCatalogCache;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
                            final TenantMembershipMapper membershipMapper,
                            final TenantMemberAuthorityMapper authorityMapper,
                            final MessagingService messagingService,
                            final UserMapper userMapper,
-                           final IamServiceMetrics metrics) {
+                           final IamServiceMetrics metrics,
+                           final PlanCatalogCache planCatalogCache) {
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;
     this.metrics = metrics;
+    this.planCatalogCache = planCatalogCache;
   }
 
   @Override
@@ -129,7 +134,16 @@ public class TenantServiceImpl implements TenantService {
     tenantMapper.insertIfAbsent(tenant);
     metrics.recordTenantProvisioning("initiated");
 
-    // Step 3: Create owner membership with TENANT_OWNER authority
+    // Step 3: Quota check: enforce maxUsers from the active plan (0 = unlimited)
+    final int maxUsers = planCatalogCache.forPlan(tenant.getActivePlanCode()).maxUsers();
+    if (maxUsers > 0) {
+      final long current = membershipMapper.countByTenantKey(tenantKey);
+      if (current >= maxUsers) {
+        throw new PlanMemberQuotaException(current, maxUsers);
+      }
+    }
+
+    // Step 4: Create owner membership with TENANT_OWNER authority
     final var membership = new TenantMembership();
     membership.setId(UUID.randomUUID());
     membership.setUserId(ownerUserId);
@@ -147,7 +161,7 @@ public class TenantServiceImpl implements TenantService {
     authority.setAuthority(UserServiceConstants.AUTHORITY_TENANT_OWNER);
     authorityMapper.insert(authority);
 
-    // Step 4: Publish tenant created event
+    // Step 5: Publish tenant created event
     messagingService.publishTenantCreated(tenantKey, tenantName, owner.getEmail(), owner.getFirstName());
 
     log.info("Tenant created (provisioning initiated): tenantKey={}, ownerUserId={}", tenantKey, ownerUserId);
