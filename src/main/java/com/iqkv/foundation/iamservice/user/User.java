@@ -22,22 +22,22 @@ import java.util.UUID;
 
 public class User {
 
-    private UUID id;
-    private String email;
-    private String passwordHash;
-    private String firstName;
-    private String lastName;
-    private AccountStatus status;
-    private boolean emailVerified = false;
-    private String locale;
-    private String avatarUrl;
-    private Instant lastGlobalSignoutAt;
-    private Instant firstSignInAt;
-    private boolean onboardingCompleted = false;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String createdBy;
-    private String updatedBy;
+  private UUID id;
+  private String email;
+  private String passwordHash;
+  private String firstName;
+  private String lastName;
+  private AccountStatus status;
+  private boolean emailVerified = false;
+  private String locale;
+  private String avatarUrl;
+  private Instant lastGlobalSignoutAt;
+  private Instant firstSignInAt;
+  private boolean onboardingCompleted = false;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
+  private String createdBy;
+  private String updatedBy;
 
   public UUID getId() {
     return id;
