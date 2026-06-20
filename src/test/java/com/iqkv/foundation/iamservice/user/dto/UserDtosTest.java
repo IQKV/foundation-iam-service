@@ -18,6 +18,7 @@ package com.iqkv.foundation.iamservice.user.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -70,6 +71,8 @@ class UserDtosTest {
         true,
         "en-US",
         null, // avatarUrl
+        null, // firstSignInAt
+        false, // onboardingCompleted
         List.of("Acme Corp"),
         List.of("MEMBER"),
         createdAt,
@@ -148,6 +151,8 @@ class UserDtosTest {
         true,
         null,
         null, // avatarUrl
+        null, // firstSignInAt
+        false, // onboardingCompleted
         List.of(),
         List.of(),
         LocalDateTime.now(),
