@@ -245,7 +245,7 @@ public final class UserDtos {
    * in the service layer.
    *
    * @param page                  zero-based page index (default 0)
-   * @param size                  page size 1–100 (default 20)
+   * @param size                  page size 1–200 (default 20)
    * @param sortBy                sort field: email | firstName | lastName | updatedAt | createdAt
    * @param sortDir               sort direction: asc | desc
    * @param search                free-text search on email, first name, last name (case-insensitive)
@@ -254,7 +254,7 @@ public final class UserDtos {
    */
   public record UserListQuery(
       @Min(0) Integer page,
-      @Min(1) @Max(100) Integer size,
+      @Min(1) @Max(200) Integer size,
       String sortBy,
       String sortDir,
       String search,
