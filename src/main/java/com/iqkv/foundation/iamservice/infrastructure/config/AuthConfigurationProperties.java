@@ -16,7 +16,8 @@ import org.springframework.validation.annotation.Validated;
 public record AuthConfigurationProperties(
     @Valid @NotNull Jwt jwt,
     @Valid @NotNull Security security,
-    @Valid @NotNull PasswordReset passwordReset
+    @Valid @NotNull PasswordReset passwordReset,
+    @Valid @NotNull MagicLink magicLink
 ) {
 
   @PostConstruct
@@ -49,6 +50,15 @@ public record AuthConfigurationProperties(
             "iqkv.auth.password-reset.rate-limit-window must be a positive duration, got: " + passwordReset.rateLimitWindow());
       }
     }
+    if (magicLink != null) {
+      if (magicLink.tokenTtl() != null && (magicLink.tokenTtl().isZero() || magicLink.tokenTtl().isNegative())) {
+        throw new IllegalStateException("iqkv.auth.magic-link.token-ttl must be a positive duration, got: " + magicLink.tokenTtl());
+      }
+      if (magicLink.rateLimitWindow() != null && (magicLink.rateLimitWindow().isZero() || magicLink.rateLimitWindow().isNegative())) {
+        throw new IllegalStateException(
+            "iqkv.auth.magic-link.rate-limit-window must be a positive duration, got: " + magicLink.rateLimitWindow());
+      }
+    }
   }
 
   public record Jwt(
@@ -77,6 +87,13 @@ public record AuthConfigurationProperties(
   }
 
   public record PasswordReset(
+      @NotNull Duration tokenTtl,
+      @NotNull Duration rateLimitWindow,
+      @Positive int rateLimitMaxRequests
+  ) {
+  }
+
+  public record MagicLink(
       @NotNull Duration tokenTtl,
       @NotNull Duration rateLimitWindow,
       @Positive int rateLimitMaxRequests

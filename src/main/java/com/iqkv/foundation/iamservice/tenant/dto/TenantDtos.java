@@ -144,12 +144,12 @@ public final class TenantDtos {
   /**
    * Query parameters for the tenant member list endpoint.
    *
-   * @param page      zero-based page index (default 0)
-   * @param size      page size 1–200 (default 20)
-   * @param sortBy    sort field: email | firstName | lastName | updatedAt | createdAt
-   * @param sortDir   sort direction: asc | desc
-   * @param search    free-text search on email, first name, last name (case-insensitive)
-   * @param status    exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
+   * @param page    zero-based page index (default 0)
+   * @param size    page size 1–200 (default 20)
+   * @param sortBy  sort field: email | firstName | lastName | updatedAt | createdAt
+   * @param sortDir sort direction: asc | desc
+   * @param search  free-text search on email, first name, last name (case-insensitive)
+   * @param status  exact account status filter: ACTIVE | LOCKED | SUSPENDED | DELETED
    */
   public record TenantMemberListQuery(
       @Min(0) Integer page,
@@ -188,12 +188,12 @@ public final class TenantDtos {
    * All filter/sort fields are optional — absent values fall back to safe defaults
    * in the service layer.
    *
-   * @param page      zero-based page index (default 0)
-   * @param size      page size 1–200 (default 20)
-   * @param sortBy    sort field: name | tenantKey | createdAt | updatedAt
-   * @param sortDir   sort direction: asc | desc
-   * @param search    free-text search on name and tenantKey (case-insensitive)
-   * @param status    exact status filter: PROVISIONING | ACTIVE | SUSPENDED | DELETED | PROVISIONING_FAILED
+   * @param page    zero-based page index (default 0)
+   * @param size    page size 1–200 (default 20)
+   * @param sortBy  sort field: name | tenantKey | createdAt | updatedAt
+   * @param sortDir sort direction: asc | desc
+   * @param search  free-text search on name and tenantKey (case-insensitive)
+   * @param status  exact status filter: PROVISIONING | ACTIVE | SUSPENDED | DELETED | PROVISIONING_FAILED
    */
   public record TenantListQuery(
       @Min(0) Integer page,

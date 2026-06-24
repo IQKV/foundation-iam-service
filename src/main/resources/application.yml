@@ -100,6 +100,10 @@ iqkv:
       token-ttl: PT1H
       rate-limit-window: PT15M
       rate-limit-max-requests: 3
+    magic-link:
+      token-ttl: PT15M
+      rate-limit-window: PT15M
+      rate-limit-max-requests: 3
   objectstorage:
     endpoint: ${OBJECTSTORAGE_ENDPOINT:http://localhost:9000}
     public-endpoint: ${OBJECTSTORAGE_PUBLIC_ENDPOINT:}

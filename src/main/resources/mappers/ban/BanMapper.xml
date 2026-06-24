@@ -30,13 +30,13 @@
     <update id="update" parameterType="com.iqkv.foundation.iamservice.ban.Ban">
         UPDATE public.bans
         SET user_id = #{userId},
-            initiator_id = #{initiatorId},
-            type = #{type, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            tenant_key = #{tenantKey},
-            reason = #{reason},
-            expires_at = #{expiresAt},
-            updated_at = #{updatedAt},
-            updated_by = #{updatedBy}
+        initiator_id = #{initiatorId},
+        type = #{type, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        tenant_key = #{tenantKey},
+        reason = #{reason},
+        expires_at = #{expiresAt},
+        updated_at = #{updatedAt},
+        updated_by = #{updatedBy}
         WHERE id = #{id}
     </update>
 

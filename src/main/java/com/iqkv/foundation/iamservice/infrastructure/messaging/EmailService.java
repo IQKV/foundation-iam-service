@@ -98,6 +98,7 @@ public class EmailService {
       case VERIFY_EMAIL -> "email/signup/verify-email";
       case EMAIL_VERIFIED -> "email/signup/email-verified";
       case PASSWORD_RESET_INITIATE -> "email/password-reset/initiate";
+      case MAGIC_LINK_SENT -> "email/magic-link/sent";
       case PASSWORD_RESET_CONFIRMED -> "email/password-reset/confirmed";
       case INVITATION -> "email/invitation/invite";
       case TENANT_OWNER_WELCOME -> "email/signup/tenant-owner-welcome";
@@ -114,6 +115,7 @@ public class EmailService {
       case VERIFY_EMAIL -> "email.verify-email.subject";
       case EMAIL_VERIFIED -> "email.email-verified.subject";
       case PASSWORD_RESET_INITIATE -> "email.password-reset.initiate.subject";
+      case MAGIC_LINK_SENT -> "email.magic-link.sent.subject";
       case PASSWORD_RESET_CONFIRMED -> "email.password-reset.confirmed.subject";
       case INVITATION -> "email.invitation.subject";
       case TENANT_OWNER_WELCOME -> "email.tenant-owner-welcome.subject";

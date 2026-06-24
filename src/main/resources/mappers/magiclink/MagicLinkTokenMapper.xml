@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.magiclink.MagicLinkTokenMapper">
+
+    <resultMap id="magicLinkTokenResultMap" type="com.iqkv.foundation.iamservice.magiclink.MagicLinkToken">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="token" column="token"/>
+        <result property="tenantKey" column="tenant_key"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="resendCount" column="resend_count"/>
+        <result property="lastResendAt" column="last_resend_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.magiclink.MagicLinkToken">
+        INSERT INTO public.magic_link_tokens
+        (id, user_id, token, tenant_key, expires_at, resend_count, last_resend_at, created_at)
+        VALUES
+        (#{id}, #{userId}, #{token}, #{tenantKey}, #{expiresAt}, #{resendCount}, #{lastResendAt}, #{createdAt})
+    </insert>
+
+    <select id="findByToken" resultMap="magicLinkTokenResultMap">
+        SELECT id, user_id, token, tenant_key, expires_at, resend_count, last_resend_at, created_at
+        FROM public.magic_link_tokens
+        WHERE token = #{token}
+    </select>
+
+    <select id="findByUserIdAndTenantKey" resultMap="magicLinkTokenResultMap">
+        SELECT id, user_id, token, tenant_key, expires_at, resend_count, last_resend_at, created_at
+        FROM public.magic_link_tokens
+        WHERE user_id = #{userId}
+        AND tenant_key = #{tenantKey}
+        AND expires_at > NOW()
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <delete id="deleteByToken">
+        DELETE FROM public.magic_link_tokens
+        WHERE token = #{token}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM public.magic_link_tokens
+        WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByExpiresAtBefore">
+        DELETE FROM public.magic_link_tokens
+        WHERE expires_at &lt; #{cutoff}
+    </delete>
+
+    <update id="incrementResendCount">
+        UPDATE public.magic_link_tokens
+        SET resend_count = resend_count + 1,
+        last_resend_at = #{now}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="countResendsWithinWindow" resultType="int">
+        SELECT COUNT(*)
+        FROM public.magic_link_tokens
+        WHERE user_id = #{userId}
+        AND last_resend_at &gt;= #{since}
+    </select>
+
+</mapper>
+

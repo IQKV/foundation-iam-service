@@ -86,6 +86,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/email/resend-verification").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/forgot").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/users/password/reset").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/magic-link/initiate").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/magic-link/exchange").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/locales").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/announcements").permitAll()
             .requestMatchers("/api/v1/iam/ws/**").permitAll()

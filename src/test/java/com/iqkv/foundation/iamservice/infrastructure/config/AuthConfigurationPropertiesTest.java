@@ -79,6 +79,20 @@ class AuthConfigurationPropertiesTest {
   }
 
   @Test
+  @DisplayName("Should create MagicLink configuration")
+  void shouldCreateMagicLinkConfiguration() {
+    var magicLink = new AuthConfigurationProperties.MagicLink(
+        Duration.ofHours(24),
+        Duration.ofHours(1),
+        3
+    );
+
+    assertThat(magicLink.tokenTtl()).isEqualTo(Duration.ofHours(24));
+    assertThat(magicLink.rateLimitWindow()).isEqualTo(Duration.ofHours(1));
+    assertThat(magicLink.rateLimitMaxRequests()).isEqualTo(3);
+  }
+
+  @Test
   @DisplayName("Should create complete AuthConfigurationProperties")
   void shouldCreateCompleteAuthConfiguration() {
     var jwt = new AuthConfigurationProperties.Jwt(
@@ -102,10 +116,16 @@ class AuthConfigurationPropertiesTest {
         Duration.ofHours(1),
         3
     );
-    var config = new AuthConfigurationProperties(jwt, security, passwordReset);
+    var magicLink = new AuthConfigurationProperties.MagicLink(
+        Duration.ofHours(24),
+        Duration.ofHours(1),
+        3
+    );
+    var config = new AuthConfigurationProperties(jwt, security, passwordReset, magicLink);
 
     assertThat(config.jwt()).isEqualTo(jwt);
     assertThat(config.security()).isEqualTo(security);
     assertThat(config.passwordReset()).isEqualTo(passwordReset);
+    assertThat(config.magicLink()).isEqualTo(magicLink);
   }
 }

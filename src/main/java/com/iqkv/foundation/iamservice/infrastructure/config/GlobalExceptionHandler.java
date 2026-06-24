@@ -37,6 +37,8 @@ import com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException
 import com.iqkv.foundation.iamservice.shared.exception.InvalidVerificationTokenException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.MagicLinkRateLimitException;
+import com.iqkv.foundation.iamservice.shared.exception.MagicLinkTokenNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
@@ -554,6 +556,35 @@ public class GlobalExceptionHandler {
         msg("error.title.too-many-requests", locale),
         429,
         msg("error.password-reset.rate-limit", locale, ex.getRetryAfterSeconds()),
+        request);
+    pd.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+        .body(pd);
+  }
+
+  @ExceptionHandler(MagicLinkTokenNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleMagicLinkTokenNotFound(final MagicLinkTokenNotFoundException ex,
+                                                                    final HttpServletRequest request,
+                                                                    final Locale locale) {
+    log.warn("Magic link token not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.invalid-password-reset-token", locale),
+        400,
+        msg("error.detail.invalid-password-reset-token", locale),
+        request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(MagicLinkRateLimitException.class)
+  public ResponseEntity<ProblemDetail> handleMagicLinkRateLimit(final MagicLinkRateLimitException ex,
+                                                                final HttpServletRequest request,
+                                                                final Locale locale) {
+    log.warn("Magic link rate limit exceeded: retryAfter={}s", ex.getRetryAfterSeconds());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.too-many-requests", locale),
+        429,
+        "Too many magic link requests. Retry after " + ex.getRetryAfterSeconds() + " seconds.",
         request);
     pd.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)

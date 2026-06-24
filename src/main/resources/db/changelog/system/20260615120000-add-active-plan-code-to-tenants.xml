@@ -13,7 +13,8 @@
         </addColumn>
 
         <sql>
-            COMMENT ON COLUMN public.tenants.active_plan_code IS
+            COMMENT
+            ON COLUMN public.tenants.active_plan_code IS
             'Human-readable plan code cached from the billing service (e.g. pro-monthly). '
             'Stamped into JWT access tokens as the plan_code claim. '
             'Null until the tenant activates a paid subscription.';
