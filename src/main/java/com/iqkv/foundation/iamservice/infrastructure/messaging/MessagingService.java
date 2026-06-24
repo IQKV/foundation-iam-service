@@ -117,6 +117,14 @@ public class MessagingService {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, routingKey, event);
   }
 
+  public void publishMagicLinkEvent(final MagicLinkEvent event) {
+    final String routingKey = switch (event.getEventType()) {
+      case MAGIC_LINK_INITIATED -> RabbitMQConfig.ROUTING_MAGIC_LINK_INITIATED;
+      case MAGIC_LINK_EXCHANGED -> RabbitMQConfig.ROUTING_MAGIC_LINK_EXCHANGED;
+    };
+    publish(RabbitMQConfig.EVENTS_EXCHANGE, routingKey, event);
+  }
+
   public void publishUserBanned(final UserEvent event) {
     publish(RabbitMQConfig.EVENTS_EXCHANGE, RabbitMQConfig.ROUTING_USER_BANNED, event);
   }

@@ -27,6 +27,7 @@ import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos.Toke
 import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.MagicLinkEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
@@ -167,6 +168,20 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     magicLinkTokenMapper.insert(mlt);
     metrics.recordUserLifecycleEvent("magic_link_initiated");
 
+    // Audit event — fire-and-forget
+    try {
+      final var mlEvent = new MagicLinkEvent(
+          user.getId(),
+          user.getEmail(),
+          resolvedTenantKey,
+          MagicLinkEvent.EventType.MAGIC_LINK_INITIATED,
+          null,
+          Instant.now());
+      messagingService.publishMagicLinkEvent(mlEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish MAGIC_LINK_INITIATED audit event for userId={}", user.getId(), e);
+    }
+
     // Send email notification
     sendMagicLinkEmail(email, user, tokenValue);
   }
@@ -207,6 +222,20 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     // Increment resend count and update last resend time
     magicLinkTokenMapper.incrementResendCount(user.getId(), Instant.now());
     metrics.recordUserLifecycleEvent("magic_link_resent");
+
+    // Audit event — fire-and-forget
+    try {
+      final var mlEvent = new MagicLinkEvent(
+          user.getId(),
+          user.getEmail(),
+          resolvedTenantKey,
+          MagicLinkEvent.EventType.MAGIC_LINK_INITIATED,
+          null,
+          Instant.now());
+      messagingService.publishMagicLinkEvent(mlEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish MAGIC_LINK_INITIATED audit event for userId={}", user.getId(), e);
+    }
 
     // Send email notification with existing token
     sendMagicLinkEmail(email, user, existingToken.getToken());
@@ -305,6 +334,20 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     magicLinkTokenMapper.deleteByToken(token);
     userMapper.setFirstSignInAt(user.getId(), Instant.now());
     metrics.recordUserLifecycleEvent("magic_link_exchanged");
+
+    // Audit event — fire-and-forget
+    try {
+      final var mlEvent = new MagicLinkEvent(
+          user.getId(),
+          user.getEmail(),
+          mlt.getTenantKey(),
+          MagicLinkEvent.EventType.MAGIC_LINK_EXCHANGED,
+          null,
+          Instant.now());
+      messagingService.publishMagicLinkEvent(mlEvent);
+    } catch (final Exception e) {
+      log.warn("Failed to publish MAGIC_LINK_EXCHANGED audit event for userId={}", user.getId(), e);
+    }
 
     final String accessToken = jwtTokenGenerator.generateAccessToken(
         user, mlt.getTenantKey(), authorities, tenant.getActivePlanCode());

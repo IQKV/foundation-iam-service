@@ -75,6 +75,12 @@ public class RabbitMQConfig {
   public static final String ROUTING_PASSWORD_CHANGED = "auth.password.changed";
 
   // -------------------------------------------------------------------------
+  // Routing keys — magic link events
+  // -------------------------------------------------------------------------
+  public static final String ROUTING_MAGIC_LINK_INITIATED = "auth.magic_link.initiated";
+  public static final String ROUTING_MAGIC_LINK_EXCHANGED = "auth.magic_link.exchanged";
+
+  // -------------------------------------------------------------------------
   // Routing keys — user admin mutations (ban, unban, unlock, status change)
   // user.# wildcard in USER_EVENTS_QUEUE already captures these
   // -------------------------------------------------------------------------
