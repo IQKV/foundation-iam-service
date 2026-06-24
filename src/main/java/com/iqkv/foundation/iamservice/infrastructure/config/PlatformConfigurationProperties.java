@@ -22,4 +22,12 @@ public record PlatformConfigurationProperties(
   public String getRolloutModeValue() {
     return rolloutMode.name();
   }
+
+  public boolean isSingleTenant() {
+    return rolloutMode == RolloutMode.SINGLE_TENANT;
+  }
+
+  public boolean isMultiTenant() {
+    return rolloutMode == RolloutMode.MULTI_TENANT;
+  }
 }

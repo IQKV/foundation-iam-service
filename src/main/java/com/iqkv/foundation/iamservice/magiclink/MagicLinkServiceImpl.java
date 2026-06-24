@@ -27,6 +27,7 @@ import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos.Toke
 import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
+import com.iqkv.foundation.iamservice.infrastructure.config.PlatformConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MagicLinkEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
@@ -47,6 +48,7 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableExcepti
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
+import com.iqkv.foundation.iamservice.tenant.DefaultTenantResolver;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.User;
@@ -79,6 +81,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final TenantMemberAuthorityMapper authorityMapper;
   private final PasswordEncoder passwordEncoder;
   private final UserEventPublisher userEventPublisher;
+  private final PlatformConfigurationProperties platformProps;
+  private final DefaultTenantResolver defaultTenantResolver;
 
   public MagicLinkServiceImpl(
       final UserMapper userMapper,
@@ -94,7 +98,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final TenantMembershipMapper membershipMapper,
       final TenantMemberAuthorityMapper authorityMapper,
       final PasswordEncoder passwordEncoder,
-      final UserEventPublisher userEventPublisher) {
+      final UserEventPublisher userEventPublisher,
+      final PlatformConfigurationProperties platformProps,
+      final DefaultTenantResolver defaultTenantResolver) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.magicLinkTokenMapper = magicLinkTokenMapper;
@@ -109,6 +115,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     this.authorityMapper = authorityMapper;
     this.passwordEncoder = passwordEncoder;
     this.userEventPublisher = userEventPublisher;
+    this.platformProps = platformProps;
+    this.defaultTenantResolver = defaultTenantResolver;
   }
 
   @Override
@@ -152,11 +160,42 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
     // Determine the final tenant key
     final String resolvedTenantKey;
-    if (tenantKey == null || tenantKey.isBlank()) {
-      // If not provided, use platform tenant
+    if (platformProps.isSingleTenant()) {
+      resolvedTenantKey = defaultTenantResolver.resolveDefaultTenantKey();
+    } else if (tenantKey == null || tenantKey.isBlank()) {
       resolvedTenantKey = PLATFORM_TENANT_KEY;
     } else {
       resolvedTenantKey = tenantKey;
+    }
+
+    if (isNewUser && platformProps.isSingleTenant()) {
+      // In single tenant mode, create membership in default tenant and grant both authorities
+      if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), resolvedTenantKey)) {
+        log.info("Adding user {} to default tenant {} in single tenant mode", user.getId(), resolvedTenantKey);
+
+        final var membership = new TenantMembership();
+        membership.setId(UUID.randomUUID());
+        membership.setUserId(user.getId());
+        membership.setTenantKey(resolvedTenantKey);
+        membership.setStatus(MembershipStatus.ACTIVE);
+        membership.setCreatedAt(LocalDateTime.now());
+        membership.setUpdatedAt(LocalDateTime.now());
+        membership.setCreatedBy(user.getId().toString());
+        membership.setUpdatedBy(user.getId().toString());
+        membershipMapper.insert(membership);
+
+        final var memberAuthority = new TenantMemberAuthority();
+        memberAuthority.setId(UUID.randomUUID());
+        memberAuthority.setMembershipId(membership.getId());
+        memberAuthority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
+        authorityMapper.insert(memberAuthority);
+
+        final var ownerAuthority = new TenantMemberAuthority();
+        ownerAuthority.setId(UUID.randomUUID());
+        ownerAuthority.setMembershipId(membership.getId());
+        ownerAuthority.setAuthority(UserServiceConstants.AUTHORITY_TENANT_OWNER);
+        authorityMapper.insert(ownerAuthority);
+      }
     }
 
     // Validate tenant
