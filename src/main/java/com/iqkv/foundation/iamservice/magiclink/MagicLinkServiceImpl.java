@@ -31,6 +31,7 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.MagicLinkEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
+import com.iqkv.foundation.iamservice.infrastructure.messaging.UserEventPublisher;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
 import com.iqkv.foundation.iamservice.membership.MembershipStatus;
@@ -54,6 +55,7 @@ import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +80,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final TenantMembershipMapper membershipMapper;
   private final TenantMemberAuthorityMapper authorityMapper;
   private final PlanCatalogCache planCatalogCache;
+  private final PasswordEncoder passwordEncoder;
+  private final UserEventPublisher userEventPublisher;
 
   public MagicLinkServiceImpl(
       final UserMapper userMapper,
@@ -92,7 +96,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final IamServiceMetrics metrics,
       final TenantMembershipMapper membershipMapper,
       final TenantMemberAuthorityMapper authorityMapper,
-      final PlanCatalogCache planCatalogCache) {
+      final PlanCatalogCache planCatalogCache,
+      final PasswordEncoder passwordEncoder,
+      final UserEventPublisher userEventPublisher) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.magicLinkTokenMapper = magicLinkTokenMapper;
@@ -106,16 +112,47 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.planCatalogCache = planCatalogCache;
+    this.passwordEncoder = passwordEncoder;
+    this.userEventPublisher = userEventPublisher;
   }
 
   @Override
   public void initiate(final String email, String tenantKey) {
+    User user;
     final var userOpt = userMapper.findByEmail(email);
+    final boolean isNewUser;
     if (userOpt.isEmpty()) {
-      return; // prevent enumeration
+      // Auto-create new user if they don't exist
+      user = new User();
+      user.setId(UUID.randomUUID());
+      user.setEmail(email);
+      user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+      user.setStatus(com.iqkv.foundation.iamservice.user.AccountStatus.ACTIVE);
+      user.setEmailVerified(false);
+      user.setCreatedAt(LocalDateTime.now());
+      user.setUpdatedAt(LocalDateTime.now());
+      user.setCreatedBy("system");
+      user.setUpdatedBy("system");
+      userMapper.upsertByEmail(user);
+      // Retrieve the canonical user after upsert
+      user = userMapper.findByEmail(email)
+          .orElseThrow(() -> new com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException(
+              "User not found after upsert: " + email));
+      isNewUser = true;
+    } else {
+      user = userOpt.get();
+      isNewUser = false;
     }
 
-    final User user = userOpt.get();
+    if (isNewUser) {
+      // Publish user created event
+      try {
+        userEventPublisher.publishUserCreated(user);
+      } catch (final Exception e) {
+        log.warn("Failed to publish USER_CREATED audit event for userId={}", user.getId(), e);
+      }
+      metrics.recordUserLifecycleEvent("registered");
+    }
 
     // Determine the final tenant key
     final String resolvedTenantKey;
