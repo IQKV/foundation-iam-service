@@ -250,7 +250,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   }
 
   private void sendMagicLinkEmail(String email, User user, String tokenValue) {
-    final String magicLinkUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/magic-link?token=" + tokenValue;
+    final String magicLinkUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/magic-link/verify?token=" + tokenValue;
     final var payload = new java.util.HashMap<String, Object>();
     payload.put("magicLinkUrl", magicLinkUrl);
     payload.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
