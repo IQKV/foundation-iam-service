@@ -129,6 +129,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
       user.setStatus(com.iqkv.foundation.iamservice.user.AccountStatus.ACTIVE);
       user.setEmailVerified(false);
+      user.setLocale(notificationProps.defaultLocale());
       user.setCreatedAt(LocalDateTime.now());
       user.setUpdatedAt(LocalDateTime.now());
       user.setCreatedBy("system");
