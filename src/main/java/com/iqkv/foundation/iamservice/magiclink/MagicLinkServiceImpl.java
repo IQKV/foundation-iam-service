@@ -140,10 +140,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       return;
     }
 
-    // Ensure user has platform membership if using platform tenant
-    if (PLATFORM_TENANT_KEY.equals(resolvedTenantKey)) {
-      ensurePlatformMembership(user);
-    }
+    // Ensure user has platform membership (personal workspace) regardless of target tenant
+    ensurePlatformMembership(user);
 
     // Check if user is a member, banned or inactive? Well, to prevent enumeration, we don't expose that
     final Instant windowStart = Instant.now().minus(authProps.magicLink().rateLimitWindow());
