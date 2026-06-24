@@ -94,6 +94,7 @@ public record AuthConfigurationProperties(
   }
 
   public record MagicLink(
+      boolean enabled,
       @NotNull Duration tokenTtl,
       @NotNull Duration rateLimitWindow,
       @Positive int rateLimitMaxRequests

@@ -19,6 +19,7 @@ package com.iqkv.foundation.iamservice.magiclink;
 import jakarta.validation.Valid;
 
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
+import com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties;
 import com.iqkv.foundation.iamservice.magiclink.dto.MagicLinkDtos;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,9 +37,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MagicLinkRestResource {
 
   private final MagicLinkService magicLinkService;
+  private final AuthConfigurationProperties authConfigurationProperties;
 
-  public MagicLinkRestResource(final MagicLinkService magicLinkService) {
+  public MagicLinkRestResource(final MagicLinkService magicLinkService, final AuthConfigurationProperties authConfigurationProperties) {
     this.magicLinkService = magicLinkService;
+    this.authConfigurationProperties = authConfigurationProperties;
   }
 
   @PostMapping("/initiate")
@@ -47,10 +50,14 @@ public class MagicLinkRestResource {
                            + "Always returns 204 to avoid email enumeration. Rate-limited per email address.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Magic link initiated (email sent if user exists)"),
+      @ApiResponse(responseCode = "404", description = "Magic link authentication is disabled"),
       @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
   })
   public ResponseEntity<Void> initiate(
       @Valid @RequestBody final MagicLinkDtos.InitiateMagicLinkRequest request) {
+    if (!authConfigurationProperties.magicLink().enabled()) {
+      return ResponseEntity.notFound().build();
+    }
     magicLinkService.initiate(request.email(), request.tenantKey());
     return ResponseEntity.noContent().build();
   }
@@ -61,10 +68,14 @@ public class MagicLinkRestResource {
                            + "Always returns 204 to avoid email enumeration. Rate-limited per email address.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Magic link resent (email sent if user exists and token exists)"),
+      @ApiResponse(responseCode = "404", description = "Magic link authentication is disabled"),
       @ApiResponse(responseCode = "429", description = "Rate limit exceeded")
   })
   public ResponseEntity<Void> resend(
       @Valid @RequestBody final MagicLinkDtos.InitiateMagicLinkRequest request) {
+    if (!authConfigurationProperties.magicLink().enabled()) {
+      return ResponseEntity.notFound().build();
+    }
     magicLinkService.resend(request.email(), request.tenantKey());
     return ResponseEntity.noContent().build();
   }
@@ -74,10 +85,14 @@ public class MagicLinkRestResource {
              description = "Consumes a magic link token and returns access and refresh tokens if valid.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Token exchange successful"),
-      @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+      @ApiResponse(responseCode = "400", description = "Invalid or expired token"),
+      @ApiResponse(responseCode = "404", description = "Magic link authentication is disabled")
   })
   public ResponseEntity<AuthenticationDtos.TokenResponse> exchange(
       @Valid @RequestBody final MagicLinkDtos.ExchangeMagicLinkRequest request) {
+    if (!authConfigurationProperties.magicLink().enabled()) {
+      return ResponseEntity.notFound().build();
+    }
     return ResponseEntity.ok(magicLinkService.exchange(request.token()));
   }
 }

@@ -82,11 +82,13 @@ class AuthConfigurationPropertiesTest {
   @DisplayName("Should create MagicLink configuration")
   void shouldCreateMagicLinkConfiguration() {
     var magicLink = new AuthConfigurationProperties.MagicLink(
+        true,
         Duration.ofHours(24),
         Duration.ofHours(1),
         3
     );
 
+    assertThat(magicLink.enabled()).isTrue();
     assertThat(magicLink.tokenTtl()).isEqualTo(Duration.ofHours(24));
     assertThat(magicLink.rateLimitWindow()).isEqualTo(Duration.ofHours(1));
     assertThat(magicLink.rateLimitMaxRequests()).isEqualTo(3);
@@ -117,6 +119,7 @@ class AuthConfigurationPropertiesTest {
         3
     );
     var magicLink = new AuthConfigurationProperties.MagicLink(
+        true,
         Duration.ofHours(24),
         Duration.ofHours(1),
         3

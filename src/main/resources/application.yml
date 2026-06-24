@@ -101,6 +101,7 @@ iqkv:
       rate-limit-window: PT15M
       rate-limit-max-requests: 3
     magic-link:
+      enabled: ${ENABLE_MAGIC_LINK:true}
       token-ttl: PT15M
       rate-limit-window: PT15M
       rate-limit-max-requests: 3

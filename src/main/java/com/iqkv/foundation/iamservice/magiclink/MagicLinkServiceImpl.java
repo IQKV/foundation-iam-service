@@ -32,11 +32,11 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
+import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
