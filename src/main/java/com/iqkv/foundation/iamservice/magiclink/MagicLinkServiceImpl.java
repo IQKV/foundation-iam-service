@@ -39,12 +39,10 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.MagicLinkRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.MagicLinkTokenNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
@@ -79,7 +77,6 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final IamServiceMetrics metrics;
   private final TenantMembershipMapper membershipMapper;
   private final TenantMemberAuthorityMapper authorityMapper;
-  private final PlanCatalogCache planCatalogCache;
   private final PasswordEncoder passwordEncoder;
   private final UserEventPublisher userEventPublisher;
 
@@ -96,7 +93,6 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final IamServiceMetrics metrics,
       final TenantMembershipMapper membershipMapper,
       final TenantMemberAuthorityMapper authorityMapper,
-      final PlanCatalogCache planCatalogCache,
       final PasswordEncoder passwordEncoder,
       final UserEventPublisher userEventPublisher) {
     this.userMapper = userMapper;
@@ -111,7 +107,6 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     this.metrics = metrics;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
-    this.planCatalogCache = planCatalogCache;
     this.passwordEncoder = passwordEncoder;
     this.userEventPublisher = userEventPublisher;
   }
@@ -285,16 +280,6 @@ public class MagicLinkServiceImpl implements MagicLinkService {
    */
   private void ensurePlatformMembership(final User user) {
     if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
-      // Quota check: enforce maxUsers from the active plan (0 = unlimited)
-      final var platformTenant = tenantMapper.findByTenantKey(PLATFORM_TENANT_KEY)
-          .orElseThrow(() -> new IllegalStateException("Platform tenant not found"));
-      final int maxUsers = planCatalogCache.forPlan(platformTenant.getActivePlanCode()).maxUsers();
-      if (maxUsers > 0) {
-        final long current = membershipMapper.countByTenantKey(PLATFORM_TENANT_KEY);
-        if (current >= maxUsers) {
-          throw new PlanMemberQuotaException(current, maxUsers);
-        }
-      }
       log.info("Adding user {} to platform tenant", user.getId());
 
       final var platformMembership = new TenantMembership();
