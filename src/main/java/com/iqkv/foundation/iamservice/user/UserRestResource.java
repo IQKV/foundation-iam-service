@@ -248,4 +248,25 @@ public class UserRestResource {
     userService.completeOnboarding(userId);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/me/profile/complete")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Complete profile setup",
+      description = "Marks the user's profile as completed. "
+                    + "Called after the user saves their name on the profile-completion screen. "
+                    + "Must be called after PATCH /me has persisted the name fields.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Profile marked as completed"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<Void> completeProfile(@AuthenticationPrincipal final Jwt jwt) {
+    final UUID userId = UUID.fromString(jwt.getClaimAsString(JwtClaimNames.USER_ID));
+    userService.completeProfile(userId);
+    return ResponseEntity.noContent().build();
+  }
 }

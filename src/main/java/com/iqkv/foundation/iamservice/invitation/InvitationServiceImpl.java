@@ -548,6 +548,7 @@ public class InvitationServiceImpl implements InvitationService {
     newUser.setStatus(AccountStatus.ACTIVE);
     // Email is implicitly verified — the user clicked the invite link sent to that address
     newUser.setEmailVerified(true);
+    newUser.setProfileCompleted(true); // name provided at invitation accept — profile is immediately complete
     newUser.setCreatedAt(LocalDateTime.now());
     newUser.setUpdatedAt(LocalDateTime.now());
     newUser.setCreatedBy("invitation:" + invitation.getId());

@@ -103,6 +103,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     user.setLastName(request.lastName());
     user.setStatus(AccountStatus.ACTIVE);
     user.setEmailVerified(false);
+    user.setProfileCompleted(true); // name provided at signup — profile is immediately complete
     user.setCreatedAt(LocalDateTime.now());
     user.setUpdatedAt(LocalDateTime.now());
     user.setCreatedBy("system");

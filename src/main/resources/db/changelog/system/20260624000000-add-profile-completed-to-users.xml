@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260624000000" author="iqkv">
+        <addColumn tableName="users" schemaName="public">
+            <column name="profile_completed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--
+            Back-fill: existing users who already have a first_name set are considered
+            to have a completed profile. Magic-link auto-created users have NULL first_name
+            and will correctly remain false, directing them to /complete-profile on next login.
+        -->
+        <sql>
+            UPDATE public.users
+            SET profile_completed = true
+            WHERE first_name IS NOT NULL AND first_name &lt;&gt; ''
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

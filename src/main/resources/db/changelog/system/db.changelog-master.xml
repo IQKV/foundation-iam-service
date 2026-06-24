@@ -27,6 +27,7 @@
     <include file="db/changelog/system/20260615120000-add-active-plan-code-to-tenants.xml"/>
     <include file="db/changelog/system/20260620000000-add-onboarding-fields-to-users.xml"/>
     <include file="db/changelog/system/20260623120000-create-magic-link-tokens-table.xml"/>
+    <include file="db/changelog/system/20260624000000-add-profile-completed-to-users.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>

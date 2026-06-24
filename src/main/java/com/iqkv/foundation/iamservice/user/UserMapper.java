@@ -102,6 +102,8 @@ public interface UserMapper {
 
   void setOnboardingCompleted(@Param("userId") UUID userId);
 
+  void setProfileCompleted(@Param("userId") UUID userId);
+
   /**
    * Counts members of a specific tenant whose account status equals the given value.
    *

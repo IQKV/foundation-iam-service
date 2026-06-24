@@ -34,6 +34,7 @@ public class User {
   private Instant lastGlobalSignoutAt;
   private Instant firstSignInAt;
   private boolean onboardingCompleted = false;
+  private boolean profileCompleted = false;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private String createdBy;
@@ -165,5 +166,13 @@ public class User {
 
   public void setOnboardingCompleted(final boolean onboardingCompleted) {
     this.onboardingCompleted = onboardingCompleted;
+  }
+
+  public boolean isProfileCompleted() {
+    return profileCompleted;
+  }
+
+  public void setProfileCompleted(final boolean profileCompleted) {
+    this.profileCompleted = profileCompleted;
   }
 }

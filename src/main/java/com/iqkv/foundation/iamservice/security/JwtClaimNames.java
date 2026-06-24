@@ -38,6 +38,7 @@ public final class JwtClaimNames {
   public static final String EMAIL_VERIFIED = "email_verified";
   public static final String PLAN_CODE = "plan_code";
   public static final String ONBOARDING_COMPLETED = "onboarding_completed";
+  public static final String PROFILE_COMPLETED = "profile_completed";
 
   public static final String TYPE_ACCESS = "access";
   public static final String TYPE_REFRESH = "refresh";

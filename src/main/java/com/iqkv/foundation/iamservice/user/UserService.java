@@ -245,4 +245,12 @@ public interface UserService {
    * @param userId the UUID of the user
    */
   void completeOnboarding(UUID userId);
+
+  /**
+   * Marks the profile as completed for the current user.
+   * Called after the user saves their name on the /complete-profile screen.
+   *
+   * @param userId the UUID of the user
+   */
+  void completeProfile(UUID userId);
 }

@@ -236,6 +236,7 @@ public class UserServiceImpl implements UserService {
     user.setLocale(request.locale());
     user.setStatus(AccountStatus.ACTIVE);
     user.setEmailVerified(false);
+    user.setProfileCompleted(true); // admin-created users have a name — profile is complete
     user.setCreatedAt(LocalDateTime.now());
     user.setUpdatedAt(LocalDateTime.now());
     user.setCreatedBy("system");
@@ -528,6 +529,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public void completeOnboarding(UUID userId) {
     userMapper.setOnboardingCompleted(userId);
+  }
+
+  @Override
+  public void completeProfile(UUID userId) {
+    userMapper.setProfileCompleted(userId);
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

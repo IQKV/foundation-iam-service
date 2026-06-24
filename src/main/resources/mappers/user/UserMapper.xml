@@ -17,6 +17,7 @@
         <result property="lastGlobalSignoutAt" column="last_global_signout_at"/>
         <result property="firstSignInAt" column="first_sign_in_at"/>
         <result property="onboardingCompleted" column="onboarding_completed"/>
+        <result property="profileCompleted" column="profile_completed"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="createdBy" column="created_by"/>
@@ -26,18 +27,18 @@
     <insert id="upsertByEmail" parameterType="com.iqkv.foundation.iamservice.user.User">
         INSERT INTO public.users
         (id, email, password_hash, first_name, last_name, status,
-        email_verified, locale, onboarding_completed, created_at, updated_at, created_by, updated_by)
+        email_verified, locale, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by)
         VALUES
         (#{id}, #{email}, #{passwordHash}, #{firstName}, #{lastName},
         #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-        #{emailVerified}, #{locale}, #{onboardingCompleted}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        #{emailVerified}, #{locale}, #{onboardingCompleted}, #{profileCompleted}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
         ON CONFLICT (email) DO NOTHING
     </insert>
 
     <select id="findById" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
         email_verified, locale, avatar_url, last_global_signout_at,
-        first_sign_in_at, onboarding_completed, created_at, updated_at, created_by, updated_by
+        first_sign_in_at, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE id = #{id}
     </select>
@@ -45,7 +46,7 @@
     <select id="findAllStreaming" resultMap="userResultMap" fetchSize="1000">
         SELECT id, email, password_hash, first_name, last_name, status,
         email_verified, locale, avatar_url, last_global_signout_at,
-        first_sign_in_at, onboarding_completed, created_at, updated_at, created_by, updated_by
+        first_sign_in_at, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE status = 'ACTIVE'
     </select>
@@ -53,7 +54,7 @@
     <select id="findAllSimple" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
         email_verified, locale, avatar_url, last_global_signout_at,
-        first_sign_in_at, onboarding_completed, created_at, updated_at, created_by, updated_by
+        first_sign_in_at, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by
         FROM public.users
         ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -70,6 +71,7 @@
         u.avatar_url,
         u.first_sign_in_at,
         u.onboarding_completed,
+        u.profile_completed,
         u.created_at,
         u.updated_at,
         array_agg(DISTINCT t.name ORDER BY t.name)
@@ -85,13 +87,13 @@
         ON a.membership_id = m.id
         WHERE u.id = #{id}
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-        u.email_verified, u.locale, u.avatar_url, u.first_sign_in_at, u.onboarding_completed, u.created_at, u.updated_at
+        u.email_verified, u.locale, u.avatar_url, u.first_sign_in_at, u.onboarding_completed, u.profile_completed, u.created_at, u.updated_at
     </select>
 
     <select id="findByEmail" resultMap="userResultMap">
         SELECT id, email, password_hash, first_name, last_name, status,
         email_verified, locale, avatar_url, last_global_signout_at,
-        first_sign_in_at, onboarding_completed, created_at, updated_at, created_by, updated_by
+        first_sign_in_at, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by
         FROM public.users
         WHERE email = #{email}
     </select>
@@ -113,6 +115,7 @@
         <result property="avatarUrl" column="avatar_url"/>
         <result property="firstSignInAt" column="first_sign_in_at"/>
         <result property="onboardingCompleted" column="onboarding_completed"/>
+        <result property="profileCompleted" column="profile_completed"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="organizations" column="organizations"
@@ -132,6 +135,7 @@
         u.avatar_url,
         u.first_sign_in_at,
         u.onboarding_completed,
+        u.profile_completed,
         u.created_at,
         u.updated_at,
         array_agg(DISTINCT t.name ORDER BY t.name)
@@ -164,7 +168,7 @@
             </if>
         </where>
         GROUP BY u.id, u.email, u.first_name, u.last_name, u.status,
-        u.email_verified, u.locale, u.avatar_url, u.first_sign_in_at, u.onboarding_completed, u.created_at, u.updated_at
+        u.email_verified, u.locale, u.avatar_url, u.first_sign_in_at, u.onboarding_completed, u.profile_completed, u.created_at, u.updated_at
         ORDER BY
         <choose>
             <when test="sortBy == 'email'">u.email</when>
@@ -357,6 +361,7 @@
         avatar_url = #{avatarUrl},
         status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
         onboarding_completed = #{onboardingCompleted},
+        profile_completed = #{profileCompleted},
         updated_at = #{updatedAt},
         updated_by = #{updatedBy}
         WHERE id = #{id}
@@ -371,6 +376,13 @@
     <update id="setOnboardingCompleted">
         UPDATE public.users
         SET onboarding_completed = true,
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{userId}
+    </update>
+
+    <update id="setProfileCompleted">
+        UPDATE public.users
+        SET profile_completed = true,
         updated_at = CURRENT_TIMESTAMP
         WHERE id = #{userId}
     </update>
