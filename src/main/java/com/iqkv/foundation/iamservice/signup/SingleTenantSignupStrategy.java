@@ -145,11 +145,18 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     membershipMapper.insert(membership);
 
     // Step 6: Grant MEMBER authority
-    final var authority = new TenantMemberAuthority();
-    authority.setId(UUID.randomUUID());
-    authority.setMembershipId(membership.getId());
-    authority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
-    authorityMapper.insert(authority);
+    final var memberAuthority = new TenantMemberAuthority();
+    memberAuthority.setId(UUID.randomUUID());
+    memberAuthority.setMembershipId(membership.getId());
+    memberAuthority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
+    authorityMapper.insert(memberAuthority);
+
+    // Step 6a: Grant TENANT_OWNER authority
+    final var ownerAuthority = new TenantMemberAuthority();
+    ownerAuthority.setId(UUID.randomUUID());
+    ownerAuthority.setMembershipId(membership.getId());
+    ownerAuthority.setAuthority(UserServiceConstants.AUTHORITY_TENANT_OWNER);
+    authorityMapper.insert(ownerAuthority);
 
     // Step 7: Add user to platform tenant with MEMBER authority if not already a member
     ensurePlatformMembership(canonicalUser);
@@ -162,7 +169,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
         canonicalUser,
         defaultTenant,
         membership,
-        List.of(UserServiceConstants.AUTHORITY_MEMBER));
+        List.of(UserServiceConstants.AUTHORITY_MEMBER, UserServiceConstants.AUTHORITY_TENANT_OWNER));
   }
 
   /**
