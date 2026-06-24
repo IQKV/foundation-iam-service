@@ -141,6 +141,7 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/signin"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/refresh"))
            || ("POST".equalsIgnoreCase(method) && path.equals("/api/v1/iam/auth/admin/refresh"))
+           || ("POST".equalsIgnoreCase(method) && path.startsWith("/api/v1/iam/auth/magic-link/"))
            || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/locales"))
            || ("GET".equalsIgnoreCase(method) && path.equals("/api/v1/iam/announcements"));
   }
