@@ -45,6 +45,7 @@ public class UserWithOrganizations {
   private String avatarUrl;
   private Instant firstSignInAt;
   private boolean onboardingCompleted;
+  private boolean profileCompleted;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private List<String> organizations;
@@ -128,6 +129,14 @@ public class UserWithOrganizations {
 
   public void setOnboardingCompleted(final boolean onboardingCompleted) {
     this.onboardingCompleted = onboardingCompleted;
+  }
+
+  public boolean isProfileCompleted() {
+    return profileCompleted;
+  }
+
+  public void setProfileCompleted(final boolean profileCompleted) {
+    this.profileCompleted = profileCompleted;
   }
 
   public LocalDateTime getCreatedAt() {

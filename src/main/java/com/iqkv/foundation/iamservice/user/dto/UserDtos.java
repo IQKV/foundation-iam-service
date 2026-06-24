@@ -65,6 +65,8 @@ public final class UserDtos {
       java.time.Instant firstSignInAt,
       // Whether the user has completed the onboarding process.
       boolean onboardingCompleted,
+      // Whether the user has completed initial profile setup (name fields populated).
+      boolean profileCompleted,
       List<String> organizations,
       List<String> membershipAuthorities,
       LocalDateTime createdAt,

@@ -72,6 +72,7 @@ class UserDtosTest {
         null, // avatarUrl
         null, // firstSignInAt
         false, // onboardingCompleted
+        true,  // profileCompleted
         List.of("Acme Corp"),
         List.of("MEMBER"),
         createdAt,
@@ -152,6 +153,7 @@ class UserDtosTest {
         null, // avatarUrl
         null, // firstSignInAt
         false, // onboardingCompleted
+        true,  // profileCompleted
         List.of(),
         List.of(),
         LocalDateTime.now(),
