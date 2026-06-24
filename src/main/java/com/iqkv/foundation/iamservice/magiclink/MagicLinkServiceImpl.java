@@ -356,6 +356,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
     magicLinkTokenMapper.deleteByToken(token);
     userMapper.setFirstSignInAt(user.getId(), Instant.now());
+    if (!user.isEmailVerified()) {
+      userMapper.setEmailVerified(user.getId());
+    }
     metrics.recordUserLifecycleEvent("magic_link_exchanged");
 
     // Audit event — fire-and-forget
