@@ -20,6 +20,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.JwtTokenGenerator;
@@ -82,7 +83,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final PasswordEncoder passwordEncoder;
   private final UserEventPublisher userEventPublisher;
   private final PlatformConfigurationProperties platformProps;
-  private final DefaultTenantResolver defaultTenantResolver;
+  private final Optional<DefaultTenantResolver> defaultTenantResolver;
 
   public MagicLinkServiceImpl(
       final UserMapper userMapper,
@@ -100,7 +101,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final PasswordEncoder passwordEncoder,
       final UserEventPublisher userEventPublisher,
       final PlatformConfigurationProperties platformProps,
-      final DefaultTenantResolver defaultTenantResolver) {
+      final Optional<DefaultTenantResolver> defaultTenantResolver) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.magicLinkTokenMapper = magicLinkTokenMapper;
@@ -160,15 +161,15 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
     // Determine the final tenant key
     final String resolvedTenantKey;
-    if (platformProps.isSingleTenant()) {
-      resolvedTenantKey = defaultTenantResolver.resolveDefaultTenantKey();
+    if (platformProps.isSingleTenant() && defaultTenantResolver.isPresent()) {
+      resolvedTenantKey = defaultTenantResolver.get().resolveDefaultTenantKey();
     } else if (tenantKey == null || tenantKey.isBlank()) {
       resolvedTenantKey = PLATFORM_TENANT_KEY;
     } else {
       resolvedTenantKey = tenantKey;
     }
 
-    if (isNewUser && platformProps.isSingleTenant()) {
+    if (isNewUser && platformProps.isSingleTenant() && defaultTenantResolver.isPresent()) {
       // In single tenant mode, create membership in default tenant and grant both authorities
       if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), resolvedTenantKey)) {
         log.info("Adding user {} to default tenant {} in single tenant mode", user.getId(), resolvedTenantKey);
