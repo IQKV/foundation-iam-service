@@ -18,8 +18,8 @@ package com.iqkv.foundation.iamservice.magiclink;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HexFormat;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.authentication.JwtTokenGenerator;
@@ -32,14 +32,21 @@ import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEvent
 import com.iqkv.foundation.iamservice.infrastructure.messaging.NotificationEventType;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
+import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
+import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
+import com.iqkv.foundation.iamservice.membership.TenantMembership;
+import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
+import com.iqkv.foundation.iamservice.membership.MembershipStatus;
+import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.shared.exception.MagicLinkRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.MagicLinkTokenNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
-import com.iqkv.foundation.iamservice.tenant.DefaultTenantResolver;
+import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.User;
@@ -55,6 +62,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
   private static final Logger log = LoggerFactory.getLogger(MagicLinkServiceImpl.class);
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+  private static final String PLATFORM_TENANT_KEY = "platform";
 
   private final UserMapper userMapper;
   private final TenantMapper tenantMapper;
@@ -66,7 +74,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final AuthConfigurationProperties authProps;
   private final NotificationConfigurationProperties notificationProps;
   private final IamServiceMetrics metrics;
-  private final Optional<DefaultTenantResolver> defaultTenantResolver;
+  private final TenantMembershipMapper membershipMapper;
+  private final TenantMemberAuthorityMapper authorityMapper;
+  private final PlanCatalogCache planCatalogCache;
 
   public MagicLinkServiceImpl(
       final UserMapper userMapper,
@@ -79,7 +89,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final AuthConfigurationProperties authProps,
       final NotificationConfigurationProperties notificationProps,
       final IamServiceMetrics metrics,
-      final Optional<DefaultTenantResolver> defaultTenantResolver) {
+      final TenantMembershipMapper membershipMapper,
+      final TenantMemberAuthorityMapper authorityMapper,
+      final PlanCatalogCache planCatalogCache) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.magicLinkTokenMapper = magicLinkTokenMapper;
@@ -90,7 +102,9 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     this.authProps = authProps;
     this.notificationProps = notificationProps;
     this.metrics = metrics;
-    this.defaultTenantResolver = defaultTenantResolver;
+    this.membershipMapper = membershipMapper;
+    this.authorityMapper = authorityMapper;
+    this.planCatalogCache = planCatalogCache;
   }
 
   @Override
@@ -105,11 +119,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     // Determine the final tenant key
     final String resolvedTenantKey;
     if (tenantKey == null || tenantKey.isBlank()) {
-      // If not provided, use default tenant (single-tenant mode), otherwise return early (multi-tenant mode requires tenantKey)
-      if (defaultTenantResolver.isEmpty()) {
-        return; // prevent enumeration
-      }
-      resolvedTenantKey = defaultTenantResolver.get().resolveDefaultTenantKey();
+      // If not provided, use platform tenant
+      resolvedTenantKey = PLATFORM_TENANT_KEY;
     } else {
       resolvedTenantKey = tenantKey;
     }
@@ -127,6 +138,11 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     }
     if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
       return;
+    }
+
+    // Ensure user has platform membership if using platform tenant
+    if (PLATFORM_TENANT_KEY.equals(resolvedTenantKey)) {
+      ensurePlatformMembership(user);
     }
 
     // Check if user is a member, banned or inactive? Well, to prevent enumeration, we don't expose that
@@ -169,11 +185,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     // Determine the final tenant key
     final String resolvedTenantKey;
     if (tenantKey == null || tenantKey.isBlank()) {
-      // If not provided, use default tenant (single-tenant mode), otherwise return early (multi-tenant mode requires tenantKey)
-      if (defaultTenantResolver.isEmpty()) {
-        return; // prevent enumeration
-      }
-      resolvedTenantKey = defaultTenantResolver.get().resolveDefaultTenantKey();
+      // If not provided, use platform tenant
+      resolvedTenantKey = PLATFORM_TENANT_KEY;
     } else {
       resolvedTenantKey = tenantKey;
     }
@@ -199,6 +212,43 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
     // Send email notification with existing token
     sendMagicLinkEmail(email, user, existingToken.getToken());
+  }
+
+  /**
+   * Ensures the user has an active membership in the platform tenant with MEMBER authority.
+   * Idempotent - skips creation if membership already exists.
+   */
+  private void ensurePlatformMembership(final User user) {
+    if (!membershipMapper.existsByUserIdAndTenantKey(user.getId(), PLATFORM_TENANT_KEY)) {
+      // Quota check: enforce maxUsers from the active plan (0 = unlimited)
+      final var platformTenant = tenantMapper.findByTenantKey(PLATFORM_TENANT_KEY)
+          .orElseThrow(() -> new IllegalStateException("Platform tenant not found"));
+      final int maxUsers = planCatalogCache.forPlan(platformTenant.getActivePlanCode()).maxUsers();
+      if (maxUsers > 0) {
+        final long current = membershipMapper.countByTenantKey(PLATFORM_TENANT_KEY);
+        if (current >= maxUsers) {
+          throw new PlanMemberQuotaException(current, maxUsers);
+        }
+      }
+      log.info("Adding user {} to platform tenant", user.getId());
+
+      final var platformMembership = new TenantMembership();
+      platformMembership.setId(UUID.randomUUID());
+      platformMembership.setUserId(user.getId());
+      platformMembership.setTenantKey(PLATFORM_TENANT_KEY);
+      platformMembership.setStatus(MembershipStatus.ACTIVE);
+      platformMembership.setCreatedAt(LocalDateTime.now());
+      platformMembership.setUpdatedAt(LocalDateTime.now());
+      platformMembership.setCreatedBy(user.getId().toString());
+      platformMembership.setUpdatedBy(user.getId().toString());
+      membershipMapper.insert(platformMembership);
+
+      final var platformAuthority = new TenantMemberAuthority();
+      platformAuthority.setId(UUID.randomUUID());
+      platformAuthority.setMembershipId(platformMembership.getId());
+      platformAuthority.setAuthority(UserServiceConstants.AUTHORITY_MEMBER);
+      authorityMapper.insert(platformAuthority);
+    }
   }
 
   private void sendMagicLinkEmail(String email, User user, String tokenValue) {

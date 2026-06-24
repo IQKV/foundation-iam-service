@@ -26,6 +26,7 @@ The IAM service is the identity backbone of the platform:
 - **Brute-force protection** — failed login attempts are tracked per email; accounts are temporarily locked after 5 attempts for 15 minutes; platform admins can unlock users manually
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
+- **Magic link authentication** — passwordless sign-in with time-limited tokens (configurable TTL), resend functionality, and rate limiting
 - **Avatar uploads** — two-phase S3 upload flow: initiate generates presigned PUT URL, client uploads directly to S3, confirm persists avatar URL; old avatars automatically deleted
 - **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS) to `/user/{userId}/queue/notifications`
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches of 1000 and broadcasts to all connected clients via `/topic/announcements`
@@ -59,6 +60,14 @@ Base path: `/api/v1/iam`
 | `POST` | `/auth/signout`                   | JWT                    | Revoke current token (JTI denylist)                                           |
 | `POST` | `/auth/signout-all`               | JWT                    | Invalidate all sessions via `last_global_signout_at`                          |
 | `POST` | `/auth/validate`                  | JWT                    | Validate token and return user context (gateway introspection)                |
+
+### Magic Link Authentication — `/api/v1/iam/auth/magic-link`
+
+| Method | Path                        | Auth   | Description                                                                |
+| ------ | --------------------------- | ------ | -------------------------------------------------------------------------- |
+| `POST` | `/auth/magic-link/initiate` | public | Initiate magic link authentication (email sent if user exists; always 204) |
+| `POST` | `/auth/magic-link/resend`   | public | Resend magic link (if token exists; always 204)                            |
+| `POST` | `/auth/magic-link/exchange` | public | Exchange magic link token for RS256 access + refresh token pair            |
 
 ### Platform Admin Account — `/api/v1/iam/auth/admin/me`
 
@@ -397,6 +406,7 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── invitation/       # Token-based invite flow + reaper job
 ├── locale/           # Supported locales
 ├── lockout/          # Brute-force login lockout per identity
+├── magiclink/        # Magic link passwordless authentication flow + reaper job
 ├── membership/       # TenantMembership, authorities (TENANT_OWNER, ADMIN, MEMBER)
 ├── notification/     # In-app user notifications (DB persistence + WebSocket push)
 ├── passwordreset/    # Forgot/reset password flow + reaper job

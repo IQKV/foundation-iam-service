@@ -22,6 +22,18 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 | `POST` | `/auth/signout-all`               | JWT                    | Revoke all sessions globally                                      |
 | `POST` | `/auth/validate`                  | JWT                    | Validate token for gateway introspection                          |
 
+### Magic Link Authentication
+
+| Method | Path                        | Auth   | Description                                                                |
+| ------ | --------------------------- | ------ | -------------------------------------------------------------------------- |
+| `POST` | `/auth/magic-link/initiate` | public | Initiate magic link authentication (email sent if user exists; always 204) |
+| `POST` | `/auth/magic-link/resend`   | public | Resend magic link (if token exists; always 204)                            |
+| `POST` | `/auth/magic-link/exchange` | public | Exchange magic link token for RS256 access + refresh token pair            |
+
+`POST /auth/magic-link/initiate` and `POST /auth/magic-link/resend` always return 204 to prevent email enumeration. Magic link tokens are time-limited (configurable via AuthProperties.MagicLink.tokenTtl, defaults to 24 hours; rate limited to configurable requests per configurable window. In single-tenant mode, the default tenant is automatically used; in multi-tenant mode, tenantKey must be provided.
+
+---
+
 `POST /auth/signup` creates a global user account and adds them as a `MEMBER` to the platform tenant.
 Tenants are created afterwards via `POST /tenants`, which provisions the tenant and grants the caller `TENANT_OWNER`.
 
