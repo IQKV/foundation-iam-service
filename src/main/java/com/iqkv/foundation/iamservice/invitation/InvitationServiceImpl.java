@@ -475,7 +475,10 @@ public class InvitationServiceImpl implements InvitationService {
     invitation.setUpdatedAt(LocalDateTime.now());
     invitation.setCreatedBy(inviterId.toString());
     invitation.setUpdatedBy(inviterId.toString());
-    invitationMapper.insert(invitation);
+    final int inserted = invitationMapper.insertIfNotExists(invitation);
+    if (inserted == 0) {
+      throw new InvitationAlreadyPendingException(normalizedEmail);
+    }
 
     messagingService.publishUserInvited(invitation, tenant.getName());
 

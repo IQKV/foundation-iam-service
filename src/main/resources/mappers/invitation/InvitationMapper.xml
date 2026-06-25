@@ -28,6 +28,18 @@
         (#{id}, #{tenantKey}, #{invitedEmail}, #{invitedBy}, #{authority}, #{token},
         #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
         #{expiresAt}, #{acceptedAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        ON CONFLICT (tenant_key, invited_email) WHERE status = 'PENDING' DO NOTHING
+    </insert>
+
+    <insert id="insertIfNotExists" parameterType="com.iqkv.foundation.iamservice.invitation.TenantInvitation" useGeneratedKeys="false">
+        INSERT INTO public.tenant_invitations
+        (id, tenant_key, invited_email, invited_by, authority, token, status,
+        expires_at, accepted_at, created_at, updated_at, created_by, updated_by)
+        VALUES
+        (#{id}, #{tenantKey}, #{invitedEmail}, #{invitedBy}, #{authority}, #{token},
+        #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{expiresAt}, #{acceptedAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        ON CONFLICT (tenant_key, invited_email) WHERE status = 'PENDING' DO NOTHING
     </insert>
 
     <select id="findByToken" resultMap="invitationResultMap">

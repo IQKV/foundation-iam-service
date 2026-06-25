@@ -27,7 +27,9 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface InvitationMapper {
 
-  void insert(TenantInvitation invitation);
+  int insert(TenantInvitation invitation);
+
+  int insertIfNotExists(TenantInvitation invitation);
 
   Optional<TenantInvitation> findByToken(String token);
 

@@ -163,6 +163,7 @@ class InvitationServiceImplTest {
     when(userMapper.findById(inviterId)).thenReturn(Optional.of(testUser));
     when(notificationProps.baseUrl()).thenReturn("https://example.com");
     when(notificationProps.defaultLocale()).thenReturn("en");
+    when(invitationMapper.insertIfNotExists(any(TenantInvitation.class))).thenReturn(1);
 
     // Act
     var result = invitationService.sendInvitation(tenantKey, inviterId, request);
@@ -172,7 +173,7 @@ class InvitationServiceImplTest {
     assertThat(result.email()).isEqualTo("invitee@example.com");
     assertThat(result.authority()).isEqualTo("MEMBER");
     assertThat(result.status()).isEqualTo("PENDING");
-    verify(invitationMapper).insert(any(TenantInvitation.class));
+    verify(invitationMapper).insertIfNotExists(any(TenantInvitation.class));
     verify(messagingService).publishUserInvited(any(), eq("Test Tenant"));
   }
 
