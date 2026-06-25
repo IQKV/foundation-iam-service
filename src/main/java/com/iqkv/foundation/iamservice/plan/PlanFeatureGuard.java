@@ -71,8 +71,7 @@ public class PlanFeatureGuard {
    */
   public boolean hasFeature(final String planCode, final String featureCode) {
     final PlanFeatures features = planCatalogCache.forPlan(planCode);
-    final PlanFeature entry = features.features().get(featureCode);
-    return entry != null && "true".equalsIgnoreCase(entry.value());
+    return features.has(featureCode);
   }
 
   /**
