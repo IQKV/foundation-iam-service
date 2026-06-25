@@ -148,12 +148,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final boolean isInternalTenant = Boolean.TRUE.equals(tenant.getIsInternal());
 
         if (!isInternalTenant && tenant.getStatus() == TenantStatus.SUSPENDED) {
+          log.warn("Signin failed: tenant suspended, tenantKey={}, email={}", tenantKey, request.email());
           failureReasonForAudit = SigninAttemptEvent.FailureReason.TENANT_SUSPENDED;
           publishSigninAttemptEvent(request.email(), null, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, failureReasonForAudit);
           throw new TenantSuspendedException("Tenant suspended");
         }
         if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
+          log.warn("Signin failed: tenant not available, tenantKey={}, email={}", tenantKey, request.email());
           failureReasonForAudit = SigninAttemptEvent.FailureReason.TENANT_NOT_AVAILABLE;
           publishSigninAttemptEvent(request.email(), null, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, failureReasonForAudit);
@@ -164,6 +166,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .orElse(null);
 
         if (user == null) {
+          log.warn("Signin failed: invalid credentials, tenantKey={}", tenantKey);
           publishSigninAttemptEvent(request.email(), null, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS);
           throw new BadCredentialsException("Invalid credentials");
@@ -172,24 +175,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userIdForAudit = user.getId();
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          log.warn("Signin failed: account not active, userId={}, tenantKey={}", user.getId(), tenantKey);
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE);
           throw new AccountNotActiveException();
         }
 
         if (banService.isUserBanned(user.getId(), tenantKey)) {
+          log.warn("Signin failed: account banned, userId={}, tenantKey={}", user.getId(), tenantKey);
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
           throw new AccountBannedException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
+          log.warn("Signin failed: account locked, tenantKey={}, email={}", tenantKey, request.email());
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
           throw new AccountLockedException();
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+          log.warn("Signin failed: invalid password, userId={}, tenantKey={}", user.getId(), tenantKey);
           accountLockoutManager.recordFailedAttempt(request.email());
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS);
@@ -212,6 +219,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
             SigninAttemptEvent.AttemptResult.SUCCESS, null);
 
+        log.info("Signin successful: userId={}, tenantKey={}", user.getId(), tenantKey);
         metrics.recordAuthOutcome(tenantKey, "login", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
       } catch (final Exception e) {
@@ -221,6 +229,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
               || e instanceof AccountNotActiveException
               || e instanceof AccountLockedException
               || e instanceof BadCredentialsException)) {
+          log.error("Signin failed with unknown error, tenantKey={}, email={}", tenantKey, request.email(), e);
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.UNKNOWN);
         }
@@ -266,6 +275,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .orElse(null);
 
         if (user == null) {
+          log.warn("Admin signin failed: invalid credentials");
           publishSigninAttemptEvent(request.email(), null, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS);
           throw new BadCredentialsException("Invalid credentials");
@@ -274,24 +284,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userIdForAudit = user.getId();
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          log.warn("Admin signin failed: account not active, userId={}", user.getId());
           publishSigninAttemptEvent(request.email(), userIdForAudit, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_NOT_ACTIVE);
           throw new AccountNotActiveException();
         }
 
         if (banService.isUserBanned(user.getId(), null)) {
+          log.warn("Admin signin failed: account banned, userId={}", user.getId());
           publishSigninAttemptEvent(request.email(), userIdForAudit, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
           throw new AccountBannedException();
         }
 
         if (accountLockoutManager.isLocked(request.email())) {
+          log.warn("Admin signin failed: account locked, email={}", request.email());
           publishSigninAttemptEvent(request.email(), userIdForAudit, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
           throw new AccountLockedException();
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+          log.warn("Admin signin failed: invalid password, userId={}", user.getId());
           accountLockoutManager.recordFailedAttempt(request.email());
           publishSigninAttemptEvent(request.email(), userIdForAudit, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.INVALID_CREDENTIALS);
@@ -300,6 +314,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
         if (platformAuthorities.isEmpty()) {
+          log.warn("Admin signin failed: no platform authorities, userId={}", user.getId());
           // Record the failed attempt to prevent user enumeration via timing differences,
           // then surface a 403 — not a 401 — so the admin UI can show a clear "no access" message.
           accountLockoutManager.reset(request.email());
@@ -318,6 +333,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         publishSigninAttemptEvent(request.email(), userIdForAudit, null,
             SigninAttemptEvent.AttemptResult.SUCCESS, null);
 
+        log.info("Admin signin successful: userId={}", user.getId());
         metrics.recordAuthOutcome(null, "admin_login", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, null);
       } catch (final Exception e) {
@@ -326,6 +342,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
               || e instanceof AccountLockedException
               || e instanceof BadCredentialsException
               || e instanceof NoPlatformAuthorityException)) {
+          log.error("Admin signin failed with unknown error, email={}", request.email(), e);
           publishSigninAttemptEvent(request.email(), userIdForAudit, null,
               SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.UNKNOWN);
         }
@@ -345,16 +362,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
           jwt = jwtDecoder.decode(request.refreshToken());
         } catch (final JwtException e) {
+          log.warn("Token refresh failed: invalid token signature, tenantKey={}", currentTenant);
           throw new BadCredentialsException("Invalid token signature", e);
         }
 
         final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
         if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
+          log.warn("Token refresh failed: invalid token type, tenantKey={}", currentTenant);
           throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
         }
 
         final String tokenTenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
         if (!currentTenant.equals(tokenTenantId)) {
+          log.warn("Token refresh failed: tenant mismatch, tenantKey={}, tokenTenantKey={}", currentTenant, tokenTenantId);
           throw new TenantContextMismatchException("Tenant context mismatch");
         }
 
@@ -363,10 +383,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          log.warn("Token refresh failed: account not active, userId={}, tenantKey={}", user.getId(), currentTenant);
           throw new AccountNotActiveException();
         }
 
         if (banService.isUserBanned(user.getId(), currentTenant)) {
+          log.warn("Token refresh failed: account banned, userId={}, tenantKey={}", user.getId(), currentTenant);
           throw new AccountBannedException();
         }
 
@@ -379,9 +401,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user, currentTenant, authorities, planCode);
         final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, currentTenant);
 
+        log.info("Token refresh successful: userId={}, tenantKey={}", user.getId(), currentTenant);
         metrics.recordAuthOutcome(currentTenant, "refresh", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, currentTenant);
       } catch (final Exception e) {
+        log.warn("Token refresh failed, tenantKey={}", currentTenant, e);
         metrics.recordAuthOutcome(currentTenant, "refresh", "failure", getAuthFailureReason(e));
         throw e;
       }
@@ -396,11 +420,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
           jwt = jwtDecoder.decode(request.refreshToken());
         } catch (final JwtException e) {
+          log.warn("Admin token refresh failed: invalid token signature");
           throw new BadCredentialsException("Invalid token signature", e);
         }
 
         final String type = jwt.getClaimAsString(JwtClaimNames.TYPE);
         if (!JwtClaimNames.TYPE_REFRESH.equals(type)) {
+          log.warn("Admin token refresh failed: invalid token type");
           throw new com.iqkv.foundation.iamservice.shared.exception.InvalidTokenTypeException();
         }
 
@@ -409,24 +435,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
+          log.warn("Admin token refresh failed: account not active, userId={}", user.getId());
           throw new AccountNotActiveException();
         }
 
         if (banService.isUserBanned(user.getId(), null)) {
+          log.warn("Admin token refresh failed: account banned, userId={}", user.getId());
           throw new AccountBannedException();
         }
 
         final List<String> platformAuthorities = platformAuthorityMapper.findAuthorityValuesByUserId(user.getId());
         if (platformAuthorities.isEmpty()) {
+          log.warn("Admin token refresh failed: no platform authorities, userId={}", user.getId());
           throw new NoPlatformAuthorityException();
         }
 
         final String accessToken = jwtTokenGenerator.generateAccessToken(user, null, platformAuthorities);
         final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, null);
 
+        log.info("Admin token refresh successful: userId={}", user.getId());
         metrics.recordAuthOutcome(null, "admin_refresh", "success", null);
         return new AuthenticationDtos.TokenResponse(accessToken, newRefreshToken, null);
       } catch (final Exception e) {
+        log.warn("Admin token refresh failed", e);
         metrics.recordAuthOutcome(null, "admin_refresh", "failure", getAuthFailureReason(e));
         throw e;
       }
@@ -498,53 +529,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public AuthenticationDtos.TokenResponse exchangeTenant(final UUID userId, final String tenantKey) {
-    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
-        .orElseThrow(() -> new TenantNotAvailableException("Tenant not available"));
-
-    // Allow access to internal (personal) tenants even if status is SUSPENDED
-    final boolean isInternalTenant = Boolean.TRUE.equals(tenant.getIsInternal());
-
-    if (!isInternalTenant && tenant.getStatus() == TenantStatus.SUSPENDED) {
-      throw new TenantSuspendedException("Tenant suspended");
-    }
-    if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
-      throw new TenantNotAvailableException("Tenant not available");
-    }
-
-    final var user = userMapper.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
-    if (user.getStatus() != AccountStatus.ACTIVE) {
-      throw new AccountNotActiveException();
-    }
-
-    if (banService.isUserBanned(userId, tenantKey)) {
-      throw new AccountBannedException();
-    }
-
-    final var membership = membershipService.resolveMembership(userId, tenantKey);
-    final var authorities = membershipService.getAuthorities(membership.getId());
-
-    final String accessToken = jwtTokenGenerator.generateAccessToken(
-        user, tenantKey, authorities, tenant.getActivePlanCode());
-    final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
-    return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
-  }
-
-  @Override
   public void verifyEmail(final String token) {
     final var verificationToken = emailVerificationTokenMapper.findByToken(token)
-        .orElseThrow(() -> new InvalidVerificationTokenException("Invalid or expired verification token"));
+        .orElseThrow(() -> {
+          log.warn("Email verification failed: invalid token");
+          return new InvalidVerificationTokenException("Invalid or expired verification token");
+        });
 
     if (verificationToken.getExpiresAt().isBefore(Instant.now())) {
+      log.warn("Email verification failed: token expired, userId={}", verificationToken.getUserId());
       throw new InvalidVerificationTokenException("Invalid or expired verification token");
     }
 
     final var user = userMapper.findById(verificationToken.getUserId())
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
+        .orElseThrow(() -> {
+          log.warn("Email verification failed: user not found, userId={}", verificationToken.getUserId());
+          return new UserNotFoundException("User not found");
+        });
 
     userMapper.setEmailVerified(verificationToken.getUserId());
     emailVerificationTokenMapper.deleteByUserId(verificationToken.getUserId());
+
+    log.info("Email verified: userId={}", user.getId());
 
     final String signinUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/signin";
     final var payload = new java.util.HashMap<String, Object>();
@@ -575,6 +581,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final Instant windowStart = Instant.now().minus(RESEND_WINDOW);
     final int resendCount = emailVerificationTokenMapper.countResendsWithinWindow(user.getId(), windowStart);
     if (resendCount >= RESEND_RATE_LIMIT) {
+      log.warn("Email verification resend failed: rate limit exceeded, userId={}", user.getId());
       throw new VerificationRateLimitException(RESEND_WINDOW.toSeconds());
     }
 
@@ -591,6 +598,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     newToken.setExpiresAt(Instant.now().plus(EMAIL_TOKEN_TTL));
     newToken.setCreatedAt(Instant.now());
     emailVerificationTokenMapper.insert(newToken);
+
+    log.info("Email verification resent: userId={}", user.getId());
 
     final String verificationUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/verify-email?token=" + tokenValue;
     final var resendPayload = new java.util.HashMap<String, Object>();
@@ -615,6 +624,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Transactional(readOnly = true)
   public String getProvisioningStatus(final String tenantKey) {
     return tenantService.getProvisioningStatus(tenantKey);
+  }
+
+  @Override
+  public AuthenticationDtos.TokenResponse exchangeTenant(final UUID userId, final String tenantKey) {
+    final Tenant tenant = tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> {
+          log.warn("Tenant exchange failed: tenant not available, userId={}, tenantKey={}", userId, tenantKey);
+          return new TenantNotAvailableException("Tenant not available");
+        });
+
+    // Allow access to internal (personal) tenants even if status is SUSPENDED
+    final boolean isInternalTenant = Boolean.TRUE.equals(tenant.getIsInternal());
+
+    if (!isInternalTenant && tenant.getStatus() == TenantStatus.SUSPENDED) {
+      log.warn("Tenant exchange failed: tenant suspended, userId={}, tenantKey={}", userId, tenantKey);
+      throw new TenantSuspendedException("Tenant suspended");
+    }
+    if (tenant.getStatus() == TenantStatus.DELETED || tenant.getStatus() == TenantStatus.PROVISIONING_FAILED) {
+      log.warn("Tenant exchange failed: tenant not available, userId={}, tenantKey={}", userId, tenantKey);
+      throw new TenantNotAvailableException("Tenant not available");
+    }
+
+    final var user = userMapper.findById(userId)
+        .orElseThrow(() -> {
+          log.warn("Tenant exchange failed: user not found, userId={}", userId);
+          return new UserNotFoundException("User not found");
+        });
+    if (user.getStatus() != AccountStatus.ACTIVE) {
+      log.warn("Tenant exchange failed: account not active, userId={}, tenantKey={}", userId, tenantKey);
+      throw new AccountNotActiveException();
+    }
+
+    if (banService.isUserBanned(userId, tenantKey)) {
+      log.warn("Tenant exchange failed: account banned, userId={}, tenantKey={}", userId, tenantKey);
+      throw new AccountBannedException();
+    }
+
+    final var membership = membershipService.resolveMembership(userId, tenantKey);
+    final var authorities = membershipService.getAuthorities(membership.getId());
+
+    final String accessToken = jwtTokenGenerator.generateAccessToken(
+        user, tenantKey, authorities, tenant.getActivePlanCode());
+    final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
+
+    log.info("Tenant exchange successful: userId={}, tenantKey={}", userId, tenantKey);
+    return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
   }
 
   /**

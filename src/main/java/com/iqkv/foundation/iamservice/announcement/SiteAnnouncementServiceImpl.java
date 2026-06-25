@@ -26,11 +26,15 @@ import com.iqkv.foundation.iamservice.announcement.dto.SiteAnnouncementDtos;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.AnnouncementPublishEvent;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
+
+  private static final Logger log = LoggerFactory.getLogger(SiteAnnouncementServiceImpl.class);
 
   private final SiteAnnouncementMapper announcementMapper;
   private final MessagingService messagingService;
@@ -56,6 +60,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
       announcementMapper.insertTranslation(translation);
     }
 
+    log.info("Site announcement created: announcementId={}", announcement.getId());
     return SiteAnnouncementDtoMapper.toResponse(announcement);
   }
 
@@ -68,6 +73,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
     if (announcement.getStatus() == SiteAnnouncementStatus.PUBLISHED
         || announcement.getStatus() == SiteAnnouncementStatus.PUBLISHING
         || announcement.getStatus() == SiteAnnouncementStatus.PENDING) {
+      log.warn("Cannot modify announcement: announcementId={}, status={}", id, announcement.getStatus());
       throw new IllegalStateException("Cannot modify a published or in-progress announcement");
     }
 
@@ -87,6 +93,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
       announcementMapper.insertTranslation(translation);
     }
 
+    log.info("Site announcement updated: announcementId={}", id);
     return getById(id);
   }
 
@@ -99,17 +106,20 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
     if (announcement.getStatus() == SiteAnnouncementStatus.PUBLISHED
         || announcement.getStatus() == SiteAnnouncementStatus.PUBLISHING
         || announcement.getStatus() == SiteAnnouncementStatus.PENDING) {
+      log.warn("Cannot delete announcement: announcementId={}, status={}", id, announcement.getStatus());
       throw new IllegalStateException("Cannot delete a published or in-progress announcement");
     }
 
     announcementMapper.deleteTranslations(id);
     announcementMapper.delete(id);
+    log.info("Site announcement deleted: announcementId={}", id);
   }
 
   private void validateEnUsTranslation(final List<? extends SiteAnnouncementDtos.SiteAnnouncementTranslationRequest> translations) {
     final boolean hasEnUs = translations.stream()
         .anyMatch(t -> "en-US".equalsIgnoreCase(t.locale()));
     if (!hasEnUs) {
+      log.warn("Validation failed: missing en-US translation");
       throw new IllegalArgumentException("English (en-US) translation is mandatory");
     }
   }
@@ -129,6 +139,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
         .orElseThrow(() -> new SiteAnnouncementNotFoundException(id));
 
     if (announcement.getStatus() != SiteAnnouncementStatus.DRAFT) {
+      log.warn("Cannot publish non-draft announcement: announcementId={}, status={}", id, announcement.getStatus());
       throw new IllegalStateException("Only draft announcements can be published");
     }
 
@@ -136,6 +147,7 @@ public class SiteAnnouncementServiceImpl implements SiteAnnouncementService {
     announcementMapper.update(announcement);
 
     messagingService.publishAnnouncementPublish(new AnnouncementPublishEvent(id, Instant.now()));
+    log.info("Site announcement publish initiated: announcementId={}", id);
   }
 
   @Override
