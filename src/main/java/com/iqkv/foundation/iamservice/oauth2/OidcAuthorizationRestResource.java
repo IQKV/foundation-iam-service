@@ -59,6 +59,7 @@ import org.springframework.web.client.RestTemplate;
 public class OidcAuthorizationRestResource {
 
   private static final Logger log = LoggerFactory.getLogger(OidcAuthorizationRestResource.class);
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
   private final OAuth2ConfigurationProperties oauth2Props;
   private final ClientRegistrationRepository clientRegistrationRepository;
   private final OidcStateJwtService oidcStateJwtService;
@@ -67,7 +68,6 @@ public class OidcAuthorizationRestResource {
   private final GitHubEmailFetcher gitHubEmailFetcher;
   private final UserIdentityMapper userIdentityMapper;
   private final UserMapper userMapper;
-  private final ObjectMapper objectMapper;
   private final RestTemplate restTemplate = new RestTemplate();
 
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -80,8 +80,7 @@ public class OidcAuthorizationRestResource {
       final OidcUserProvisioningService provisioningService,
       final GitHubEmailFetcher gitHubEmailFetcher,
       final UserIdentityMapper userIdentityMapper,
-      final UserMapper userMapper,
-      final ObjectMapper objectMapper
+      final UserMapper userMapper
   ) {
     this.oauth2Props = oauth2Props;
     this.clientRegistrationRepository = clientRegistrationRepository;
@@ -91,7 +90,6 @@ public class OidcAuthorizationRestResource {
     this.gitHubEmailFetcher = gitHubEmailFetcher;
     this.userIdentityMapper = userIdentityMapper;
     this.userMapper = userMapper;
-    this.objectMapper = objectMapper;
   }
 
   @GetMapping("/authorize")
@@ -410,7 +408,7 @@ public class OidcAuthorizationRestResource {
     }
     try {
       final byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
-      return objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {
+      return OBJECT_MAPPER.readValue(payload, new TypeReference<Map<String, Object>>() {
       });
     } catch (final IOException | IllegalArgumentException ex) {
       throw new OidcProvisioningException("Failed to decode provider id_token");

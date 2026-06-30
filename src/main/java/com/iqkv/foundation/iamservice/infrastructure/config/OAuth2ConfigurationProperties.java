@@ -19,8 +19,34 @@ public record OAuth2ConfigurationProperties(
     String encryptionKey,
     @NotNull Duration stateTtl,
     @NotNull Duration stateTtlMax,
+    @NotNull Providers providers,
     @NotNull AutoLink autoLink
 ) {
+
+  public record Providers(
+      @NotNull Provider google,
+      @NotNull Provider github,
+      @NotNull MicrosoftProvider microsoft
+  ) {
+  }
+
+  public record Provider(
+      String clientId,
+      String clientSecret,
+      String scopes,
+      String redirectUri
+  ) {
+  }
+
+  public record MicrosoftProvider(
+      String clientId,
+      String clientSecret,
+      String scopes,
+      String redirectUri,
+      String provider,
+      String issuerUri
+  ) {
+  }
 
   public record AutoLink(
       boolean enabled

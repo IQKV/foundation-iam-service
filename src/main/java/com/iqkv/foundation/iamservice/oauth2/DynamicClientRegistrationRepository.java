@@ -2,12 +2,13 @@ package com.iqkv.foundation.iamservice.oauth2;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties;
 import com.iqkv.foundation.iamservice.oauth2.mapper.TenantOidcProviderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientPropertiesMapper;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
@@ -24,11 +25,11 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
   private final AesGcmEncryptionService encryptionService;
 
   public DynamicClientRegistrationRepository(
-      final OAuth2ClientProperties clientProperties,
+      final OAuth2ConfigurationProperties oauth2Properties,
       final TenantOidcProviderMapper tenantOidcProviderMapper,
       final AesGcmEncryptionService encryptionService
   ) {
-    this.staticRegistrations = buildStaticRegistrations(clientProperties);
+    this.staticRegistrations = buildStaticRegistrations(oauth2Properties);
     this.tenantOidcProviderMapper = tenantOidcProviderMapper;
     this.encryptionService = encryptionService;
   }
@@ -66,16 +67,65 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
     return null;
   }
 
-  private List<ClientRegistration> buildStaticRegistrations(final OAuth2ClientProperties clientProperties) {
-    if (clientProperties == null) {
+  private List<ClientRegistration> buildStaticRegistrations(final OAuth2ConfigurationProperties oauth2Properties) {
+    if (oauth2Properties == null || oauth2Properties.providers() == null) {
       return List.of();
     }
-    return new OAuth2ClientPropertiesMapper(clientProperties)
-        .asClientRegistrations()
-        .values()
-        .stream()
-        .filter(registration -> !isBlank(registration.getClientId()))
+    return Stream.of(
+            googleRegistration(oauth2Properties.providers().google()),
+            githubRegistration(oauth2Properties.providers().github()),
+            microsoftRegistration(oauth2Properties.providers().microsoft())
+        )
+        .flatMap(Optional::stream)
         .toList();
+  }
+
+  private Optional<ClientRegistration> googleRegistration(final OAuth2ConfigurationProperties.Provider provider) {
+    if (provider == null || isBlank(provider.clientId())) {
+      return Optional.empty();
+    }
+    return Optional.of(CommonOAuth2Provider.GOOGLE.getBuilder("google")
+        .clientId(provider.clientId())
+        .clientSecret(provider.clientSecret())
+        .scope(splitScopes(provider.scopes()))
+        .redirectUri(provider.redirectUri())
+        .build());
+  }
+
+  private Optional<ClientRegistration> githubRegistration(final OAuth2ConfigurationProperties.Provider provider) {
+    if (provider == null || isBlank(provider.clientId())) {
+      return Optional.empty();
+    }
+    return Optional.of(CommonOAuth2Provider.GITHUB.getBuilder("github")
+        .clientId(provider.clientId())
+        .clientSecret(provider.clientSecret())
+        .scope(splitScopes(provider.scopes()))
+        .redirectUri(provider.redirectUri())
+        .build());
+  }
+
+  private Optional<ClientRegistration> microsoftRegistration(
+      final OAuth2ConfigurationProperties.MicrosoftProvider provider) {
+    if (provider == null || isBlank(provider.clientId()) || isBlank(provider.issuerUri())) {
+      return Optional.empty();
+    }
+    return Optional.of(ClientRegistrations.fromIssuerLocation(provider.issuerUri())
+        .registrationId("microsoft")
+        .clientId(provider.clientId())
+        .clientSecret(provider.clientSecret())
+        .scope(splitScopes(provider.scopes()))
+        .redirectUri(provider.redirectUri())
+        .build());
+  }
+
+  private String[] splitScopes(final String scopes) {
+    if (isBlank(scopes)) {
+      return new String[0];
+    }
+    return Stream.of(scopes.split(","))
+        .map(String::trim)
+        .filter(scope -> !scope.isEmpty())
+        .toArray(String[]::new);
   }
 
   private boolean isBlank(final String value) {

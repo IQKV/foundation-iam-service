@@ -27,8 +27,6 @@ import java.util.List;
 
 import com.iqkv.foundation.iamservice.security.JwtAuthenticationFilter;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -160,11 +158,5 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);
-  }
-
-  @Bean
-  @ConfigurationProperties("spring.security.oauth2.client")
-  public OAuth2ClientProperties oauth2ClientProperties() {
-    return new OAuth2ClientProperties();
   }
 }
