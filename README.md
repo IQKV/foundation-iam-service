@@ -27,6 +27,9 @@ The IAM service is the identity backbone of the platform:
 - **Token revocation** — single-session signout (JTI denylist) and global signout (`last_global_signout_at`) are both supported
 - **Password reset** — time-limited reset tokens (1 hour TTL) with rate limiting (3 requests per 15-minute window)
 - **Magic link authentication** — passwordless sign-in with time-limited tokens (configurable TTL), resend functionality, and rate limiting
+- **OAuth2/OIDC authentication** — social sign-in via Google, GitHub, and Microsoft plus tenant-specific OIDC providers; browser flows use server-side PKCE and Redis-backed signed state
+- **Account linking** — authenticated users can link/unlink external identities; platform admins can inspect and force-unmerge linked identities for remediation
+- **Tenant SSO configuration** — tenant owners and platform admins can manage custom OIDC client settings per tenant
 - **Avatar uploads** — two-phase S3 upload flow: initiate generates presigned PUT URL, client uploads directly to S3, confirm persists avatar URL; old avatars automatically deleted
 - **In-app notifications** — transactional events (signup, password reset, invitation, etc.) are persisted as `UserNotification` records and pushed in real time via WebSocket (STOMP/SockJS) to `/user/{userId}/queue/notifications`
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches of 1000 and broadcasts to all connected clients via `/topic/announcements`
@@ -68,6 +71,19 @@ Base path: `/api/v1/iam`
 | `POST` | `/auth/magic-link/initiate` | public | Initiate magic link authentication (email sent if user exists; always 204) |
 | `POST` | `/auth/magic-link/resend`   | public | Resend magic link (if token exists; always 204)                            |
 | `POST` | `/auth/magic-link/exchange` | public | Exchange magic link token for RS256 access + refresh token pair            |
+
+### OAuth2/OIDC Authentication — `/api/v1/iam/auth/oauth2`
+
+| Method   | Path                           | Auth   | Description                                                                        |
+| -------- | ------------------------------ | ------ | ---------------------------------------------------------------------------------- |
+| `GET`    | `/auth/oauth2/providers`       | public | List enabled OAuth2/OIDC providers that resolve to active client registrations     |
+| `GET`    | `/auth/oauth2/authorize`       | public | Start browser-based OAuth2/OIDC login flow with signed state + server-side PKCE    |
+| `GET`    | `/auth/oauth2/callback`        | public | Handle provider callback and redirect to the configured frontend callback URI      |
+| `POST`   | `/auth/oauth2/exchange`        | public | Exchange provider authorization code + PKCE verifier for IAM access/refresh tokens |
+| `GET`    | `/auth/oauth2/link/{provider}` | JWT    | Start account-linking flow for the current user                                    |
+| `GET`    | `/auth/oauth2/link/callback`   | public | Handle provider callback for account linking                                       |
+| `DELETE` | `/auth/oauth2/link/{provider}` | JWT    | Unlink an external provider from the current account                               |
+| `GET`    | `/auth/oauth2/identities`      | JWT    | List linked external identities for the current user                               |
 
 ### Platform Admin Account — `/api/v1/iam/auth/admin/me`
 
@@ -134,6 +150,14 @@ Real-time delivery via WebSocket — connect to `/api/v1/iam/ws` (STOMP/SockJS):
 | `POST`   | `/tenants/{tenantKey}/members/{userId}/ban`                | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Ban member from tenant; invalidates all sessions for this tenant      |
 | `POST`   | `/tenants/{tenantKey}/members/{userId}/unban`              | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Unban member from tenant                                              |
 | `POST`   | `/tenants/{tenantKey}/members/{userId}/transfer-ownership` | JWT `TENANT_OWNER` + `X-Tenant-ID`                  | Transfer tenant ownership to another member; old owner becomes MEMBER |
+
+### Tenant SSO Configuration — `/api/v1/iam/tenants/sso`
+
+| Method   | Path           | Auth                                | Description                             |
+| -------- | -------------- | ----------------------------------- | --------------------------------------- |
+| `GET`    | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Get current tenant custom OIDC settings |
+| `PUT`    | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Create or replace tenant OIDC settings  |
+| `DELETE` | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Delete tenant OIDC settings             |
 
 ### Invitations
 
@@ -206,6 +230,13 @@ Real-time delivery via WebSocket — connect to `/api/v1/iam/ws` (STOMP/SockJS):
 | `GET`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Get announcement by UUID                            |
 | `GET`    | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | List all announcements (paginated)                  |
 
+### OIDC Admin — `/api/v1/iam/admin/oidc/users`
+
+| Method   | Path                                         | Auth                 | Description                                         |
+| -------- | -------------------------------------------- | -------------------- | --------------------------------------------------- |
+| `GET`    | `/admin/oidc/users/{userId}/identities`      | JWT `PLATFORM_ADMIN` | List linked OIDC identities for a user              |
+| `DELETE` | `/admin/oidc/users/{userId}/identities/{id}` | JWT `PLATFORM_ADMIN` | Force-unmerge a linked identity from a user account |
+
 > Auth legend: `public` = no token required; `JWT` = valid Bearer token; `JWT ROLE` = JWT with that authority; `X-Tenant-ID` = 8-char alphanumeric tenantKey header required for tenant-scoped endpoints.
 
 JWKS endpoint (public, consumed by the gateway): `GET /.well-known/jwks.json`
@@ -252,8 +283,10 @@ Failed messages are routed to the dead-letter exchange `iqkv.dlx` → `iqkv.dlq`
 - MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase (system + per-tenant schema migrations)
 - RabbitMQ (async tenant provisioning events, notifications, announcements)
+- Redis (OIDC state/PKCE storage, lockouts, ephemeral security state)
 - MinIO 9.x S3-compatible client (avatar uploads, presigned URLs)
 - JJWT 0.13 RS256 (token issuance and validation)
+- Spring Security OAuth2 Client (OAuth2/OIDC providers and tenant SSO)
 - ShedLock 7.x (distributed scheduled cleanup jobs)
 - Spring WebSocket + STOMP/SockJS (real-time in-app notifications)
 - Thymeleaf (transactional email templates)
@@ -296,7 +329,7 @@ pnpm install
 cp .env.example .env.local
 # Edit .env.local — defaults work for local Docker setup
 
-# Start infrastructure dependencies (PostgreSQL, RabbitMQ, MailHog, MinIO)
+# Start infrastructure dependencies (PostgreSQL, RabbitMQ, Redis, MailHog, MinIO)
 docker compose up -d
 
 # Run the service from your IDE or CLI
@@ -311,33 +344,52 @@ export $(grep -v '^#' .env.local | xargs)
 
 ## Environment Variables
 
-| Variable                    | Default                      | Description                                      |
-| --------------------------- | ---------------------------- | ------------------------------------------------ |
-| `ROLLOUT_MODE`              | `MULTI_TENANT`               | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
-| `DB_HOST`                   | `localhost`                  | PostgreSQL host                                  |
-| `DB_PORT`                   | `5432`                       | PostgreSQL port                                  |
-| `DB_NAME`                   | `iam`                        | Database name                                    |
-| `DB_USERNAME`               | `svc_iam_dba`                | Database user                                    |
-| `DB_PASSWORD`               | `svc_iam_dba`                | Database password                                |
-| `RABBITMQ_HOST`             | `localhost`                  | RabbitMQ host                                    |
-| `RABBITMQ_PORT`             | `5672`                       | RabbitMQ AMQP port                               |
-| `RABBITMQ_USERNAME`         | `svc_iam_rmq`                | RabbitMQ user                                    |
-| `RABBITMQ_PASSWORD`         | `svc_iam_rmq`                | RabbitMQ password                                |
-| `MAIL_HOST`                 | `localhost`                  | SMTP host                                        |
-| `MAIL_PORT`                 | `587`                        | SMTP port                                        |
-| `MAIL_FROM`                 | `noreply@iqkv.com`           | Sender address                                   |
-| `OBJECTSTORAGE_ENDPOINT`    | `http://localhost:9000`      | S3-compatible storage endpoint (MinIO/AWS S3)    |
-| `OBJECTSTORAGE_ACCESS_KEY`  | `minioadmin`                 | S3 access key                                    |
-| `OBJECTSTORAGE_SECRET_KEY`  | `minioadmin`                 | S3 secret key                                    |
-| `OBJECTSTORAGE_BUCKET_NAME` | `iam-avatars`                | S3 bucket name for avatar uploads                |
-| `OBJECTSTORAGE_REGION`      | `us-east-1`                  | S3 region                                        |
-| `OBJECTSTORAGE_SSL`         | `false`                      | Use SSL for S3 connections                       |
-| `JWT_PRIVATE_KEY_PATH`      | `classpath:keys/private.pem` | RS256 private key                                |
-| `JWT_PUBLIC_KEY_PATH`       | `classpath:keys/public.pem`  | RS256 public key                                 |
-| `APP_BASE_URL`              | `http://localhost:3000`      | Frontend base URL (used in email links)          |
-| `DEFAULT_TENANT_KEY`        | _(empty)_                    | Default tenant key for `SINGLE_TENANT` mode      |
-| `DEFAULT_TENANT_NAME`       | `Acme Corp.`                 | Default tenant display name                      |
-| `INVITATION_TOKEN_TTL`      | `PT72H`                      | Invitation token lifetime (ISO-8601 duration)    |
+| Variable                         | Default                               | Description                                      |
+| -------------------------------- | ------------------------------------- | ------------------------------------------------ |
+| `ROLLOUT_MODE`                   | `MULTI_TENANT`                        | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT` |
+| `DB_HOST`                        | `localhost`                           | PostgreSQL host                                  |
+| `DB_PORT`                        | `5432`                                | PostgreSQL port                                  |
+| `DB_NAME`                        | `iam`                                 | Database name                                    |
+| `DB_USERNAME`                    | `svc_iam_dba`                         | Database user                                    |
+| `DB_PASSWORD`                    | `svc_iam_dba`                         | Database password                                |
+| `RABBITMQ_HOST`                  | `localhost`                           | RabbitMQ host                                    |
+| `RABBITMQ_PORT`                  | `5672`                                | RabbitMQ AMQP port                               |
+| `RABBITMQ_USERNAME`              | `svc_iam_rmq`                         | RabbitMQ user                                    |
+| `RABBITMQ_PASSWORD`              | `svc_iam_rmq`                         | RabbitMQ password                                |
+| `REDIS_HOST`                     | `localhost`                           | Redis host                                       |
+| `REDIS_PORT`                     | `6379`                                | Redis port                                       |
+| `REDIS_PASSWORD`                 | _(empty)_                             | Redis password                                   |
+| `REDIS_DATABASE`                 | `0`                                   | Redis database index                             |
+| `REDIS_TIMEOUT`                  | `PT2S`                                | Redis operation timeout                          |
+| `MAIL_HOST`                      | `localhost`                           | SMTP host                                        |
+| `MAIL_PORT`                      | `587`                                 | SMTP port                                        |
+| `MAIL_FROM`                      | `noreply@iqkv.com`                    | Sender address                                   |
+| `OBJECTSTORAGE_ENDPOINT`         | `http://localhost:9000`               | S3-compatible storage endpoint (MinIO/AWS S3)    |
+| `OBJECTSTORAGE_ACCESS_KEY`       | `minioadmin`                          | S3 access key                                    |
+| `OBJECTSTORAGE_SECRET_KEY`       | `minioadmin`                          | S3 secret key                                    |
+| `OBJECTSTORAGE_BUCKET_NAME`      | `iam-avatars`                         | S3 bucket name for avatar uploads                |
+| `OBJECTSTORAGE_REGION`           | `us-east-1`                           | S3 region                                        |
+| `OBJECTSTORAGE_SSL`              | `false`                               | Use SSL for S3 connections                       |
+| `JWT_PRIVATE_KEY_PATH`           | `classpath:keys/private.pem`          | RS256 private key                                |
+| `JWT_PUBLIC_KEY_PATH`            | `classpath:keys/public.pem`           | RS256 public key                                 |
+| `APP_BASE_URL`                   | `http://localhost:3000`               | Frontend base URL (used in email links)          |
+| `OAUTH2_ENABLED_PROVIDERS`       | `google,github`                       | Enabled built-in OAuth2/OIDC providers           |
+| `OAUTH2_BASE_URL`                | `http://localhost:8080`               | Public IAM base URL used in OAuth redirect URIs  |
+| `OAUTH2_POST_LOGIN_REDIRECT_URI` | `http://localhost:3000/auth/callback` | Frontend callback URI for browser OAuth flows    |
+| `OAUTH2_AUTO_LINK_ENABLED`       | `true`                                | Allow verified-email auto-linking for OIDC       |
+| `OIDC_ENCRYPTION_KEY`            | _(empty)_                             | AES-256-GCM key for tenant OIDC client secrets   |
+| `OAUTH2_STATE_TTL`               | `PT10M`                               | Signed OAuth state / PKCE verifier lifetime      |
+| `OAUTH2_STATE_TTL_MAX`           | `PT15M`                               | Maximum allowed OAuth state lifetime             |
+| `OAUTH2_GOOGLE_CLIENT_ID`        | _(empty)_                             | Google OAuth client ID                           |
+| `OAUTH2_GOOGLE_CLIENT_SECRET`    | _(empty)_                             | Google OAuth client secret                       |
+| `OAUTH2_GITHUB_CLIENT_ID`        | _(empty)_                             | GitHub OAuth client ID                           |
+| `OAUTH2_GITHUB_CLIENT_SECRET`    | _(empty)_                             | GitHub OAuth client secret                       |
+| `OAUTH2_MICROSOFT_CLIENT_ID`     | _(empty)_                             | Microsoft OAuth client ID                        |
+| `OAUTH2_MICROSOFT_CLIENT_SECRET` | _(empty)_                             | Microsoft OAuth client secret                    |
+| `OAUTH2_MICROSOFT_TENANT_ID`     | `common`                              | Microsoft tenant identifier for issuer discovery |
+| `DEFAULT_TENANT_KEY`             | _(empty)_                             | Default tenant key for `SINGLE_TENANT` mode      |
+| `DEFAULT_TENANT_NAME`            | `Acme Corp.`                          | Default tenant display name                      |
+| `INVITATION_TOKEN_TTL`           | `PT72H`                               | Invitation token lifetime (ISO-8601 duration)    |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
 
@@ -409,6 +461,7 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── magiclink/        # Magic link passwordless authentication flow + reaper job
 ├── membership/       # TenantMembership, authorities (TENANT_OWNER, ADMIN, MEMBER)
 ├── notification/     # In-app user notifications (DB persistence + WebSocket push)
+├── oauth2/           # OAuth2/OIDC login, account linking, tenant SSO, admin identity remediation
 ├── passwordreset/    # Forgot/reset password flow + reaper job
 ├── platformadmin/    # Platform operator self-service account
 ├── platformauthority/# Platform-level authorities (PLATFORM_ADMIN)
@@ -436,6 +489,7 @@ Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of 
 - **Persistence**: MyBatis with XML mappers + PostgreSQL; Liquibase manages both system and per-tenant schema migrations; `is_default` column on `public.tenants` marks the single-mode default tenant with a partial unique index
 - **Messaging**: RabbitMQ for async domain events (tenant provisioning, notifications, announcements); ShedLock guards scheduled cleanup jobs (expired tokens, stuck tenants); dead-letter exchange (`iqkv.dlx`) routes failed messages to `iqkv.dlq`
 - **Security**: Spring Security + JJWT RS256; JTI denylist for token revocation; `last_global_signout_at` for session-wide invalidation; brute-force lockout per identity
+- **OAuth2/OIDC**: Built-in Google, GitHub, and Microsoft providers plus tenant-configurable OIDC; browser flows use signed JWT state, server-side PKCE, Redis-backed verifier storage, and verified-email provisioning/linking
 - **Multi-tenancy**: Per-tenant schema isolation managed by Liquibase; `TenantMembership` carries per-tenant authorities (`TENANT_OWNER`, `ADMIN`, `MEMBER`); tenant-scoped endpoints require a JWT scoped to the target tenant via `X-Tenant-ID` header
 - **In-app notifications**: `NotificationConsumer` listens on `iqkv.iam.notifications` — sends email, persists `UserNotification` to DB, and pushes to `/user/{userId}/queue/notifications` via STOMP; `AnnouncementConsumer` listens on `iqkv.iam.announcements` — streams all users via MyBatis cursor in batches of 1000, bulk-inserts notifications, and broadcasts to `/topic/announcements`
 - **Platform rollout mode**: Controlled via `iqkv.platform.rollout-mode` (`MULTI_TENANT` | `SINGLE_TENANT`); must be identical across IAM, Billing, and Gateway; IAM publishes canonical mode via `/actuator/info` under `platform.rollout-mode`; service fails readiness on invalid/missing mode

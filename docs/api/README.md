@@ -34,6 +34,41 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ---
 
+### OAuth2/OIDC Authentication
+
+| Method   | Path                           | Auth   | Description                                                                        |
+| -------- | ------------------------------ | ------ | ---------------------------------------------------------------------------------- |
+| `GET`    | `/auth/oauth2/providers`       | public | List enabled OAuth2/OIDC providers that resolve to active client registrations     |
+| `GET`    | `/auth/oauth2/authorize`       | public | Start browser-based OAuth2/OIDC login flow with signed state + server-side PKCE    |
+| `GET`    | `/auth/oauth2/callback`        | public | Handle provider callback and redirect to the configured frontend callback URI      |
+| `POST`   | `/auth/oauth2/exchange`        | public | Exchange provider authorization code + PKCE verifier for IAM access/refresh tokens |
+| `GET`    | `/auth/oauth2/link/{provider}` | JWT    | Start account-linking flow for the current user                                    |
+| `GET`    | `/auth/oauth2/link/callback`   | public | Handle provider callback for account linking                                       |
+| `DELETE` | `/auth/oauth2/link/{provider}` | JWT    | Unlink an external provider from the current account                               |
+| `GET`    | `/auth/oauth2/identities`      | JWT    | List linked external identities for the current user                               |
+
+`GET /auth/oauth2/authorize` accepts `provider` and optional `tenantKey` query parameters. The service signs the OAuth state, stores the PKCE verifier in Redis, and redirects the browser to the selected provider.
+
+`GET /auth/oauth2/callback` and `GET /auth/oauth2/link/callback` are provider-facing redirect endpoints. They validate signed state, restore the PKCE verifier, exchange the authorization code, and redirect back to the configured frontend callback URI.
+
+`POST /auth/oauth2/exchange` supports SPA or native-app flows that already obtained an authorization code and PKCE verifier.
+
+Example request:
+
+```json
+{
+    "provider": "google",
+    "code": "<authorization-code>",
+    "codeVerifier": "<pkce-code-verifier>",
+    "redirectUri": "http://localhost:3000/auth/callback",
+    "tenantKey": "platform"
+}
+```
+
+`DELETE /auth/oauth2/link/{provider}` returns `204` when the provider is absent and rejects removal of the last sign-in method if the account has no password set.
+
+---
+
 `POST /auth/signup` creates a global user account and adds them as a `MEMBER` to the platform tenant.
 Tenants are created afterwards via `POST /tenants`, which provisions the tenant and grants the caller `TENANT_OWNER`.
 
@@ -231,6 +266,18 @@ Accepts a `locale` query parameter (default `en-US`). Returns only `PUBLISHED` a
 
 ---
 
+### Tenant SSO Configuration
+
+| Method   | Path           | Auth                                | Description                             |
+| -------- | -------------- | ----------------------------------- | --------------------------------------- |
+| `GET`    | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Get current tenant custom OIDC settings |
+| `PUT`    | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Create or replace tenant OIDC settings  |
+| `DELETE` | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Delete tenant OIDC settings             |
+
+Tenant SSO configuration is tenant-scoped and uses the current `X-Tenant-ID` context. Stored client secrets are encrypted at rest with `OIDC_ENCRYPTION_KEY`.
+
+---
+
 ### Invitations (Tenant-scoped)
 
 | Method   | Path                                    | Auth                                       | Description                 |
@@ -327,6 +374,17 @@ For existing users: only `password` is required (used to verify identity).
 Publishing an announcement (`POST /admin/announcements/{id}/publish`) triggers an async fan-out via RabbitMQ:
 the service streams all users in batches of 1000, creates a `UserNotification` record per user, and broadcasts
 a real-time message to the `/topic/announcements` WebSocket topic.
+
+---
+
+### Platform Admin — OIDC
+
+| Method   | Path                                         | Auth                 | Description                                         |
+| -------- | -------------------------------------------- | -------------------- | --------------------------------------------------- |
+| `GET`    | `/admin/oidc/users/{userId}/identities`      | JWT `PLATFORM_ADMIN` | List linked OIDC identities for a user              |
+| `DELETE` | `/admin/oidc/users/{userId}/identities/{id}` | JWT `PLATFORM_ADMIN` | Force-unmerge a linked identity from a user account |
+
+The admin delete endpoint is a remediation path for incorrectly linked external identities. It intentionally bypasses the self-service unlink guard that protects the last usable sign-in method on an account.
 
 ---
 

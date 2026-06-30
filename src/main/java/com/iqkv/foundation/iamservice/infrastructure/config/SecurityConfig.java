@@ -27,11 +27,14 @@ import java.util.List;
 
 import com.iqkv.foundation.iamservice.security.JwtAuthenticationFilter;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -92,6 +95,11 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/locales").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/announcements").permitAll()
             .requestMatchers("/api/v1/iam/ws/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/oauth2/authorize").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/oauth2/callback").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/oauth2/link/callback").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/oauth2/providers").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/oauth2/exchange").permitAll()
             .requestMatchers("/api/v1/iam/admin/**").hasAuthority("PLATFORM_ADMIN")
             // Invitation accept flow — public (no JWT required)
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/invitations/*").permitAll()
@@ -106,6 +114,7 @@ public class SecurityConfig {
                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
             )
         )
+        .oauth2Client(Customizer.withDefaults())
         .addFilterBefore(jwtAuthenticationFilter, BearerTokenAuthenticationFilter.class);
 
     return http.build();
@@ -151,5 +160,11 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);
+  }
+
+  @Bean
+  @ConfigurationProperties("spring.security.oauth2.client")
+  public OAuth2ClientProperties oauth2ClientProperties() {
+    return new OAuth2ClientProperties();
   }
 }

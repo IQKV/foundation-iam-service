@@ -14,6 +14,13 @@ spring:
     port: ${iqkv.rabbitmq.port}
     username: ${iqkv.rabbitmq.username}
     password: ${iqkv.rabbitmq.password}
+  data:
+    redis:
+      host: ${iqkv.redis.host}
+      port: ${iqkv.redis.port}
+      password: ${iqkv.redis.password}
+      database: ${iqkv.redis.database}
+      timeout: ${iqkv.redis.timeout}
   liquibase:
     enabled: false
   mail:
@@ -28,6 +35,29 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     fallback-to-system-locale: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${iqkv.auth.oauth2.providers.google.client-id}
+            client-secret: ${iqkv.auth.oauth2.providers.google.client-secret}
+            scope: ${iqkv.auth.oauth2.providers.google.scopes}
+            redirect-uri: ${iqkv.auth.oauth2.providers.google.redirect-uri}
+          github:
+            client-id: ${iqkv.auth.oauth2.providers.github.client-id}
+            client-secret: ${iqkv.auth.oauth2.providers.github.client-secret}
+            scope: ${iqkv.auth.oauth2.providers.github.scopes}
+            redirect-uri: ${iqkv.auth.oauth2.providers.github.redirect-uri}
+          microsoft:
+            client-id: ${iqkv.auth.oauth2.providers.microsoft.client-id}
+            client-secret: ${iqkv.auth.oauth2.providers.microsoft.client-secret}
+            scope: ${iqkv.auth.oauth2.providers.microsoft.scopes}
+            redirect-uri: ${iqkv.auth.oauth2.providers.microsoft.redirect-uri}
+            provider: ${iqkv.auth.oauth2.providers.microsoft.provider}
+        provider:
+          microsoft:
+            issuer-uri: ${iqkv.auth.oauth2.providers.microsoft.issuer-uri}
 
 mybatis:
   mapper-locations: classpath:mappers/**/*.xml
@@ -75,6 +105,12 @@ iqkv:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:svc_iam_rmq}
     password: ${RABBITMQ_PASSWORD:svc_iam_rmq}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DATABASE:0}
+    timeout: ${REDIS_TIMEOUT:PT2S}
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:587}
@@ -90,6 +126,34 @@ iqkv:
       expiry: PT15M
       refresh-expiry: P7D
       issuer: foundation-iam-service
+    oauth2:
+      enabled-providers: ${OAUTH2_ENABLED_PROVIDERS:google,github}
+      base-url: ${OAUTH2_BASE_URL:http://localhost:8080}
+      post-login-redirect-uri: ${OAUTH2_POST_LOGIN_REDIRECT_URI:http://localhost:3000/auth/callback}
+      auto-provision-users: ${OAUTH2_AUTO_PROVISION_USERS:true}
+      encryption-key: ${OIDC_ENCRYPTION_KEY:}
+      state-ttl: ${OAUTH2_STATE_TTL:PT10M}
+      state-ttl-max: ${OAUTH2_STATE_TTL_MAX:PT15M}
+      providers:
+        google:
+          client-id: ${OAUTH2_GOOGLE_CLIENT_ID:}
+          client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET:}
+          scopes: openid,profile,email
+          redirect-uri: "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+        github:
+          client-id: ${OAUTH2_GITHUB_CLIENT_ID:}
+          client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET:}
+          scopes: read:user,user:email
+          redirect-uri: "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+        microsoft:
+          client-id: ${OAUTH2_MICROSOFT_CLIENT_ID:}
+          client-secret: ${OAUTH2_MICROSOFT_CLIENT_SECRET:}
+          scopes: openid,profile,email
+          redirect-uri: "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+          provider: microsoft
+          issuer-uri: https://login.microsoftonline.com/${OAUTH2_MICROSOFT_TENANT_ID:common}/v2.0
+      auto-link:
+        enabled: ${OAUTH2_AUTO_LINK_ENABLED:true}
     security:
       password-encoder-strength: 12
       min-length: 8

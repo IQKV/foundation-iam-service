@@ -49,6 +49,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *       tokens carry a null {@code tenant_id}.</li>
  *   <li>{@code GET /api/v1/iam/locales} — platform-wide locale list, stored in {@code public} schema.</li>
  *   <li>{@code GET /api/v1/iam/announcements} — platform-wide announcements, stored in {@code public} schema.</li>
+ *   <li>{@code /api/v1/iam/auth/oauth2/**} — OAuth2/OIDC endpoints manage tenant resolution separately.</li>
  *   <li>{@code /.well-known/**} — public JWKS endpoint</li>
  *   <li>Actuator, API docs, Swagger UI</li>
  * </ul>
@@ -124,6 +125,12 @@ public class TenantExtractionFilter extends OncePerRequestFilter {
     // No tenant schema routing needed; accessible to both tenant users and platform admins
     // (whose tokens carry a null tenant_id).
     if (path.startsWith("/api/v1/iam/users/notifications")) {
+      return true;
+    }
+
+    // OAuth2/OIDC — authorize/callback/link flows do not use header-based tenant extraction.
+    // Tenant context is carried in signed state or handled explicitly by the controller.
+    if (path.startsWith("/api/v1/iam/auth/oauth2/")) {
       return true;
     }
 

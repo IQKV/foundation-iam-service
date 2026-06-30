@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.oauth2.mapper.TenantOidcProviderMapper">
+
+    <resultMap id="TenantOidcProviderResultMap" type="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="provider" column="provider"/>
+        <result property="clientId" column="client_id"/>
+        <result property="encryptedClientSecret" column="encrypted_client_secret"/>
+        <result property="authorizationEndpoint" column="authorization_endpoint"/>
+        <result property="tokenEndpoint" column="token_endpoint"/>
+        <result property="userInfoEndpoint" column="user_info_endpoint"/>
+        <result property="jwksUri" column="jwks_uri"/>
+        <result property="issuer" column="issuer"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByTenantIdAndProvider" resultMap="TenantOidcProviderResultMap">
+        SELECT id, tenant_id, provider, client_id, encrypted_client_secret,
+        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
+        issuer, enabled, created_at, updated_at
+        FROM public.tenant_oidc_providers
+        WHERE tenant_id = #{tenantId}
+        AND provider = #{provider}
+        AND enabled = true
+    </select>
+
+    <select id="findByTenantId" resultMap="TenantOidcProviderResultMap">
+        SELECT id, tenant_id, provider, client_id, encrypted_client_secret,
+        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
+        issuer, enabled, created_at, updated_at
+        FROM public.tenant_oidc_providers
+        WHERE tenant_id = #{tenantId}
+    </select>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
+        INSERT INTO public.tenant_oidc_providers (
+        id, tenant_id, provider, client_id, encrypted_client_secret,
+        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
+        issuer, enabled, created_at, updated_at
+        ) VALUES (
+        #{id}, #{tenantId}, #{provider}, #{clientId}, #{encryptedClientSecret},
+        #{authorizationEndpoint}, #{tokenEndpoint}, #{userInfoEndpoint}, #{jwksUri},
+        #{issuer}, #{enabled}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
+        UPDATE public.tenant_oidc_providers
+        SET client_id = #{clientId},
+        encrypted_client_secret = #{encryptedClientSecret},
+        authorization_endpoint = #{authorizationEndpoint},
+        token_endpoint = #{tokenEndpoint},
+        user_info_endpoint = #{userInfoEndpoint},
+        jwks_uri = #{jwksUri},
+        issuer = #{issuer},
+        enabled = #{enabled},
+        updated_at = NOW()
+        WHERE id = #{id}
+        AND tenant_id = #{tenantId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM public.tenant_oidc_providers
+        WHERE id = #{id}
+        AND tenant_id = #{tenantId}
+    </delete>
+
+</mapper>

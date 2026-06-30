@@ -47,6 +47,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
         "com.iqkv.foundation.iamservice.magiclink",
         "com.iqkv.foundation.iamservice.membership",
         "com.iqkv.foundation.iamservice.notification",
+        "com.iqkv.foundation.iamservice.oauth2",
+        "com.iqkv.foundation.iamservice.oauth2.mapper",
         "com.iqkv.foundation.iamservice.passwordreset",
         "com.iqkv.foundation.iamservice.platformauthority",
         "com.iqkv.foundation.iamservice.tenant",

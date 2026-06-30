@@ -20,7 +20,8 @@
         <sql>
             UPDATE public.users
             SET profile_completed = true
-            WHERE first_name IS NOT NULL AND first_name &lt;&gt; ''
+            WHERE first_name IS NOT NULL
+              AND first_name &lt;&gt; ''
         </sql>
     </changeSet>
 

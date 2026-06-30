@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
+import com.iqkv.foundation.iamservice.oauth2.OidcIdentityNotFoundException;
+import com.iqkv.foundation.iamservice.oauth2.OidcProvisioningException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountBannedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
@@ -205,6 +207,32 @@ public class GlobalExceptionHandler {
         ex.getMessage(),
         request);
     return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(OidcProvisioningException.class)
+  public ResponseEntity<ProblemDetail> handleOidcProvisioning(final OidcProvisioningException ex,
+                                                              final HttpServletRequest request,
+                                                              final Locale locale) {
+    log.warn("OIDC provisioning/linking failed: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.validation-failed", locale),
+        400,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(OidcIdentityNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleOidcIdentityNotFound(final OidcIdentityNotFoundException ex,
+                                                                  final HttpServletRequest request,
+                                                                  final Locale locale) {
+    log.warn("OIDC identity not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.not-found", locale),
+        404,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
 
   @ExceptionHandler({AuthenticationException.class})
