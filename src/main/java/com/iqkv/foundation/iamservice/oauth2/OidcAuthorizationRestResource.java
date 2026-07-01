@@ -226,6 +226,22 @@ public class OidcAuthorizationRestResource {
                                        final UUID userId,
                                        final String callbackRedirectUri,
                                        final HttpServletResponse response) throws IOException {
+    response.sendRedirect(buildAuthorizationRequestUri(
+        provider,
+        tenantKey,
+        redirectUri,
+        flowType,
+        userId,
+        callbackRedirectUri
+    ));
+  }
+
+  private String buildAuthorizationRequestUri(final String provider,
+                                              final String tenantKey,
+                                              final String redirectUri,
+                                              final String flowType,
+                                              final UUID userId,
+                                              final String callbackRedirectUri) {
     final ClientRegistration clientRegistration = requireClientRegistration(provider);
 
     final UUID stateJti = UUID.randomUUID();
@@ -261,7 +277,7 @@ public class OidcAuthorizationRestResource {
         .attributes(attrs -> attrs.put("nonce", nonce))
         .build();
 
-    response.sendRedirect(authorizationRequest.getAuthorizationRequestUri());
+    return authorizationRequest.getAuthorizationRequestUri();
   }
 
   private String generateRandomString(int length) {
@@ -566,6 +582,25 @@ public class OidcAuthorizationRestResource {
         buildLinkCallbackRedirectUri(),
         response
     );
+  }
+
+  @GetMapping("/link/{provider}/authorize-url")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(summary = "Get provider authorization URL for account linking")
+  public ResponseEntity<OidcDtos.AuthorizationUrlResponse> getLinkAuthorizationUrl(
+      @PathVariable final String provider,
+      @AuthenticationPrincipal final Jwt jwt
+  ) {
+    final String url = buildAuthorizationRequestUri(
+        provider,
+        null,
+        oauth2Props.postLoginRedirectUri(),
+        "link",
+        extractUserId(jwt),
+        buildLinkCallbackRedirectUri()
+    );
+    return ResponseEntity.ok(new OidcDtos.AuthorizationUrlResponse(url));
   }
 
   @DeleteMapping("/link/{provider}")

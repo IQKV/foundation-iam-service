@@ -18,6 +18,7 @@ public class AesGcmEncryptionService {
   private static final int GCM_IV_LENGTH = 12;
   private static final int GCM_TAG_LENGTH = 16;
   private static final String ALGORITHM = "AES/GCM/NoPadding";
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
   private final SecretKey encryptionKey;
 
@@ -43,7 +44,7 @@ public class AesGcmEncryptionService {
   public String encrypt(final String plaintext) {
     try {
       byte[] iv = new byte[GCM_IV_LENGTH];
-      new SecureRandom().nextBytes(iv);
+      SECURE_RANDOM.nextBytes(iv);
 
       Cipher cipher = Cipher.getInstance(ALGORITHM);
       cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv));

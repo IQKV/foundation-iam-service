@@ -3,6 +3,7 @@ package com.iqkv.foundation.iamservice.oauth2.sso;
 import jakarta.validation.Valid;
 
 import com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider;
+import com.iqkv.foundation.iamservice.oauth2.sso.dto.TenantSsoDtos;
 import com.iqkv.foundation.iamservice.tenancy.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,8 +40,21 @@ public class TenantSsoRestResource {
       @ApiResponse(responseCode = "200", description = "Configuration returned"),
       @ApiResponse(responseCode = "403", description = "Forbidden")
   })
-  public ResponseEntity<TenantOidcProvider> getSsoConfig(@AuthenticationPrincipal Jwt jwt) {
-    return ResponseEntity.ok(tenantSsoService.getTenantSsoConfiguration(TenantContext.getCurrentTenant()));
+  public ResponseEntity<TenantSsoDtos.TenantSsoConfigResponse> getSsoConfig(@AuthenticationPrincipal Jwt jwt) {
+    final TenantOidcProvider provider =
+        tenantSsoService.getTenantSsoConfiguration(TenantContext.getCurrentTenant());
+    if (provider == null) {
+      return ResponseEntity.ok(null);
+    }
+    return ResponseEntity.ok(new TenantSsoDtos.TenantSsoConfigResponse(
+        provider.getProviderKey(),
+        provider.getDisplayName(),
+        provider.getIssuerUri(),
+        provider.getClientId(),
+        provider.getScopes(),
+        provider.isEnabled(),
+        provider.getClientSecret() != null && !provider.getClientSecret().isBlank()
+    ));
   }
 
   @PutMapping
@@ -54,9 +68,16 @@ public class TenantSsoRestResource {
   })
   public ResponseEntity<Void> updateSsoConfig(
       @AuthenticationPrincipal Jwt jwt,
-      @Valid @RequestBody TenantOidcProvider provider
+      @Valid @RequestBody TenantSsoDtos.TenantSsoConfigRequest provider
   ) {
-    tenantSsoService.configureTenantSso(TenantContext.getCurrentTenant(), provider);
+    final TenantOidcProvider model = new TenantOidcProvider();
+    model.setDisplayName(provider.displayName());
+    model.setIssuerUri(provider.issuerUri());
+    model.setClientId(provider.clientId());
+    model.setClientSecret(provider.clientSecret());
+    model.setScopes(provider.scopes());
+    model.setEnabled(provider.enabled());
+    tenantSsoService.configureTenantSso(TenantContext.getCurrentTenant(), model);
     return ResponseEntity.noContent().build();
   }
 

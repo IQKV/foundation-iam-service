@@ -36,16 +36,17 @@ The JWT must be passed as a `Bearer` token in the `Authorization` header.
 
 ### OAuth2/OIDC Authentication
 
-| Method   | Path                           | Auth   | Description                                                                        |
-| -------- | ------------------------------ | ------ | ---------------------------------------------------------------------------------- |
-| `GET`    | `/auth/oauth2/providers`       | public | List enabled OAuth2/OIDC providers that resolve to active client registrations     |
-| `GET`    | `/auth/oauth2/authorize`       | public | Start browser-based OAuth2/OIDC login flow with signed state + server-side PKCE    |
-| `GET`    | `/auth/oauth2/callback`        | public | Handle provider callback and redirect to the configured frontend callback URI      |
-| `POST`   | `/auth/oauth2/exchange`        | public | Exchange provider authorization code + PKCE verifier for IAM access/refresh tokens |
-| `GET`    | `/auth/oauth2/link/{provider}` | JWT    | Start account-linking flow for the current user                                    |
-| `GET`    | `/auth/oauth2/link/callback`   | public | Handle provider callback for account linking                                       |
-| `DELETE` | `/auth/oauth2/link/{provider}` | JWT    | Unlink an external provider from the current account                               |
-| `GET`    | `/auth/oauth2/identities`      | JWT    | List linked external identities for the current user                               |
+| Method   | Path                                         | Auth   | Description                                                                        |
+| -------- | -------------------------------------------- | ------ | ---------------------------------------------------------------------------------- |
+| `GET`    | `/auth/oauth2/providers`                     | public | List enabled OAuth2/OIDC providers that resolve to active client registrations     |
+| `GET`    | `/auth/oauth2/authorize`                     | public | Start browser-based OAuth2/OIDC login flow with signed state + server-side PKCE    |
+| `GET`    | `/auth/oauth2/callback`                      | public | Handle provider callback and redirect to the configured frontend callback URI      |
+| `POST`   | `/auth/oauth2/exchange`                      | public | Exchange provider authorization code + PKCE verifier for IAM access/refresh tokens |
+| `GET`    | `/auth/oauth2/link/{provider}`               | JWT    | Start account-linking flow for the current user                                    |
+| `GET`    | `/auth/oauth2/link/{provider}/authorize-url` | JWT    | Get the provider authorization URL for account linking (UI-driven redirect)        |
+| `GET`    | `/auth/oauth2/link/callback`                 | public | Handle provider callback for account linking                                       |
+| `DELETE` | `/auth/oauth2/link/{provider}`               | JWT    | Unlink an external provider from the current account                               |
+| `GET`    | `/auth/oauth2/identities`                    | JWT    | List linked external identities for the current user                               |
 
 `GET /auth/oauth2/authorize` accepts `provider` and optional `tenantKey` query parameters. The service signs the OAuth state, stores the PKCE verifier in Redis, and redirects the browser to the selected provider.
 
@@ -274,7 +275,7 @@ Accepts a `locale` query parameter (default `en-US`). Returns only `PUBLISHED` a
 | `PUT`    | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Create or replace tenant OIDC settings  |
 | `DELETE` | `/tenants/sso` | JWT `TENANT_OWNER`/`PLATFORM_ADMIN` | Delete tenant OIDC settings             |
 
-Tenant SSO configuration is tenant-scoped and uses the current `X-Tenant-ID` context. Stored client secrets are encrypted at rest with `OIDC_ENCRYPTION_KEY`.
+Tenant SSO configuration is tenant-scoped and uses the current `X-Tenant-ID` context. Stored client secrets are encrypted at rest with `OIDC_ENCRYPTION_KEY`. The `clientSecret` is write-only and is never returned by `GET /tenants/sso`.
 
 ---
 

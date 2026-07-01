@@ -12,6 +12,11 @@ public final class OidcDtos {
   ) {
   }
 
+  public record AuthorizationUrlResponse(
+      String url
+  ) {
+  }
+
   public record OidcExchangeRequest(
       @NotBlank String provider,
       @NotBlank String code,
