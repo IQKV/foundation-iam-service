@@ -23,6 +23,16 @@
             WHERE first_name IS NOT NULL
               AND first_name &lt;&gt; ''
         </sql>
+        
+        <rollback>
+            <sql>
+                UPDATE public.users
+                SET profile_completed = false
+                WHERE first_name IS NOT NULL
+                  AND first_name &lt;&gt; ''
+            </sql>
+            <dropColumn tableName="users" schemaName="public" columnName="profile_completed"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

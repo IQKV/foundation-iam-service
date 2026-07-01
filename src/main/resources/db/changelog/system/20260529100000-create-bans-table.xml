@@ -51,6 +51,13 @@
         <createIndex indexName="idx_bans_tenant_key" tableName="bans" schemaName="public">
             <column name="tenant_key"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_bans_tenant_key" tableName="bans" schemaName="public"/>
+            <dropIndex indexName="idx_bans_user_id" tableName="bans" schemaName="public"/>
+            <dropUniqueConstraint constraintName="uq_bans_user_tenant_type" tableName="bans" schemaName="public"/>
+            <dropTable tableName="bans" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

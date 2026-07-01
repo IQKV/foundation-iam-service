@@ -11,6 +11,10 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+        <rollback>
+            <dropColumn tableName="users" schemaName="public" columnName="locale"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

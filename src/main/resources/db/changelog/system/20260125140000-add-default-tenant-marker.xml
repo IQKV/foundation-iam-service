@@ -30,6 +30,13 @@
             CREATE UNIQUE INDEX idx_tenants_default_unique
                 ON public.tenants (is_default) WHERE is_default = true;
         </sql>
+        
+        <rollback>
+            <sql>DROP INDEX IF EXISTS public.idx_tenants_default_unique;</sql>
+            <sql>ALTER TABLE public.tenants DROP CONSTRAINT IF EXISTS chk_tenant_mode_origin;</sql>
+            <dropColumn tableName="tenants" schemaName="public" columnName="tenant_mode_origin"/>
+            <dropColumn tableName="tenants" schemaName="public" columnName="is_default"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

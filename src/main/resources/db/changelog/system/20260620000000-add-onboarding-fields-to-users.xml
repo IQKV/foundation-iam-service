@@ -12,6 +12,11 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+        <rollback>
+            <dropColumn tableName="users" schemaName="public" columnName="onboarding_completed"/>
+            <dropColumn tableName="users" schemaName="public" columnName="first_sign_in_at"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

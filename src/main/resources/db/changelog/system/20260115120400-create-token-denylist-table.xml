@@ -38,6 +38,13 @@
         <createIndex indexName="idx_token_denylist_expires_at" tableName="token_denylist" schemaName="public">
             <column name="expires_at"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_token_denylist_expires_at" tableName="token_denylist" schemaName="public"/>
+            <dropIndex indexName="idx_token_denylist_user_id" tableName="token_denylist" schemaName="public"/>
+            <dropIndex indexName="idx_token_denylist_jti" tableName="token_denylist" schemaName="public"/>
+            <dropTable tableName="token_denylist" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

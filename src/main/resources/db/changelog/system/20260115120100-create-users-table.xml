@@ -38,6 +38,11 @@
         <createIndex indexName="idx_users_email" tableName="users" schemaName="public" unique="true">
             <column name="email"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_users_email" tableName="users" schemaName="public"/>
+            <dropTable tableName="users" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

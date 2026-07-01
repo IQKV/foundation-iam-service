@@ -41,6 +41,12 @@
                      schemaName="public">
             <column name="user_id"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_platform_authorities_user_id" tableName="platform_authorities" schemaName="public"/>
+            <dropUniqueConstraint constraintName="uq_platform_authorities_user_authority" tableName="platform_authorities" schemaName="public"/>
+            <dropTable tableName="platform_authorities" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

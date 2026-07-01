@@ -34,6 +34,11 @@
             <column name="target_user_id"/>
             <column name="is_read"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_user_notifications_target_user_read" tableName="user_notifications" schemaName="public"/>
+            <dropTable tableName="user_notifications" schemaName="public"/>
+        </rollback>
     </changeSet>
 
     <changeSet id="20260525000003-create-site-announcement-table" author="iqkv">

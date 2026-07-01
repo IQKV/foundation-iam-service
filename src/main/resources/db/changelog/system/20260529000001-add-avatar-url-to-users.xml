@@ -11,6 +11,10 @@
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+        
+        <rollback>
+            <dropColumn tableName="users" schemaName="public" columnName="avatar_url"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

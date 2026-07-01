@@ -72,6 +72,14 @@
             CREATE UNIQUE INDEX idx_tenant_invitations_pending_email
                 ON public.tenant_invitations (tenant_key, invited_email) WHERE status = 'PENDING';
         </sql>
+        
+        <rollback>
+            <sql>DROP INDEX IF EXISTS public.idx_tenant_invitations_pending_email;</sql>
+            <dropIndex indexName="idx_tenant_invitations_expires_at" tableName="tenant_invitations" schemaName="public"/>
+            <dropIndex indexName="idx_tenant_invitations_tenant_key" tableName="tenant_invitations" schemaName="public"/>
+            <dropIndex indexName="idx_tenant_invitations_token" tableName="tenant_invitations" schemaName="public"/>
+            <dropTable tableName="tenant_invitations" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

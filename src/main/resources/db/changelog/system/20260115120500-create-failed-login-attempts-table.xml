@@ -21,6 +21,11 @@
         <createIndex indexName="idx_failed_login_attempts_email" tableName="failed_login_attempts" schemaName="public">
             <column name="email"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_failed_login_attempts_email" tableName="failed_login_attempts" schemaName="public"/>
+            <dropTable tableName="failed_login_attempts" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

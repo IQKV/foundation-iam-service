@@ -24,6 +24,11 @@
         <createIndex indexName="idx_tenant_member_authorities_membership_id" tableName="tenant_member_authorities" schemaName="public">
             <column name="membership_id"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_tenant_member_authorities_membership_id" tableName="tenant_member_authorities" schemaName="public"/>
+            <dropTable tableName="tenant_member_authorities" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

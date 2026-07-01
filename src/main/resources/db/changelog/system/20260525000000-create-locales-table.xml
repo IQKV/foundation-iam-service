@@ -22,6 +22,11 @@
         <createIndex indexName="idx_locales_is_active" tableName="locales" schemaName="public">
             <column name="is_active"/>
         </createIndex>
+        
+        <rollback>
+            <dropIndex indexName="idx_locales_is_active" tableName="locales" schemaName="public"/>
+            <dropTable tableName="locales" schemaName="public"/>
+        </rollback>
     </changeSet>
 
     <changeSet id="20260525000000-default-locale-en-us" author="iqkv">

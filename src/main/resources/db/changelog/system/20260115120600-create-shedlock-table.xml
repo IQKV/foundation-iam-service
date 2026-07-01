@@ -20,6 +20,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        
+        <rollback>
+            <dropTable tableName="shedlock" schemaName="public"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
