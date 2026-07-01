@@ -2,7 +2,6 @@ package com.iqkv.foundation.iamservice.oauth2;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -18,7 +17,6 @@ public class AesGcmEncryptionService {
   private static final int GCM_IV_LENGTH = 12;
   private static final int GCM_TAG_LENGTH = 16;
   private static final String ALGORITHM = "AES/GCM/NoPadding";
-  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
   private final SecretKey encryptionKey;
 
@@ -43,11 +41,12 @@ public class AesGcmEncryptionService {
 
   public String encrypt(final String plaintext) {
     try {
-      byte[] iv = new byte[GCM_IV_LENGTH];
-      SECURE_RANDOM.nextBytes(iv);
-
       Cipher cipher = Cipher.getInstance(ALGORITHM);
-      cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv));
+      cipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
+      byte[] iv = cipher.getIV();
+      if (iv == null || iv.length != GCM_IV_LENGTH) {
+        throw new IllegalStateException("Unexpected GCM IV length");
+      }
       byte[] ciphertext = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
 
       byte[] encrypted = ByteBuffer.allocate(iv.length + ciphertext.length)
