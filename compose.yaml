@@ -11,6 +11,12 @@ services:
       file: compose.base.yaml
       service: rabbitmq-iam
 
+  # Redis for OIDC state/PKCE, lockouts, and ephemeral security state
+  redis-iam:
+    extends:
+      file: compose.base.yaml
+      service: redis-iam
+
   # MailHog for local email testing
   mailhog:
     extends:
@@ -39,6 +45,8 @@ volumes:
     name: iqkv_iam_postgres_data_dev
   rabbitmq_iam_data:
     name: iqkv_iam_rabbitmq_data_dev
+  redis_iam_data:
+    name: iqkv_iam_redis_data_dev
   minio_iam_data:
     name: iqkv_iam_minio_data_dev
   dbgate_iam_data:

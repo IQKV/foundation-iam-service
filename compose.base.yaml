@@ -17,7 +17,7 @@ services:
     networks:
       - iam-service-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U svc_iam_dba -d iam -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U svc_iam_dba -d iamservice -h localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,6 +62,24 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    restart: unless-stopped
+
+  # Redis for OIDC state/PKCE, lockouts, and ephemeral security state - Local Development
+  redis-iam:
+    image: redis:7-alpine
+    container_name: foundation-iam-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_iam_data:/data
+    networks:
+      - iam-service-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   # MailHog for local email testing
@@ -117,6 +135,8 @@ services:
         condition: service_healthy
       rabbitmq-iam:
         condition: service_healthy
+      redis-iam:
+        condition: service_healthy
       minio:
         condition: service_healthy
     healthcheck:
@@ -153,12 +173,19 @@ services:
       RABBITMQ_USERNAME: svc_iam_rmq
       RABBITMQ_PASSWORD: svc_iam_rmq
 
+      # Redis Configuration
+      REDIS_HOST: redis-iam
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DATABASE: 0
+      REDIS_TIMEOUT: PT2S
+
       # Mail Configuration (MailHog)
       MAIL_HOST: mailhog
       MAIL_PORT: 1025
       MAIL_USERNAME: ""
       MAIL_PASSWORD: ""
-      MAIL_FROM: noreply@iqkv.dev
+      MAIL_FROM: noreply@iqkv.com
       MAIL_REPLY_TO: ""
 
       # Object Storage Configuration (MinIO)
@@ -195,6 +222,8 @@ services:
       postgres-iam:
         condition: service_healthy
       rabbitmq-iam:
+        condition: service_healthy
+      redis-iam:
         condition: service_healthy
       minio:
         condition: service_healthy
@@ -233,6 +262,9 @@ volumes:
     driver: local
   rabbitmq_iam_data:
     name: iqkv_iam_rabbitmq_data_dev
+    driver: local
+  redis_iam_data:
+    name: iqkv_iam_redis_data_dev
     driver: local
   minio_iam_data:
     name: iqkv_iam_minio_data_dev
