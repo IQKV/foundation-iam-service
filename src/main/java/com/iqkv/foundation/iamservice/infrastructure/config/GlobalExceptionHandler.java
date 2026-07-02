@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import com.iqkv.foundation.entitlement.plan.PlanFeatureNotAvailableException;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.oauth2.OidcIdentityNotFoundException;
 import com.iqkv.foundation.iamservice.oauth2.OidcProvisioningException;
@@ -45,7 +46,6 @@ import com.iqkv.foundation.iamservice.shared.exception.MembershipNotFoundExcepti
 import com.iqkv.foundation.iamservice.shared.exception.NoPlatformAuthorityException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetRateLimitException;
 import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.PlanFeatureNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;

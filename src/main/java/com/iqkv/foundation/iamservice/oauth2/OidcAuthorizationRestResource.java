@@ -467,8 +467,8 @@ public class OidcAuthorizationRestResource {
   private String buildSuccessRedirectUri(final String redirectUri,
                                          final AuthenticationDtos.TokenResponse tokenResponse) {
     return redirectUri + "#access_token=" + urlEncode(tokenResponse.accessToken())
-        + "&refresh_token=" + urlEncode(tokenResponse.refreshToken())
-        + "&tenant_key=" + urlEncode(tokenResponse.tenantKey());
+           + "&refresh_token=" + urlEncode(tokenResponse.refreshToken())
+           + "&tenant_key=" + urlEncode(tokenResponse.tenantKey());
   }
 
   private String buildErrorRedirectUri(final String redirectUri, final String message) {

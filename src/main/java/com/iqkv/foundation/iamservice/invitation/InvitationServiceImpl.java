@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.iqkv.foundation.entitlement.plan.PlanResolver;
 import com.iqkv.foundation.iamservice.authentication.JwtTokenGenerator;
 import com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
@@ -39,7 +40,6 @@ import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
@@ -81,7 +81,7 @@ public class InvitationServiceImpl implements InvitationService {
   private final InvitationConfigurationProperties invitationProps;
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformConfigurationProperties platformConfig;
-  private final PlanCatalogCache planCatalogCache;
+  private final PlanResolver planCatalogCache;
 
   public InvitationServiceImpl(
       final InvitationMapper invitationMapper,
@@ -97,7 +97,7 @@ public class InvitationServiceImpl implements InvitationService {
       final InvitationConfigurationProperties invitationProps,
       final NotificationConfigurationProperties notificationProps,
       final PlatformConfigurationProperties platformConfig,
-      final PlanCatalogCache planCatalogCache) {
+      final PlanResolver planCatalogCache) {
     this.invitationMapper = invitationMapper;
     this.tenantMapper = tenantMapper;
     this.userMapper = userMapper;

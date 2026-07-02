@@ -20,10 +20,10 @@ import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.iqkv.foundation.entitlement.plan.PlanFeatureGuard;
 import com.iqkv.foundation.iamservice.ban.BanService;
 import com.iqkv.foundation.iamservice.ban.dto.BanDtos;
 import com.iqkv.foundation.iamservice.membership.MembershipService;
-import com.iqkv.foundation.iamservice.plan.PlanFeatureGuard;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.tenant.dto.TenantDtoMapper;

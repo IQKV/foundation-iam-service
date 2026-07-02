@@ -20,12 +20,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.iqkv.foundation.entitlement.plan.PlanResolver;
 import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthority;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
 import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException;
@@ -65,7 +65,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
   private final TenantMemberAuthorityMapper authorityMapper;
   private final DefaultTenantResolver defaultTenantResolver;
   private final PasswordEncoder passwordEncoder;
-  private final PlanCatalogCache planCatalogCache;
+  private final PlanResolver planCatalogCache;
 
   public SingleTenantSignupStrategy(final UserMapper userMapper,
                                     final TenantMapper tenantMapper,
@@ -73,7 +73,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
                                     final TenantMemberAuthorityMapper authorityMapper,
                                     final DefaultTenantResolver defaultTenantResolver,
                                     final PasswordEncoder passwordEncoder,
-                                    final PlanCatalogCache planCatalogCache) {
+                                    final PlanResolver planCatalogCache) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
