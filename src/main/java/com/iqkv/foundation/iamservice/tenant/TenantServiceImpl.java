@@ -135,7 +135,7 @@ public class TenantServiceImpl implements TenantService {
     metrics.recordTenantProvisioning("initiated");
 
     // Step 3: Quota check: enforce maxUsers from the active plan (0 = unlimited)
-    final int maxUsers = planCatalogCache.forPlan(tenant.getActivePlanCode()).maxUsers();
+    final int maxUsers = planCatalogCache.resolveEntitlement(tenant.getActivePlanCode()).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(tenantKey);
       if (current >= maxUsers) {

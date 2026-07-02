@@ -210,7 +210,7 @@ public class InvitationServiceImpl implements InvitationService {
     // Quota check: enforce maxUsers from the active plan (0 = unlimited)
     final String planCode = tenantMapper.findByTenantKey(tenantKey)
         .map(Tenant::getActivePlanCode).orElse(null);
-    final int maxUsers = planCatalogCache.forPlan(planCode).maxUsers();
+    final int maxUsers = planCatalogCache.resolveEntitlement(planCode).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(tenantKey);
       if (current >= maxUsers) {

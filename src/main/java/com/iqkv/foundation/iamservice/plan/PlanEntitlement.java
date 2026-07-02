@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * <p>{@code maxUsers} and {@code maxProjects} use {@code 0} to mean "unlimited".
  */
-public record PlanFeatures(
+public record PlanEntitlement(
     int maxUsers,
     int maxProjects,
     Map<String, PlanFeature> features,
@@ -58,9 +58,9 @@ public record PlanFeatures(
    * Safe fallback used when the plan code is unknown or the cache is empty.
    * Most restrictive quotas, no display features, no pricing model override.
    */
-  public static final PlanFeatures NONE = new PlanFeatures(1, 1, Collections.emptyMap(), null);
+  public static final PlanEntitlement NONE = new PlanEntitlement(1, 1, Collections.emptyMap(), null);
 
-  public PlanFeatures {
+  public PlanEntitlement {
     features = features != null ? Collections.unmodifiableMap(features) : Collections.emptyMap();
   }
 

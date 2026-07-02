@@ -124,7 +124,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     }
 
     // Step 4a: Quota check — enforce maxUsers from the active plan (0 = unlimited)
-    final int maxUsers = planCatalogCache.forPlan(defaultTenant.getActivePlanCode()).maxUsers();
+    final int maxUsers = planCatalogCache.resolveEntitlement(defaultTenant.getActivePlanCode()).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(defaultTenantKey);
       if (current >= maxUsers) {

@@ -70,7 +70,7 @@ public class PlanFeatureGuard {
    * @return {@code true} if the feature is enabled for this plan, {@code false} otherwise
    */
   public boolean hasFeature(final String planCode, final String featureCode) {
-    final PlanFeatures features = planCatalogCache.forPlan(planCode);
+    final PlanEntitlement features = planCatalogCache.resolveEntitlement(planCode);
     return features.has(featureCode);
   }
 
@@ -82,7 +82,7 @@ public class PlanFeatureGuard {
    * the service, with the {@code planCode} sourced from the caller's JWT {@code plan_code} claim.
    *
    * @param planCode    the caller's active plan code; {@code null} or blank resolves to
-   *                    {@link PlanFeatures#NONE} (all features disabled)
+   *                    {@link PlanEntitlement#NONE} (all features disabled)
    * @param featureCode the feature that must be enabled (e.g. {@code "advanced_analytics"})
    * @throws PlanFeatureNotAvailableException if the feature is not enabled for this plan
    */
