@@ -41,8 +41,8 @@ import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMemberAuthorityMapper;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
-import com.iqkv.foundation.iamservice.plan.PlanCatalogCache;
-import com.iqkv.foundation.iamservice.plan.PlanEntitlement;
+import com.iqkv.foundation.entitlement.plan.PlanEntitlement;
+import com.iqkv.foundation.entitlement.plan.PlanResolver;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -88,7 +88,7 @@ class InvitationServiceImplTest {
   @Mock
   private PlatformConfigurationProperties platformConfig;
   @Mock
-  private PlanCatalogCache planCatalogCache;
+  private PlanResolver planCatalogCache;
 
   private InvitationServiceImpl invitationService;
 
