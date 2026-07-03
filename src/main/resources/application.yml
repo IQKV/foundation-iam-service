@@ -201,8 +201,9 @@ iqkv:
     default-schema: public
     provisioning-timeout: PT10M
   liquibase:
-    system-change-log: db/changelog/system/db.changelog-master.xml
-    tenant-change-log: db/changelog/tenant/master.xml
+    system-change-log: db/changelog/system/db.changelog-system.xml
+    tenant-change-log: db/changelog/tenant/db.changelog-tenant.xml
+    demo-tenants: []
   notification:
     mail:
       from: ${iqkv.mail.from}
