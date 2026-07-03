@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider;
 import com.iqkv.foundation.iamservice.oauth2.sso.dto.TenantSsoDtos;
-import com.iqkv.foundation.iamservice.tenancy.TenantContext;
+import com.iqkv.foundation.tenancy.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

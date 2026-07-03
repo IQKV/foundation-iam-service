@@ -50,6 +50,7 @@ import com.iqkv.foundation.iamservice.tenant.TenantStatus;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
+import com.iqkv.foundation.tenancy.TenantContext;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -162,7 +163,7 @@ class AuthenticationServiceImplTest {
     var authorities = List.of("MEMBER");
 
     // Set tenant context
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
 
     when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
     when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -186,7 +187,7 @@ class AuthenticationServiceImplTest {
     verify(accountLockoutManager).reset("user@example.com");
 
     // Cleanup
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    TenantContext.clear();
   }
 
   @Test
@@ -198,7 +199,7 @@ class AuthenticationServiceImplTest {
     var jwt = createMockJwt("user@example.com", "test-tenant", JwtClaimNames.TYPE_REFRESH);
 
     // Set tenant context
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
 
     when(jwtDecoder.decode("valid-refresh-token")).thenReturn(jwt);
     when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -219,7 +220,7 @@ class AuthenticationServiceImplTest {
     assertThat(result.tenantKey()).isEqualTo("test-tenant");
 
     // Cleanup
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+    TenantContext.clear();
   }
 
   @Test
@@ -387,7 +388,7 @@ class AuthenticationServiceImplTest {
   @DisplayName("signIn — suspended user should be rejected with AccountNotActiveException")
   void signIn_suspendedUser_throwsAccountNotActiveException() {
     testUser.setStatus(AccountStatus.SUSPENDED);
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
     try {
       when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
       when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -398,7 +399,7 @@ class AuthenticationServiceImplTest {
 
       verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
     } finally {
-      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+      TenantContext.clear();
     }
   }
 
@@ -406,7 +407,7 @@ class AuthenticationServiceImplTest {
   @DisplayName("signIn — deleted user should be rejected with AccountNotActiveException")
   void signIn_deletedUser_throwsAccountNotActiveException() {
     testUser.setStatus(AccountStatus.DELETED);
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
     try {
       when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
       when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -417,7 +418,7 @@ class AuthenticationServiceImplTest {
 
       verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
     } finally {
-      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+      TenantContext.clear();
     }
   }
 
@@ -425,7 +426,7 @@ class AuthenticationServiceImplTest {
   @DisplayName("signIn — locked (status) user should be rejected with AccountNotActiveException")
   void signIn_lockedStatusUser_throwsAccountNotActiveException() {
     testUser.setStatus(AccountStatus.LOCKED);
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
     try {
       when(tenantMapper.findByTenantKey("test-tenant")).thenReturn(Optional.of(testTenant));
       when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -436,7 +437,7 @@ class AuthenticationServiceImplTest {
 
       verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
     } finally {
-      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+      TenantContext.clear();
     }
   }
 
@@ -471,7 +472,7 @@ class AuthenticationServiceImplTest {
   void refresh_suspendedUser_throwsAccountNotActiveException() {
     testUser.setStatus(AccountStatus.SUSPENDED);
     var jwt = createMockJwt("user@example.com", "test-tenant", JwtClaimNames.TYPE_REFRESH);
-    com.iqkv.foundation.iamservice.tenancy.TenantContext.setCurrentTenant("test-tenant");
+    TenantContext.setCurrentTenant("test-tenant");
     try {
       when(jwtDecoder.decode("refresh-token")).thenReturn(jwt);
       when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
@@ -482,7 +483,7 @@ class AuthenticationServiceImplTest {
 
       verifyNoInteractions(membershipService, jwtTokenGenerator);
     } finally {
-      com.iqkv.foundation.iamservice.tenancy.TenantContext.clear();
+      TenantContext.clear();
     }
   }
 

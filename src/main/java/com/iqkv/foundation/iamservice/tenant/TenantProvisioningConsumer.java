@@ -22,7 +22,7 @@ import com.iqkv.foundation.iamservice.infrastructure.config.RabbitMQConfig;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.TenantEvent;
 import com.iqkv.foundation.iamservice.infrastructure.metrics.IamServiceMetrics;
-import com.iqkv.foundation.iamservice.tenancy.TenantLiquibaseRunner;
+import com.iqkv.foundation.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

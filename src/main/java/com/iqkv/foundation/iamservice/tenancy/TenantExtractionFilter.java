@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.tenancy.TenantContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.oauth2.jwt.Jwt;
