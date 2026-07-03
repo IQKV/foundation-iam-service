@@ -188,7 +188,7 @@ iqkv:
     # Billing service base URL used by PlanCatalogCache for quota enforcement
     service-url: ${BILLING_SERVICE_URI:http://foundation-billing-service}
     # How often the plan catalog cache is refreshed (ISO-8601 duration)
-    plan-catalog-refresh-interval: ${PLAN_CATALOG_REFRESH_INTERVAL:PT10M}
+    plan-refresh-interval: ${BILLING_PLAN_REFRESH_INTERVAL:PT10M}
   tenancy:
     # Default tenant key for SINGLE_TENANT mode (optional)
     # If not provided, will be resolved from database or auto-generated
