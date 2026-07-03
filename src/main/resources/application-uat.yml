@@ -6,7 +6,6 @@
 
 spring:
   liquibase:
-    enabled: true
     contexts: demo
 
 logging:
