@@ -201,6 +201,7 @@ iqkv:
     default-schema: public
     provisioning-timeout: PT10M
   liquibase:
+    tenant-runner-enabled: true
     system-change-log: db/changelog/system/db.changelog-system.xml
     tenant-change-log: db/changelog/tenant/db.changelog-tenant.xml
     demo-tenants: []

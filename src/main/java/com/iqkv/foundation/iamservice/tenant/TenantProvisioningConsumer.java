@@ -26,11 +26,13 @@ import com.iqkv.foundation.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")
+@ConditionalOnBean(TenantLiquibaseRunner.class)
 public class TenantProvisioningConsumer {
 
   private static final Logger log = LoggerFactory.getLogger(TenantProvisioningConsumer.class);
