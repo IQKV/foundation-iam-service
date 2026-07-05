@@ -62,6 +62,13 @@ public interface TenantMapper {
 
   List<Tenant> findStuckProvisioning(@Param("olderThan") Instant olderThan);
 
+  /**
+   * Returns all tenant keys whose schemas should be migrated on startup.
+   * Excludes tenants in terminal states ({@code DELETED}) that no longer have an active schema.
+   * Used exclusively by {@link com.iqkv.foundation.iamservice.tenant.AllTenantsKeyProvider}.
+   */
+  List<String> findAllTenantKeysForUpgrade();
+
   Optional<OwnerInfo> findOwnerByTenantKey(String tenantKey);
 
   /**

@@ -123,6 +123,13 @@
         AND created_at &lt; #{olderThan}
     </select>
 
+    <select id="findAllTenantKeysForUpgrade" resultType="string">
+        SELECT tenant_key
+        FROM public.tenants
+        WHERE status NOT IN ('DELETED')
+        ORDER BY created_at ASC
+    </select>
+
     <select id="findOwnerByTenantKey"
             parameterType="string"
             resultType="com.iqkv.foundation.iamservice.tenant.OwnerInfo">
