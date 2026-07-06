@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <!--
+        Marks all existing demo users as having completed onboarding and profile setup.
+
+        Sets onboarding_completed = true and profile_completed = true for every row in
+        public.users so that demo accounts bypass the onboarding flow and land directly
+        on the dashboard after sign-in.
+
+        This changeSet runs in the "demo" context only and is safe to re-run (runOnChange
+        is not set; Liquibase will skip it once the checksum is recorded).
+    -->
+
+    <changeSet id="20260706000000-demo-users-onboarding-completed" author="iqkv" context="demo">
+        <sql>
+            UPDATE public.users
+            SET onboarding_completed = true,
+                profile_completed    = true,
+                updated_at           = NOW(),
+                updated_by           = 'system'
+            WHERE onboarding_completed = false
+               OR profile_completed    = false
+        </sql>
+
+        <rollback>
+            <sql>
+                UPDATE public.users
+                SET onboarding_completed = false,
+                    profile_completed    = false,
+                    updated_at           = NOW(),
+                    updated_by           = 'system'
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
