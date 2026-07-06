@@ -174,6 +174,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         userIdForAudit = user.getId();
 
+        if (user.getStatus() == AccountStatus.LOCKED) {
+          log.warn("Signin failed: account locked, userId={}, tenantKey={}", user.getId(), tenantKey);
+          publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
+              SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
+          throw new AccountLockedException();
+        }
+
         if (user.getStatus() != AccountStatus.ACTIVE) {
           log.warn("Signin failed: account not active, userId={}, tenantKey={}", user.getId(), tenantKey);
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
@@ -208,8 +215,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         accountLockoutManager.reset(request.email());
 
-        // Set first sign in time if not already set
-        userMapper.setFirstSignInAt(user.getId(), Instant.now());
+        // Set first sign in time if not already set (WHERE clause ensures idempotency)
+        if (user.getFirstSignInAt() == null) {
+          userMapper.setFirstSignInAt(user.getId(), Instant.now());
+        }
 
         final String accessToken = jwtTokenGenerator.generateAccessToken(
             user, tenantKey, authorities, tenant.getActivePlanCode());
@@ -228,6 +237,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
               || e instanceof TenantNotAvailableException
               || e instanceof AccountNotActiveException
               || e instanceof AccountLockedException
+              || e instanceof AccountBannedException
               || e instanceof BadCredentialsException)) {
           log.error("Signin failed with unknown error, tenantKey={}, email={}", tenantKey, request.email(), e);
           publishSigninAttemptEvent(request.email(), userIdForAudit, tenantKey,
@@ -282,6 +292,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         userIdForAudit = user.getId();
+
+        if (user.getStatus() == AccountStatus.LOCKED) {
+          log.warn("Admin signin failed: account locked, userId={}", user.getId());
+          publishSigninAttemptEvent(request.email(), userIdForAudit, null,
+              SigninAttemptEvent.AttemptResult.FAILURE, SigninAttemptEvent.FailureReason.ACCOUNT_LOCKED);
+          throw new AccountLockedException();
+        }
 
         if (user.getStatus() != AccountStatus.ACTIVE) {
           log.warn("Admin signin failed: account not active, userId={}", user.getId());
@@ -340,6 +357,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Only publish if we haven't already published in the specific catch blocks above
         if (!(e instanceof AccountNotActiveException
               || e instanceof AccountLockedException
+              || e instanceof AccountBannedException
               || e instanceof BadCredentialsException
               || e instanceof NoPlatformAuthorityException)) {
           log.error("Admin signin failed with unknown error, email={}", request.email(), e);

@@ -6,68 +6,58 @@
     <resultMap id="TenantOidcProviderResultMap" type="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
         <id property="id" column="id"/>
         <result property="tenantId" column="tenant_id"/>
-        <result property="provider" column="provider"/>
+        <result property="providerKey" column="provider_key"/>
+        <result property="displayName" column="display_name"/>
+        <result property="issuerUri" column="issuer_uri"/>
         <result property="clientId" column="client_id"/>
-        <result property="encryptedClientSecret" column="encrypted_client_secret"/>
-        <result property="authorizationEndpoint" column="authorization_endpoint"/>
-        <result property="tokenEndpoint" column="token_endpoint"/>
-        <result property="userInfoEndpoint" column="user_info_endpoint"/>
-        <result property="jwksUri" column="jwks_uri"/>
-        <result property="issuer" column="issuer"/>
+        <result property="clientSecret" column="client_secret"/>
+        <result property="scopes" column="scopes"/>
         <result property="enabled" column="enabled"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <select id="findByTenantIdAndProvider" resultMap="TenantOidcProviderResultMap">
-        SELECT id, tenant_id, provider, client_id, encrypted_client_secret,
-        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
-        issuer, enabled, created_at, updated_at
+    <select id="findByProviderKey" resultMap="TenantOidcProviderResultMap">
+        SELECT id, tenant_id, provider_key, display_name, issuer_uri,
+               client_id, client_secret, scopes, enabled, created_at, updated_at
         FROM public.tenant_oidc_providers
-        WHERE tenant_id = #{tenantId}
-        AND provider = #{provider}
+        WHERE provider_key = #{providerKey}
         AND enabled = true
     </select>
 
     <select id="findByTenantId" resultMap="TenantOidcProviderResultMap">
-        SELECT id, tenant_id, provider, client_id, encrypted_client_secret,
-        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
-        issuer, enabled, created_at, updated_at
+        SELECT id, tenant_id, provider_key, display_name, issuer_uri,
+               client_id, client_secret, scopes, enabled, created_at, updated_at
         FROM public.tenant_oidc_providers
         WHERE tenant_id = #{tenantId}
     </select>
 
     <insert id="insert" parameterType="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
         INSERT INTO public.tenant_oidc_providers (
-        id, tenant_id, provider, client_id, encrypted_client_secret,
-        authorization_endpoint, token_endpoint, user_info_endpoint, jwks_uri,
-        issuer, enabled, created_at, updated_at
+            id, tenant_id, provider_key, display_name, issuer_uri,
+            client_id, client_secret, scopes, enabled, created_at, updated_at
         ) VALUES (
-        #{id}, #{tenantId}, #{provider}, #{clientId}, #{encryptedClientSecret},
-        #{authorizationEndpoint}, #{tokenEndpoint}, #{userInfoEndpoint}, #{jwksUri},
-        #{issuer}, #{enabled}, #{createdAt}, #{updatedAt}
+            #{id}, #{tenantId}, #{providerKey}, #{displayName}, #{issuerUri},
+            #{clientId}, #{clientSecret}, #{scopes}, #{enabled}, #{createdAt}, #{updatedAt}
         )
     </insert>
 
     <update id="update" parameterType="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
         UPDATE public.tenant_oidc_providers
-        SET client_id = #{clientId},
-        encrypted_client_secret = #{encryptedClientSecret},
-        authorization_endpoint = #{authorizationEndpoint},
-        token_endpoint = #{tokenEndpoint},
-        user_info_endpoint = #{userInfoEndpoint},
-        jwks_uri = #{jwksUri},
-        issuer = #{issuer},
-        enabled = #{enabled},
-        updated_at = NOW()
+        SET provider_key = #{providerKey},
+            display_name = #{displayName},
+            issuer_uri = #{issuerUri},
+            client_id = #{clientId},
+            client_secret = #{clientSecret},
+            scopes = #{scopes},
+            enabled = #{enabled},
+            updated_at = NOW()
         WHERE id = #{id}
-        AND tenant_id = #{tenantId}
     </update>
 
-    <delete id="deleteById">
+    <delete id="deleteByTenantId">
         DELETE FROM public.tenant_oidc_providers
-        WHERE id = #{id}
-        AND tenant_id = #{tenantId}
+        WHERE tenant_id = #{tenantId}
     </delete>
 
 </mapper>
