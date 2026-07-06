@@ -3,7 +3,7 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
 
     <!-- MVP: zero changesets — Liquibase tracking tables are initialized in t_{tenantKey} schema
          when TenantLiquibaseRunner.runMigrationsForTenant runs. Tenant-scoped tables will be
