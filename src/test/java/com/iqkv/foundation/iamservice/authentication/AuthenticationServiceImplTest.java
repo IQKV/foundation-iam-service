@@ -43,6 +43,7 @@ import com.iqkv.foundation.iamservice.membership.MembershipStatus;
 import com.iqkv.foundation.iamservice.membership.TenantMembership;
 import com.iqkv.foundation.iamservice.membership.TenantMembershipMapper;
 import com.iqkv.foundation.iamservice.security.JwtClaimNames;
+import com.iqkv.foundation.iamservice.shared.exception.AccountLockedException;
 import com.iqkv.foundation.iamservice.shared.exception.AccountNotActiveException;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
@@ -423,8 +424,8 @@ class AuthenticationServiceImplTest {
   }
 
   @Test
-  @DisplayName("signIn — locked (status) user should be rejected with AccountNotActiveException")
-  void signIn_lockedStatusUser_throwsAccountNotActiveException() {
+  @DisplayName("signIn — locked (status) user should be rejected with AccountLockedException")
+  void signIn_lockedStatusUser_throwsAccountLockedException() {
     testUser.setStatus(AccountStatus.LOCKED);
     TenantContext.setCurrentTenant("test-tenant");
     try {
@@ -433,7 +434,7 @@ class AuthenticationServiceImplTest {
 
       assertThatThrownBy(() -> authenticationService.signIn(
           new AuthenticationDtos.SignInRequest("user@example.com", "password123")))
-          .isInstanceOf(AccountNotActiveException.class);
+          .isInstanceOf(AccountLockedException.class);
 
       verifyNoInteractions(accountLockoutManager, passwordEncoder, membershipService, jwtTokenGenerator);
     } finally {
