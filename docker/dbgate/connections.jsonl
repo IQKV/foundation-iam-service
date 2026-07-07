@@ -1,3 +1,4 @@
-{"_id":"postgres-iam","engine":"postgres@dbgate-plugin-postgres","server":"postgres-iam","port":5432,"user":"svc_iam_dba","password":"svc_iam_dba","database":"iam","displayName":"PostgreSQL - IAM Service"}
-{"_id":"rabbitmq-management","engine":"rabbitmq@dbgate-plugin-rabbitmq","server":"rabbitmq-iam","port":15672,"user":"svc_iam_rmq","password":"svc_iam_rmq","displayName":"RabbitMQ - IAM Service"}
-{"_id":"minio-s3","engine":"s3@dbgate-plugin-s3","server":"minio","port":9000,"user":"iqkv","password":"iqkv_password","displayName":"MinIO - S3 Storage"}
+{"_id":"postgres-iam","engine":"postgres@dbgate-plugin-postgres","server":"postgres-iam","port":5432,"user":"svc_iam_dba","password":"svc_iam_dba","database":"iamservice","displayName":"PostgreSQL - IAM Service"}
+{"_id":"rabbitmq-iam","engine":"rabbitmq@dbgate-plugin-rabbitmq","server":"rabbitmq-iam","port":15672,"user":"svc_iam_rmq","password":"svc_iam_rmq","displayName":"RabbitMQ - IAM Service"}
+{"_id":"redis-iam","engine":"redis@dbgate-plugin-redis","server":"redis-iam","port":6379,"displayName":"Redis - IAM Service"}
+{"_id":"minio-iam","engine":"s3@dbgate-plugin-s3","server":"minio","port":9000,"user":"iqkv","password":"iqkv_password","displayName":"MinIO - IAM Service"}
