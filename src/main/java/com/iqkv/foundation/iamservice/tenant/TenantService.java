@@ -40,9 +40,10 @@ public interface TenantService {
    *
    * @param tenantKey the tenant's unique key
    * @param planCode  the human-readable plan code (e.g. {@code "pro-monthly"})
+   * @param seatCount the purchased seat count for per-seat plans
    * @throws com.iqkv.foundation.iamservice.shared.exception.TenantNotFoundException if no tenant exists with the given key
    */
-  void updateActivePlanCode(String tenantKey, String planCode);
+  void updateActivePlanCode(String tenantKey, String planCode, Long seatCount);
 
   // ─── Self-service ──────────────────────────────────────────────────────────
 

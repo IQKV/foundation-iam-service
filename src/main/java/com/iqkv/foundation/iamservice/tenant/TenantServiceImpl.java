@@ -89,11 +89,11 @@ public class TenantServiceImpl implements TenantService {
   }
 
   @Override
-  public void updateActivePlanCode(final String tenantKey, final String planCode) {
+  public void updateActivePlanCode(final String tenantKey, final String planCode, final Long seatCount) {
     tenantMapper.findByTenantKey(tenantKey)
         .orElseThrow(() -> new TenantNotFoundException("Tenant not found: " + tenantKey));
-    tenantMapper.updateActivePlanCode(tenantKey, planCode);
-    log.info("Active plan code updated: tenantKey={}, planCode={}", tenantKey, planCode);
+    tenantMapper.updateActivePlanCode(tenantKey, planCode, seatCount);
+    log.info("Active plan code and seat count updated: tenantKey={}, planCode={}, seatCount={}", tenantKey, planCode, seatCount);
   }
 
   // ─── Self-service ──────────────────────────────────────────────────────────
@@ -134,12 +134,22 @@ public class TenantServiceImpl implements TenantService {
     tenantMapper.insertIfAbsent(tenant);
     metrics.recordTenantProvisioning("initiated");
 
-    // Step 3: Quota check: enforce maxUsers from the active plan (0 = unlimited)
-    final int maxUsers = planResolver.resolveEntitlement(tenant.getActivePlanCode()).maxUsers();
-    if (maxUsers > 0) {
-      final long current = membershipMapper.countByTenantKey(tenantKey);
-      if (current >= maxUsers) {
-        throw new PlanMemberQuotaException(current, maxUsers);
+    // Step 3: Quota check: enforce limits based on plan type
+    final var entitlement = planResolver.resolveEntitlement(tenant.getActivePlanCode());
+    final long current = membershipMapper.countByTenantKey(tenantKey);
+
+    if (entitlement.isPerSeat()) {
+      // For per-seat plans, use purchased seat count if available, otherwise plan max users
+      final long limit = (tenant.getPurchasedSeatCount() != null && tenant.getPurchasedSeatCount() > 0)
+          ? tenant.getPurchasedSeatCount()
+          : entitlement.maxUsers();
+      if (limit > 0 && current >= limit) {
+        throw new PlanMemberQuotaException(current, (int) limit);
+      }
+    } else {
+      // For flat plans, use plan max users
+      if (entitlement.maxUsers() > 0 && current >= entitlement.maxUsers()) {
+        throw new PlanMemberQuotaException(current, entitlement.maxUsers());
       }
     }
 

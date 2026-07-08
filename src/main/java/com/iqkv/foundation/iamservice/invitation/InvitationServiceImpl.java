@@ -207,14 +207,25 @@ public class InvitationServiceImpl implements InvitationService {
       throw new TenantMembershipAlreadyExistsException();
     }
 
-    // Quota check: enforce maxUsers from the active plan (0 = unlimited)
-    final String planCode = tenantMapper.findByTenantKey(tenantKey)
-        .map(Tenant::getActivePlanCode).orElse(null);
-    final int maxUsers = planResolver.resolveEntitlement(planCode).maxUsers();
-    if (maxUsers > 0) {
-      final long current = membershipMapper.countByTenantKey(tenantKey);
-      if (current >= maxUsers) {
-        throw new PlanMemberQuotaException(current, maxUsers);
+    // Quota check: enforce limits based on plan type
+    final var tenant = tenantMapper.findByTenantKey(tenantKey)
+        .orElseThrow(() -> new TenantNotAvailableException("Tenant not found: " + tenantKey));
+    final String planCode = tenant.getActivePlanCode();
+    final var entitlement = planResolver.resolveEntitlement(planCode);
+    final long current = membershipMapper.countByTenantKey(tenantKey);
+
+    if (entitlement.isPerSeat()) {
+      // For per-seat plans, use purchased seat count if available, otherwise plan max users
+      final long limit = (tenant.getPurchasedSeatCount() != null && tenant.getPurchasedSeatCount() > 0)
+          ? tenant.getPurchasedSeatCount()
+          : entitlement.maxUsers();
+      if (limit > 0 && current >= limit) {
+        throw new PlanMemberQuotaException(current, (int) limit);
+      }
+    } else {
+      // For flat plans, use plan max users
+      if (entitlement.maxUsers() > 0 && current >= entitlement.maxUsers()) {
+        throw new PlanMemberQuotaException(current, entitlement.maxUsers());
       }
     }
 
@@ -253,8 +264,8 @@ public class InvitationServiceImpl implements InvitationService {
 
     // Send invitation-accepted welcome email (fire-and-forget — must not affect the accept transaction).
     try {
-      final Tenant tenant = tenantMapper.findByTenantKey(tenantKey).orElse(null);
-      final String tenantName = tenant != null ? tenant.getName() : tenantKey;
+      final Tenant tenantForEmail = tenantMapper.findByTenantKey(tenantKey).orElse(null);
+      final String tenantName = tenantForEmail != null ? tenantForEmail.getName() : tenantKey;
       final String dashboardUrl = (notificationProps.baseUrl() != null ? notificationProps.baseUrl() : "") + "/dashboard";
       final String userLocale = user.getLocale() != null && !user.getLocale().isBlank()
           ? user.getLocale()

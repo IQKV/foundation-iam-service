@@ -33,6 +33,7 @@ public class Tenant {
   private String tenantModeOrigin;
   private Boolean isInternal;
   private String activePlanCode;
+  private Long purchasedSeatCount;
 
   public UUID getId() {
     return id;
@@ -128,5 +129,13 @@ public class Tenant {
 
   public void setActivePlanCode(final String activePlanCode) {
     this.activePlanCode = activePlanCode;
+  }
+
+  public Long getPurchasedSeatCount() {
+    return purchasedSeatCount;
+  }
+
+  public void setPurchasedSeatCount(final Long purchasedSeatCount) {
+    this.purchasedSeatCount = purchasedSeatCount;
   }
 }

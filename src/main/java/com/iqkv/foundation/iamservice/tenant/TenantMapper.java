@@ -50,7 +50,7 @@ public interface TenantMapper {
    * @param tenantKey the tenant's unique key
    * @param planCode  the human-readable plan code (e.g. {@code "pro-monthly"}); may be null to clear
    */
-  void updateActivePlanCode(@Param("tenantKey") String tenantKey, @Param("planCode") String planCode);
+  void updateActivePlanCode(@Param("tenantKey") String tenantKey, @Param("planCode") String planCode, @Param("seatCount") Long seatCount);
 
   void deleteByTenantKey(@Param("tenantKey") String tenantKey);
 

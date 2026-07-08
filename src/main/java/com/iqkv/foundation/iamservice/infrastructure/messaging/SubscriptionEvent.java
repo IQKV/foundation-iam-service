@@ -40,6 +40,7 @@ public class SubscriptionEvent {
   private String subjectType;
   private String subjectKey;
   private String planCode;
+  private Long seatCount;
 
   public SubscriptionEvent() {
   }
@@ -98,5 +99,13 @@ public class SubscriptionEvent {
 
   public void setPlanCode(final String planCode) {
     this.planCode = planCode;
+  }
+
+  public Long getSeatCount() {
+    return seatCount;
+  }
+
+  public void setSeatCount(final Long seatCount) {
+    this.seatCount = seatCount;
   }
 }
