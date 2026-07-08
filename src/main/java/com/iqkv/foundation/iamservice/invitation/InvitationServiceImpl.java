@@ -81,7 +81,7 @@ public class InvitationServiceImpl implements InvitationService {
   private final InvitationConfigurationProperties invitationProps;
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformConfigurationProperties platformConfig;
-  private final PlanResolver planCatalogCache;
+  private final PlanResolver planResolver;
 
   public InvitationServiceImpl(
       final InvitationMapper invitationMapper,
@@ -97,7 +97,7 @@ public class InvitationServiceImpl implements InvitationService {
       final InvitationConfigurationProperties invitationProps,
       final NotificationConfigurationProperties notificationProps,
       final PlatformConfigurationProperties platformConfig,
-      final PlanResolver planCatalogCache) {
+      final PlanResolver planResolver) {
     this.invitationMapper = invitationMapper;
     this.tenantMapper = tenantMapper;
     this.userMapper = userMapper;
@@ -111,7 +111,7 @@ public class InvitationServiceImpl implements InvitationService {
     this.invitationProps = invitationProps;
     this.notificationProps = notificationProps;
     this.platformConfig = platformConfig;
-    this.planCatalogCache = planCatalogCache;
+    this.planResolver = planResolver;
   }
 
   // -------------------------------------------------------------------------
@@ -210,7 +210,7 @@ public class InvitationServiceImpl implements InvitationService {
     // Quota check: enforce maxUsers from the active plan (0 = unlimited)
     final String planCode = tenantMapper.findByTenantKey(tenantKey)
         .map(Tenant::getActivePlanCode).orElse(null);
-    final int maxUsers = planCatalogCache.resolveEntitlement(planCode).maxUsers();
+    final int maxUsers = planResolver.resolveEntitlement(planCode).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(tenantKey);
       if (current >= maxUsers) {

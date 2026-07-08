@@ -70,7 +70,7 @@ public class TenantServiceImpl implements TenantService {
   private final MessagingService messagingService;
   private final UserMapper userMapper;
   private final IamServiceMetrics metrics;
-  private final PlanResolver planCatalogCache;
+  private final PlanResolver planResolver;
 
   public TenantServiceImpl(final TenantMapper tenantMapper,
                            final TenantMembershipMapper membershipMapper,
@@ -78,14 +78,14 @@ public class TenantServiceImpl implements TenantService {
                            final MessagingService messagingService,
                            final UserMapper userMapper,
                            final IamServiceMetrics metrics,
-                           final PlanResolver planCatalogCache) {
+                           final PlanResolver planResolver) {
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.messagingService = messagingService;
     this.userMapper = userMapper;
     this.metrics = metrics;
-    this.planCatalogCache = planCatalogCache;
+    this.planResolver = planResolver;
   }
 
   @Override
@@ -135,7 +135,7 @@ public class TenantServiceImpl implements TenantService {
     metrics.recordTenantProvisioning("initiated");
 
     // Step 3: Quota check: enforce maxUsers from the active plan (0 = unlimited)
-    final int maxUsers = planCatalogCache.resolveEntitlement(tenant.getActivePlanCode()).maxUsers();
+    final int maxUsers = planResolver.resolveEntitlement(tenant.getActivePlanCode()).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(tenantKey);
       if (current >= maxUsers) {

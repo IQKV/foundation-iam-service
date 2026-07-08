@@ -65,7 +65,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
   private final TenantMemberAuthorityMapper authorityMapper;
   private final DefaultTenantResolver defaultTenantResolver;
   private final PasswordEncoder passwordEncoder;
-  private final PlanResolver planCatalogCache;
+  private final PlanResolver planResolver;
 
   public SingleTenantSignupStrategy(final UserMapper userMapper,
                                     final TenantMapper tenantMapper,
@@ -73,14 +73,14 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
                                     final TenantMemberAuthorityMapper authorityMapper,
                                     final DefaultTenantResolver defaultTenantResolver,
                                     final PasswordEncoder passwordEncoder,
-                                    final PlanResolver planCatalogCache) {
+                                    final PlanResolver planResolver) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
     this.authorityMapper = authorityMapper;
     this.defaultTenantResolver = defaultTenantResolver;
     this.passwordEncoder = passwordEncoder;
-    this.planCatalogCache = planCatalogCache;
+    this.planResolver = planResolver;
   }
 
   private static final String PLATFORM_TENANT_KEY = "platform";
@@ -124,7 +124,7 @@ public class SingleTenantSignupStrategy implements SignupStrategy {
     }
 
     // Step 4a: Quota check — enforce maxUsers from the active plan (0 = unlimited)
-    final int maxUsers = planCatalogCache.resolveEntitlement(defaultTenant.getActivePlanCode()).maxUsers();
+    final int maxUsers = planResolver.resolveEntitlement(defaultTenant.getActivePlanCode()).maxUsers();
     if (maxUsers > 0) {
       final long current = membershipMapper.countByTenantKey(defaultTenantKey);
       if (current >= maxUsers) {

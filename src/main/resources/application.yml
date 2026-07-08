@@ -185,7 +185,7 @@ iqkv:
     token-ttl: ${INVITATION_TOKEN_TTL:PT72H}
     reaper-interval: ${INVITATION_REAPER_INTERVAL:PT1H}
   billing:
-    # Billing service base URL used by PlanCatalogCache for quota enforcement
+    # Billing service base URL used by PlanResolver for quota enforcement
     service-url: ${BILLING_SERVICE_URI:http://foundation-billing-service}
     # How often the plan catalog cache is refreshed (ISO-8601 duration)
     plan-refresh-interval: ${BILLING_PLAN_REFRESH_INTERVAL:PT10M}

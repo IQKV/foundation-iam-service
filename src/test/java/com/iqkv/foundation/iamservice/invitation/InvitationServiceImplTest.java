@@ -88,7 +88,7 @@ class InvitationServiceImplTest {
   @Mock
   private PlatformConfigurationProperties platformConfig;
   @Mock
-  private PlanResolver planCatalogCache;
+  private PlanResolver planResolver;
 
   private InvitationServiceImpl invitationService;
 
@@ -113,7 +113,7 @@ class InvitationServiceImplTest {
         invitationProps,
         notificationProps,
         platformConfig,
-        planCatalogCache
+        planResolver
     );
 
     testUser = new User();
@@ -223,7 +223,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "platform")).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
-    when(planCatalogCache.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
+    when(planResolver.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
@@ -269,7 +269,7 @@ class InvitationServiceImplTest {
     // Mock that user is already a platform tenant member so ensurePlatformMembership doesn't call insert
     when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("platform"))).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
-    when(planCatalogCache.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
+    when(planResolver.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
     when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
