@@ -81,32 +81,32 @@ public class SubscriptionEventConsumer {
    * The plan code is subsequently stamped into JWT access tokens via {@code JwtTokenGenerator}.
    */
   private void handleSubscriptionActivated(final SubscriptionEvent event) {
-        final String tenantKey = event.getTenantKey();
-        final String planCode = event.getPlanCode();
-        final Long seatCount = event.getSeatCount();
+    final String tenantKey = event.getTenantKey();
+    final String planCode = event.getPlanCode();
+    final Long seatCount = event.getSeatCount();
 
-        if (tenantKey == null || tenantKey.isBlank()) {
-            log.warn("Received {} event with missing tenantKey, skipping", event.getEventType());
-            return;
-        }
-
-        if (planCode == null || planCode.isBlank()) {
-            log.debug("Received {} event for tenantKey={} with null planCode, skipping plan cache update",
-                event.getEventType(), tenantKey);
-            return;
-        }
-
-        log.info("Received {} event: tenantKey={}, planCode={}, seatCount={}, externalSubscriptionId={}",
-            event.getEventType(), tenantKey, planCode, seatCount, event.getExternalSubscriptionId());
-
-        try {
-            tenantService.updateActivePlanCode(tenantKey, planCode, seatCount);
-            log.info("Cached active plan code and seat count for tenantKey={}: planCode={}, seatCount={}", tenantKey, planCode, seatCount);
-        } catch (final TenantNotFoundException e) {
-            log.error("Tenant not found for {} event: tenantKey={}", event.getEventType(), tenantKey, e);
-            throw e; // → DLQ after retry exhaustion
-        }
+    if (tenantKey == null || tenantKey.isBlank()) {
+      log.warn("Received {} event with missing tenantKey, skipping", event.getEventType());
+      return;
     }
+
+    if (planCode == null || planCode.isBlank()) {
+      log.debug("Received {} event for tenantKey={} with null planCode, skipping plan cache update",
+          event.getEventType(), tenantKey);
+      return;
+    }
+
+    log.info("Received {} event: tenantKey={}, planCode={}, seatCount={}, externalSubscriptionId={}",
+        event.getEventType(), tenantKey, planCode, seatCount, event.getExternalSubscriptionId());
+
+    try {
+      tenantService.updateActivePlanCode(tenantKey, planCode, seatCount);
+      log.info("Cached active plan code and seat count for tenantKey={}: planCode={}, seatCount={}", tenantKey, planCode, seatCount);
+    } catch (final TenantNotFoundException e) {
+      log.error("Tenant not found for {} event: tenantKey={}", event.getEventType(), tenantKey, e);
+      throw e; // → DLQ after retry exhaustion
+    }
+  }
 
   /**
    * Suspends the tenant when their subscription is cancelled.
