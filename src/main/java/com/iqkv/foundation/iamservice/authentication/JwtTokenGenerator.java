@@ -85,7 +85,6 @@ public class JwtTokenGenerator {
         .claim(JwtClaimNames.JTI, UUID.randomUUID().toString())
         .claim(JwtClaimNames.TYPE, JwtClaimNames.TYPE_ACCESS)
         .claim(JwtClaimNames.USER_ID, user.getId().toString())
-        .claim(JwtClaimNames.USERNAME, user.getEmail())
         .claim(JwtClaimNames.EMAIL, user.getEmail())
         .claim(JwtClaimNames.FIRST_NAME, user.getFirstName())
         .claim(JwtClaimNames.LAST_NAME, user.getLastName())
@@ -113,7 +112,6 @@ public class JwtTokenGenerator {
         .claim(JwtClaimNames.EXP, Date.from(expiry))
         .claim(JwtClaimNames.JTI, UUID.randomUUID().toString())
         .claim(JwtClaimNames.TYPE, JwtClaimNames.TYPE_REFRESH)
-        .claim(JwtClaimNames.USERNAME, user.getEmail())
         .claim(JwtClaimNames.TENANT_ID, tenantKey)
         .signWith(privateKey, Jwts.SIG.RS256)
         .compact();

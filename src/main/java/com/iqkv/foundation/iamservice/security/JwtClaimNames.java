@@ -28,11 +28,10 @@ public final class JwtClaimNames {
   public static final String EXP = "exp";
   public static final String JTI = "jti";
   public static final String TYPE = "type";
-  public static final String USER_ID = "userId";
-  public static final String USERNAME = "username";
+  public static final String USER_ID = "user_id";
   public static final String EMAIL = "email";
-  public static final String FIRST_NAME = "firstName";
-  public static final String LAST_NAME = "lastName";
+  public static final String FIRST_NAME = "first_name";
+  public static final String LAST_NAME = "last_name";
   public static final String TENANT_ID = "tenant_id";
   public static final String AUTHORITIES = "authorities";
   public static final String EMAIL_VERIFIED = "email_verified";

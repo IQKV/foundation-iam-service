@@ -38,11 +38,10 @@ class JwtClaimNamesTest {
   @DisplayName("Custom claim names should have expected values")
   void shouldHaveCorrectCustomClaimNames() {
     assertThat(JwtClaimNames.TYPE).isEqualTo("type");
-    assertThat(JwtClaimNames.USER_ID).isEqualTo("userId");
-    assertThat(JwtClaimNames.USERNAME).isEqualTo("username");
+    assertThat(JwtClaimNames.USER_ID).isEqualTo("user_id");
     assertThat(JwtClaimNames.EMAIL).isEqualTo("email");
-    assertThat(JwtClaimNames.FIRST_NAME).isEqualTo("firstName");
-    assertThat(JwtClaimNames.LAST_NAME).isEqualTo("lastName");
+    assertThat(JwtClaimNames.FIRST_NAME).isEqualTo("first_name");
+    assertThat(JwtClaimNames.LAST_NAME).isEqualTo("last_name");
     assertThat(JwtClaimNames.TENANT_ID).isEqualTo("tenant_id");
     assertThat(JwtClaimNames.AUTHORITIES).isEqualTo("authorities");
     assertThat(JwtClaimNames.EMAIL_VERIFIED).isEqualTo("email_verified");
@@ -59,14 +58,14 @@ class JwtClaimNamesTest {
   }
 
   @Test
-  @DisplayName("Issuer constant should have expected value")
-  void shouldHaveCorrectIssuer() {
-    assertThat(JwtClaimNames.ISSUER).isEqualTo("foundation-iam-service");
-  }
-
-  @Test
   @DisplayName("Access and refresh type constants should be distinct")
   void tokenTypeConstantsShouldBeDistinct() {
     assertThat(JwtClaimNames.TYPE_ACCESS).isNotEqualTo(JwtClaimNames.TYPE_REFRESH);
+  }
+
+  @Test
+  @DisplayName("Issuer constant should have expected value")
+  void shouldHaveCorrectIssuer() {
+    assertThat(JwtClaimNames.ISSUER).isEqualTo("foundation-iam-service");
   }
 }
