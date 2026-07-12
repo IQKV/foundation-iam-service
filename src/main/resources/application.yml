@@ -194,7 +194,7 @@ iqkv:
     # If not provided, will be resolved from database or auto-generated
     # Format: 8-character NanoID using alphabet [a-z0-9]
     # Example: abc12345
-    default-tenant-key: ${DEFAULT_TENANT_KEY:platform}
+    default-tenant-key: platform
     # Display name for the default tenant in SINGLE_TENANT mode
     default-tenant-name: ${DEFAULT_TENANT_NAME:Acme Corp.}
     schema-prefix: t_
