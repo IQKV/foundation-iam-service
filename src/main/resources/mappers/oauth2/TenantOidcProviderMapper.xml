@@ -44,14 +44,18 @@
 
     <update id="update" parameterType="com.iqkv.foundation.iamservice.oauth2.TenantOidcProvider">
         UPDATE public.tenant_oidc_providers
-        SET provider_key = #{providerKey},
+        <set>
+            provider_key = #{providerKey},
             display_name = #{displayName},
             issuer_uri = #{issuerUri},
             client_id = #{clientId},
-            client_secret = #{clientSecret},
+            <if test="clientSecret != null">
+                client_secret = #{clientSecret},
+            </if>
             scopes = #{scopes},
             enabled = #{enabled},
             updated_at = NOW()
+        </set>
         WHERE id = #{id}
     </update>
 

@@ -75,7 +75,10 @@ public class TenantSsoRestResource {
     model.setIssuerUri(provider.issuerUri());
     model.setClientId(provider.clientId());
     model.setClientSecret(provider.clientSecret());
-    model.setScopes(provider.scopes());
+    // Use default scopes if not provided
+    model.setScopes(provider.scopes() != null && !provider.scopes().isBlank() 
+        ? provider.scopes() 
+        : "openid,profile,email");
     model.setEnabled(provider.enabled());
     tenantSsoService.configureTenantSso(TenantContext.getCurrentTenant(), model);
     return ResponseEntity.noContent().build();

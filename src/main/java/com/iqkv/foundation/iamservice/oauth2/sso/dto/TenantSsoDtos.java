@@ -1,5 +1,7 @@
 package com.iqkv.foundation.iamservice.oauth2.sso.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public final class TenantSsoDtos {
 
   private TenantSsoDtos() {
@@ -17,9 +19,9 @@ public final class TenantSsoDtos {
   }
 
   public record TenantSsoConfigRequest(
-      String displayName,
-      String issuerUri,
-      String clientId,
+      @NotBlank String displayName,
+      @NotBlank String issuerUri,
+      @NotBlank String clientId,
       String clientSecret,
       String scopes,
       boolean enabled
