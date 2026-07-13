@@ -19,10 +19,8 @@ package com.iqkv.foundation.iamservice.tenant;
 import java.util.List;
 
 import com.iqkv.foundation.tenancy.TenantKeyProvider;
-import com.iqkv.foundation.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,12 +29,8 @@ import org.springframework.stereotype.Component;
  * <p>Queries the authoritative {@code public.tenants} table for all tenant keys whose schemas
  * should receive Liquibase migrations on startup. Tenants in the {@code DELETED} state are
  * excluded because their schemas may have been dropped.
- *
- * <p>This bean is activated only when {@link TenantLiquibaseRunner} is present, ensuring it does
- * not interfere when the runner is disabled.
  */
 @Component
-@ConditionalOnBean(TenantLiquibaseRunner.class)
 public class AllTenantsKeyProvider implements TenantKeyProvider {
 
   private static final Logger log = LoggerFactory.getLogger(AllTenantsKeyProvider.class);
