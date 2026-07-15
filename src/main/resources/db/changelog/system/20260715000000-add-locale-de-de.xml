@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="20260715000000-add-locale-de-de" author="iqkv">
+        <insert tableName="locales" schemaName="public">
+            <column name="code" value="de-DE"/>
+            <column name="name" value="German (Germany)"/>
+            <column name="native_name" value="Deutsch (Deutschland)"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_default" valueBoolean="false"/>
+        </insert>
+        <rollback>
+            <delete tableName="locales" schemaName="public">
+                <where>code = 'de-DE'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

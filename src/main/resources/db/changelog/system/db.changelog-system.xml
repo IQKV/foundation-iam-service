@@ -32,6 +32,8 @@
     <include file="db/changelog/system/20260630100000-tenant-oidc-providers.xml"/>
     <include file="db/changelog/system/20260708120000-add-purchased-seat-count-to-tenants.xml"/>
     <include file="db/changelog/system/20260712120000-make-tenant-oidc-client-secret-nullable.xml"/>
+    <include file="db/changelog/system/20260715000000-add-locale-de-de.xml"/>
+    <include file="db/changelog/system/20260715000001-add-locale-fr-fr.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>
