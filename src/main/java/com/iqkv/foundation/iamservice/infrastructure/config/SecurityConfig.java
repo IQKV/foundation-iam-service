@@ -16,13 +16,7 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.List;
 
 import com.iqkv.foundation.iamservice.security.JwtAuthenticationFilter;
@@ -30,7 +24,6 @@ import com.iqkv.foundation.iamservice.security.JwtClaimNames;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -53,16 +46,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  private final AuthConfigurationProperties authProps;
+  private final RSAPublicKey jwtPublicKey;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
-  private final ResourceLoader resourceLoader;
 
-  public SecurityConfig(final AuthConfigurationProperties authProps,
-                        @Lazy final JwtAuthenticationFilter jwtAuthenticationFilter,
-                        final ResourceLoader resourceLoader) {
-    this.authProps = authProps;
+  public SecurityConfig(final RSAPublicKey jwtPublicKey,
+                        @Lazy final JwtAuthenticationFilter jwtAuthenticationFilter) {
+    this.jwtPublicKey = jwtPublicKey;
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    this.resourceLoader = resourceLoader;
   }
 
   @Bean
@@ -120,23 +110,7 @@ public class SecurityConfig {
 
   @Bean
   public JwtDecoder jwtDecoder() {
-    try {
-      final String publicKeyPath = authProps.jwt().publicKeyPath();
-      final String pem;
-      try (InputStream is = resourceLoader.getResource(publicKeyPath).getInputStream()) {
-        pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-      }
-      final String stripped = pem
-          .replace("-----BEGIN PUBLIC KEY-----", "")
-          .replace("-----END PUBLIC KEY-----", "")
-          .replaceAll("\\s", "");
-      final byte[] keyBytes = Base64.getDecoder().decode(stripped);
-      final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      final RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
-      return NimbusJwtDecoder.withPublicKey(publicKey).build();
-    } catch (final IOException | java.security.GeneralSecurityException e) {
-      throw new IllegalStateException("Failed to load RSA public key for JWT decoding", e);
-    }
+    return NimbusJwtDecoder.withPublicKey(jwtPublicKey).build();
   }
 
   @Bean

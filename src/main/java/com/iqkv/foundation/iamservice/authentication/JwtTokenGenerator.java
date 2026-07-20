@@ -39,11 +39,18 @@ public class JwtTokenGenerator {
 
   private final AuthConfigurationProperties authProps;
   private final RSAPrivateKey privateKey;
+  /**
+   * Key ID matching the {@code kid} field in the JWKS document.
+   * Stamped into every issued JWT header so consumers can look up the correct verification key.
+   */
+  private final String keyId;
 
   public JwtTokenGenerator(final AuthConfigurationProperties authProps,
-                           final ResourceLoader resourceLoader) {
+                           final ResourceLoader resourceLoader,
+                           final String jwtKeyId) {
     this.authProps = authProps;
     this.privateKey = loadPrivateKey(authProps.jwt().privateKeyPath(), resourceLoader);
+    this.keyId = jwtKeyId;
   }
 
   private static RSAPrivateKey loadPrivateKey(final String privateKeyPath,
@@ -78,6 +85,7 @@ public class JwtTokenGenerator {
     final Instant expiry = now.plus(authProps.jwt().expiry());
 
     final var builder = Jwts.builder()
+        .header().keyId(keyId).and()
         .claim(JwtClaimNames.SUB, user.getEmail())
         .claim(JwtClaimNames.ISS, JwtClaimNames.ISSUER)
         .claim(JwtClaimNames.IAT, Date.from(now))
@@ -106,6 +114,7 @@ public class JwtTokenGenerator {
     final Instant expiry = now.plus(authProps.jwt().refreshExpiry());
 
     return Jwts.builder()
+        .header().keyId(keyId).and()
         .claim(JwtClaimNames.SUB, user.getEmail())
         .claim(JwtClaimNames.ISS, JwtClaimNames.ISSUER)
         .claim(JwtClaimNames.IAT, Date.from(now))
