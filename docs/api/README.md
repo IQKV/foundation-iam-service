@@ -378,6 +378,41 @@ a real-time message to the `/topic/announcements` WebSocket topic.
 
 ---
 
+### Platform Admin — Platform Health Notes
+
+Operator-only scratch-pad for tracking incidents, maintenance windows, and operational observations.
+Notes are strictly internal — they are never surfaced to tenants or end-users.
+
+| Method   | Path                          | Auth                 | Description                                                            |
+| -------- | ----------------------------- | -------------------- | ---------------------------------------------------------------------- |
+| `GET`    | `/admin/platform-notes`       | JWT `PLATFORM_ADMIN` | List notes (paginated, filterable by search / severity / status)       |
+| `GET`    | `/admin/platform-notes/count` | JWT `PLATFORM_ADMIN` | Count notes matching the supplied filters                              |
+| `GET`    | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Get note by UUID                                                       |
+| `POST`   | `/admin/platform-notes`       | JWT `PLATFORM_ADMIN` | Create note (status defaults to `OPEN`; actor recorded as `createdBy`) |
+| `PUT`    | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Replace note (all fields required)                                     |
+| `PATCH`  | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Partially update note (e.g. quick status transition)                   |
+| `DELETE` | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Permanently delete note                                                |
+
+**List query parameters** (`GET /admin/platform-notes`):
+
+| Parameter  | Type                                                            | Description                        |
+| ---------- | --------------------------------------------------------------- | ---------------------------------- |
+| `page`     | integer (0-based)                                               | Page number, default `0`           |
+| `size`     | integer                                                         | Page size, default `20`            |
+| `search`   | string                                                          | Free-text search on title and body |
+| `severity` | `INFO` \| `WARNING` \| `CRITICAL`                               | Filter by severity                 |
+| `status`   | `OPEN` \| `RESOLVED` \| `ARCHIVED`                              | Filter by status                   |
+| `sortBy`   | `title` \| `severity` \| `status` \| `createdAt` \| `updatedAt` | Sort field, default `createdAt`    |
+| `sortDir`  | `asc` \| `desc`                                                 | Sort direction, default `desc`     |
+
+**Note severity levels**: `INFO` (blue) → `WARNING` (orange) → `CRITICAL` (red)
+
+**Note status lifecycle**: `OPEN` → `RESOLVED` or `ARCHIVED`; `ARCHIVED` is a soft-retain state for audit — prefer archiving over deleting when history matters.
+
+> This endpoint also serves as the backend for the `platform-health-notes` addon in the platform admin UI, which demonstrates the full addon capability set (routing, tabs, forms, validation, data fetching, mutations) against a real secured API.
+
+---
+
 ### Platform Admin — OIDC
 
 | Method   | Path                                         | Auth                 | Description                                         |

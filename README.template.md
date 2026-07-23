@@ -24,6 +24,7 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 - **Site-wide announcements** — platform admins create multi-lingual announcements; publishing triggers an async fan-out that creates per-user notifications in batches and broadcasts to all connected clients via WebSocket
 - **Email notifications** — Thymeleaf-rendered transactional emails via SMTP
 - **Platform admin actions** — platform admins can ban/unban/unlock users, manage platform authorities, and more
+- **Platform Health Notes** — operator-only note-pad for tracking incidents, maintenance windows, and operational observations; notes are internal and never tenant-visible; backed by `/admin/platform-notes` (CRUD with severity `INFO`/`WARNING`/`CRITICAL` and status `OPEN`/`RESOLVED`/`ARCHIVED`); also serves as the reference backend for the `platform-health-notes` UI addon
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 - **Plan feature enforcement** — `PlanFeatureGuard` resolves the caller's active plan features from a local cache (populated at startup from the billing service) and throws `PlanFeatureNotAvailableException` when a gated endpoint is called by a plan that does not include the required feature; the `plan_code` JWT claim is the only runtime input required
 
@@ -227,6 +228,18 @@ Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and
 | `GET`    | `/admin/announcements/{id}`         | JWT `PLATFORM_ADMIN` | Get announcement by UUID                            |
 | `GET`    | `/admin/announcements`              | JWT `PLATFORM_ADMIN` | List all announcements (paginated)                  |
 
+### Platform Admin — Platform Health Notes
+
+| Method   | Path                          | Auth                 | Description                                                        |
+| -------- | ----------------------------- | -------------------- | ------------------------------------------------------------------ |
+| `GET`    | `/admin/platform-notes`       | JWT `PLATFORM_ADMIN` | List notes (paginated; filter by search / severity / status)       |
+| `GET`    | `/admin/platform-notes/count` | JWT `PLATFORM_ADMIN` | Count notes matching filters                                       |
+| `GET`    | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Get note by UUID                                                   |
+| `POST`   | `/admin/platform-notes`       | JWT `PLATFORM_ADMIN` | Create note (status defaults to `OPEN`)                            |
+| `PUT`    | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Replace note                                                       |
+| `PATCH`  | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Partially update note (e.g. status transition `OPEN` → `RESOLVED`) |
+| `DELETE` | `/admin/platform-notes/{id}`  | JWT `PLATFORM_ADMIN` | Permanently delete note                                            |
+
 ### Platform Admin — OIDC
 
 | Method   | Path                                         | Auth                 | Description                                         |
@@ -427,6 +440,7 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── passwordreset/    # Forgot/reset password flow + reaper job
 ├── platformadmin/    # Platform operator self-service account
 ├── platformauthority/# Platform-level authorities (PLATFORM_ADMIN)
+├── platformnote/     # Platform Health Notes (operator-only incident/obs note-pad)
 ├── security/         # JWT authentication filter, claim names, JWKS endpoint
 ├── signup/           # SignupStrategy (multi-tenant / single-tenant)
 ├── tenant/           # Tenant lifecycle, provisioning, bootstrap strategies

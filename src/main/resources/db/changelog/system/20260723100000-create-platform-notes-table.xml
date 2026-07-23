@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="20260723100000" author="iqkv">
+        <comment>
+            Platform Health Notes — operator-only scratch-pad for incidents, maintenance windows,
+            and operational observations. Notes are platform-scoped and never tenant-visible.
+        </comment>
+
+        <createTable tableName="platform_notes" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Enum stored as VARCHAR; values: INFO, WARNING, CRITICAL -->
+            <column name="severity" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Enum stored as VARCHAR; values: OPEN, RESOLVED, ARCHIVED -->
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_platform_notes_created_by"
+                             references="public.users(id)"
+                             deleteCascade="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Fast look-up by status (dashboard widget queries OPEN notes) -->
+        <createIndex indexName="idx_platform_notes_status"
+                     tableName="platform_notes"
+                     schemaName="public">
+            <column name="status"/>
+        </createIndex>
+
+        <!-- Fast look-up by severity (filter / widget queries) -->
+        <createIndex indexName="idx_platform_notes_severity"
+                     tableName="platform_notes"
+                     schemaName="public">
+            <column name="severity"/>
+        </createIndex>
+
+        <!-- Default list ordering uses created_at DESC -->
+        <createIndex indexName="idx_platform_notes_created_at"
+                     tableName="platform_notes"
+                     schemaName="public">
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="idx_platform_notes_created_at" tableName="platform_notes" schemaName="public"/>
+            <dropIndex indexName="idx_platform_notes_severity"   tableName="platform_notes" schemaName="public"/>
+            <dropIndex indexName="idx_platform_notes_status"     tableName="platform_notes" schemaName="public"/>
+            <dropTable tableName="platform_notes" schemaName="public"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
