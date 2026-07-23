@@ -50,6 +50,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
         "com.iqkv.foundation.iamservice.oauth2",
         "com.iqkv.foundation.iamservice.passwordreset",
         "com.iqkv.foundation.iamservice.platformauthority",
+        "com.iqkv.foundation.iamservice.platformnote",
         "com.iqkv.foundation.iamservice.tenant",
         "com.iqkv.foundation.iamservice.user"
     },
