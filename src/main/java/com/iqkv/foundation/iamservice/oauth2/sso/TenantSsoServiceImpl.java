@@ -53,7 +53,7 @@ public class TenantSsoServiceImpl implements TenantSsoService {
       if (provider.getClientSecret() == null || provider.getClientSecret().isBlank()) {
         throw new IllegalArgumentException("client_secret is required when creating a new SSO provider");
       }
-      
+
       final var newProvider = new TenantOidcProvider();
       newProvider.setId(UUID.randomUUID());
       newProvider.setTenantId(tenant.getId());

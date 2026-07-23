@@ -50,7 +50,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "JWKS", description = "JSON Web Key Set for RS256 token verification")
 public class JwksRestResource {
 
-  /** Cache the key set for 1 hour; the value changes only on key rotation. */
+  /**
+   * Cache the key set for 1 hour; the value changes only on key rotation.
+   */
   private static final CacheControl JWKS_CACHE = CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic();
 
   private final JwkSetResponse jwkSetResponse;

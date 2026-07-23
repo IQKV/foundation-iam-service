@@ -48,13 +48,13 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
     Optional<TenantOidcProvider> tenantProvider = tenantOidcProviderMapper.findByProviderKey(registrationId);
     if (tenantProvider.isPresent()) {
       final TenantOidcProvider tp = tenantProvider.get();
-      
+
       // Validate that client_secret is present (required for confidential OAuth2 clients)
       if (tp.getClientSecret() == null || tp.getClientSecret().isBlank()) {
         log.warn("Tenant OIDC provider {} has no client_secret configured, skipping registration", registrationId);
         return null;
       }
-      
+
       try {
         return ClientRegistrations.fromIssuerLocation(tp.getIssuerUri())
             .registrationId(registrationId)

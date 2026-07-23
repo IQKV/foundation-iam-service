@@ -85,10 +85,18 @@ public class PlatformNoteServiceImpl implements PlatformNoteService {
     final PlatformNote note = noteMapper.findById(id)
         .orElseThrow(() -> new PlatformNoteNotFoundException(id));
 
-    if (request.title() != null) note.setTitle(request.title());
-    if (request.body() != null) note.setBody(request.body());
-    if (request.severity() != null) note.setSeverity(request.severity());
-    if (request.status() != null) note.setStatus(request.status());
+    if (request.title() != null) {
+      note.setTitle(request.title());
+    }
+    if (request.body() != null) {
+      note.setBody(request.body());
+    }
+    if (request.severity() != null) {
+      note.setSeverity(request.severity());
+    }
+    if (request.status() != null) {
+      note.setStatus(request.status());
+    }
     note.setUpdatedAt(LocalDateTime.now());
 
     noteMapper.update(note);
