@@ -4,7 +4,7 @@
 
 This document provides comprehensive guidelines for repository management, development workflows, and collaboration standards for this Maven-based Java project. It serves as a reference for both human developers and AI agents working with this codebase.
 
-**Project:** `foundation-iam-service` — Identity and Access Management microservice for the IQKV Foundation platform.
+**Project:** `foundation-iam-service` — Identity and Access Management microservice for the iQKV Foundation platform.
 **Package root:** `com.iqkv.foundation.iamservice`
 **Main class:** `IamServiceApplication`
 
