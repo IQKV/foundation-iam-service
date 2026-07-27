@@ -87,7 +87,7 @@
 <div class="email-container">
 
     <div class="header">
-        <div class="logo" th:text="#{email.common.logo}">IQ Key Value</div>
+        <div class="logo" th:text="#{email.common.logo}">iQ Key Value</div>
         <div class="warning-icon">&#9888;</div>
         <h1 class="title" th:text="#{email.account-banned.title}">Account Banned</h1>
     </div>
@@ -103,7 +103,7 @@
         <div class="warning-box">
             <th:block th:if="${banType == 'PLATFORM'}">
                 <p th:text="#{email.account-banned.platform-warning}">
-                    Your account has been banned from the entire IQ Key Value platform.
+                    Your account has been banned from the entire iQ Key Value platform.
                 </p>
             </th:block>
             <th:block th:if="${banType == 'TENANT'}">
@@ -134,11 +134,11 @@
         </p>
 
         <p><span th:text="#{email.common.regards}">Best regards,</span><br>
-            <span th:text="#{email.common.team}">The IQ Key Value Team</span></p>
+            <span th:text="#{email.common.team}">The iQ Key Value Team</span></p>
     </div>
 
     <div class="footer">
-        <p th:text="#{email.common.footer.copyright}">&copy; 2026 IQ Key Value. All rights reserved.</p>
+        <p th:text="#{email.common.footer.copyright}">&copy; 2026 iQ Key Value. All rights reserved.</p>
     </div>
 
 </div>

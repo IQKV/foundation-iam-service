@@ -117,7 +117,7 @@ iqkv:
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     from: ${MAIL_FROM:noreply@iqkv.com}
-    from-name: ${MAIL_FROM_NAME:IQ Key Value}
+    from-name: ${MAIL_FROM_NAME:iQ Key Value}
     reply-to: ${MAIL_REPLY_TO:}
   auth:
     jwt:

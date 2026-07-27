@@ -171,7 +171,7 @@
             "name": "iqkv.mail.from-name",
             "type": "java.lang.String",
             "description": "Display name for the From address in outgoing emails.",
-            "defaultValue": "IQ Key Value"
+            "defaultValue": "iQ Key Value"
         },
         {
             "name": "iqkv.mail.reply-to",

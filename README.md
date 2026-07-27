@@ -1,6 +1,6 @@
 > ## 🤔 What is this service all about?
 >
-> - Multi-tenant Identity and Access Management microservice for the IQ Key Value platform.
+> - Multi-tenant Identity and Access Management microservice for the iQ Key Value platform.
 > - A single user account can belong to multiple tenants with different authorities in each.
 > - Make the project easy to maintain with **8 issue templates**.
 > - Quick-start documentation
@@ -9,7 +9,7 @@
 
 ---
 
-# 🔐 IQ Key Value IAM Service
+# 🔐 iQ Key Value IAM Service
 
 Multi-tenant Identity and Access Management microservice. Handles the full identity lifecycle — signup, authentication, token management, tenant provisioning, in-app notifications, and brute-force protection.
 
