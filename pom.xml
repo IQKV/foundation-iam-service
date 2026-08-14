@@ -96,6 +96,13 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+        <!-- Resend email provider SDK (alternative to SMTP) -->
+        <dependency>
+            <groupId>com.resend</groupId>
+            <artifactId>resend-java</artifactId>
+            <version>4.13.0</version>
+        </dependency>
+
         <!-- Messaging: RabbitMQ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

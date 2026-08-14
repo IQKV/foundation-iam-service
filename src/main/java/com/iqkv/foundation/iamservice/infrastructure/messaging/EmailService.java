@@ -16,35 +16,46 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.messaging;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.util.Locale;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+/**
+ * Orchestrates outbound email delivery.
+ *
+ * <p>This class owns two concerns:
+ * <ol>
+ *   <li><b>Rendering</b> — resolves the Thymeleaf template path and i18n subject key from
+ *       {@link NotificationEventType}, renders the HTML body via {@link TemplateEngine}, and
+ *       resolves the localised subject via {@link MessageSource}.</li>
+ *   <li><b>Transport delegation</b> — hands the fully-assembled {@link EmailSendRequest} to the
+ *       active {@link EmailSender} (SMTP or Resend), which is injected at startup based
+ *       on {@code iqkv.notification.mail.provider}.</li>
+ * </ol>
+ *
+ * <p>Switching providers requires only a configuration change — no code changes here.
+ */
 @Service
 public class EmailService {
 
   private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-  private final JavaMailSender javaMailSender;
+  private final EmailSender emailSender;
   private final TemplateEngine templateEngine;
   private final NotificationConfigurationProperties notificationProps;
   private final MessageSource messageSource;
 
-  public EmailService(final JavaMailSender javaMailSender,
+  public EmailService(final EmailSender emailSender,
                       final TemplateEngine templateEngine,
                       final NotificationConfigurationProperties notificationProps,
                       final MessageSource messageSource) {
-    this.javaMailSender = javaMailSender;
+    this.emailSender = emailSender;
     this.templateEngine = templateEngine;
     this.notificationProps = notificationProps;
     this.messageSource = messageSource;
@@ -55,34 +66,26 @@ public class EmailService {
     final String templateName = resolveTemplate(event.getType());
     final String subjectKey = resolveSubjectKey(event.getType());
 
-    try {
-      final Context ctx = new Context(locale);
-      if (event.getPayload() != null) {
-        event.getPayload().forEach(ctx::setVariable);
-      }
-
-      final String htmlBody = templateEngine.process(templateName, ctx);
-      final String subject = messageSource.getMessage(subjectKey, null, locale);
-
-      final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-      final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-      helper.setFrom(notificationProps.mail().from(), notificationProps.mail().fromName());
-      helper.setTo(event.getRecipientEmail());
-      helper.setSubject(subject);
-      helper.setText(htmlBody, true);
-
-      final String replyTo = notificationProps.mail().replyTo();
-      if (replyTo != null && !replyTo.isBlank()) {
-        helper.setReplyTo(replyTo);
-      }
-
-      javaMailSender.send(mimeMessage);
-      log.info("Email sent: type={} to={}", event.getType(), event.getRecipientEmail());
-    } catch (final MessagingException | java.io.UnsupportedEncodingException e) {
-      log.error("Failed to send email: type={} to={}", event.getType(), event.getRecipientEmail(), e);
-      throw new com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException(
-          "Failed to send email to " + event.getRecipientEmail(), e);
+    final Context ctx = new Context(locale);
+    if (event.getPayload() != null) {
+      event.getPayload().forEach(ctx::setVariable);
     }
+
+    final String htmlBody = templateEngine.process(templateName, ctx);
+    final String subject = messageSource.getMessage(subjectKey, null, locale);
+
+    final EmailSendRequest request = new EmailSendRequest(
+        notificationProps.mail().from(),
+        notificationProps.mail().fromName(),
+        notificationProps.mail().replyTo(),
+        event.getRecipientEmail(),
+        subject,
+        htmlBody
+    );
+
+    emailSender.send(request);
+    log.info("Email sent: provider={} type={} to={}",
+        notificationProps.mail().provider(), event.getType(), event.getRecipientEmail());
   }
 
   private Locale resolveLocale(final String localeTag) {

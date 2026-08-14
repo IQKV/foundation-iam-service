@@ -209,6 +209,10 @@ iqkv:
       from: ${iqkv.mail.from}
       from-name: ${iqkv.mail.from-name}
       reply-to: ${iqkv.mail.reply-to}
+      # Email transport provider: "smtp" (default) or "resend"
+      provider: ${MAIL_PROVIDER:smtp}
+      resend:
+        api-key: ${RESEND_API_KEY:}
     default-locale: en
     base-url: ${APP_BASE_URL:http://localhost:3000}
 

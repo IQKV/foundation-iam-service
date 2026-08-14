@@ -18,6 +18,22 @@ public record NotificationConfigurationProperties(
     @NotBlank @Pattern(regexp = "^https?://.+", message = "baseUrl must be a valid http or https URL") String baseUrl
 ) {
 
-  public record Mail(@NotBlank String from, @NotBlank String fromName, String replyTo) {
+  /**
+   * SMTP sender identity and optional reply-to.
+   */
+  public record Mail(
+      @NotBlank String from,
+      @NotBlank String fromName,
+      String replyTo,
+      // Active email transport: "smtp" (default) or "resend"
+      @NotBlank @Pattern(regexp = "^(smtp|resend)$", message = "provider must be 'smtp' or 'resend'") String provider,
+      @Valid Resend resend
+  ) {
+
+    /**
+     * Resend-specific configuration, required when {@code provider=resend}.
+     */
+    public record Resend(String apiKey) {
+    }
   }
 }
