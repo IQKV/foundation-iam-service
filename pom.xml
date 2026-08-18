@@ -100,7 +100,6 @@
         <dependency>
             <groupId>com.resend</groupId>
             <artifactId>resend-java</artifactId>
-            <version>4.13.0</version>
         </dependency>
 
         <!-- Messaging: RabbitMQ -->
