@@ -101,6 +101,8 @@ services:
     environment:
       MINIO_ROOT_USER: iqkv
       MINIO_ROOT_PASSWORD: iqkv_password
+      # Server-level CORS — allows presigned URL uploads from any local origin
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
     ports:
       - "9000:9000" # S3 API
       - "9001:9001" # Console UI
@@ -115,6 +117,24 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
+
+  # MinIO bucket init — creates required buckets and sets public read on avatars
+  minio-init:
+    image: minio/mc:latest
+    container_name: foundation-iam-minio-init-dev
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - iam-service-network
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 iqkv iqkv_password &&
+        mc mb --ignore-existing local/iam-assets &&
+        mc anonymous set download local/iam-assets &&
+        echo 'Buckets ready.'
+      "
+    restart: on-failure
 
   # DbGate - Database Administration Tool
   dbgate:
@@ -190,6 +210,7 @@ services:
 
       # Object Storage Configuration (MinIO)
       OBJECTSTORAGE_ENDPOINT: http://minio:9000
+      OBJECTSTORAGE_PUBLIC_ENDPOINT: http://localhost:9000
       OBJECTSTORAGE_ACCESS_KEY: iqkv
       OBJECTSTORAGE_SECRET_KEY: iqkv_password
       OBJECTSTORAGE_BUCKET_NAME: iam-assets

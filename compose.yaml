@@ -29,6 +29,12 @@ services:
       file: compose.base.yaml
       service: minio
 
+  # MinIO bucket init
+  minio-init:
+    extends:
+      file: compose.base.yaml
+      service: minio-init
+
   # DbGate - Database Administration Tool
   dbgate:
     extends:
