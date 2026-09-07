@@ -1,4 +1,30 @@
-*
-!.dockerignore
-!Dockerfile
-!target/*.jar
+# Exclude build artifacts and dev tooling from Docker build context.
+# pom.xml and src/ must be present for the multi-stage Maven build.
+
+.git
+.github
+.idea
+.mvn/wrapper/maven-wrapper.jar
+.husky
+.devcontainer
+docker
+docs
+target/
+*.iml
+*.md
+*.log
+.env*
+.editorconfig
+.prettierrc
+.prettierignore
+.stylelintrc
+.stylelintignore
+.stylelintcache
+.gitignore
+.gitattributes
+.cursorignore
+commitlint.config.js
+package.json
+pnpm-lock.yaml
+AGENTS.md
+LICENSE
