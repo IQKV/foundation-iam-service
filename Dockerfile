@@ -17,8 +17,10 @@ RUN mvn dependency:go-offline -B
 COPY src src
 
 # Build the application and extract layers (Spring Boot 4.x jarmode)
+# Rename to application.jar first so the extracted application/ layer contains application.jar
 RUN mvn clean package -DskipTests -B && \
-    java -Djarmode=tools -jar target/$(ls target/*.jar | grep -v plain | xargs -n1 basename) extract --layers --destination target/extracted
+    cp target/$(ls target/*.jar | grep -v plain | xargs -n1 basename) target/application.jar && \
+    java -Djarmode=tools -jar target/application.jar extract --layers --destination target/extracted
 
 # Production runtime stage with security hardening
 FROM eclipse-temurin:25-jre-alpine
