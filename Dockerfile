@@ -20,7 +20,7 @@ COPY src src
 RUN mvn clean package -DskipTests -B && \
     mkdir -p target/dependency && \
     cd target && \
-    java -Djarmode=tools -jar app.jar extract --layers --destination dependency
+    java -Djarmode=tools -jar $(ls *.jar | grep -v plain) extract --layers --destination dependency
 
 # Production runtime stage with security hardening
 FROM eclipse-temurin:25-jre-alpine
