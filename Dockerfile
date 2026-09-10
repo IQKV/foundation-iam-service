@@ -16,11 +16,9 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src src
 
-# Build the application
+# Build the application and extract layers (Spring Boot 4.x jarmode)
 RUN mvn clean package -DskipTests -B && \
-    mkdir -p target/dependency && \
-    cd target && \
-    java -Djarmode=tools -jar $(ls *.jar | grep -v plain) extract --layers --destination dependency
+    java -Djarmode=tools -jar target/$(ls target/*.jar | grep -v plain | xargs -n1 basename) extract --layers --destination target/extracted
 
 # Production runtime stage with security hardening
 FROM eclipse-temurin:25-jre-alpine
@@ -36,10 +34,10 @@ RUN mkdir -p /app/logs /app/tmp && \
     chown -R appuser:appuser /app
 
 # Copy application layers for optimal caching
-COPY --from=builder --chown=appuser:appuser /app/target/dependency/dependencies/ ./
-COPY --from=builder --chown=appuser:appuser /app/target/dependency/spring-boot-loader/ ./
-COPY --from=builder --chown=appuser:appuser /app/target/dependency/snapshot-dependencies/ ./
-COPY --from=builder --chown=appuser:appuser /app/target/dependency/application/ ./
+COPY --from=builder --chown=appuser:appuser /app/target/extracted/dependencies/ ./
+COPY --from=builder --chown=appuser:appuser /app/target/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=appuser:appuser /app/target/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=appuser:appuser /app/target/extracted/application/ ./
 
 USER appuser
 
@@ -55,12 +53,10 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
     -XX:+UseG1GC \
     -XX:+UseStringDeduplication \
     -XX:+OptimizeStringConcat \
-    -XX:+UseCompressedOops \
-    -XX:+UseCompressedClassPointers \
     -Djava.security.egd=file:/dev/./urandom \
     -Dspring.backgroundpreinitializer.ignore=true \
     -Dlogging.config=classpath:logback-spring.xml"
 
 ENV JAVA_TOOL_OPTIONS="-Djava.io.tmpdir=/app/tmp"
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS $JAVA_TOOL_OPTIONS org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS $JAVA_TOOL_OPTIONS -jar application.jar"]
