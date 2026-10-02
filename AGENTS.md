@@ -117,10 +117,11 @@ Format: `type(scope): subject`
 - Types: `feat`, `fix`, `improvement`, `refactor`, `docs`, `test`, `chore`, `ci`, `perf`, `revert`
 - Scope: affected bounded context or layer (e.g., `auth`, `user`, `tenant`, `ban`, `invitation`, `security`, `config`)
 - For `fix`: describe the symptom and trigger, not the code change
-  - ✅ `fix(auth): refresh token rejected after tenant key rotation`
-  - ❌ `fix(auth): update token validation logic`
+    - ✅ `fix(auth): refresh token rejected after tenant key rotation`
+    - ❌ `fix(auth): update token validation logic`
 
 Examples:
+
 - `feat(invitation): add expiry extension endpoint for admin`
 - `fix(ban): banned user can still refresh token via concurrent request`
 - `refactor(user): extract tenant resolution into dedicated service`
