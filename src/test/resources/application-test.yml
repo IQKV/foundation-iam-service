@@ -11,7 +11,7 @@ spring:
     password: ""
     driver-class-name: org.h2.Driver
   liquibase:
-    enabled: false  # Migrations are handled by TenantLiquibaseRunner; Spring auto-config must stay off to avoid conflicts
+    enabled: false # Migrations are handled by TenantLiquibaseRunner; Spring auto-config must stay off to avoid conflicts
   mail:
     port: 3025
     properties:
@@ -20,10 +20,10 @@ spring:
 
 iqkv:
   liquibase:
-    tenant-runner-enabled: false  # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
+    tenant-runner-enabled: false # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
   auth:
     security:
-      password-encoder-strength: 4  # Reduced from 12 for faster test execution
+      password-encoder-strength: 4 # Reduced from 12 for faster test execution
   messaging:
     rabbitmq:
       enabled: false
