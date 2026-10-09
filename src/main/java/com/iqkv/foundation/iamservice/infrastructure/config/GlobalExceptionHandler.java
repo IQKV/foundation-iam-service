@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import com.iqkv.foundation.entitlement.plan.BillingServiceException;
 import com.iqkv.foundation.entitlement.plan.PlanFeatureNotAvailableException;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingException;
 import com.iqkv.foundation.iamservice.oauth2.OidcIdentityNotFoundException;
@@ -325,6 +326,22 @@ public class GlobalExceptionHandler {
         request);
     pd.setProperty("featureCode", ex.getFeatureCode());
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(BillingServiceException.class)
+  public ResponseEntity<ProblemDetail> handleBillingServiceError(final BillingServiceException ex,
+                                                                 final HttpServletRequest request,
+                                                                 final Locale locale) {
+    log.error("Billing service error: status={}, detail={}", ex.getHttpStatus(), ex.getDetail());
+    final ProblemDetail pd = problem("about:blank",
+        "Upstream Service Error",
+        502,
+        ex.getDetail(),
+        request);
+    pd.setProperty("upstreamService", "foundation-billing-service");
+    pd.setProperty("upstreamStatus", ex.getHttpStatus().value());
+    ex.getProperties().forEach(pd::setProperty);
+    return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(pd);
   }
 
   @ExceptionHandler(PlanMemberQuotaException.class)
