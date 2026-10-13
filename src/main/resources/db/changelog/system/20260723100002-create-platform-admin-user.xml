@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <!--
+        Bootstrap platform admin account for fresh (non-demo) installations.
+
+        This account has NO tenant membership and authenticates exclusively via
+        POST /api/v1/iam/auth/admin/signin (no X-Tenant-ID header required).
+
+        Credentials (change immediately after first sign-in):
+          Email    : platform.admin@iqkv.com
+          Password : ChangeMePass123!  (BCrypt strength 12)
+
+        The PLATFORM_ADMIN platform authority grants access to all
+        /api/v1/iam/admin/** endpoints.
+
+        IDs use the 00000000-0000-0000-0000-* range reserved for system accounts
+        (distinct from demo data which uses the 00000000-0000-0000-0001-* range).
+    -->
+    <changeSet id="20260723100002-platform-admin-user" author="iqkv">
+        <insert tableName="users" schemaName="public">
+            <column name="id"             value="00000000-0000-0000-0000-000000000010"/>
+            <column name="email"          value="platform.admin@iqkv.com"/>
+            <column name="password_hash"  value="$2a$12$YORlFUMbBxpK1igR4NDnP.hOUGheIiYtd7dWVyDaLHXPnVNTdfHku"/>
+            <column name="first_name"     value="Platform"/>
+            <column name="last_name"      value="Admin"/>
+            <column name="status"         value="ACTIVE"/>
+            <column name="email_verified"     valueBoolean="true"/>
+            <column name="profile_completed"  valueBoolean="true"/>
+            <column name="onboarding_completed" valueBoolean="true"/>
+            <column name="created_at"     valueDate="2026-01-15T12:00:00"/>
+            <column name="updated_at"     valueDate="2026-01-15T12:00:00"/>
+            <column name="created_by"     value="system"/>
+            <column name="updated_by"     value="system"/>
+        </insert>
+
+        <insert tableName="platform_authorities" schemaName="public">
+            <column name="id"         value="00000000-0000-0000-0000-000000000010"/>
+            <column name="user_id"    value="00000000-0000-0000-0000-000000000010"/>
+            <column name="authority"  value="PLATFORM_ADMIN"/>
+            <column name="granted_at" valueDate="2026-01-15T12:00:00"/>
+            <column name="granted_by" value="system"/>
+        </insert>
+
+        <rollback>
+            <delete tableName="platform_authorities" schemaName="public">
+                <where>user_id = '00000000-0000-0000-0000-000000000010'</where>
+            </delete>
+            <delete tableName="users" schemaName="public">
+                <where>id = '00000000-0000-0000-0000-000000000010'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

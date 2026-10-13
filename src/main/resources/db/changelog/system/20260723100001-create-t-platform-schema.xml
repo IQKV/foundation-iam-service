@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <!--
+        Ensures the t_platform schema exists in the database.
+
+        The schema is the personal workspace provisioned for platform-level users
+        (PLATFORM_ADMIN accounts) — analogous to a tenant schema but not tied to
+        any regular tenant signup flow.
+
+        docker/postgres/init-iam.sql creates this schema for local Docker stacks.
+        This changeSet covers non-Docker deployments (managed cloud DBs, CI pipelines,
+        Kubernetes init containers) where the init script never runs.
+
+        CREATE SCHEMA IF NOT EXISTS is safe to run against a database that already
+        has the schema — Liquibase will record the changeSet as applied and skip it
+        on subsequent runs.
+    -->
+    <changeSet id="20260723100001-create-t-platform-schema" author="iqkv" runAlways="false">
+        <sql>CREATE SCHEMA IF NOT EXISTS t_platform;</sql>
+        <rollback>
+            <sql>DROP SCHEMA IF EXISTS t_platform;</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
