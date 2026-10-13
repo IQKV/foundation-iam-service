@@ -18,7 +18,7 @@ package com.iqkv.foundation.iamservice.shared.exception;
 
 import java.util.UUID;
 
-public class PlatformNoteNotFoundException extends RuntimeException {
+public class PlatformNoteNotFoundException extends ResourceNotFoundException {
   public PlatformNoteNotFoundException(final UUID id) {
     super("Platform note not found: " + id);
   }

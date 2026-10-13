@@ -16,7 +16,7 @@
 
 package com.iqkv.foundation.iamservice.shared.exception;
 
-public class UserNotFoundException extends RuntimeException {
+public class UserNotFoundException extends ResourceNotFoundException {
 
   public UserNotFoundException(final String message) {
     super(message);

@@ -18,7 +18,7 @@ package com.iqkv.foundation.iamservice.shared.exception;
 
 import java.util.UUID;
 
-public class SiteAnnouncementNotFoundException extends RuntimeException {
+public class SiteAnnouncementNotFoundException extends ResourceNotFoundException {
   public SiteAnnouncementNotFoundException(final UUID id) {
     super("Site announcement not found: " + id);
   }

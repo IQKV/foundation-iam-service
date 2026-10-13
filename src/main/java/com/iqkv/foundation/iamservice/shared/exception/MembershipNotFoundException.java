@@ -18,7 +18,7 @@ package com.iqkv.foundation.iamservice.shared.exception;
 
 import java.util.UUID;
 
-public class MembershipNotFoundException extends RuntimeException {
+public class MembershipNotFoundException extends ResourceNotFoundException {
 
   private final UUID userId;
   private final String tenantKey;
