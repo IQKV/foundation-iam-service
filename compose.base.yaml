@@ -95,7 +95,7 @@ services:
 
   # MinIO S3-compatible object storage - Local Development
   minio:
-    image: minio/minio:latest
+    image: pgsty/minio:latest
     container_name: foundation-iam-minio-dev
     command: server /data --console-address :9001
     environment:
@@ -120,7 +120,7 @@ services:
 
   # MinIO bucket init — creates required buckets and sets public read on avatars
   minio-init:
-    image: minio/mc:latest
+    image: pgsty/mc:latest
     container_name: foundation-iam-minio-init-dev
     depends_on:
       minio:
