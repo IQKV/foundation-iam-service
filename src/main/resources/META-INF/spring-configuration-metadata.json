@@ -9,6 +9,10 @@
             "description": "Intermediary RabbitMQ connection properties. Values are composed into spring.rabbitmq by profile ymls."
         },
         {
+            "name": "iqkv.redis",
+            "description": "Intermediary Redis connection properties. Values are composed into spring.data.redis by profile ymls."
+        },
+        {
             "name": "iqkv.mail",
             "description": "Intermediary mail connection properties. Values are composed into spring.mail and iqkv.notification.mail."
         },
@@ -44,6 +48,45 @@
             "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
         },
         {
+            "name": "iqkv.auth.magic-link",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties$MagicLink",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.AuthConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties$Providers",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.google",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties$Provider",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.github",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties$Provider",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties$MicrosoftProvider",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.auth.oauth2.auto-link",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties$AutoLink",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties"
+        },
+        {
+            "name": "iqkv.billing",
+            "description": "Billing service integration properties consumed by the entitlement plan resolver."
+        },
+        {
             "name": "iqkv.invitation",
             "type": "com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties",
             "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurationProperties"
@@ -69,9 +112,14 @@
             "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties"
         },
         {
+            "name": "iqkv.notification.mail.resend",
+            "type": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail$Resend",
+            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties$Mail"
+        },
+        {
             "name": "iqkv.liquibase",
-            "type": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties",
-            "sourceType": "com.iqkv.foundation.iamservice.infrastructure.config.LiquibaseConfigurationProperties"
+            "type": "com.iqkv.foundation.tenancy.LiquibaseConfigurationProperties",
+            "sourceType": "com.iqkv.foundation.tenancy.LiquibaseConfigurationProperties"
         },
         {
             "name": "iqkv.objectstorage",
@@ -103,13 +151,13 @@
             "name": "iqkv.db.name",
             "type": "java.lang.String",
             "description": "Database name.",
-            "defaultValue": "iam"
+            "defaultValue": "iamservice"
         },
         {
             "name": "iqkv.db.username",
             "type": "java.lang.String",
             "description": "Database username.",
-            "defaultValue": "iam"
+            "defaultValue": "svc_iam_dba"
         },
         {
             "name": "iqkv.db.password",
@@ -132,12 +180,41 @@
             "name": "iqkv.rabbitmq.username",
             "type": "java.lang.String",
             "description": "RabbitMQ username.",
-            "defaultValue": "iam"
+            "defaultValue": "svc_iam_rmq"
         },
         {
             "name": "iqkv.rabbitmq.password",
             "type": "java.lang.String",
             "description": "RabbitMQ password."
+        },
+        {
+            "name": "iqkv.redis.host",
+            "type": "java.lang.String",
+            "description": "Redis server hostname.",
+            "defaultValue": "localhost"
+        },
+        {
+            "name": "iqkv.redis.port",
+            "type": "java.lang.Integer",
+            "description": "Redis server port.",
+            "defaultValue": 6379
+        },
+        {
+            "name": "iqkv.redis.password",
+            "type": "java.lang.String",
+            "description": "Redis authentication password. Empty when the server has no auth."
+        },
+        {
+            "name": "iqkv.redis.database",
+            "type": "java.lang.Integer",
+            "description": "Redis logical database index.",
+            "defaultValue": 0
+        },
+        {
+            "name": "iqkv.redis.timeout",
+            "type": "java.time.Duration",
+            "description": "Redis command timeout.",
+            "defaultValue": "PT2S"
         },
         {
             "name": "iqkv.mail.host",
@@ -183,6 +260,18 @@
             "type": "com.iqkv.foundation.iamservice.infrastructure.config.RolloutMode",
             "description": "Platform-wide operational mode. Must match across all core services. MULTI_TENANT: each signup creates a new tenant with TENANT_OWNER authority. SINGLE_TENANT: all users join a single pre-provisioned tenant with MEMBER authority.",
             "defaultValue": "MULTI_TENANT"
+        },
+        {
+            "name": "iqkv.billing.service-url",
+            "type": "java.lang.String",
+            "description": "Base URL of the billing service used by the entitlement plan resolver for quota enforcement.",
+            "defaultValue": "http://foundation-billing-service"
+        },
+        {
+            "name": "iqkv.billing.plan-refresh-interval",
+            "type": "java.time.Duration",
+            "description": "How often the entitlement plan catalog cache is refreshed from the billing service.",
+            "defaultValue": "PT10M"
         },
         {
             "name": "iqkv.auth.jwt.private-key-path",
@@ -257,6 +346,155 @@
             "defaultValue": 3
         },
         {
+            "name": "iqkv.auth.magic-link.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Enables passwordless magic-link authentication.",
+            "defaultValue": true
+        },
+        {
+            "name": "iqkv.auth.magic-link.token-ttl",
+            "type": "java.time.Duration",
+            "description": "Magic-link token time-to-live.",
+            "defaultValue": "PT15M"
+        },
+        {
+            "name": "iqkv.auth.magic-link.rate-limit-window",
+            "type": "java.time.Duration",
+            "description": "Sliding window for magic-link request rate limiting.",
+            "defaultValue": "PT15M"
+        },
+        {
+            "name": "iqkv.auth.magic-link.rate-limit-max-requests",
+            "type": "java.lang.Integer",
+            "description": "Maximum magic-link requests allowed within the rate limit window.",
+            "defaultValue": 3
+        },
+        {
+            "name": "iqkv.auth.oauth2.enabled-providers",
+            "type": "java.util.List<java.lang.String>",
+            "description": "Comma-separated list of enabled OAuth2 provider ids (google, github, microsoft).",
+            "defaultValue": "google,github"
+        },
+        {
+            "name": "iqkv.auth.oauth2.base-url",
+            "type": "java.lang.String",
+            "description": "Public base URL of this service, used to build OAuth2 callback redirect URIs.",
+            "defaultValue": "http://localhost:8080"
+        },
+        {
+            "name": "iqkv.auth.oauth2.post-login-redirect-uri",
+            "type": "java.lang.String",
+            "description": "Frontend URL the user is redirected to after a successful OAuth2 login.",
+            "defaultValue": "http://localhost:3000/auth/callback"
+        },
+        {
+            "name": "iqkv.auth.oauth2.auto-provision-users",
+            "type": "java.lang.Boolean",
+            "description": "Whether users authenticating via OAuth2 are auto-provisioned when no local account exists.",
+            "defaultValue": true
+        },
+        {
+            "name": "iqkv.auth.oauth2.encryption-key",
+            "type": "java.lang.String",
+            "description": "Symmetric key used to encrypt sensitive OIDC/OAuth2 state. Required in non-dev environments."
+        },
+        {
+            "name": "iqkv.auth.oauth2.state-ttl",
+            "type": "java.time.Duration",
+            "description": "OAuth2 authorization-state time-to-live. Must not exceed state-ttl-max.",
+            "defaultValue": "PT10M"
+        },
+        {
+            "name": "iqkv.auth.oauth2.state-ttl-max",
+            "type": "java.time.Duration",
+            "description": "Upper bound for the OAuth2 authorization-state time-to-live.",
+            "defaultValue": "PT15M"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.google.client-id",
+            "type": "java.lang.String",
+            "description": "Google OAuth2 client id."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.google.client-secret",
+            "type": "java.lang.String",
+            "description": "Google OAuth2 client secret."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.google.scopes",
+            "type": "java.lang.String",
+            "description": "Comma-separated OAuth2 scopes requested from Google.",
+            "defaultValue": "openid,profile,email"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.google.redirect-uri",
+            "type": "java.lang.String",
+            "description": "Google OAuth2 redirect URI template. Supports {baseUrl} and {registrationId} placeholders.",
+            "defaultValue": "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.github.client-id",
+            "type": "java.lang.String",
+            "description": "GitHub OAuth2 client id."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.github.client-secret",
+            "type": "java.lang.String",
+            "description": "GitHub OAuth2 client secret."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.github.scopes",
+            "type": "java.lang.String",
+            "description": "Comma-separated OAuth2 scopes requested from GitHub.",
+            "defaultValue": "read:user,user:email"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.github.redirect-uri",
+            "type": "java.lang.String",
+            "description": "GitHub OAuth2 redirect URI template. Supports {baseUrl} and {registrationId} placeholders.",
+            "defaultValue": "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.client-id",
+            "type": "java.lang.String",
+            "description": "Microsoft OAuth2 client id."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.client-secret",
+            "type": "java.lang.String",
+            "description": "Microsoft OAuth2 client secret."
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.scopes",
+            "type": "java.lang.String",
+            "description": "Comma-separated OAuth2 scopes requested from Microsoft.",
+            "defaultValue": "openid,profile,email"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.redirect-uri",
+            "type": "java.lang.String",
+            "description": "Microsoft OAuth2 redirect URI template. Supports {baseUrl} and {registrationId} placeholders.",
+            "defaultValue": "{baseUrl}/api/v1/iam/auth/oauth2/callback/{registrationId}"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.provider",
+            "type": "java.lang.String",
+            "description": "Spring Security provider id bound for the Microsoft registration.",
+            "defaultValue": "microsoft"
+        },
+        {
+            "name": "iqkv.auth.oauth2.providers.microsoft.issuer-uri",
+            "type": "java.lang.String",
+            "description": "Microsoft OIDC issuer URI. The tenant id defaults to 'common' when not overridden.",
+            "defaultValue": "https://login.microsoftonline.com/common/v2.0"
+        },
+        {
+            "name": "iqkv.auth.oauth2.auto-link.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Whether an OAuth2 login is automatically linked to an existing local account with the same verified email.",
+            "defaultValue": true
+        },
+        {
             "name": "iqkv.invitation.token-ttl",
             "type": "java.time.Duration",
             "description": "How long an invitation token remains valid.",
@@ -271,7 +509,8 @@
         {
             "name": "iqkv.tenancy.default-tenant-key",
             "type": "java.lang.String",
-            "description": "NanoID key of the default tenant used in SINGLE tenancy mode. Must be exactly 8 lowercase alphanumeric characters [a-z0-9]. Auto-generated if blank."
+            "description": "NanoID key of the default tenant used in SINGLE tenancy mode. Must be exactly 8 lowercase alphanumeric characters [a-z0-9]. Auto-generated if blank.",
+            "defaultValue": "platform"
         },
         {
             "name": "iqkv.tenancy.default-tenant-name",
@@ -319,6 +558,17 @@
             "description": "Reply-To address used in outgoing notification emails."
         },
         {
+            "name": "iqkv.notification.mail.provider",
+            "type": "java.lang.String",
+            "description": "Active email transport provider: 'smtp' or 'resend'.",
+            "defaultValue": "smtp"
+        },
+        {
+            "name": "iqkv.notification.mail.resend.api-key",
+            "type": "java.lang.String",
+            "description": "Resend API key. Required when iqkv.notification.mail.provider=resend."
+        },
+        {
             "name": "iqkv.notification.default-locale",
             "type": "java.lang.String",
             "description": "Default locale for notification templates.",
@@ -331,14 +581,22 @@
             "defaultValue": "http://localhost:3000"
         },
         {
+            "name": "iqkv.liquibase.tenant-runner-enabled",
+            "type": "java.lang.Boolean",
+            "description": "Registers the TenantLiquibaseRunner so pending changesets are applied to every tenant schema on startup.",
+            "defaultValue": true
+        },
+        {
             "name": "iqkv.liquibase.system-change-log",
             "type": "java.lang.String",
-            "description": "Classpath location of the system (public schema) Liquibase changelog."
+            "description": "Classpath location of the system (public schema) Liquibase changelog.",
+            "defaultValue": "db/changelog/system/db.changelog-system.xml"
         },
         {
             "name": "iqkv.liquibase.tenant-change-log",
             "type": "java.lang.String",
-            "description": "Classpath location of the per-tenant schema Liquibase changelog."
+            "description": "Classpath location of the per-tenant schema Liquibase changelog.",
+            "defaultValue": "db/changelog/tenant/db.changelog-tenant.xml"
         },
         {
             "name": "iqkv.liquibase.contexts",
@@ -346,10 +604,26 @@
             "description": "Active Liquibase contexts (e.g. demo to include seed data, or omit for clean schema only)."
         },
         {
+            "name": "iqkv.liquibase.bootstrap-tenants",
+            "type": "java.util.List<java.lang.String>",
+            "description": "Tenant keys whose schemas are migrated during bootstrap, in addition to the system schema."
+        },
+        {
+            "name": "iqkv.liquibase.upgrade-existing-tenants",
+            "type": "java.lang.Boolean",
+            "description": "Whether the TenantLiquibaseRunner scans and upgrades already-provisioned tenant schemas on startup.",
+            "defaultValue": true
+        },
+        {
             "name": "iqkv.objectstorage.endpoint",
             "type": "java.lang.String",
             "description": "S3-compatible endpoint URL. Use the MinIO in-cluster service URL for SIT/UAT, or https://s3.amazonaws.com for AWS S3 in production.",
             "defaultValue": "http://localhost:9000"
+        },
+        {
+            "name": "iqkv.objectstorage.public-endpoint",
+            "type": "java.lang.String",
+            "description": "Publicly reachable object storage URL used to rewrite presigned URLs before returning them to external clients. When blank, presigned URLs are returned unchanged."
         },
         {
             "name": "iqkv.objectstorage.access-key",
@@ -360,7 +634,8 @@
         {
             "name": "iqkv.objectstorage.secret-key",
             "type": "java.lang.String",
-            "description": "S3 / MinIO secret key (password). Injected from a Kubernetes Secret in cluster environments."
+            "description": "S3 / MinIO secret key (password). Injected from a Kubernetes Secret in cluster environments.",
+            "defaultValue": "iqkv_password"
         },
         {
             "name": "iqkv.objectstorage.bucket-name",
@@ -440,15 +715,32 @@
             ]
         },
         {
-            "name": "iqkv.tenancy.mode",
+            "name": "iqkv.auth.oauth2.enabled-providers",
             "values": [
                 {
-                    "value": "MULTI",
-                    "description": "Multi-tenant mode — use with ROLLOUT_MODE=MULTI_TENANT."
+                    "value": "google",
+                    "description": "Google OpenID Connect."
                 },
                 {
-                    "value": "SINGLE",
-                    "description": "Single-tenant mode — use with ROLLOUT_MODE=SINGLE_TENANT."
+                    "value": "github",
+                    "description": "GitHub OAuth2 (read:user,user:email)."
+                },
+                {
+                    "value": "microsoft",
+                    "description": "Microsoft Entra ID (Azure AD) OpenID Connect."
+                }
+            ]
+        },
+        {
+            "name": "iqkv.notification.mail.provider",
+            "values": [
+                {
+                    "value": "smtp",
+                    "description": "Send via the configured SMTP server (default)."
+                },
+                {
+                    "value": "resend",
+                    "description": "Send via the Resend HTTP API. Requires iqkv.notification.mail.resend.api-key."
                 }
             ]
         },
