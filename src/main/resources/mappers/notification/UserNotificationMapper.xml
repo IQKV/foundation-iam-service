@@ -22,7 +22,7 @@
         (id, target_user_id, locale, type, severity, title, message, payload, is_read, created_at, read_at)
         VALUES
         (#{id}, #{targetUserId}, #{locale}, #{type}, #{severity}, #{title}, #{message},
-        #{payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+        #{payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.mybatis.util.JsonTypeHandler},
         #{isRead}, #{createdAt}, #{readAt})
     </insert>
 
@@ -32,7 +32,7 @@
         VALUES
         <foreach collection="notifications" item="item" separator=",">
             (#{item.id}, #{item.targetUserId}, #{item.locale}, #{item.type}, #{item.severity}, #{item.title}, #{item.message},
-            #{item.payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.iamservice.infrastructure.mybatis.JsonTypeHandler},
+            #{item.payload, jdbcType=OTHER, typeHandler=com.iqkv.foundation.mybatis.util.JsonTypeHandler},
             #{item.isRead}, #{item.createdAt}, #{item.readAt})
         </foreach>
     </insert>

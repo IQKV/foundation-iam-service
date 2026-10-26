@@ -19,7 +19,7 @@ package com.iqkv.foundation.iamservice.infrastructure.config;
 import java.util.UUID;
 import javax.sql.DataSource;
 
-import com.iqkv.foundation.iamservice.infrastructure.mybatis.UuidTypeHandler;
+import com.iqkv.foundation.mybatis.util.UuidTypeHandler;
 import com.iqkv.foundation.tenancy.MyBatisSchemaInterceptor;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
