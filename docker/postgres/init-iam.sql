@@ -15,6 +15,7 @@ ALTER DATABASE iamservice SET search_path TO t_platform, iamservice, public;
 -- Create extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
+CREATE EXTENSION IF NOT EXISTS "vector";
 
 -- Grant permissions
 GRANT ALL PRIVILEGES ON DATABASE iamservice TO svc_iam_dba;
