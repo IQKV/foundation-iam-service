@@ -35,29 +35,6 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     fallback-to-system-locale: false
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${iqkv.auth.oauth2.providers.google.client-id}
-            client-secret: ${iqkv.auth.oauth2.providers.google.client-secret}
-            scope: ${iqkv.auth.oauth2.providers.google.scopes}
-            redirect-uri: ${iqkv.auth.oauth2.providers.google.redirect-uri}
-          github:
-            client-id: ${iqkv.auth.oauth2.providers.github.client-id}
-            client-secret: ${iqkv.auth.oauth2.providers.github.client-secret}
-            scope: ${iqkv.auth.oauth2.providers.github.scopes}
-            redirect-uri: ${iqkv.auth.oauth2.providers.github.redirect-uri}
-          microsoft:
-            client-id: ${iqkv.auth.oauth2.providers.microsoft.client-id}
-            client-secret: ${iqkv.auth.oauth2.providers.microsoft.client-secret}
-            scope: ${iqkv.auth.oauth2.providers.microsoft.scopes}
-            redirect-uri: ${iqkv.auth.oauth2.providers.microsoft.redirect-uri}
-            provider: ${iqkv.auth.oauth2.providers.microsoft.provider}
-        provider:
-          microsoft:
-            issuer-uri: ${iqkv.auth.oauth2.providers.microsoft.issuer-uri}
 
 mybatis:
   mapper-locations: classpath:mappers/**/*.xml
