@@ -19,6 +19,9 @@ package com.iqkv.foundation.iamservice.infrastructure.messaging;
 import java.util.Locale;
 
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
+import com.iqkv.foundation.mail.EmailSendRequest;
+import com.iqkv.foundation.mail.EmailSender;
+import com.iqkv.foundation.mail.MailProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -49,15 +52,18 @@ public class EmailService {
   private final EmailSender emailSender;
   private final TemplateEngine templateEngine;
   private final NotificationConfigurationProperties notificationProps;
+  private final MailProperties mailProps;
   private final MessageSource messageSource;
 
   public EmailService(final EmailSender emailSender,
                       final TemplateEngine templateEngine,
                       final NotificationConfigurationProperties notificationProps,
+                      final MailProperties mailProps,
                       final MessageSource messageSource) {
     this.emailSender = emailSender;
     this.templateEngine = templateEngine;
     this.notificationProps = notificationProps;
+    this.mailProps = mailProps;
     this.messageSource = messageSource;
   }
 
@@ -75,9 +81,9 @@ public class EmailService {
     final String subject = messageSource.getMessage(subjectKey, null, locale);
 
     final EmailSendRequest request = new EmailSendRequest(
-        notificationProps.mail().from(),
-        notificationProps.mail().fromName(),
-        notificationProps.mail().replyTo(),
+        mailProps.from(),
+        mailProps.fromName(),
+        mailProps.replyTo(),
         event.getRecipientEmail(),
         subject,
         htmlBody
@@ -85,7 +91,7 @@ public class EmailService {
 
     emailSender.send(request);
     log.info("Email sent: provider={} type={} to={}",
-        notificationProps.mail().provider(), event.getType(), event.getRecipientEmail());
+        mailProps.provider(), event.getType(), event.getRecipientEmail());
   }
 
   private Locale resolveLocale(final String localeTag) {
