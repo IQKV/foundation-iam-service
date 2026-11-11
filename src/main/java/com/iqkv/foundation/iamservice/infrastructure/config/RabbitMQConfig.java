@@ -93,6 +93,16 @@ public class RabbitMQConfig {
   // Routing keys — IAM notification emails (scoped to avoid conflicts)
   // -------------------------------------------------------------------------
   public static final String ROUTING_NOTIFICATION_IAM_EMAIL = "notification.iam.email";
+  /**
+   * WebSocket-only push: persists an in-app notification and delivers it over STOMP without
+   * sending an email. Published by other services (e.g. catalog-processing-worker) when they
+   * need to signal the user in real time but have no email to send.
+   */
+  public static final String ROUTING_NOTIFICATION_IAM_PUSH = "notification.iam.push";
+  /**
+   * IAM queue name for WebSocket-only push notifications.
+   */
+  public static final String PUSH_NOTIFICATIONS_QUEUE = "iqkv.iam.notifications.push";
   public static final String ROUTING_ANNOUNCEMENT_PUBLISH = "announcement.publish";
 
   private static final long TTL_24H_MS = 86_400_000L;
@@ -185,6 +195,21 @@ public class RabbitMQConfig {
     // Exact match — only IAM notification emails land here
     return BindingBuilder.bind(notificationsQueue()).to(eventsExchange())
         .with(ROUTING_NOTIFICATION_IAM_EMAIL);
+  }
+
+  @Bean
+  public Queue pushNotificationsQueue() {
+    return QueueBuilder.durable(PUSH_NOTIFICATIONS_QUEUE)
+        .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+        .withArgument("x-message-ttl", TTL_24H_MS)
+        .build();
+  }
+
+  @Bean
+  public Binding pushNotificationsBinding() {
+    // Exact match — only WebSocket-push notifications land here (no email)
+    return BindingBuilder.bind(pushNotificationsQueue()).to(eventsExchange())
+        .with(ROUTING_NOTIFICATION_IAM_PUSH);
   }
 
   @Bean
