@@ -16,7 +16,9 @@
 
 package com.iqkv.foundation.iamservice.infrastructure.config;
 
+import com.iqkv.foundation.iamservice.infrastructure.messaging.WebSocketAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -26,11 +28,24 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+  private final WebSocketAuthInterceptor webSocketAuthInterceptor;
+
+  public WebSocketConfig(final WebSocketAuthInterceptor webSocketAuthInterceptor) {
+    this.webSocketAuthInterceptor = webSocketAuthInterceptor;
+  }
+
   @Override
   public void configureMessageBroker(final MessageBrokerRegistry config) {
     config.enableSimpleBroker("/topic", "/queue");
     config.setApplicationDestinationPrefixes("/app");
     config.setUserDestinationPrefix("/user");
+  }
+
+  @Override
+  public void configureClientInboundChannel(final ChannelRegistration registration) {
+    // Authenticates the CONNECT frame and binds the session to a Principal (user_id claim),
+    // so convertAndSendToUser targets the right session.
+    registration.interceptors(webSocketAuthInterceptor);
   }
 
   @Override
