@@ -43,6 +43,17 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findByIds" resultMap="userResultMap">
+        SELECT id, email, password_hash, first_name, last_name, status,
+        email_verified, locale, avatar_url, last_global_signout_at,
+        first_sign_in_at, onboarding_completed, profile_completed, created_at, updated_at, created_by, updated_by
+        FROM public.users
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="findAllStreaming" resultMap="userResultMap" fetchSize="1000">
         SELECT id, email, password_hash, first_name, last_name, status,
         email_verified, locale, avatar_url, last_global_signout_at,

@@ -16,6 +16,7 @@
 
 package com.iqkv.foundation.iamservice.user;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.iqkv.foundation.iamservice.user.dto.UserDtos;
@@ -68,6 +69,16 @@ public interface UserService {
    * @throws com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException if no user exists with the given ID
    */
   UserDtos.UserResponse getUserById(UUID userId);
+
+  /**
+   * Bulk-fetches slim public profiles (id, first name, last name, avatar URL) for the given
+   * user ids in a single query. Unknown ids are silently ignored. Returns an empty list when
+   * the input is empty.
+   *
+   * @param ids the user ids to look up (max 50)
+   * @return matching public profiles, unordered
+   */
+  UserDtos.UserProfilesResponse getUserProfiles(List<UUID> ids);
 
   /**
    * Returns the total number of user accounts across all tenants.

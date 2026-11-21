@@ -146,12 +146,28 @@ public final class UserDtos {
   }
 
   /**
-   * Returned by {@code POST /users/me/avatar}.
-   *
-   * <p>The client must PUT the file directly to {@code presignedUploadUrl} within
-   * {@code expiresInMinutes} minutes, then call {@code POST /users/me/avatar/confirm}
-   * with the resulting {@code objectKey} to persist the avatar URL on the profile.
+   * Slim public profile used by other services to resolve an author's display name and avatar
+   * from their UUID — e.g. for note author indicators in the catalog UI.
    */
+  public record UserPublicProfile(
+      UUID id,
+      String firstName,
+      String lastName,
+      // Public avatar URL; null when no avatar has been uploaded.
+      String avatarUrl) {
+  }
+
+  /**
+   * Request body for the bulk profile lookup endpoint.
+   * Capped at 50 ids per call to bound the query size.
+   */
+  public record UserProfilesRequest(
+      @jakarta.validation.constraints.Size(max = 50) List<UUID> ids) {
+  }
+
+  public record UserProfilesResponse(List<UserPublicProfile> profiles) {
+  }
+
   public record AvatarUploadInitResponse(
       // Pre-signed S3/MinIO PUT URL — valid for expiresInMinutes minutes.
       String presignedUploadUrl,

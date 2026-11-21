@@ -269,4 +269,24 @@ public class UserRestResource {
     userService.completeProfile(userId);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/profiles")
+  @PreAuthorize("isAuthenticated()")
+  @SecurityRequirement(name = "bearerAuth")
+  @Operation(
+      summary = "Bulk-fetch public user profiles",
+      description = "Returns the display name and avatar URL for up to 50 user UUIDs in a "
+                    + "single call. Used by other services to resolve author indicators without "
+                    + "N+1 lookups. Unknown ids are silently omitted from the response.")
+  @Parameter(name = "X-Tenant-ID", in = ParameterIn.HEADER, required = true,
+             description = "8-char alphanumeric tenantKey (e.g. xk7f2b9a)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Profiles returned"),
+      @ApiResponse(responseCode = "400", description = "More than 50 ids supplied"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
+  public ResponseEntity<UserDtos.UserProfilesResponse> getUserProfiles(
+      @Valid @RequestBody final UserDtos.UserProfilesRequest request) {
+    return ResponseEntity.ok(userService.getUserProfiles(request.ids()));
+  }
 }

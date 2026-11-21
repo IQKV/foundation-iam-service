@@ -34,6 +34,16 @@ public interface UserMapper {
 
   Optional<User> findById(UUID id);
 
+  /**
+   * Fetches the slim profile columns for the given ids in a single query.
+   * Returns only the rows that exist; unknown ids are silently ignored.
+   * Returns an empty list when {@code ids} is empty.
+   *
+   * @param ids the user ids to look up
+   * @return matching user rows, unordered
+   */
+  List<User> findByIds(@Param("ids") List<UUID> ids);
+
   Cursor<User> findAllStreaming();
 
   Optional<UserWithOrganizations> findByIdWithAuthorities(UUID id);

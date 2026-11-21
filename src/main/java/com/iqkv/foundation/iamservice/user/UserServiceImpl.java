@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -406,6 +407,17 @@ public class UserServiceImpl implements UserService {
     return userMapper.findByIdWithAuthorities(userId)
         .map(UserDtoMapper::toResponse)
         .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+  }
+
+  @Override
+  public UserDtos.UserProfilesResponse getUserProfiles(final List<UUID> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return new UserDtos.UserProfilesResponse(List.of());
+    }
+    final var profiles = userMapper.findByIds(ids).stream()
+        .map(u -> new UserDtos.UserPublicProfile(u.getId(), u.getFirstName(), u.getLastName(), u.getAvatarUrl()))
+        .toList();
+    return new UserDtos.UserProfilesResponse(profiles);
   }
 
   @Override
