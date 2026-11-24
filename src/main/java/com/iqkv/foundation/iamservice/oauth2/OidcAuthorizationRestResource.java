@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqkv.foundation.iamservice.authentication.dto.AuthenticationDtos;
 import com.iqkv.foundation.iamservice.infrastructure.config.OAuth2ConfigurationProperties;
 import com.iqkv.foundation.iamservice.oauth2.dto.OidcDtos;
@@ -52,6 +50,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/api/v1/iam/auth/oauth2")
@@ -59,7 +60,7 @@ import org.springframework.web.client.RestTemplate;
 public class OidcAuthorizationRestResource {
 
   private static final Logger log = LoggerFactory.getLogger(OidcAuthorizationRestResource.class);
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
+  private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().findAndAddModules().build();
   private final OAuth2ConfigurationProperties oauth2Props;
   private final ClientRegistrationRepository clientRegistrationRepository;
   private final OidcStateJwtService oidcStateJwtService;
@@ -426,7 +427,7 @@ public class OidcAuthorizationRestResource {
       final byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
       return OBJECT_MAPPER.readValue(payload, new TypeReference<Map<String, Object>>() {
       });
-    } catch (final IOException | IllegalArgumentException ex) {
+    } catch (final JacksonException | IllegalArgumentException ex) {
       throw new OidcProvisioningException("Failed to decode provider id_token");
     }
   }
