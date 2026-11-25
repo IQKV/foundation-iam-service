@@ -34,8 +34,6 @@ import com.iqkv.foundation.iamservice.infrastructure.config.InvitationConfigurat
 import com.iqkv.foundation.iamservice.infrastructure.config.NotificationConfigurationProperties;
 import com.iqkv.foundation.iamservice.infrastructure.messaging.MessagingService;
 import com.iqkv.foundation.iamservice.shared.exception.InvitationAlreadyPendingException;
-import com.iqkv.foundation.iamservice.shared.exception.TeamInvitationNotFoundException;
-import com.iqkv.foundation.iamservice.shared.exception.TeamNotFoundException;
 import com.iqkv.foundation.iamservice.user.User;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
