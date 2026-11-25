@@ -69,7 +69,8 @@ public final class AuthenticationDtos {
       UUID userId,
       String email,
       String tenantId,
-      List<String> authorities) {
+      List<String> authorities,
+      List<String> teamIds) {
   }
 
   public record TenantDiscoveryRequest(

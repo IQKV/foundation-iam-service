@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.team.TeamMapper">
+
+    <resultMap id="teamResultMap" type="com.iqkv.foundation.iamservice.team.Team">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="slug" column="slug"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdByUserId" column="created_by_user_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.team.Team">
+        INSERT INTO public.teams (id, name, slug, status, created_by_user_id,
+                                  created_at, updated_at, created_by, updated_by)
+        VALUES (#{id}, #{name}, #{slug},
+                #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{createdByUserId}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+    </insert>
+
+    <select id="findById" resultMap="teamResultMap">
+        SELECT id, name, slug, status, created_by_user_id,
+               created_at, updated_at, created_by, updated_by
+        FROM public.teams
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findByMemberUserId" resultMap="teamResultMap">
+        SELECT t.id, t.name, t.slug, t.status, t.created_by_user_id,
+               t.created_at, t.updated_at, t.created_by, t.updated_by
+        FROM public.teams t
+        INNER JOIN public.team_members tm ON tm.team_id = t.id
+        WHERE tm.user_id = #{userId}
+          AND tm.status = 'ACTIVE'
+        ORDER BY t.created_at DESC
+    </select>
+
+    <update id="update" parameterType="com.iqkv.foundation.iamservice.team.Team">
+        UPDATE public.teams
+        SET name             = #{name},
+            status           = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            updated_at       = #{updatedAt},
+            updated_by       = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

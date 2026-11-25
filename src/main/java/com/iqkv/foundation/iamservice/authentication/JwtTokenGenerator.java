@@ -76,11 +76,23 @@ public class JwtTokenGenerator {
 
   public String generateAccessToken(final User user, final String tenantKey,
                                     final List<String> authorities) {
-    return generateAccessToken(user, tenantKey, authorities, null);
+    return generateAccessToken(user, tenantKey, authorities, null, List.of());
   }
 
   public String generateAccessToken(final User user, final String tenantKey,
                                     final List<String> authorities, final String planCode) {
+    return generateAccessToken(user, tenantKey, authorities, planCode, List.of());
+  }
+
+  /**
+   * Generates an access token with team membership embedded.
+   *
+   * @param teamIds active team UUIDs for the user — non-empty only for platform-tenant tokens.
+   *                Pass {@code List.of()} for company-tenant and admin tokens.
+   */
+  public String generateAccessToken(final User user, final String tenantKey,
+                                    final List<String> authorities, final String planCode,
+                                    final List<UUID> teamIds) {
     final Instant now = Instant.now();
     final Instant expiry = now.plus(authProps.jwt().expiry());
 
@@ -104,6 +116,11 @@ public class JwtTokenGenerator {
 
     if (planCode != null && !planCode.isBlank()) {
       builder.claim(JwtClaimNames.PLAN_CODE, planCode);
+    }
+
+    if (!teamIds.isEmpty()) {
+      builder.claim(JwtClaimNames.TEAM_IDS,
+          teamIds.stream().map(UUID::toString).toList());
     }
 
     return builder.signWith(privateKey, Jwts.SIG.RS256).compact();

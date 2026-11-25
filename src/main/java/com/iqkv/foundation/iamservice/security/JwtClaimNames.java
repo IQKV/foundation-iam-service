@@ -38,6 +38,13 @@ public final class JwtClaimNames {
   public static final String PLAN_CODE = "plan_code";
   public static final String ONBOARDING_COMPLETED = "onboarding_completed";
   public static final String PROFILE_COMPLETED = "profile_completed";
+  /**
+   * List of team UUIDs (as strings) the user is an active member of.
+   * Only present in platform-tenant access tokens; absent in company-tenant and admin tokens.
+   * Consumers use this to enforce team-scoped visibility in t_platform data without
+   * a cross-service call on the hot read path.
+   */
+  public static final String TEAM_IDS = "team_ids";
 
   public static final String TYPE_ACCESS = "access";
   public static final String TYPE_REFRESH = "refresh";

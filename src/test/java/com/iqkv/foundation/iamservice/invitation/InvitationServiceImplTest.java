@@ -89,6 +89,8 @@ class InvitationServiceImplTest {
   private PlatformConfigurationProperties platformConfig;
   @Mock
   private PlanResolver planResolver;
+  @Mock
+  private com.iqkv.foundation.iamservice.team.TeamMemberMapper teamMemberMapper;
 
   private InvitationServiceImpl invitationService;
 
@@ -113,7 +115,8 @@ class InvitationServiceImplTest {
         invitationProps,
         notificationProps,
         platformConfig,
-        planResolver
+        planResolver,
+        teamMemberMapper
     );
 
     testUser = new User();
@@ -224,7 +227,7 @@ class InvitationServiceImplTest {
     when(membershipMapper.existsByUserIdAndTenantKey(existingUser.getId(), "platform")).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
     when(planResolver.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
-    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
     // Act
@@ -270,7 +273,7 @@ class InvitationServiceImplTest {
     when(membershipMapper.existsByUserIdAndTenantKey(any(), eq("platform"))).thenReturn(true);
     when(membershipService.getAuthorities(any())).thenReturn(List.of("MEMBER"));
     when(planResolver.resolveEntitlement(any())).thenReturn(PlanEntitlement.NONE);
-    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any())).thenReturn("access-token");
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any(), any())).thenReturn("access-token");
     when(jwtTokenGenerator.generateRefreshToken(any(), eq("test-tenant"))).thenReturn("refresh-token");
 
     // Act

@@ -47,6 +47,7 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantMembershipAlreadyEx
 import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
+import com.iqkv.foundation.iamservice.team.TeamMemberMapper;
 import com.iqkv.foundation.iamservice.tenant.Tenant;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -82,6 +83,7 @@ public class InvitationServiceImpl implements InvitationService {
   private final NotificationConfigurationProperties notificationProps;
   private final PlatformConfigurationProperties platformConfig;
   private final PlanResolver planResolver;
+  private final TeamMemberMapper teamMemberMapper;
 
   public InvitationServiceImpl(
       final InvitationMapper invitationMapper,
@@ -97,7 +99,8 @@ public class InvitationServiceImpl implements InvitationService {
       final InvitationConfigurationProperties invitationProps,
       final NotificationConfigurationProperties notificationProps,
       final PlatformConfigurationProperties platformConfig,
-      final PlanResolver planResolver) {
+      final PlanResolver planResolver,
+      final TeamMemberMapper teamMemberMapper) {
     this.invitationMapper = invitationMapper;
     this.tenantMapper = tenantMapper;
     this.userMapper = userMapper;
@@ -112,6 +115,7 @@ public class InvitationServiceImpl implements InvitationService {
     this.notificationProps = notificationProps;
     this.platformConfig = platformConfig;
     this.planResolver = planResolver;
+    this.teamMemberMapper = teamMemberMapper;
   }
 
   // -------------------------------------------------------------------------
@@ -256,7 +260,10 @@ public class InvitationServiceImpl implements InvitationService {
 
     // Issue token pair scoped to the invited tenant
     final List<String> authorities = membershipService.getAuthorities(membership.getId());
-    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities, planCode);
+    final String accessToken = jwtTokenGenerator.generateAccessToken(user, tenantKey, authorities, planCode,
+        PLATFORM_TENANT_KEY.equals(tenantKey)
+            ? teamMemberMapper.findActiveTeamIdsByUserId(user.getId())
+            : java.util.List.of());
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
     log.info("Invitation accepted: invitationId={} userId={} tenantKey={}",

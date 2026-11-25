@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="20261125100001" author="iqkv">
+        <createTable tableName="team_members" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="team_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_team_members_team_id"
+                             references="public.teams(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_team_members_user_id"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="role" type="VARCHAR(50)" defaultValue="MEMBER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Enforce one membership row per (team, user) -->
+        <addUniqueConstraint tableName="team_members" schemaName="public"
+                             columnNames="team_id,user_id"
+                             constraintName="uq_team_members_team_user"/>
+
+        <createIndex indexName="idx_team_members_team_id"
+                     tableName="team_members" schemaName="public">
+            <column name="team_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_team_members_user_id"
+                     tableName="team_members" schemaName="public">
+            <column name="user_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="idx_team_members_user_id" tableName="team_members" schemaName="public"/>
+            <dropIndex indexName="idx_team_members_team_id" tableName="team_members" schemaName="public"/>
+            <dropTable tableName="team_members" schemaName="public"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

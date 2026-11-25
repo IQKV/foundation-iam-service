@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="20261125100002" author="iqkv">
+        <createTable tableName="team_invitations" schemaName="public">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="team_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_team_invitations_team_id"
+                             references="public.teams(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="invited_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invited_by" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_team_invitations_invited_by"
+                             references="public.users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="role" type="VARCHAR(50)" defaultValue="MEMBER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_team_invitations_token"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="accepted_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="updated_by" type="VARCHAR(255)"/>
+        </createTable>
+
+        <!-- Fast token lookup (accept flow) -->
+        <createIndex indexName="idx_team_invitations_token"
+                     tableName="team_invitations" schemaName="public" unique="true">
+            <column name="token"/>
+        </createIndex>
+
+        <!-- List invitations per team -->
+        <createIndex indexName="idx_team_invitations_team_id"
+                     tableName="team_invitations" schemaName="public">
+            <column name="team_id"/>
+        </createIndex>
+
+        <!-- Reaper job: find expired PENDING rows efficiently -->
+        <createIndex indexName="idx_team_invitations_expires_at"
+                     tableName="team_invitations" schemaName="public">
+            <column name="expires_at"/>
+        </createIndex>
+
+        <!--
+            Partial unique index: only one PENDING invite per (team_id, invited_email) at a time.
+            PostgreSQL partial indexes are not supported natively in Liquibase XML,
+            so we use a raw SQL changeset.
+        -->
+        <sql>
+            CREATE UNIQUE INDEX idx_team_invitations_pending_email
+                ON public.team_invitations (team_id, invited_email) WHERE status = 'PENDING';
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS public.idx_team_invitations_pending_email;</sql>
+            <dropIndex indexName="idx_team_invitations_expires_at" tableName="team_invitations" schemaName="public"/>
+            <dropIndex indexName="idx_team_invitations_team_id" tableName="team_invitations" schemaName="public"/>
+            <dropIndex indexName="idx_team_invitations_token" tableName="team_invitations" schemaName="public"/>
+            <dropTable tableName="team_invitations" schemaName="public"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

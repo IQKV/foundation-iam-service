@@ -67,7 +67,8 @@ class AuthenticationDtosTest {
         userId,
         "user@example.com",
         "tenant-key",
-        authorities
+        authorities,
+        List.of()
     );
 
     assertThat(response.userId()).isEqualTo(userId);

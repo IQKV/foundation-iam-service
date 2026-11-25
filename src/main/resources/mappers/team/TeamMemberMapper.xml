@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.team.TeamMemberMapper">
+
+    <resultMap id="teamMemberResultMap" type="com.iqkv.foundation.iamservice.team.TeamMember">
+        <id property="id" column="id"/>
+        <result property="teamId" column="team_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="role" column="role"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="teamMemberWithUserResultMap" type="com.iqkv.foundation.iamservice.team.TeamMemberWithUser">
+        <id property="id" column="id"/>
+        <result property="teamId" column="team_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="role" column="role"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="userFirstName" column="user_first_name"/>
+        <result property="userLastName" column="user_last_name"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.iamservice.team.TeamMember">
+        INSERT INTO public.team_members (id, team_id, user_id, role, status, created_at, updated_at)
+        VALUES (#{id}, #{teamId}, #{userId},
+                #{role, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="findById" resultMap="teamMemberResultMap">
+        SELECT id, team_id, user_id, role, status, created_at, updated_at
+        FROM public.team_members
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findActiveByTeamIdAndUserId" resultMap="teamMemberResultMap">
+        SELECT id, team_id, user_id, role, status, created_at, updated_at
+        FROM public.team_members
+        WHERE team_id = #{teamId}
+          AND user_id = #{userId}
+          AND status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <select id="findActiveByTeamId" resultMap="teamMemberWithUserResultMap">
+        SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.status,
+               tm.created_at, tm.updated_at,
+               u.email     AS user_email,
+               u.first_name AS user_first_name,
+               u.last_name  AS user_last_name
+        FROM public.team_members tm
+        INNER JOIN public.users u ON u.id = tm.user_id
+        WHERE tm.team_id = #{teamId}
+          AND tm.status = 'ACTIVE'
+        ORDER BY tm.created_at ASC
+    </select>
+
+    <select id="existsActiveByTeamIdAndUserId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM public.team_members
+            WHERE team_id = #{teamId}
+              AND user_id = #{userId}
+              AND status = 'ACTIVE'
+        )
+    </select>
+
+    <select id="countActiveOwnersByTeamId" resultType="long">
+        SELECT COUNT(*) FROM public.team_members
+        WHERE team_id = #{teamId}
+          AND role = 'OWNER'
+          AND status = 'ACTIVE'
+    </select>
+
+    <select id="findActiveTeamIdsByUserId" resultType="java.util.UUID">
+        SELECT team_id
+        FROM public.team_members
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <update id="updateRoleAndStatus">
+        UPDATE public.team_members
+        SET role       = #{role},
+            status     = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

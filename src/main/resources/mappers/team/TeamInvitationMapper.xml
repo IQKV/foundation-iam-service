@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.iamservice.team.TeamInvitationMapper">
+
+    <resultMap id="teamInvitationResultMap" type="com.iqkv.foundation.iamservice.team.TeamInvitation">
+        <id property="id" column="id"/>
+        <result property="teamId" column="team_id"/>
+        <result property="invitedEmail" column="invited_email"/>
+        <result property="invitedBy" column="invited_by"/>
+        <result property="role" column="role"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="token" column="token"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="acceptedAt" column="accepted_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <insert id="insertIfNotExists" parameterType="com.iqkv.foundation.iamservice.team.TeamInvitation"
+            useGeneratedKeys="false">
+        INSERT INTO public.team_invitations
+        (id, team_id, invited_email, invited_by, role, token, status,
+         expires_at, accepted_at, created_at, updated_at, created_by, updated_by)
+        VALUES
+        (#{id}, #{teamId}, #{invitedEmail}, #{invitedBy},
+         #{role, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+         #{token},
+         #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+         #{expiresAt}, #{acceptedAt}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+        ON CONFLICT (team_id, invited_email) WHERE status = 'PENDING' DO NOTHING
+    </insert>
+
+    <select id="findByToken" resultMap="teamInvitationResultMap">
+        SELECT id, team_id, invited_email, invited_by, role, token, status,
+               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        FROM public.team_invitations
+        WHERE token = #{token}
+        LIMIT 1
+    </select>
+
+    <select id="findById" resultMap="teamInvitationResultMap">
+        SELECT id, team_id, invited_email, invited_by, role, token, status,
+               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        FROM public.team_invitations
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findPendingByTeamId" resultMap="teamInvitationResultMap">
+        SELECT id, team_id, invited_email, invited_by, role, token, status,
+               expires_at, accepted_at, created_at, updated_at, created_by, updated_by
+        FROM public.team_invitations
+        WHERE team_id = #{teamId}
+          AND status = 'PENDING'
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="existsPendingForTeamAndEmail" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM public.team_invitations
+            WHERE team_id = #{teamId}
+              AND invited_email = #{invitedEmail}
+              AND status = 'PENDING'
+        )
+    </select>
+
+    <update id="updateStatus">
+        UPDATE public.team_invitations
+        SET status     = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="markAccepted">
+        UPDATE public.team_invitations
+        SET status      = 'ACCEPTED',
+            accepted_at = #{acceptedAt},
+            updated_at  = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="expireStale">
+        UPDATE public.team_invitations
+        SET status     = 'EXPIRED',
+            updated_at = #{updatedAt}
+        WHERE status = 'PENDING'
+          AND expires_at &lt; #{now}
+    </update>
+
+</mapper>

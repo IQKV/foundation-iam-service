@@ -89,6 +89,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/auth/oauth2/providers").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/auth/oauth2/exchange").permitAll()
             .requestMatchers("/api/v1/iam/admin/**").hasAuthority("PLATFORM_ADMIN")
+            // Team invitation preview — public (no JWT, invitee previews before logging in)
+            .requestMatchers(HttpMethod.GET, "/api/v1/team-invitations/*").permitAll()
             // Invitation accept flow — public (no JWT required)
             .requestMatchers(HttpMethod.GET, "/api/v1/iam/invitations/*").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/iam/invitations/*/accept").permitAll()

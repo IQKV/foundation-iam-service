@@ -29,6 +29,12 @@ public class MembershipNotFoundException extends ResourceNotFoundException {
     this.tenantKey = tenantKey;
   }
 
+  public MembershipNotFoundException(final String message) {
+    super(message);
+    this.userId = null;
+    this.tenantKey = null;
+  }
+
   public UUID getUserId() {
     return userId;
   }

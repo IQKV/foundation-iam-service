@@ -49,6 +49,7 @@ import com.iqkv.foundation.iamservice.shared.exception.TenantNotAvailableExcepti
 import com.iqkv.foundation.iamservice.shared.exception.TenantSuspendedException;
 import com.iqkv.foundation.iamservice.shared.exception.UserNotFoundException;
 import com.iqkv.foundation.iamservice.shared.util.UserServiceConstants;
+import com.iqkv.foundation.iamservice.team.TeamMemberMapper;
 import com.iqkv.foundation.iamservice.tenant.DefaultTenantResolver;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
@@ -84,6 +85,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
   private final UserEventPublisher userEventPublisher;
   private final PlatformConfigurationProperties platformProps;
   private final Optional<DefaultTenantResolver> defaultTenantResolver;
+  private final TeamMemberMapper teamMemberMapper;
 
   public MagicLinkServiceImpl(
       final UserMapper userMapper,
@@ -101,7 +103,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
       final PasswordEncoder passwordEncoder,
       final UserEventPublisher userEventPublisher,
       final PlatformConfigurationProperties platformProps,
-      final Optional<DefaultTenantResolver> defaultTenantResolver) {
+      final Optional<DefaultTenantResolver> defaultTenantResolver,
+      final TeamMemberMapper teamMemberMapper) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.magicLinkTokenMapper = magicLinkTokenMapper;
@@ -118,6 +121,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     this.userEventPublisher = userEventPublisher;
     this.platformProps = platformProps;
     this.defaultTenantResolver = defaultTenantResolver;
+    this.teamMemberMapper = teamMemberMapper;
   }
 
   @Override
@@ -416,7 +420,10 @@ public class MagicLinkServiceImpl implements MagicLinkService {
     }
 
     final String accessToken = jwtTokenGenerator.generateAccessToken(
-        user, mlt.getTenantKey(), authorities, tenant.getActivePlanCode());
+        user, mlt.getTenantKey(), authorities, tenant.getActivePlanCode(),
+        PLATFORM_TENANT_KEY.equals(mlt.getTenantKey())
+            ? teamMemberMapper.findActiveTeamIdsByUserId(user.getId())
+            : java.util.List.of());
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, mlt.getTenantKey());
 
     return new TokenResponse(accessToken, refreshToken, mlt.getTenantKey());

@@ -27,6 +27,7 @@ The IAM service handles the full identity lifecycle for a SaaS platform:
 - **Platform Health Notes** — operator-only note-pad for tracking incidents, maintenance windows, and operational observations; notes are internal and never tenant-visible; backed by `/admin/platform-notes` (CRUD with severity `INFO`/`WARNING`/`CRITICAL` and status `OPEN`/`RESOLVED`/`ARCHIVED`); also serves as the reference backend for the `platform-health-notes` UI addon
 - **Platform rollout mode** — publishes canonical `platform.rollout-mode` via `/actuator/info` for gateway and billing service consistency checks
 - **Plan feature enforcement** — `PlanFeatureGuard` resolves the caller's active plan features from a local cache (populated at startup from the billing service) and throws `PlanFeatureNotAvailableException` when a gated endpoint is called by a plan that does not include the required feature; the `plan_code` JWT claim is the only runtime input required
+- **Teams** — lightweight collaboration groups within the platform workspace; users invite colleagues by email into a named team (roles: `OWNER`, `ADMIN`, `MEMBER`); team membership is embedded in the access token (`team_ids` claim) so downstream services can enforce team-scoped visibility in `t_platform` without a cross-service call; teams are not tenants — no schema provisioning, no billing plan
 
 ## Quick Links
 
@@ -166,6 +167,28 @@ Real-time delivery via WebSocket: connect to `/api/v1/iam/ws` (STOMP/SockJS) and
 | `DELETE` | `/tenants/{tenantKey}/invitations/{id}` | JWT `TENANT_OWNER`/`ADMIN` + `X-Tenant-ID` | Revoke invitation                                   |
 | `GET`    | `/invitations/{token}`                  | public                                     | Preview invitation (tenant name, authority, expiry) |
 | `POST`   | `/invitations/{token}/accept`           | public                                     | Accept invitation; returns token pair               |
+
+### Teams — `/api/v1/teams`
+
+| Method   | Path                               | Auth | Description                                                             |
+| -------- | ---------------------------------- | ---- | ----------------------------------------------------------------------- |
+| `POST`   | `/teams`                           | JWT  | Create team; caller auto-added as `OWNER`                               |
+| `GET`    | `/teams`                           | JWT  | List teams the caller is an active member of                            |
+| `GET`    | `/teams/{teamId}`                  | JWT  | Get team details + member list; caller must be active member            |
+| `PATCH`  | `/teams/{teamId}`                  | JWT  | Update team name or status; requires `OWNER` or `ADMIN`                 |
+| `GET`    | `/teams/{teamId}/members`          | JWT  | List active team members; caller must be active member                  |
+| `DELETE` | `/teams/{teamId}/members/{userId}` | JWT  | Remove member; requires `OWNER` or `ADMIN`; last `OWNER` guard enforced |
+| `PATCH`  | `/teams/{teamId}/members/{userId}` | JWT  | Change member role; `ADMIN` cannot promote to `OWNER`                   |
+| `POST`   | `/teams/{teamId}/invitations`      | JWT  | Send team invitation email; requires `OWNER` or `ADMIN`                 |
+| `GET`    | `/teams/{teamId}/invitations`      | JWT  | List pending team invitations; caller must be active member             |
+| `DELETE` | `/teams/{teamId}/invitations/{id}` | JWT  | Revoke pending invitation; inviter, `OWNER`, or `ADMIN` may revoke      |
+
+### Team Invitations — `/api/v1/team-invitations`
+
+| Method | Path                               | Auth   | Description                                                      |
+| ------ | ---------------------------------- | ------ | ---------------------------------------------------------------- |
+| `GET`  | `/team-invitations/{token}`        | public | Preview invitation (team name, role, expiry)                     |
+| `POST` | `/team-invitations/{token}/accept` | JWT    | Accept invitation; caller's email must match the invited address |
 
 ### Locales
 
@@ -438,6 +461,7 @@ src/main/java/com/iqkv/foundation/iamservice/
 ├── notification/     # In-app user notifications (DB persistence + WebSocket push)
 ├── oauth2/           # OAuth2/OIDC login, account linking, tenant SSO, admin identity remediation
 ├── passwordreset/    # Forgot/reset password flow + reaper job
+├── team/             # Teams: CRUD, member management, invitation flow, reaper job
 ├── platformadmin/    # Platform operator self-service account
 ├── platformauthority/# Platform-level authorities (PLATFORM_ADMIN)
 ├── platformnote/     # Platform Health Notes (operator-only incident/obs note-pad)
@@ -472,6 +496,7 @@ Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) and [Code of 
 - **Single-tenant mode**: Strategy pattern (`SignupStrategy`, `TenantBootstrapStrategy`) branches behavior at startup and signup; `SingleTenantBootstrapStrategy` idempotently provisions the default tenant on `ApplicationReadyEvent`; `SingleTenantSignupStrategy` joins users to the default tenant with `MEMBER` authority — no tenant creation, no `TENANT_OWNER` grant
 - **Platform tenant**: Every user is automatically added to the hidden platform tenant (tenantKey = "platform") as a `MEMBER` — used for single-tenant mode and as a default workspace in multi-tenant mode; enables seamless single-to-multi tenant switching
 - **Invitations**: Token-based signup-by-invitation flow; token resolves tenant context so accept endpoints are tenant-agnostic; `authority` defaults to `MEMBER`; ShedLock-guarded reaper expires stale tokens
+- **Teams**: Lightweight platform-scoped collaboration groups (`public.teams`, `team_members`, `team_invitations`); roles `OWNER`/`ADMIN`/`MEMBER` enforced in the service layer; last-`OWNER` guard prevents orphaning; `team_ids` JWT claim embeds active memberships at token issuance so `t_platform` data-plane services can filter by team without a cross-service call; ShedLock-guarded reaper expires stale invitations
 - **Email**: Thymeleaf-rendered transactional emails via Spring Mail; MailHog for local testing
 - **Observability**: Micrometer + Prometheus; structured JSON logging with Logstash encoder; health probes for Kubernetes; `PlatformModeHealthIndicator` exposes rollout mode in `/actuator/health`; `PlatformModeInfoContributor` publishes canonical `platform.rollout-mode` in `/actuator/info`
 - **GitHub Integration**: Issue templates, labels, Dependabot, and CI workflows

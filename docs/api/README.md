@@ -303,6 +303,40 @@ For existing users: only `password` is required (used to verify identity).
 
 ---
 
+### Teams
+
+Teams are lightweight collaboration groups within the platform workspace. All team endpoints operate under the caller's `platform` JWT tenant context — no `X-Tenant-ID` header is required.
+
+#### Team Management — `/api/v1/teams`
+
+| Method   | Path                               | Auth | Description                                                                        |
+| -------- | ---------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| `POST`   | `/teams`                           | JWT  | Create team; caller auto-added as `OWNER`                                          |
+| `GET`    | `/teams`                           | JWT  | List teams the caller is an active member of                                       |
+| `GET`    | `/teams/{teamId}`                  | JWT  | Get team details + full member list; caller must be active member                  |
+| `PATCH`  | `/teams/{teamId}`                  | JWT  | Update team name or status (`ACTIVE`/`ARCHIVED`); `OWNER` or `ADMIN` only          |
+| `GET`    | `/teams/{teamId}/members`          | JWT  | List active members; caller must be active member                                  |
+| `DELETE` | `/teams/{teamId}/members/{userId}` | JWT  | Remove member; `OWNER` or `ADMIN` only; last `OWNER` guard enforced                |
+| `PATCH`  | `/teams/{teamId}/members/{userId}` | JWT  | Change member role; `ADMIN` cannot promote to `OWNER`; last `OWNER` guard enforced |
+| `POST`   | `/teams/{teamId}/invitations`      | JWT  | Send team invitation; `OWNER` or `ADMIN` only                                      |
+| `GET`    | `/teams/{teamId}/invitations`      | JWT  | List pending invitations; caller must be active member                             |
+| `DELETE` | `/teams/{teamId}/invitations/{id}` | JWT  | Revoke pending invitation; inviter, `OWNER`, or `ADMIN` may revoke                 |
+
+#### Team Invitations — `/api/v1/team-invitations`
+
+| Method | Path                               | Auth   | Description                                                             |
+| ------ | ---------------------------------- | ------ | ----------------------------------------------------------------------- |
+| `GET`  | `/team-invitations/{token}`        | public | Preview invitation — returns team name, invited email, role, and expiry |
+| `POST` | `/team-invitations/{token}/accept` | JWT    | Accept invitation; caller's email must match the invited address        |
+
+**Team roles**: `OWNER` (full control, last-owner protected) · `ADMIN` (manage members and invitations) · `MEMBER` (read access to team context)
+
+**Invitation flow**: tokens are time-limited (reuses `iqkv.invitation.token-ttl`, default 72 h); one `PENDING` invite per `(team, email)` enforced by a partial unique index; a ShedLock-guarded reaper marks stale tokens as `EXPIRED` hourly.
+
+**JWT `team_ids` claim**: access tokens issued for the `platform` tenant include a `team_ids` list of UUID strings representing the user's active team memberships. Downstream services (e.g. catalog) use this claim to enforce team-scoped visibility in `t_platform` without a cross-service call. Tokens for company tenants and platform-admin tokens do not include this claim.
+
+---
+
 ### Locales
 
 | Method | Path       | Auth   | Description            |
@@ -448,6 +482,7 @@ The service exposes a STOMP-over-SockJS endpoint for real-time push notification
 | `/topic/announcements`               | server → broadcast | Global broadcast when a site-wide announcement is published                                         |
 
 Clients must authenticate the WebSocket handshake with a valid Bearer token.
+The `team_ids` claim in the access token is available to WebSocket handlers for team-scoped push filtering.
 The user destination prefix is `/user`; the application prefix is `/app`.
 
 ---

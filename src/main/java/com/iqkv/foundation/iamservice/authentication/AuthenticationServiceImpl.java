@@ -55,6 +55,7 @@ import com.iqkv.foundation.iamservice.tenant.TenantListingService;
 import com.iqkv.foundation.iamservice.tenant.TenantMapper;
 import com.iqkv.foundation.iamservice.tenant.TenantService;
 import com.iqkv.foundation.iamservice.tenant.TenantStatus;
+import com.iqkv.foundation.iamservice.team.TeamMemberMapper;
 import com.iqkv.foundation.iamservice.user.AccountStatus;
 import com.iqkv.foundation.iamservice.user.UserMapper;
 import com.iqkv.foundation.tenancy.TenantContext;
@@ -95,6 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final IamServiceMetrics metrics;
   private final BanService banService;
   private final TenantListingService tenantListingService;
+  private final TeamMemberMapper teamMemberMapper;
 
   public AuthenticationServiceImpl(
       final UserMapper userMapper,
@@ -113,7 +115,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       final TenantService tenantService,
       final IamServiceMetrics metrics,
       final BanService banService,
-      final TenantListingService tenantListingService) {
+      final TenantListingService tenantListingService,
+      final TeamMemberMapper teamMemberMapper) {
     this.userMapper = userMapper;
     this.tenantMapper = tenantMapper;
     this.membershipMapper = membershipMapper;
@@ -131,6 +134,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.metrics = metrics;
     this.banService = banService;
     this.tenantListingService = tenantListingService;
+    this.teamMemberMapper = teamMemberMapper;
   }
 
   @Override
@@ -221,7 +225,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         final String accessToken = jwtTokenGenerator.generateAccessToken(
-            user, tenantKey, authorities, tenant.getActivePlanCode());
+            user, tenantKey, authorities, tenant.getActivePlanCode(),
+            resolveTeamIds(user.getId(), tenantKey));
         final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
         // Publish successful signin attempt event
@@ -416,7 +421,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String planCode = tenantMapper.findByTenantKey(currentTenant)
             .map(Tenant::getActivePlanCode).orElse(null);
         final String accessToken = jwtTokenGenerator.generateAccessToken(
-            user, currentTenant, authorities, planCode);
+            user, currentTenant, authorities, planCode,
+            resolveTeamIds(user.getId(), currentTenant));
         final String newRefreshToken = jwtTokenGenerator.generateRefreshToken(user, currentTenant);
 
         log.info("Token refresh successful: userId={}, tenantKey={}", user.getId(), currentTenant);
@@ -516,10 +522,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final String email = jwt.getClaimAsString(JwtClaimNames.EMAIL);
     final String tenantId = jwt.getClaimAsString(JwtClaimNames.TENANT_ID);
     final List<String> authorities = jwt.getClaimAsStringList(JwtClaimNames.AUTHORITIES);
+    final List<String> teamIds = jwt.getClaimAsStringList(JwtClaimNames.TEAM_IDS);
 
     return new AuthenticationDtos.ValidateTokenResponse(
         UUID.fromString(userId), email, tenantId,
-        authorities != null ? authorities : List.of());
+        authorities != null ? authorities : List.of(),
+        teamIds != null ? teamIds : List.of());
   }
 
   @Override
@@ -683,11 +691,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final var authorities = membershipService.getAuthorities(membership.getId());
 
     final String accessToken = jwtTokenGenerator.generateAccessToken(
-        user, tenantKey, authorities, tenant.getActivePlanCode());
+        user, tenantKey, authorities, tenant.getActivePlanCode(),
+        resolveTeamIds(userId, tenantKey));
     final String refreshToken = jwtTokenGenerator.generateRefreshToken(user, tenantKey);
 
     log.info("Tenant exchange successful: userId={}, tenantKey={}", userId, tenantKey);
     return new AuthenticationDtos.TokenResponse(accessToken, refreshToken, tenantKey);
+  }
+
+  /**
+   * Returns the user's active team IDs, but only for platform-tenant tokens.
+   * Company-tenant and admin tokens never carry team context.
+   */
+  private java.util.List<java.util.UUID> resolveTeamIds(final java.util.UUID userId, final String tenantKey) {
+    if ("platform".equals(tenantKey)) {
+      return teamMemberMapper.findActiveTeamIdsByUserId(userId);
+    }
+    return java.util.List.of();
   }
 
   /**

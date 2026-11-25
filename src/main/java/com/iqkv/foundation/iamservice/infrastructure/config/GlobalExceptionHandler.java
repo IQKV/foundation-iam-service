@@ -50,6 +50,8 @@ import com.iqkv.foundation.iamservice.shared.exception.PasswordResetTokenNotFoun
 import com.iqkv.foundation.iamservice.shared.exception.PlanMemberQuotaException;
 import com.iqkv.foundation.iamservice.shared.exception.SchemaProvisioningException;
 import com.iqkv.foundation.iamservice.shared.exception.SiteAnnouncementNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.TeamInvitationNotFoundException;
+import com.iqkv.foundation.iamservice.shared.exception.TeamNotFoundException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantAlreadyExistsException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantContextMismatchException;
 import com.iqkv.foundation.iamservice.shared.exception.TenantManagementException;
@@ -724,6 +726,32 @@ public class GlobalExceptionHandler {
         msg("error.title.not-found", locale),
         404,
         "No resource found at " + request.getRequestURI(),
+        request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
+  }
+
+  @ExceptionHandler(TeamNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleTeamNotFound(final TeamNotFoundException ex,
+                                                          final HttpServletRequest request,
+                                                          final Locale locale) {
+    log.warn("Team not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.not-found", locale),
+        404,
+        ex.getMessage(),
+        request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
+  }
+
+  @ExceptionHandler(TeamInvitationNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleTeamInvitationNotFound(final TeamInvitationNotFoundException ex,
+                                                                    final HttpServletRequest request,
+                                                                    final Locale locale) {
+    log.warn("Team invitation not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank",
+        msg("error.title.not-found", locale),
+        404,
+        ex.getMessage(),
         request);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }

@@ -102,6 +102,8 @@ class AuthenticationServiceImplTest {
   private com.iqkv.foundation.iamservice.ban.BanService banService;
   @Mock
   private com.iqkv.foundation.iamservice.tenant.TenantListingService tenantListingService;
+  @Mock
+  private com.iqkv.foundation.iamservice.team.TeamMemberMapper teamMemberMapper;
 
   private AuthenticationServiceImpl authenticationService;
 
@@ -128,11 +130,14 @@ class AuthenticationServiceImplTest {
         tenantService,
         metrics,
         banService,
-        tenantListingService
+        tenantListingService,
+        teamMemberMapper
     );
 
     lenient().when(metrics.authDurationTimer(any(), any()))
         .thenReturn(Timer.builder("test").register(new SimpleMeterRegistry()));
+    lenient().when(teamMemberMapper.findActiveTeamIdsByUserId(any()))
+        .thenReturn(java.util.List.of());
 
     testUser = new User();
     testUser.setId(UUID.randomUUID());
@@ -172,7 +177,7 @@ class AuthenticationServiceImplTest {
     when(passwordEncoder.matches("password123", testUser.getPasswordHash())).thenReturn(true);
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any(), any()))
         .thenReturn("access-token-123");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("refresh-token-456");
@@ -206,7 +211,7 @@ class AuthenticationServiceImplTest {
     when(userMapper.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any(), any()))
         .thenReturn("new-access-token");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("new-refresh-token");
@@ -320,7 +325,7 @@ class AuthenticationServiceImplTest {
     when(userMapper.findById(testUser.getId())).thenReturn(Optional.of(testUser));
     when(membershipService.resolveMembership(testUser.getId(), "test-tenant")).thenReturn(testMembership);
     when(membershipService.getAuthorities(testMembership.getId())).thenReturn(authorities);
-    when(jwtTokenGenerator.generateAccessToken(testUser, "test-tenant", authorities, null))
+    when(jwtTokenGenerator.generateAccessToken(any(), eq("test-tenant"), any(), any(), any()))
         .thenReturn("exchanged-access-token");
     when(jwtTokenGenerator.generateRefreshToken(testUser, "test-tenant"))
         .thenReturn("exchanged-refresh-token");

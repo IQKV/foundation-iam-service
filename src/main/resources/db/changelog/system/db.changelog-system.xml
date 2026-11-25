@@ -37,6 +37,9 @@
     <include file="db/changelog/system/20260723100000-create-platform-notes-table.xml"/>
     <include file="db/changelog/system/20260723100001-create-t-platform-schema.xml"/>
     <include file="db/changelog/system/20260723100002-create-platform-admin-user.xml"/>
+    <include file="db/changelog/system/20261125100000-create-teams-table.xml"/>
+    <include file="db/changelog/system/20261125100001-create-team-members-table.xml"/>
+    <include file="db/changelog/system/20261125100002-create-team-invitations-table.xml"/>
 
     <!-- Demo data for development and testing (context: demo) -->
     <include file="db/changelog/system/demo/master.xml"/>
